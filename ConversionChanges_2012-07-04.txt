@@ -1,0 +1,4 @@
+ParameterDatabase.cs
+	- Added C_CLASS constant
+	- Added public string property Label
+	- Added RelativeClass and RelativePath

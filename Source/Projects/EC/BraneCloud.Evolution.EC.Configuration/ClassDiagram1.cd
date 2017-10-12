@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BraneCloud.EC.Configuration.BadParameterException" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>BadParameterException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BraneCloud.EC.Configuration.ParamClassLoadException" Collapsed="true">
+    <Position X="3.75" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ParamClassLoadException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BraneCloud.EC.Configuration.Parameter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.75" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAIQAAAAAAAEAAAAAAAgAACIAAAAAAAAAAAACAA=</HashCode>
+      <FileName>Parameter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="BraneCloud.EC.Configuration.ParameterDatabase" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="1.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>IAKgABRgCCLSghCHDBggBABAIIkDIEAL0BEUBQHIEMM=</HashCode>
+      <FileName>ParameterDatabase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="BraneCloud.EC.Configuration.ParameterDatabaseAdapter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="3.75" Y="1.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ParameterDatabaseAdapter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="BraneCloud.EC.Configuration.ParameterDatabaseEvent" Collapsed="true">
+    <Position X="6.75" Y="1.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAIAAEQAAAAAAgAAAAAQAAAAAQAgAAAAAAA=</HashCode>
+      <FileName>ParameterDatabaseEvent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BraneCloud.EC.Configuration.ParameterDatabaseTreeModel" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAIIQAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ParameterDatabaseTreeModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BraneCloud.EC.Configuration.ParameterDatabaseTreeNode" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="3.75" Y="2.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAQAAAA0AAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ParameterDatabaseTreeNode.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Interface Name="BraneCloud.EC.Configuration.IParameter" Collapsed="true">
+    <Position X="0.5" Y="3.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAgAACIAAAAAAAAAAAACAA=</HashCode>
+      <FileName>IParameter.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="BraneCloud.EC.Configuration.IParameterDatabase" Collapsed="true">
+    <Position X="3.75" Y="3.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAKAABQgACCQghADBAAgBABAIAkAIAACEBAUAAHAAEM=</HashCode>
+      <FileName>IParameterDatabase.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="BraneCloud.EC.Configuration.ParameterDatabaseListener" Collapsed="true">
+    <Position X="6.75" Y="3.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ParameterDatabaseListener.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Delegate Name="BraneCloud.EC.Configuration.ParameterDatabaseListenerDelegate" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>ParameterDatabaseListener.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

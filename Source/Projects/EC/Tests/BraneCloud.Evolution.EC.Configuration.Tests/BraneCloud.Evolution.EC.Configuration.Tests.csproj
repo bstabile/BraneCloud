@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{35F4781E-6D36-47E8-86A9-CED63C17E031}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BraneCloud.Evolution.EC.Configuration.Tests</RootNamespace>
+    <AssemblyName>BraneCloud.Evolution.EC.Configuration.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDependentAssemblyPaths Condition=" '$(VS100COMNTOOLS)' != '' " Include="$(VS100COMNTOOLS)..\IDE\PrivateAssemblies">
+      <Visible>False</Visible>
+    </CodeAnalysisDependentAssemblyPaths>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ECActivatorTests.cs" />
+    <Compile Include="ECNamespace.cs" />
+    <Compile Include="ECTypeMap.cs" />
+    <Compile Include="ECTypeNameMap.cs" />
+    <Compile Include="FileDictionaryTreeTests.cs" />
+    <Compile Include="ParameterFileTests.cs" />
+    <Compile Include="ParameterDatabaseTests.cs" />
+    <Compile Include="OrderedFileParsingTests.cs" />
+    <Compile Include="ParameterFileTreeTests.cs" />
+    <Compile Include="ParameterForestTests.cs" />
+    <Compile Include="ParameterTests.cs" />
+    <Compile Include="ParameterXmlParsingTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyClassTests.cs" />
+    <Compile Include="TypeNameMapping.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\BraneCloud.Evolution.Archetype\BraneCloud.Evolution.Archetype.csproj">
+      <Project>{07A344D1-F022-4785-8A3B-A90DD6E61557}</Project>
+      <Name>BraneCloud.Evolution.Archetype</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Core\BraneCloud.Evolution.Collections.Generic\BraneCloud.Evolution.Collections.Generic.csproj">
+      <Project>{78B9F0C7-5E96-4546-96BE-1856A7BFDE7B}</Project>
+      <Name>BraneCloud.Evolution.Collections.Generic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Configuration\BraneCloud.Evolution.EC.Configuration.csproj">
+      <Project>{9A7B8EFC-D36E-435D-99E2-10793AA3FFCD}</Project>
+      <Name>BraneCloud.Evolution.EC.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Evaluation\BraneCloud.Evolution.EC.Evaluation.csproj">
+      <Project>{A8AB0B32-952F-4FBA-8C34-C22CCB897977}</Project>
+      <Name>BraneCloud.Evolution.EC.Evaluation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Randomization\BraneCloud.Evolution.EC.Randomization.csproj">
+      <Project>{5993FC6C-820B-482F-AB46-961F89FC8EA1}</Project>
+      <Name>BraneCloud.Evolution.EC.Randomization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Runtime\BraneCloud.Evolution.EC.Runtime.csproj">
+      <Project>{926F38F4-D132-458C-91DB-6314AE9F2FAD}</Project>
+      <Name>BraneCloud.Evolution.EC.Runtime</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Support\BraneCloud.Evolution.EC.Support.csproj">
+      <Project>{1669FD6F-D6A2-4498-A62B-F5A831B56A83}</Project>
+      <Name>BraneCloud.Evolution.EC.Support</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC\BraneCloud.Evolution.EC.csproj">
+      <Project>{197FC1BD-8578-4DE7-9AEA-D7098A3505EA}</Project>
+      <Name>BraneCloud.Evolution.EC</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ParamFiles\ParameterFileTreeDocument.xml" />
+    <Content Include="Readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ParamFiles\ec\app\ant\ant.params" />
+    <None Include="ParamFiles\ec\app\ant\ge.params" />
+    <None Include="ParamFiles\ec\app\ant\progn4.params" />
+    <None Include="ParamFiles\ec\app\async\asesum.params" />
+    <None Include="ParamFiles\ec\app\async\sum.slave.params" />
+    <None Include="ParamFiles\ec\app\bbob\bbob.params" />
+    <None Include="ParamFiles\ec\app\bbob\de.params" />
+    <None Include="ParamFiles\ec\app\coevolve1\coevolve1.params" />
+    <None Include="ParamFiles\ec\app\coevolve2\coevolve2.params" />
+    <None Include="ParamFiles\ec\app\coevolve2\ecsuite.params" />
+    <None Include="ParamFiles\ec\app\ecsuite\de.params" />
+    <None Include="ParamFiles\ec\app\ecsuite\ecsuite.params" />
+    <None Include="ParamFiles\ec\app\ecsuite\es.params" />
+    <None Include="ParamFiles\ec\app\ecsuite\steady.params" />
+    <None Include="ParamFiles\ec\app\edge\1.params" />
+    <None Include="ParamFiles\ec\app\edge\2.params" />
+    <None Include="ParamFiles\ec\app\edge\3.params" />
+    <None Include="ParamFiles\ec\app\edge\4.params" />
+    <None Include="ParamFiles\ec\app\edge\5.params" />
+    <None Include="ParamFiles\ec\app\edge\6.params" />
+    <None Include="ParamFiles\ec\app\edge\7.params" />
+    <None Include="ParamFiles\ec\app\gui\ant.params" />
+    <None Include="ParamFiles\ec\app\gui\coevolve2.params" />
+    <None Include="ParamFiles\ec\app\hiff\hiff.params" />
+    <None Include="ParamFiles\ec\app\lawnmower\adf.params" />
+    <None Include="ParamFiles\ec\app\lawnmower\ge.params" />
+    <None Include="ParamFiles\ec\app\lawnmower\noadf.params" />
+    <None Include="ParamFiles\ec\app\moosuite\f2.params" />
+    <None Include="ParamFiles\ec\app\moosuite\fon.params" />
+    <None Include="ParamFiles\ec\app\moosuite\kur-nsga2.params" />
+    <None Include="ParamFiles\ec\app\moosuite\kur-spea2.params" />
+    <None Include="ParamFiles\ec\app\moosuite\moosuite.params" />
+    <None Include="ParamFiles\ec\app\moosuite\nsga2.params" />
+    <None Include="ParamFiles\ec\app\moosuite\pol.params" />
+    <None Include="ParamFiles\ec\app\moosuite\qv.params" />
+    <None Include="ParamFiles\ec\app\moosuite\sch.params" />
+    <None Include="ParamFiles\ec\app\moosuite\spea2.params" />
+    <None Include="ParamFiles\ec\app\moosuite\sphere.params" />
+    <None Include="ParamFiles\ec\app\moosuite\unconstrained-f3.params" />
+    <None Include="ParamFiles\ec\app\moosuite\zdt1.params" />
+    <None Include="ParamFiles\ec\app\moosuite\zdt2.params" />
+    <None Include="ParamFiles\ec\app\moosuite\zdt3.params" />
+    <None Include="ParamFiles\ec\app\moosuite\zdt4.params" />
+    <None Include="ParamFiles\ec\app\moosuite\zdt6.params" />
+    <None Include="ParamFiles\ec\app\multiplexerslow\11.params" />
+    <None Include="ParamFiles\ec\app\multiplexerslow\3.params" />
+    <None Include="ParamFiles\ec\app\multiplexerslow\6.params" />
+    <None Include="ParamFiles\ec\app\multiplexer\11.params" />
+    <None Include="ParamFiles\ec\app\multiplexer\3.params" />
+    <None Include="ParamFiles\ec\app\multiplexer\6.params" />
+    <None Include="ParamFiles\ec\app\nk\nk.params" />
+    <None Include="ParamFiles\ec\app\parity\adf.params" />
+    <None Include="ParamFiles\ec\app\parity\parity.params" />
+    <None Include="ParamFiles\ec\app\regression\erc.params" />
+    <None Include="ParamFiles\ec\app\regression\ge.params" />
+    <None Include="ParamFiles\ec\app\regression\noerc.params" />
+    <None Include="ParamFiles\ec\app\regression\noerc2.params" />
+    <None Include="ParamFiles\ec\app\regression\quinticerc.params" />
+    <None Include="ParamFiles\ec\app\regression\quinticnoerc.params" />
+    <None Include="ParamFiles\ec\app\regression\sexticerc.params" />
+    <None Include="ParamFiles\ec\app\regression\sexticnoerc.params" />
+    <None Include="ParamFiles\ec\app\regression\steadynoerc.params" />
+    <None Include="ParamFiles\ec\app\sat\sat.params" />
+    <None Include="ParamFiles\ec\app\spatial\spatial.params" />
+    <None Include="ParamFiles\ec\app\spatial\spatialcoevolve.params" />
+    <None Include="ParamFiles\ec\app\star\ant.master.params" />
+    <None Include="ParamFiles\ec\app\star\ant.slave.params" />
+    <None Include="ParamFiles\ec\app\star\coevolve1.master.params" />
+    <None Include="ParamFiles\ec\app\star\coevolve1.slave.params" />
+    <None Include="ParamFiles\ec\app\star\coevolve2.master.params" />
+    <None Include="ParamFiles\ec\app\star\coevolve2.slave.params" />
+    <None Include="ParamFiles\ec\app\sum\steadysum.params" />
+    <None Include="ParamFiles\ec\app\sum\sum.params" />
+    <None Include="ParamFiles\ec\app\tutorial1\tutorial1.params" />
+    <None Include="ParamFiles\ec\app\tutorial2\tutorial2.params" />
+    <None Include="ParamFiles\ec\app\tutorial3\tutorial3.params" />
+    <None Include="ParamFiles\ec\app\tutorial4\tutorial4.params" />
+    <None Include="ParamFiles\ec\app\twobox\adf.params" />
+    <None Include="ParamFiles\ec\app\twobox\noadf.params" />
+    <None Include="ParamFiles\ec\de\de.params" />
+    <None Include="ParamFiles\ec\ec.params" />
+    <None Include="ParamFiles\ec\es\es.params" />
+    <None Include="ParamFiles\ec\eval\master.params" />
+    <None Include="ParamFiles\ec\eval\slave.params" />
+    <None Include="ParamFiles\ec\exchange\2-Island-Server\client.params" />
+    <None Include="ParamFiles\ec\exchange\2-Island-Server\crete.params" />
+    <None Include="ParamFiles\ec\exchange\2-Island-Server\minoa.params" />
+    <None Include="ParamFiles\ec\exchange\2-Island-Server\server.params" />
+    <None Include="ParamFiles\ec\exchange\3-Island\assateague.params" />
+    <None Include="ParamFiles\ec\exchange\3-Island\chincoteague.params" />
+    <None Include="ParamFiles\ec\exchange\3-Island\client.params" />
+    <None Include="ParamFiles\ec\exchange\3-Island\server.params" />
+    <None Include="ParamFiles\ec\exchange\3-Island\wallops.params" />
+    <None Include="ParamFiles\ec\exchange\8-Island\client.params" />
+    <None Include="ParamFiles\ec\exchange\8-Island\coney.params" />
+    <None Include="ParamFiles\ec\exchange\8-Island\ellis.params" />
+    <None Include="ParamFiles\ec\exchange\8-Island\fantasy.params" />
+    <None Include="ParamFiles\ec\exchange\8-Island\gilligans.params" />
+    <None Include="ParamFiles\ec\exchange\8-Island\rhode.params" />
+    <None Include="ParamFiles\ec\exchange\8-Island\server.params" />
+    <None Include="ParamFiles\ec\exchange\8-Island\survivor.params" />
+    <None Include="ParamFiles\ec\exchange\8-Island\temptation.params" />
+    <None Include="ParamFiles\ec\exchange\8-Island\treasure.params" />
+    <None Include="ParamFiles\ec\exchange\inter.params" />
+    <None Include="ParamFiles\ec\gp\breed\breed.params" />
+    <None Include="ParamFiles\ec\gp\ge\ge.params" />
+    <None Include="ParamFiles\ec\gp\gp.params" />
+    <None Include="ParamFiles\ec\gp\koza\koza.params" />
+    <None Include="ParamFiles\ec\multiobjective\multiobjective.params" />
+    <None Include="ParamFiles\ec\multiobjective\nsga2\nsga2.params" />
+    <None Include="ParamFiles\ec\multiobjective\spea2\spea2.params" />
+    <None Include="ParamFiles\ec\pso\pso.params" />
+    <None Include="ParamFiles\ec\simple\simple.params" />
+    <None Include="ParamFiles\ec\steadystate\steadystate.params" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

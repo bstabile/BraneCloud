@@ -1,0 +1,5 @@
+Alpha2 Changes
+
+2012-04-10 : BugFix - GeneVectorIndividual - Setter for Genome Length - filling "genome" should have been filling "newGenome" when new length is greater than old length. 
+
+BRS
