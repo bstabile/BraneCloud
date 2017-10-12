@@ -1,3 +1,5 @@
+# BraneCloud
+Industrial-Strength Evolutionary Computation for .NET 4.x
 
 This is an independent port of Sean Luke's venerable ECJ project (GMU EC Lab) Version 20
 
@@ -30,5 +32,3 @@ ECJ License (AFL 3.0)
 BraneCloud.Evolution.EC (Apache 2.0) 
 (Sean informs me that he may eventually be switching to the Apache license when he gets around to it.) 
 
-# BraneCloud
-Industrial-Strength Evolutionary Computation for .NET 4.x
