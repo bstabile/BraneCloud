@@ -1,0 +1,318 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{197FC1BD-8578-4DE7-9AEA-D7098A3505EA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BraneCloud.Evolution.EC</RootNamespace>
+    <AssemblyName>BraneCloud.Evolution.EC</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Breed\BreedDefaults.cs" />
+    <Compile Include="Breed\BufferedBreedingPipeline.cs" />
+    <Compile Include="Breed\ForceBreedingPipeline.cs" />
+    <Compile Include="Breed\GenerationSwitchPipeline.cs" />
+    <Compile Include="Breed\MultiBreedingPipeline.cs" />
+    <Compile Include="Breed\ReproductionPipeline.cs" />
+    <Compile Include="CoEvolve\IGroupedProblem.cs" />
+    <Compile Include="Core\Breeder.cs" />
+    <Compile Include="Core\BreedingPipeline.cs" />
+    <Compile Include="Core\BreedingSource.cs" />
+    <Compile Include="Core\Constants.cs" />
+    <Compile Include="Core\Finisher.cs" />
+    <Compile Include="Core\Interfaces\IEvaluator.cs" />
+    <Compile Include="Core\Interfaces\IDefaults.cs" />
+    <Compile Include="Core\ECDefaults.cs" />
+    <Compile Include="Core\EvolutionState.cs" />
+    <Compile Include="Core\Exchanger.cs" />
+    <Compile Include="Core\Interfaces\IFinisher.cs" />
+    <Compile Include="Core\Fitness.cs" />
+    <Compile Include="Core\Interfaces\IGroup.cs" />
+    <Compile Include="Core\Interfaces\IBreeder.cs" />
+    <Compile Include="Core\Interfaces\IBreedingPipeline.cs" />
+    <Compile Include="Core\Interfaces\IBreedingSource.cs" />
+    <Compile Include="Core\Interfaces\IClique.cs" />
+    <Compile Include="Core\Interfaces\IEvolutionState.cs" />
+    <Compile Include="Core\Interfaces\IFitness.cs" />
+    <Compile Include="Core\Individual.cs" />
+    <Compile Include="Core\Initializer.cs" />
+    <Compile Include="Core\Interfaces\IStateManager.cs" />
+    <Compile Include="DE\IDEEvaluator.cs" />
+    <Compile Include="Eval\IJob.cs" />
+    <Compile Include="Eval\IMasterProblem.cs" />
+    <Compile Include="Core\Interfaces\IProblem.cs" />
+    <Compile Include="Core\Interfaces\IPrototype.cs" />
+    <Compile Include="Core\Interfaces\ISetup.cs" />
+    <Compile Include="Core\Interfaces\ISingleton.cs" />
+    <Compile Include="Eval\ISlaveConnection.cs" />
+    <Compile Include="Eval\ISlaveMonitor.cs" />
+    <Compile Include="Eval\SlaveEvaluationType.cs" />
+    <Compile Include="Eval\SlaveReturnType.cs" />
+    <Compile Include="GP\Build\UniformGPNodeStorage.cs" />
+    <Compile Include="GP\GE\Breed\GETruncationPipeline.cs" />
+    <Compile Include="GP\GE\GEDefaults.cs" />
+    <Compile Include="GP\GE\GEIndividual.cs" />
+    <Compile Include="GP\GE\GEProblem.cs" />
+    <Compile Include="GP\GE\GESpecies.cs" />
+    <Compile Include="GP\GE\GrammarFunctionNode.cs" />
+    <Compile Include="GP\GE\GrammarNode.cs" />
+    <Compile Include="GP\GE\GrammarParser.cs" />
+    <Compile Include="GP\GE\GrammarRuleNode.cs" />
+    <Compile Include="GP\GE\IGPProblemParent.cs" />
+    <Compile Include="GP\IGPProblem.cs" />
+    <Compile Include="MultiObjective\MultiObjectiveFitnessComparator.cs" />
+    <Compile Include="MultiObjective\MultiObjectiveStatistics.cs" />
+    <Compile Include="MultiObjective\Nsga2\INSGA2Evaluator.cs" />
+    <Compile Include="MultiObjective\Nsga2\NSGA2Breeder.cs" />
+    <Compile Include="MultiObjective\Nsga2\NSGA2MultiObjectiveFitness.cs" />
+    <Compile Include="MultiObjective\Nsga2\NSGA2MultiObjectiveFitnessComparator.cs" />
+    <Compile Include="MultiObjective\Spea2\ISPEA2Evaluator.cs" />
+    <Compile Include="Select\BoltzmannSelection.cs" />
+    <Compile Include="Select\SigmaScalingSelection.cs" />
+    <Compile Include="Select\SUSSelection.cs" />
+    <Compile Include="Core\Population.cs" />
+    <Compile Include="Core\Problem.cs" />
+    <Compile Include="DE\Best1BinDEBreeder.cs" />
+    <Compile Include="DE\DEBreeder.cs" />
+    <Compile Include="DE\Rand1EitherOrDEBreeder.cs" />
+    <Compile Include="ES\ESDefaults.cs" />
+    <Compile Include="ES\ESSelection.cs" />
+    <Compile Include="ES\MuCommaLambdaBreeder.cs" />
+    <Compile Include="ES\MuPlusLambdaBreeder.cs" />
+    <Compile Include="ModelFactory.cs" />
+    <Compile Include="GP\ADF.cs" />
+    <Compile Include="GP\ADFArgument.cs" />
+    <Compile Include="GP\ADFContext.cs" />
+    <Compile Include="GP\ADFStack.cs" />
+    <Compile Include="GP\ADM.cs" />
+    <Compile Include="GP\Breed\GPBreedDefaults.cs" />
+    <Compile Include="GP\Breed\InternalCrossoverPipeline.cs" />
+    <Compile Include="GP\Breed\MutateAllNodesPipeline.cs" />
+    <Compile Include="GP\Breed\MutateDemotePipeline.cs" />
+    <Compile Include="GP\Breed\MutateERCPipeline.cs" />
+    <Compile Include="GP\Breed\MutateOneNodePipeline.cs" />
+    <Compile Include="GP\Breed\MutatePromotePipeline.cs" />
+    <Compile Include="GP\Breed\MutateSwapPipeline.cs" />
+    <Compile Include="GP\Breed\RehangPipeline.cs" />
+    <Compile Include="GP\Build\GPBuildDefaults.cs" />
+    <Compile Include="GP\Build\PTC1.cs" />
+    <Compile Include="GP\Build\PTC2.cs" />
+    <Compile Include="GP\Build\PTCFunctionSet.cs" />
+    <Compile Include="GP\Build\IPTCFunctionSet.cs" />
+    <Compile Include="GP\Build\RandomBranch.cs" />
+    <Compile Include="GP\Build\RandTree.cs" />
+    <Compile Include="GP\Build\Uniform.cs" />
+    <Compile Include="GP\ERC.cs" />
+    <Compile Include="GP\GPAtomicType.cs" />
+    <Compile Include="GP\GPBreedingPipeline.cs" />
+    <Compile Include="GP\GPData.cs" />
+    <Compile Include="GP\GPDefaults.cs" />
+    <Compile Include="GP\GPFunctionSet.cs" />
+    <Compile Include="GP\GPIndividual.cs" />
+    <Compile Include="GP\GPInitializer.cs" />
+    <Compile Include="GP\GPNode.cs" />
+    <Compile Include="GP\GPNodeBuilder.cs" />
+    <Compile Include="GP\GPNodeConstraints.cs" />
+    <Compile Include="GP\GPNodeGatherer.cs" />
+    <Compile Include="GP\IGPNodeParent.cs" />
+    <Compile Include="GP\IGPNodeSelector.cs" />
+    <Compile Include="GP\GPProblem.cs" />
+    <Compile Include="GP\GPSetType.cs" />
+    <Compile Include="GP\GPSpecies.cs" />
+    <Compile Include="GP\GPTree.cs" />
+    <Compile Include="GP\GPTreeConstraints.cs" />
+    <Compile Include="GP\GPType.cs" />
+    <Compile Include="GP\Koza\CrossoverPipeline.cs" />
+    <Compile Include="GP\Koza\FullBuilder.cs" />
+    <Compile Include="GP\Koza\GPKozaDefaults.cs" />
+    <Compile Include="GP\Koza\GrowBuilder.cs" />
+    <Compile Include="GP\Koza\HalfBuilder.cs" />
+    <Compile Include="GP\Koza\KozaBuilder.cs" />
+    <Compile Include="GP\Koza\KozaFitness.cs" />
+    <Compile Include="GP\Koza\KozaNodeSelector.cs" />
+    <Compile Include="GP\Koza\KozaShortStatistics.cs" />
+    <Compile Include="GP\Koza\MutationPipeline.cs" />
+    <Compile Include="MultiObjective\MultiObjectiveDefaults.cs" />
+    <Compile Include="MultiObjective\MultiObjectiveFitness.cs" />
+    <Compile Include="MultiObjective\Spea2\SPEA2Breeder.cs" />
+    <Compile Include="MultiObjective\Spea2\SPEA2MultiObjectiveFitness.cs" />
+    <Compile Include="MultiObjective\Spea2\SPEA2TournamentSelection.cs" />
+    <Compile Include="Parsimony\BucketTournamentSelection.cs" />
+    <Compile Include="Parsimony\DoubleTournamentSelection.cs" />
+    <Compile Include="Parsimony\LexicographicTournamentSelection.cs" />
+    <Compile Include="Parsimony\ProportionalTournamentSelection.cs" />
+    <Compile Include="Parsimony\RatioBucketTournamentSelection.cs" />
+    <Compile Include="Parsimony\TarpeianStatistics.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Core\SelectionMethod.cs" />
+    <Compile Include="Core\Species.cs" />
+    <Compile Include="Core\Statistics.cs" />
+    <Compile Include="Core\Subpopulation.cs" />
+    <Compile Include="PSO\PSOBreeder.cs" />
+    <Compile Include="PSO\PSOSubpopulation.cs" />
+    <Compile Include="Rule\Breed\RuleCrossoverPipeline.cs" />
+    <Compile Include="Rule\Breed\RuleMutationPipeline.cs" />
+    <Compile Include="Rule\Rule.cs" />
+    <Compile Include="Rule\RuleConstraints.cs" />
+    <Compile Include="Rule\RuleDefaults.cs" />
+    <Compile Include="Rule\RuleIndividual.cs" />
+    <Compile Include="Rule\RuleInitializer.cs" />
+    <Compile Include="Rule\RuleSet.cs" />
+    <Compile Include="Rule\RuleSetConstraints.cs" />
+    <Compile Include="Rule\RuleSpecies.cs" />
+    <Compile Include="Select\BestSelection.cs" />
+    <Compile Include="Select\FirstSelection.cs" />
+    <Compile Include="Select\FitProportionateSelection.cs" />
+    <Compile Include="Select\GreedyOverselection.cs" />
+    <Compile Include="Select\MultiSelection.cs" />
+    <Compile Include="Select\RandomSelection.cs" />
+    <Compile Include="Select\SelectDefaults.cs" />
+    <Compile Include="Select\TournamentSelection.cs" />
+    <Compile Include="Simple\SimpleBreeder.cs" />
+    <Compile Include="Simple\SimpleDefaults.cs" />
+    <Compile Include="Simple\SimpleEvolutionState.cs" />
+    <Compile Include="Simple\SimpleExchanger.cs" />
+    <Compile Include="Simple\SimpleFinisher.cs" />
+    <Compile Include="Simple\SimpleFitness.cs" />
+    <Compile Include="Simple\SimpleInitializer.cs" />
+    <Compile Include="Simple\ISimpleProblem.cs" />
+    <Compile Include="Simple\SimpleShortStatistics.cs" />
+    <Compile Include="Simple\SimpleStatistics.cs" />
+    <Compile Include="Spatial\ISpace.cs" />
+    <Compile Include="Spatial\Spatial1DSubpopulation.cs" />
+    <Compile Include="Spatial\SpatialBreeder.cs" />
+    <Compile Include="Spatial\SpatialDefaults.cs" />
+    <Compile Include="Spatial\SpatialTournamentSelection.cs" />
+    <Compile Include="SteadyState\ISteadyStateEvaluator.cs" />
+    <Compile Include="SteadyState\QueueIndividual.cs" />
+    <Compile Include="SteadyState\SteadyStateBreeder.cs" />
+    <Compile Include="SteadyState\ISteadyStateBSource.cs" />
+    <Compile Include="SteadyState\SteadyStateDefaults.cs" />
+    <Compile Include="SteadyState\SteadyStateEvolutionState.cs" />
+    <Compile Include="SteadyState\ISteadyStateExchanger.cs" />
+    <Compile Include="SteadyState\ISteadyStateStatistics.cs" />
+    <Compile Include="Util\Checkpoint.cs" />
+    <Compile Include="Util\Code.cs" />
+    <Compile Include="Util\DecodeReturn.cs" />
+    <Compile Include="Util\ExpressionUtil.cs" />
+    <Compile Include="Util\GELexer.cs" />
+    <Compile Include="Util\IGELexer.cs" />
+    <Compile Include="Util\GELexer_OLD.cs" />
+    <Compile Include="Util\ISortComparatorUL.cs" />
+    <Compile Include="Util\LocalHost.cs" />
+    <Compile Include="Util\NullOp.cs" />
+    <Compile Include="Util\Operator.cs" />
+    <Compile Include="Util\QuickSort.cs" />
+    <Compile Include="Util\ISortComparator.cs" />
+    <Compile Include="Util\ISortComparatorL.cs" />
+    <Compile Include="Util\TensorFactory.cs" />
+    <Compile Include="Util\Version.cs" />
+    <Compile Include="Vector\BitVectorIndividual.cs" />
+    <Compile Include="Vector\Breed\GeneDuplicationPipeline.cs" />
+    <Compile Include="Vector\Breed\ListCrossoverPipeline.cs" />
+    <Compile Include="Vector\Breed\MultipleVectorCrossoverPipeline.cs" />
+    <Compile Include="Vector\Breed\VectorCrossoverPipeline.cs" />
+    <Compile Include="Vector\Breed\VectorMutationPipeline.cs" />
+    <Compile Include="Vector\ByteVectorIndividual.cs" />
+    <Compile Include="Vector\DoubleVectorIndividual.cs" />
+    <Compile Include="Vector\FloatVectorIndividual.cs" />
+    <Compile Include="Vector\FloatVectorSpecies.cs" />
+    <Compile Include="Vector\GeneVectorIndividual.cs" />
+    <Compile Include="Vector\GeneVectorSpecies.cs" />
+    <Compile Include="Vector\IntegerVectorIndividual.cs" />
+    <Compile Include="Vector\IntegerVectorSpecies.cs" />
+    <Compile Include="Vector\IntegralVectorIndividual_EXP.cs" />
+    <Compile Include="Vector\IntegralVectorSpecies_EXP.cs" />
+    <Compile Include="Vector\LongVectorIndividual.cs" />
+    <Compile Include="Vector\ShortVectorIndividual.cs" />
+    <Compile Include="Vector\VectorDefaults.cs" />
+    <Compile Include="Vector\VectorGene.cs" />
+    <Compile Include="Vector\VectorIndividual.cs" />
+    <Compile Include="Vector\VectorSpecies.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BraneCloud.Evolution.EC.Configuration\BraneCloud.Evolution.EC.Configuration.csproj">
+      <Project>{9A7B8EFC-D36E-435D-99E2-10793AA3FFCD}</Project>
+      <Name>BraneCloud.Evolution.EC.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BraneCloud.Evolution.EC.Logging\BraneCloud.Evolution.EC.Logging.csproj">
+      <Project>{E5ECCEA3-0448-40CD-98B2-BC70578807B1}</Project>
+      <Name>BraneCloud.Evolution.EC.Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BraneCloud.Evolution.EC.Randomization\BraneCloud.Evolution.EC.Randomization.csproj">
+      <Project>{5993FC6C-820B-482F-AB46-961F89FC8EA1}</Project>
+      <Name>BraneCloud.Evolution.EC.Randomization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BraneCloud.Evolution.EC.Support\BraneCloud.Evolution.EC.Support.csproj">
+      <Project>{1669FD6F-D6A2-4498-A62B-F5A831B56A83}</Project>
+      <Name>BraneCloud.Evolution.EC.Support</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Readme.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

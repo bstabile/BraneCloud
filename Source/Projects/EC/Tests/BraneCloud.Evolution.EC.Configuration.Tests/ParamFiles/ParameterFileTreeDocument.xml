@@ -1,0 +1,2440 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- 
+  This file is output by an instance of ParameterFileTree. 
+  It is produced by parsing all param files beginning with 
+  the root "ec" directory.
+-->
+<root path="W:\BraneCloud.trunk\Solutions\EC\ParamFiles\ec">
+  <files count="1">
+    <file name="ec.params" propertyCount="6">
+      <property key="evalthreads" value="1" />
+      <property key="breedthreads" value="1" />
+      <property key="seed.0" value="time" />
+      <property key="checkpoint" value="false" />
+      <property key="checkpoint-modulo" value="1" />
+      <property key="prefix" value="ec" />
+    </file>
+  </files>
+  <directory name="app">
+    <files count="0" />
+    <directory name="ant">
+      <files count="3">
+        <file name="ant.params" propertyCount="22">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="gp.fs.size" value="1" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.func.0" value="ec.app.ant.func.Left" />
+          <property key="gp.fs.0.func.0.nc" value="nc0" />
+          <property key="gp.fs.0.func.1" value="ec.app.ant.func.Right" />
+          <property key="gp.fs.0.func.1.nc" value="nc0" />
+          <property key="gp.fs.0.func.2" value="ec.app.ant.func.Move" />
+          <property key="gp.fs.0.func.2.nc" value="nc0" />
+          <property key="gp.fs.0.func.3" value="ec.app.ant.func.IfFoodAhead" />
+          <property key="gp.fs.0.func.3.nc" value="nc2" />
+          <property key="gp.fs.0.func.4" value="ec.app.ant.func.Progn2" />
+          <property key="gp.fs.0.func.4.nc" value="nc2" />
+          <property key="gp.fs.0.func.5" value="ec.app.ant.func.Progn3" />
+          <property key="gp.fs.0.func.5.nc" value="nc3" />
+          <property key="gp.fs.0.func.6" value="ec.app.ant.func.Progn4" />
+          <property key="gp.fs.0.func.6.nc" value="nc4" />
+          <property key="eval.problem" value="ec.app.ant.Ant" />
+          <property key="eval.problem.data" value="ec.app.ant.AntData" />
+          <property key="gp.fs.0.size" value="6" />
+          <property key="eval.problem.moves" value="400" />
+          <property key="eval.problem.file" value="santafe.trl" />
+        </file>
+        <file name="ge.params" propertyCount="7">
+          <property key="parent.0" value="../../gp/ge/ge.params" />
+          <property key="parent.1" value="ant.params" />
+          <property key="ge.species.file.0" value="ant.grammar" />
+          <property key="eval.problem.problem" value="ec.app.ant.Ant" />
+          <property key="eval.problem.problem.data" value="ec.app.ant.AntData" />
+          <property key="eval.problem.problem.moves" value="400" />
+          <property key="eval.problem.problem.file" value="santafe.trl" />
+        </file>
+        <file name="progn4.params" propertyCount="4">
+          <property key="parent.0" value="ant.params" />
+          <property key="gp.fs.0.size" value="7" />
+          <property key="eval.problem.moves" value="400" />
+          <property key="eval.problem.file" value="santafe.trl" />
+        </file>
+      </files>
+    </directory>
+    <directory name="async">
+      <files count="2">
+        <file name="asesum.params" propertyCount="3">
+          <property key="parent.0" value="steadysum.params" />
+          <property key="parent.1" value="../../eval/master.params" />
+          <property key="state" value="ec.eval.AsynchronousEvolutionState" />
+        </file>
+        <file name="sum.slave.params" propertyCount="5">
+          <property key="parent.0" value="asesum.params" />
+          <property key="eval.i-am-slave" value="true" />
+          <property key="eval.stat" value="ec.Statistics" />
+          <property key="eval.stat.num-children" value="0" />
+          <property key="eval.master.host" value="127.0.0.1" />
+        </file>
+      </files>
+    </directory>
+    <directory name="bbob">
+      <files count="2">
+        <file name="bbob.params" propertyCount="32">
+          <property key="parent.0" value="../../ec.params" />
+          <property key="eval.problem" value="ec.app.bbob.BBOBenchmarks" />
+          <property key="eval.problem.type" value="sphere" />
+          <property key="noise" value="none" />
+          <property key="state" value="ec.simple.SimpleEvolutionState" />
+          <property key="init" value="ec.simple.SimpleInitializer" />
+          <property key="finish" value="ec.simple.SimpleFinisher" />
+          <property key="exch" value="ec.simple.SimpleExchanger" />
+          <property key="breed" value="ec.simple.SimpleBreeder" />
+          <property key="eval" value="ec.simple.SimpleEvaluator" />
+          <property key="stat" value="ec.simple.SimpleStatistics" />
+          <property key="generations" value="50" />
+          <property key="quit-on-run-complete" value="true" />
+          <property key="pop" value="ec.Population" />
+          <property key="pop.subpops" value="1" />
+          <property key="pop.subpop.0" value="ec.Subpopulation" />
+          <property key="pop.subpop.0.duplicate-retries" value="2" />
+          <property key="pop.subpop.0.species" value="ec.vector.FloatVectorSpecies" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="same" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.DoubleVectorIndividual" />
+          <property key="pop.subpop.0.species.min-gene" value="-5.12" />
+          <property key="pop.subpop.0.species.max-gene" value="5.12" />
+          <property key="pop.subpop.0.species.genome-size" value="50" />
+          <property key="select.tournament.size" value="2" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.005" />
+          <property key="pop.subpop.0.species.crossover-type" value="one" />
+          <property key="pop.subpop.0.size" value="200" />
+          <property key="stat.file" value="$out.stat" />
+        </file>
+        <file name="de.params" propertyCount="6">
+          <property key="parent.0" value="bbob.params" />
+          <property key="breed" value="ec.de.DEBreeder" />
+          <property key="stat" value="ec.de.DEStatistics" />
+          <property key="stat.num-children" value="1" />
+          <property key="stat.child.0" value="ec.simple.SimpleStatistics" />
+          <property key="stat.child.0.file" value="$out.stat" />
+        </file>
+      </files>
+    </directory>
+    <directory name="coevolve1">
+      <files count="1">
+        <file name="coevolve1.params" propertyCount="36">
+          <property key="parent.0" value="../../simple/simple.params" />
+          <property key="generations" value="100" />
+          <property key="quit-on-run-complete" value="true" />
+          <property key="eval" value="ec.coevolve.CompetitiveEvaluator" />
+          <property key="pop" value="ec.Population" />
+          <property key="pop.subpops" value="1" />
+          <property key="pop.subpop.0" value="ec.Subpopulation" />
+          <property key="pop.subpop.0.size" value="31" />
+          <property key="pop.subpop.0.duplicate-retries" value="2" />
+          <property key="pop.subpop.0.species" value="ec.vector.VectorSpecies" />
+          <property key="pop.subpop.0.species.genome-size" value="50" />
+          <property key="pop.subpop.0.species.chunk-size" value="1" />
+          <property key="pop.subpop.0.species.pipe" value="ec.breed.ForceBreedingPipeline" />
+          <property key="pop.subpop.0.species.pipe.num-inds" value="2" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0.source.0.size" value="3" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0.source.1" value="same" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0.source.1.size" value="3" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.BitVectorIndividual" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.01" />
+          <property key="pop.subpop.0.species.crossover-type" value="one" />
+          <property key="stat.file" value="$out.stat" />
+          <property key="select.tournament.size" value="2" />
+          <property key="eval.problem" value="ec.app.coevolve1.CompetitiveMaxOne" />
+          <property key="eval.problem.hist-size" value="1" />
+          <property key="stat.child.0.hist-size" value="1" />
+          <property key="stat.child.0.file" value="compete.stat" />
+          <property key="stat" value="ec.simple.SimpleStatistics" />
+          <property key="stat.gather-full" value="true" />
+          <property key="stat.num-children" value="0" />
+          <property key="breed.elite.0" value="1" />
+          <property key="eval.style" value="rand-1-way" />
+          <property key="eval.group-size" value="7" />
+        </file>
+      </files>
+    </directory>
+    <directory name="coevolve2">
+      <files count="2">
+        <file name="coevolve2.params" propertyCount="50">
+          <property key="parent.0" value="../../simple/simple.params" />
+          <property key="generations" value="100" />
+          <property key="quit-on-run-complete" value="false" />
+          <property key="eval" value="ec.coevolve.MultiPopCoevolutionaryEvaluator" />
+          <property key="eval.num-current" value="4" />
+          <property key="eval.num-elites" value="1" />
+          <property key="eval.num-prev" value="2" />
+          <property key="eval.select-current" value="ec.select.RandomSelection" />
+          <property key="eval.select-prev" value="ec.select.RandomSelection" />
+          <property key="eval.problem" value="ec.app.coevolve2.CoevolutionaryRosenbrock" />
+          <property key="pop.subpops" value="2" />
+          <property key="pop.subpop.0" value="ec.Subpopulation" />
+          <property key="pop.subpop.0.duplicate-retries" value="10" />
+          <property key="pop.subpop.0.size" value="16" />
+          <property key="pop.subpop.0.species" value="ec.vector.FloatVectorSpecies" />
+          <property key="pop.subpop.0.species.crossover-type" value="one" />
+          <property key="pop.subpop.0.species.genome-size" value="5" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.0.species.ind" value="ec.app.coevolve2.CoevolutionaryDoubleVectorIndividual" />
+          <property key="pop.subpop.0.species.min-gene" value="-5.12" />
+          <property key="pop.subpop.0.species.max-gene" value="5.12" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.mutation-type" value="gauss" />
+          <property key="pop.subpop.0.species.mutation-stdev" value="0.25" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.95" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.size" value="2" />
+          <property key="pop.subpop.1" value="ec.Subpopulation" />
+          <property key="pop.subpop.1.duplicate-retries" value="10" />
+          <property key="pop.subpop.1.size" value="16" />
+          <property key="pop.subpop.1.species" value="ec.vector.FloatVectorSpecies" />
+          <property key="pop.subpop.1.species.crossover-type" value="one" />
+          <property key="pop.subpop.1.species.genome-size" value="5" />
+          <property key="pop.subpop.1.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.1.species.ind" value="ec.app.coevolve2.CoevolutionaryDoubleVectorIndividual" />
+          <property key="pop.subpop.1.species.min-gene" value="-5.12" />
+          <property key="pop.subpop.1.species.max-gene" value="5.12" />
+          <property key="pop.subpop.1.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.1.species.mutation-type" value="gauss" />
+          <property key="pop.subpop.1.species.mutation-stdev" value="0.25" />
+          <property key="pop.subpop.1.species.mutation-prob" value="0.95" />
+          <property key="pop.subpop.1.species.pipe.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.1.species.pipe.source.0.size" value="2" />
+          <property key="stat" value="ec.simple.SimpleStatistics" />
+          <property key="stat.file" value="$out.stat" />
+          <property key="stat.num-children" value="1" />
+          <property key="stat.child.0" value="ec.simple.SimpleShortStatistics" />
+          <property key="stat.child.0.file" value="$out2.stat" />
+          <property key="breed.elite.0" value="1" />
+          <property key="breed.elite.1" value="1" />
+        </file>
+        <file name="ecsuite.params" propertyCount="42">
+          <property key="parent.0" value="../ecsuite/ecsuite.params" />
+          <property key="eval.problem" value="ec.app.coevolve2.CoevolutionaryECSuite" />
+          <property key="eval.problem.type" value="rosenbrock" />
+          <property key="eval" value="ec.coevolve.MultiPopCoevolutionaryEvaluator" />
+          <property key="eval.num-current" value="4" />
+          <property key="eval.num-elites" value="1" />
+          <property key="eval.num-prev" value="2" />
+          <property key="eval.select-current" value="ec.select.RandomSelection" />
+          <property key="eval.select-prev" value="ec.select.RandomSelection" />
+          <property key="pop.subpops" value="2" />
+          <property key="pop.subpop.0" value="ec.Subpopulation" />
+          <property key="pop.subpop.0.duplicate-retries" value="10" />
+          <property key="pop.subpop.0.size" value="16" />
+          <property key="pop.subpop.0.species" value="ec.vector.FloatVectorSpecies" />
+          <property key="pop.subpop.0.species.crossover-type" value="one" />
+          <property key="pop.subpop.0.species.genome-size" value="5" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.0.species.ind" value="ec.app.coevolve2.CoevolutionaryDoubleVectorIndividual" />
+          <property key="pop.subpop.0.species.min-gene" value="-5.12" />
+          <property key="pop.subpop.0.species.max-gene" value="5.12" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.mutation-type" value="gauss" />
+          <property key="pop.subpop.0.species.mutation-stdev" value="0.25" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.95" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.size" value="2" />
+          <property key="pop.subpop.1" value="ec.Subpopulation" />
+          <property key="pop.subpop.1.duplicate-retries" value="10" />
+          <property key="pop.subpop.1.size" value="16" />
+          <property key="pop.subpop.1.species" value="ec.vector.FloatVectorSpecies" />
+          <property key="pop.subpop.1.species.crossover-type" value="one" />
+          <property key="pop.subpop.1.species.genome-size" value="5" />
+          <property key="pop.subpop.1.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.1.species.ind" value="ec.app.coevolve2.CoevolutionaryDoubleVectorIndividual" />
+          <property key="pop.subpop.1.species.min-gene" value="-5.12" />
+          <property key="pop.subpop.1.species.max-gene" value="5.12" />
+          <property key="pop.subpop.1.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.1.species.mutation-type" value="gauss" />
+          <property key="pop.subpop.1.species.mutation-stdev" value="0.25" />
+          <property key="pop.subpop.1.species.mutation-prob" value="0.95" />
+          <property key="pop.subpop.1.species.pipe.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.1.species.pipe.source.0.size" value="2" />
+        </file>
+      </files>
+    </directory>
+    <directory name="ecsuite">
+      <files count="4">
+        <file name="de.params" propertyCount="3">
+          <property key="parent.0" value="../../de/de.params" />
+          <property key="parent.1" value="ecsuite.params" />
+          <property key="generations" value="1000" />
+        </file>
+        <file name="ecsuite.params" propertyCount="34">
+          <property key="parent.0" value="../../ec.params" />
+          <property key="eval.problem" value="ec.app.ecsuite.ECSuite" />
+          <property key="eval.problem.type" value="rastrigin" />
+          <property key="state" value="ec.simple.SimpleEvolutionState" />
+          <property key="init" value="ec.simple.SimpleInitializer" />
+          <property key="finish" value="ec.simple.SimpleFinisher" />
+          <property key="exch" value="ec.simple.SimpleExchanger" />
+          <property key="breed" value="ec.simple.SimpleBreeder" />
+          <property key="eval" value="ec.simple.SimpleEvaluator" />
+          <property key="stat" value="ec.simple.SimpleStatistics" />
+          <property key="generations" value="1000" />
+          <property key="quit-on-run-complete" value="true" />
+          <property key="pop" value="ec.Population" />
+          <property key="pop.subpops" value="1" />
+          <property key="pop.subpop.0" value="ec.Subpopulation" />
+          <property key="pop.subpop.0.duplicate-retries" value="2" />
+          <property key="pop.subpop.0.species" value="ec.vector.FloatVectorSpecies" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="same" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.DoubleVectorIndividual" />
+          <property key="pop.subpop.0.species.mutation-bounded" value="true" />
+          <property key="pop.subpop.0.species.min-gene" value="-5.12" />
+          <property key="pop.subpop.0.species.max-gene" value="5.12" />
+          <property key="pop.subpop.0.species.genome-size" value="100" />
+          <property key="select.tournament.size" value="2" />
+          <property key="pop.subpop.0.species.mutation-prob" value="1.0" />
+          <property key="pop.subpop.0.species.crossover-type" value="one" />
+          <property key="pop.subpop.0.species.mutation-type" value="gauss" />
+          <property key="pop.subpop.0.species.mutation-stdev" value="0.01" />
+          <property key="pop.subpop.0.size" value="1000" />
+          <property key="stat.file" value="$out.stat" />
+        </file>
+        <file name="es.params" propertyCount="4">
+          <property key="parent.0" value="../../es/es.params" />
+          <property key="parent.1" value="ecsuite.params" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.es.ESSelection" />
+          <property key="generations" value="1000" />
+        </file>
+        <file name="steady.params" propertyCount="3">
+          <property key="parent.0" value="../../steadystate/steadystate.params" />
+          <property key="parent.1" value="ecsuite.params" />
+          <property key="evaluations" value="1000000" />
+        </file>
+      </files>
+    </directory>
+    <directory name="edge">
+      <files count="7">
+        <file name="1.params" propertyCount="39">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="gp.fs.size" value="1" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.size" value="14" />
+          <property key="gp.fs.0.func.0" value="ec.app.edge.func.Double" />
+          <property key="gp.fs.0.func.0.nc" value="nc2" />
+          <property key="gp.fs.0.func.1" value="ec.app.edge.func.Bud" />
+          <property key="gp.fs.0.func.1.nc" value="nc2" />
+          <property key="gp.fs.0.func.2" value="ec.app.edge.func.Split" />
+          <property key="gp.fs.0.func.2.nc" value="nc2" />
+          <property key="gp.fs.0.func.3" value="ec.app.edge.func.Loop" />
+          <property key="gp.fs.0.func.3.nc" value="nc2" />
+          <property key="gp.fs.0.func.4" value="ec.app.edge.func.Reverse" />
+          <property key="gp.fs.0.func.4.nc" value="nc1" />
+          <property key="gp.fs.0.func.5" value="ec.app.edge.func.Accept" />
+          <property key="gp.fs.0.func.5.nc" value="nc1" />
+          <property key="gp.fs.0.func.6" value="ec.app.edge.func.Start" />
+          <property key="gp.fs.0.func.6.nc" value="nc1" />
+          <property key="gp.fs.0.func.7" value="ec.app.edge.func.Zero" />
+          <property key="gp.fs.0.func.7.nc" value="nc0" />
+          <property key="gp.fs.0.func.8" value="ec.app.edge.func.One" />
+          <property key="gp.fs.0.func.8.nc" value="nc0" />
+          <property key="gp.fs.0.func.9" value="ec.app.edge.func.Epsilon" />
+          <property key="gp.fs.0.func.9.nc" value="nc0" />
+          <property key="gp.fs.0.func.10" value="ec.app.edge.func.BBud" />
+          <property key="gp.fs.0.func.10.nc" value="nc2" />
+          <property key="gp.fs.0.func.11" value="ec.app.edge.func.BLoop" />
+          <property key="gp.fs.0.func.11.nc" value="nc2" />
+          <property key="gp.fs.0.func.12" value="ec.app.edge.func.BStart" />
+          <property key="gp.fs.0.func.12.nc" value="nc1" />
+          <property key="gp.fs.0.func.13" value="ec.app.edge.func.BAccept" />
+          <property key="gp.fs.0.func.13.nc" value="nc1" />
+          <property key="eval.problem" value="ec.app.edge.Edge" />
+          <property key="eval.problem.data" value="ec.app.edge.EdgeData" />
+          <property key="eval.problem.allpos" value="input/1.out.gz" />
+          <property key="eval.problem.allneg" value="input/1a.out.gz" />
+          <property key="eval.problem.testpos" value="input/1s.out.gz" />
+          <property key="eval.problem.testneg" value="input/1sa.out.gz" />
+          <property key="eval.problem.generalize" value="true" />
+        </file>
+        <file name="2.params" propertyCount="5">
+          <property key="parent.0" value="1.params" />
+          <property key="eval.problem.allpos" value="input/2.out.gz" />
+          <property key="eval.problem.allneg" value="input/2a.out.gz" />
+          <property key="eval.problem.testpos" value="input/2s.out.gz" />
+          <property key="eval.problem.testneg" value="input/2sa.out.gz" />
+        </file>
+        <file name="3.params" propertyCount="5">
+          <property key="parent.0" value="1.params" />
+          <property key="eval.problem.allpos" value="input/3.out.gz" />
+          <property key="eval.problem.allneg" value="input/3a.out.gz" />
+          <property key="eval.problem.testpos" value="input/3s.out.gz" />
+          <property key="eval.problem.testneg" value="input/3sa.out.gz" />
+        </file>
+        <file name="4.params" propertyCount="5">
+          <property key="parent.0" value="1.params" />
+          <property key="eval.problem.allpos" value="input/4.out.gz" />
+          <property key="eval.problem.allneg" value="input/4a.out.gz" />
+          <property key="eval.problem.testpos" value="input/4s.out.gz" />
+          <property key="eval.problem.testneg" value="input/4sa.out.gz" />
+        </file>
+        <file name="5.params" propertyCount="5">
+          <property key="parent.0" value="1.params" />
+          <property key="eval.problem.allpos" value="input/5.out.gz" />
+          <property key="eval.problem.allneg" value="input/5a.out.gz" />
+          <property key="eval.problem.testpos" value="input/5s.out.gz" />
+          <property key="eval.problem.testneg" value="input/5sa.out.gz" />
+        </file>
+        <file name="6.params" propertyCount="5">
+          <property key="parent.0" value="1.params" />
+          <property key="eval.problem.allpos" value="input/6.out.gz" />
+          <property key="eval.problem.allneg" value="input/6a.out.gz" />
+          <property key="eval.problem.testpos" value="input/6s.out.gz" />
+          <property key="eval.problem.testneg" value="input/6sa.out.gz" />
+        </file>
+        <file name="7.params" propertyCount="5">
+          <property key="parent.0" value="1.params" />
+          <property key="eval.problem.allpos" value="input/7.out.gz" />
+          <property key="eval.problem.allneg" value="input/7a.out.gz" />
+          <property key="eval.problem.testpos" value="input/7s.out.gz" />
+          <property key="eval.problem.testneg" value="input/7sa.out.gz" />
+        </file>
+      </files>
+    </directory>
+    <directory name="gui">
+      <files count="2">
+        <file name="ant.params" propertyCount="6">
+          <property key="parent.0" value="../ant/ant.params" />
+          <property key="stat.num-children" value="1" />
+          <property key="stat.child.0" value="ec.app.gui.SimpleXYSeriesChartStatistics" />
+          <property key="stat.child.0.title" value="Best of Generation" />
+          <property key="stat.child.0.x-axis-label" value="generation" />
+          <property key="stat.child.0.y-axis-label" value="fitness" />
+        </file>
+        <file name="coevolve2.params" propertyCount="10">
+          <property key="parent.0" value="../coevolve2/coevolve2.params" />
+          <property key="stat.num-children" value="2" />
+          <property key="stat.child.0" value="ec.app.gui.SimpleXYSeriesChartStatistics" />
+          <property key="stat.child.0.title" value="Best of Generation" />
+          <property key="stat.child.0.x-axis-label" value="generation" />
+          <property key="stat.child.0.y-axis-label" value="value" />
+          <property key="stat.child.1" value="ec.app.gui.SimpleBarChartStatistics" />
+          <property key="stat.child.1.title" value="Best of Generation" />
+          <property key="stat.child.1.x-axis-label" value="generation" />
+          <property key="stat.child.1.y-axis-label" value="value" />
+        </file>
+      </files>
+    </directory>
+    <directory name="hiff">
+      <files count="1">
+        <file name="hiff.params" propertyCount="20">
+          <property key="parent.0" value="../../simple/simple.params" />
+          <property key="seed.0" value="time" />
+          <property key="pop.subpop.0.species.genome-size" value="64" />
+          <property key="eval.problem" value="ec.app.hiff.HIFF" />
+          <property key="eval.problem.p" value="6" />
+          <property key="eval.problem.k" value="2" />
+          <property key="eval.problem.rc" value="2" />
+          <property key="pop.subpop.0.size" value="1000" />
+          <property key="generations" value="1000" />
+          <property key="pop.subpop.0.species" value="ec.vector.VectorSpecies" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="same" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.BitVectorIndividual" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="select.tournament.size" value="2" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.0" />
+          <property key="pop.subpop.0.species.crossover-prob" value="0.3" />
+          <property key="pop.subpop.0.species.crossover-type" value="two" />
+        </file>
+      </files>
+    </directory>
+    <directory name="lawnmower">
+      <files count="3">
+        <file name="adf.params" propertyCount="98">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="pop.subpop.0.species.ind.numtrees" value="3" />
+          <property key="pop.subpop.0.species.ind.tree.0" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.ind.tree.0.tc" value="tc0" />
+          <property key="pop.subpop.0.species.ind.tree.1" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.ind.tree.1.tc" value="tc1" />
+          <property key="pop.subpop.0.species.ind.tree.2" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.ind.tree.2.tc" value="tc2" />
+          <property key="gp.tc.size" value="3" />
+          <property key="gp.tc.0" value="ec.gp.GPTreeConstraints" />
+          <property key="gp.tc.0.name" value="tc0" />
+          <property key="gp.tc.0.fset" value="f0" />
+          <property key="gp.tc.0.returns" value="nil" />
+          <property key="gp.tc.0.init" value="ec.gp.koza.HalfBuilder" />
+          <property key="gp.tc.0.init.growp" value="0.5" />
+          <property key="gp.tc.0.init.min" value="2" />
+          <property key="gp.tc.0.init.max" value="6" />
+          <property key="gp.tc.1" value="ec.gp.GPTreeConstraints" />
+          <property key="gp.tc.1.name" value="tc1" />
+          <property key="gp.tc.1.fset" value="f1" />
+          <property key="gp.tc.1.returns" value="nil" />
+          <property key="gp.tc.1.init" value="ec.gp.koza.HalfBuilder" />
+          <property key="gp.tc.1.init.growp" value="0.5" />
+          <property key="gp.tc.1.init.min" value="2" />
+          <property key="gp.tc.1.init.max" value="6" />
+          <property key="gp.tc.2" value="ec.gp.GPTreeConstraints" />
+          <property key="gp.tc.2.name" value="tc2" />
+          <property key="gp.tc.2.fset" value="f2" />
+          <property key="gp.tc.2.returns" value="nil" />
+          <property key="gp.tc.2.init" value="ec.gp.koza.HalfBuilder" />
+          <property key="gp.tc.2.init.growp" value="0.5" />
+          <property key="gp.tc.2.init.min" value="2" />
+          <property key="gp.tc.2.init.max" value="6" />
+          <property key="gp.fs.size" value="3" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.size" value="8" />
+          <property key="gp.fs.0" value="ec.gp.GPFunctionSet" />
+          <property key="gp.fs.0.func.0" value="ec.app.lawnmower.func.LawnERC" />
+          <property key="gp.fs.0.func.0.nc" value="nc0" />
+          <property key="gp.fs.0.func.1" value="ec.app.lawnmower.func.Left" />
+          <property key="gp.fs.0.func.1.nc" value="nc0" />
+          <property key="gp.fs.0.func.2" value="ec.app.lawnmower.func.Mow" />
+          <property key="gp.fs.0.func.2.nc" value="nc0" />
+          <property key="gp.fs.0.func.3" value="ec.app.lawnmower.func.V8a" />
+          <property key="gp.fs.0.func.3.nc" value="nc2" />
+          <property key="gp.fs.0.func.4" value="ec.app.lawnmower.func.Progn2" />
+          <property key="gp.fs.0.func.4.nc" value="nc2" />
+          <property key="gp.fs.0.func.5" value="ec.app.lawnmower.func.Frog" />
+          <property key="gp.fs.0.func.5.nc" value="nc1" />
+          <property key="gp.fs.0.func.6" value="ec.gp.ADF" />
+          <property key="gp.fs.0.func.6.nc" value="nc0" />
+          <property key="gp.fs.0.func.6.tree" value="1" />
+          <property key="gp.fs.0.func.6.name" value="ADF0" />
+          <property key="gp.fs.0.func.7" value="ec.gp.ADF" />
+          <property key="gp.fs.0.func.7.nc" value="nc1" />
+          <property key="gp.fs.0.func.7.tree" value="2" />
+          <property key="gp.fs.0.func.7.name" value="ADF1" />
+          <property key="gp.fs.1" value="ec.gp.GPFunctionSet" />
+          <property key="gp.fs.1.name" value="f1" />
+          <property key="gp.fs.1.size" value="5" />
+          <property key="gp.fs.1.func.0" value="ec.app.lawnmower.func.LawnERC" />
+          <property key="gp.fs.1.func.0.nc" value="nc0" />
+          <property key="gp.fs.1.func.1" value="ec.app.lawnmower.func.Left" />
+          <property key="gp.fs.1.func.1.nc" value="nc0" />
+          <property key="gp.fs.1.func.2" value="ec.app.lawnmower.func.Mow" />
+          <property key="gp.fs.1.func.2.nc" value="nc0" />
+          <property key="gp.fs.1.func.3" value="ec.app.lawnmower.func.V8a" />
+          <property key="gp.fs.1.func.3.nc" value="nc2" />
+          <property key="gp.fs.1.func.4" value="ec.app.lawnmower.func.Progn2" />
+          <property key="gp.fs.1.func.4.nc" value="nc2" />
+          <property key="gp.fs.2" value="ec.gp.GPFunctionSet" />
+          <property key="gp.fs.2.name" value="f2" />
+          <property key="gp.fs.2.size" value="8" />
+          <property key="gp.fs.2.func.0" value="ec.app.lawnmower.func.LawnERC" />
+          <property key="gp.fs.2.func.0.nc" value="nc0" />
+          <property key="gp.fs.2.func.1" value="ec.app.lawnmower.func.Left" />
+          <property key="gp.fs.2.func.1.nc" value="nc0" />
+          <property key="gp.fs.2.func.2" value="ec.app.lawnmower.func.Mow" />
+          <property key="gp.fs.2.func.2.nc" value="nc0" />
+          <property key="gp.fs.2.func.3" value="ec.app.lawnmower.func.V8a" />
+          <property key="gp.fs.2.func.3.nc" value="nc2" />
+          <property key="gp.fs.2.func.4" value="ec.app.lawnmower.func.Progn2" />
+          <property key="gp.fs.2.func.4.nc" value="nc2" />
+          <property key="gp.fs.2.func.5" value="ec.app.lawnmower.func.Frog" />
+          <property key="gp.fs.2.func.5.nc" value="nc1" />
+          <property key="gp.fs.2.func.6" value="ec.gp.ADFArgument" />
+          <property key="gp.fs.2.func.6.nc" value="nc0" />
+          <property key="gp.fs.2.func.6.name" value="ARG0" />
+          <property key="gp.fs.2.func.6.arg" value="0" />
+          <property key="gp.fs.2.func.7" value="ec.gp.ADF" />
+          <property key="gp.fs.2.func.7.nc" value="nc0" />
+          <property key="gp.fs.2.func.7.tree" value="1" />
+          <property key="gp.fs.2.func.7.name" value="ADF0" />
+          <property key="eval.problem" value="ec.app.lawnmower.Lawnmower" />
+          <property key="eval.problem.data" value="ec.app.lawnmower.LawnmowerData" />
+          <property key="eval.problem.x" value="8" />
+          <property key="eval.problem.y" value="8" />
+          <property key="stat.gather-full" value="true" />
+        </file>
+        <file name="ge.params" propertyCount="16">
+          <property key="parent.0" value="../../gp/ge/ge.params" />
+          <property key="parent.1" value="adf.params" />
+          <property key="ge.species.file.0" value="lawnmower.grammar" />
+          <property key="ge.species.file.1" value="adf0.grammar" />
+          <property key="ge.species.file.2" value="adf1.grammar" />
+          <property key="eval.problem.problem" value="ec.app.lawnmower.Lawnmower" />
+          <property key="eval.problem.problem.data" value="ec.app.lawnmower.LawnmowerData" />
+          <property key="eval.problem.problem.x" value="8" />
+          <property key="eval.problem.problem.y" value="8" />
+          <property key="pop.subpop.0.species.gp-species.ind.numtrees" value="3" />
+          <property key="pop.subpop.0.species.gp-species.ind.tree.0" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.gp-species.ind.tree.0.tc" value="tc0" />
+          <property key="pop.subpop.0.species.gp-species.ind.tree.1" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.gp-species.ind.tree.1.tc" value="tc1" />
+          <property key="pop.subpop.0.species.gp-species.ind.tree.2" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.gp-species.ind.tree.2.tc" value="tc2" />
+        </file>
+        <file name="noadf.params" propertyCount="21">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="gp.fs.size" value="1" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.size" value="6" />
+          <property key="gp.fs.0.func.0" value="ec.app.lawnmower.func.LawnERC" />
+          <property key="gp.fs.0.func.0.nc" value="nc0" />
+          <property key="gp.fs.0.func.1" value="ec.app.lawnmower.func.Left" />
+          <property key="gp.fs.0.func.1.nc" value="nc0" />
+          <property key="gp.fs.0.func.2" value="ec.app.lawnmower.func.Mow" />
+          <property key="gp.fs.0.func.2.nc" value="nc0" />
+          <property key="gp.fs.0.func.3" value="ec.app.lawnmower.func.V8a" />
+          <property key="gp.fs.0.func.3.nc" value="nc2" />
+          <property key="gp.fs.0.func.4" value="ec.app.lawnmower.func.Progn2" />
+          <property key="gp.fs.0.func.4.nc" value="nc2" />
+          <property key="gp.fs.0.func.5" value="ec.app.lawnmower.func.Frog" />
+          <property key="gp.fs.0.func.5.nc" value="nc1" />
+          <property key="eval.problem" value="ec.app.lawnmower.Lawnmower" />
+          <property key="eval.problem.data" value="ec.app.lawnmower.LawnmowerData" />
+          <property key="eval.problem.x" value="8" />
+          <property key="eval.problem.y" value="8" />
+          <property key="stat.gather-full" value="true" />
+        </file>
+      </files>
+    </directory>
+    <directory name="moosuite">
+      <files count="17">
+        <file name="f2.params" propertyCount="6">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="f2" />
+          <property key="pop.subpop.0.species.min-gene" value="-5" />
+          <property key="pop.subpop.0.species.max-gene" value="10" />
+          <property key="pop.subpop.0.species.genome-size" value="1" />
+          <property key="pop.subpop.0.species.mutation-prob" value="1" />
+        </file>
+        <file name="fon.params" propertyCount="7">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="fon" />
+          <property key="pop.subpop.0.species.fitness.maximize" value="false" />
+          <property key="pop.subpop.0.species.min-gene" value="-4" />
+          <property key="pop.subpop.0.species.max-gene" value="4" />
+          <property key="pop.subpop.0.species.genome-size" value="3" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.3333" />
+        </file>
+        <file name="kur-nsga2.params" propertyCount="6">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="kur-nsga2" />
+          <property key="pop.subpop.0.species.min-gene" value="-5" />
+          <property key="pop.subpop.0.species.max-gene" value="5" />
+          <property key="pop.subpop.0.species.genome-size" value="3" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.3333" />
+        </file>
+        <file name="kur-spea2.params" propertyCount="6">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="kur-spea2" />
+          <property key="pop.subpop.0.species.min-gene" value="-5" />
+          <property key="pop.subpop.0.species.max-gene" value="5" />
+          <property key="pop.subpop.0.species.genome-size" value="3" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.3333" />
+        </file>
+        <file name="moosuite.params" propertyCount="12">
+          <property key="parent.0" value="nsga2.params" />
+          <property key="eval.problem" value="ec.app.moosuite.MooSuite" />
+          <property key="pop.subpop.0.species" value="ec.vector.FloatVectorSpecies" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.DoubleVectorIndividual" />
+          <property key="pop.subpop.0.species.fitness.num-objectives" value="2" />
+          <property key="pop.subpop.0.species.fitness.maximize" value="false" />
+          <property key="seed.0" value="time" />
+          <property key="pop.subpop.0.species.crossover-type" value="sbx" />
+          <property key="pop.subpop.0.species.crossover-distribution-index" value="20" />
+          <property key="pop.subpop.0.species.mutation-type" value="polynomial" />
+          <property key="pop.subpop.0.species.mutation-distribution-index" value="20" />
+          <property key="pop.subpop.0.species.mutation-bounded" value="true" />
+        </file>
+        <file name="nsga2.params" propertyCount="10">
+          <property key="parent.0" value="../../multiobjective/nsga2/nsga2.params" />
+          <property key="pop.subpop.0.size" value="100" />
+          <property key="generations" value="250" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.likelihood" value="1.0" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.likelihood" value="0.9" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="same" />
+          <property key="select.tournament.size" value="2" />
+        </file>
+        <file name="pol.params" propertyCount="6">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="pol" />
+          <property key="pop.subpop.0.species.min-gene" value="-3.141592653589793" />
+          <property key="pop.subpop.0.species.max-gene" value="3.141592653589793" />
+          <property key="pop.subpop.0.species.genome-size" value="2" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.5" />
+        </file>
+        <file name="qv.params" propertyCount="6">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="qv" />
+          <property key="pop.subpop.0.species.min-gene" value="-5" />
+          <property key="pop.subpop.0.species.max-gene" value="5" />
+          <property key="pop.subpop.0.species.genome-size" value="100" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.01" />
+        </file>
+        <file name="sch.params" propertyCount="6">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="sch" />
+          <property key="pop.subpop.0.species.min-gene" value="-1000" />
+          <property key="pop.subpop.0.species.max-gene" value="1000" />
+          <property key="pop.subpop.0.species.genome-size" value="1" />
+          <property key="pop.subpop.0.species.mutation-prob" value="1" />
+        </file>
+        <file name="spea2.params" propertyCount="11">
+          <property key="parent.0" value="../../multiobjective/spea2/spea2.params" />
+          <property key="pop.subpop.0.size" value="150" />
+          <property key="breed.elite.0" value="50" />
+          <property key="generations" value="250" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.likelihood" value="1.0" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.likelihood" value="0.9" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.multiobjective.spea2.SPEA2TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="same" />
+          <property key="select.tournament.size" value="2" />
+        </file>
+        <file name="sphere.params" propertyCount="8">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="sphere" />
+          <property key="pop.subpop.0.species.min-gene" value="-1000" />
+          <property key="pop.subpop.0.species.max-gene" value="1000" />
+          <property key="pop.subpop.0.species.genome-size" value="2" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.2" />
+          <property key="pop.supbop.0.species.bounded" value="true" />
+          <property key="pop.subpop.0.species.fitness.num-objectives" value="2" />
+        </file>
+        <file name="unconstrained-f3.params" propertyCount="6">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="unconstrained-f3" />
+          <property key="pop.subpop.0.species.min-gene" value="-20" />
+          <property key="pop.subpop.0.species.max-gene" value="20" />
+          <property key="pop.subpop.0.species.genome-size" value="2" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.5" />
+        </file>
+        <file name="zdt1.params" propertyCount="7">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="zdt1" />
+          <property key="pop.subpop.0.species.fitness.maximize" value="false" />
+          <property key="pop.subpop.0.species.min-gene" value="0" />
+          <property key="pop.subpop.0.species.max-gene" value="1" />
+          <property key="pop.subpop.0.species.genome-size" value="30" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.0333" />
+        </file>
+        <file name="zdt2.params" propertyCount="6">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="zdt2" />
+          <property key="pop.subpop.0.species.min-gene" value="0" />
+          <property key="pop.subpop.0.species.max-gene" value="1" />
+          <property key="pop.subpop.0.species.genome-size" value="30" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.0333" />
+        </file>
+        <file name="zdt3.params" propertyCount="6">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="zdt3" />
+          <property key="pop.subpop.0.species.min-gene" value="0" />
+          <property key="pop.subpop.0.species.max-gene" value="1" />
+          <property key="pop.subpop.0.species.genome-size" value="30" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.0333" />
+        </file>
+        <file name="zdt4.params" propertyCount="8">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="zdt4" />
+          <property key="pop.subpop.0.species.min-gene.0" value="0" />
+          <property key="pop.subpop.0.species.max-gene.0" value="1" />
+          <property key="pop.subpop.0.species.min-gene" value="-5" />
+          <property key="pop.subpop.0.species.max-gene" value="5" />
+          <property key="pop.subpop.0.species.genome-size" value="10" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.1" />
+        </file>
+        <file name="zdt6.params" propertyCount="6">
+          <property key="parent.0" value="moosuite.params" />
+          <property key="eval.problem.type" value="zdt6" />
+          <property key="pop.subpop.0.species.min-gene" value="0" />
+          <property key="pop.subpop.0.species.max-gene" value="1" />
+          <property key="pop.subpop.0.species.genome-size" value="10" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.1" />
+        </file>
+      </files>
+    </directory>
+    <directory name="multiplexer">
+      <files count="3">
+        <file name="11.params" propertyCount="37">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="gp.fs.size" value="1" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.func.0" value="ec.app.multiplexer.func.And" />
+          <property key="gp.fs.0.func.0.nc" value="nc2" />
+          <property key="gp.fs.0.func.1" value="ec.app.multiplexer.func.Or" />
+          <property key="gp.fs.0.func.1.nc" value="nc2" />
+          <property key="gp.fs.0.func.2" value="ec.app.multiplexer.func.Not" />
+          <property key="gp.fs.0.func.2.nc" value="nc1" />
+          <property key="gp.fs.0.func.3" value="ec.app.multiplexer.func.A0" />
+          <property key="gp.fs.0.func.3.nc" value="nc0" />
+          <property key="gp.fs.0.func.4" value="ec.app.multiplexer.func.D0" />
+          <property key="gp.fs.0.func.4.nc" value="nc0" />
+          <property key="gp.fs.0.func.5" value="ec.app.multiplexer.func.D1" />
+          <property key="gp.fs.0.func.5.nc" value="nc0" />
+          <property key="gp.fs.0.func.6" value="ec.app.multiplexer.func.If" />
+          <property key="gp.fs.0.func.6.nc" value="nc3" />
+          <property key="gp.fs.0.func.7" value="ec.app.multiplexer.func.A1" />
+          <property key="gp.fs.0.func.7.nc" value="nc0" />
+          <property key="gp.fs.0.func.8" value="ec.app.multiplexer.func.D2" />
+          <property key="gp.fs.0.func.8.nc" value="nc0" />
+          <property key="gp.fs.0.func.9" value="ec.app.multiplexer.func.D3" />
+          <property key="gp.fs.0.func.9.nc" value="nc0" />
+          <property key="gp.fs.0.func.10" value="ec.app.multiplexer.func.A2" />
+          <property key="gp.fs.0.func.10.nc" value="nc0" />
+          <property key="gp.fs.0.func.11" value="ec.app.multiplexer.func.D4" />
+          <property key="gp.fs.0.func.11.nc" value="nc0" />
+          <property key="gp.fs.0.func.12" value="ec.app.multiplexer.func.D5" />
+          <property key="gp.fs.0.func.12.nc" value="nc0" />
+          <property key="gp.fs.0.func.13" value="ec.app.multiplexer.func.D6" />
+          <property key="gp.fs.0.func.13.nc" value="nc0" />
+          <property key="gp.fs.0.func.14" value="ec.app.multiplexer.func.D7" />
+          <property key="gp.fs.0.func.14.nc" value="nc0" />
+          <property key="eval.problem" value="ec.app.multiplexer.Multiplexer" />
+          <property key="eval.problem.data" value="ec.app.multiplexer.MultiplexerData" />
+          <property key="eval.problem.bits" value="3" />
+          <property key="gp.fs.0.size" value="15" />
+        </file>
+        <file name="3.params" propertyCount="3">
+          <property key="parent.0" value="11.params" />
+          <property key="eval.problem.bits" value="1" />
+          <property key="gp.fs.0.size" value="6" />
+        </file>
+        <file name="6.params" propertyCount="3">
+          <property key="parent.0" value="11.params" />
+          <property key="eval.problem.bits" value="2" />
+          <property key="gp.fs.0.size" value="10" />
+        </file>
+      </files>
+    </directory>
+    <directory name="multiplexerslow">
+      <files count="3">
+        <file name="11.params" propertyCount="37">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="gp.fs.size" value="1" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.func.0" value="ec.app.multiplexerslow.func.And" />
+          <property key="gp.fs.0.func.0.nc" value="nc2" />
+          <property key="gp.fs.0.func.1" value="ec.app.multiplexerslow.func.Or" />
+          <property key="gp.fs.0.func.1.nc" value="nc2" />
+          <property key="gp.fs.0.func.2" value="ec.app.multiplexerslow.func.Not" />
+          <property key="gp.fs.0.func.2.nc" value="nc1" />
+          <property key="gp.fs.0.func.3" value="ec.app.multiplexerslow.func.A0" />
+          <property key="gp.fs.0.func.3.nc" value="nc0" />
+          <property key="gp.fs.0.func.4" value="ec.app.multiplexerslow.func.D0" />
+          <property key="gp.fs.0.func.4.nc" value="nc0" />
+          <property key="gp.fs.0.func.5" value="ec.app.multiplexerslow.func.D1" />
+          <property key="gp.fs.0.func.5.nc" value="nc0" />
+          <property key="gp.fs.0.func.6" value="ec.app.multiplexerslow.func.If" />
+          <property key="gp.fs.0.func.6.nc" value="nc3" />
+          <property key="gp.fs.0.func.7" value="ec.app.multiplexerslow.func.A1" />
+          <property key="gp.fs.0.func.7.nc" value="nc0" />
+          <property key="gp.fs.0.func.8" value="ec.app.multiplexerslow.func.D2" />
+          <property key="gp.fs.0.func.8.nc" value="nc0" />
+          <property key="gp.fs.0.func.9" value="ec.app.multiplexerslow.func.D3" />
+          <property key="gp.fs.0.func.9.nc" value="nc0" />
+          <property key="gp.fs.0.func.10" value="ec.app.multiplexerslow.func.A2" />
+          <property key="gp.fs.0.func.10.nc" value="nc0" />
+          <property key="gp.fs.0.func.11" value="ec.app.multiplexerslow.func.D4" />
+          <property key="gp.fs.0.func.11.nc" value="nc0" />
+          <property key="gp.fs.0.func.12" value="ec.app.multiplexerslow.func.D5" />
+          <property key="gp.fs.0.func.12.nc" value="nc0" />
+          <property key="gp.fs.0.func.13" value="ec.app.multiplexerslow.func.D6" />
+          <property key="gp.fs.0.func.13.nc" value="nc0" />
+          <property key="gp.fs.0.func.14" value="ec.app.multiplexerslow.func.D7" />
+          <property key="gp.fs.0.func.14.nc" value="nc0" />
+          <property key="eval.problem" value="ec.app.multiplexerslow.Multiplexer" />
+          <property key="eval.problem.data" value="ec.app.multiplexerslow.MultiplexerData" />
+          <property key="eval.problem.bits" value="3" />
+          <property key="gp.fs.0.size" value="15" />
+        </file>
+        <file name="3.params" propertyCount="3">
+          <property key="parent.0" value="11.params" />
+          <property key="eval.problem.bits" value="1" />
+          <property key="gp.fs.0.size" value="6" />
+        </file>
+        <file name="6.params" propertyCount="3">
+          <property key="parent.0" value="11.params" />
+          <property key="eval.problem.bits" value="2" />
+          <property key="gp.fs.0.size" value="10" />
+        </file>
+      </files>
+    </directory>
+    <directory name="nk">
+      <files count="1">
+        <file name="nk.params" propertyCount="19">
+          <property key="parent.0" value="../../simple/simple.params" />
+          <property key="seed.0" value="time" />
+          <property key="pop.subpop.0.species.genome-size" value="20" />
+          <property key="eval.problem" value="ec.app.nk.NK" />
+          <property key="eval.problem.n" value="20" />
+          <property key="eval.problem.k" value="5" />
+          <property key="eval.problem.adjacent" value="true" />
+          <property key="pop.subpop.0.size" value="1000" />
+          <property key="generations" value="100" />
+          <property key="pop.subpop.0.species" value="ec.vector.VectorSpecies" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="same" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.BitVectorIndividual" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="select.tournament.size" value="2" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.05" />
+          <property key="pop.subpop.0.species.crossover-type" value="two" />
+        </file>
+      </files>
+    </directory>
+    <directory name="parity">
+      <files count="2">
+        <file name="adf.params" propertyCount="287">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="pop.subpop.0.species.ind.numtrees" value="3" />
+          <property key="pop.subpop.0.species.ind.tree.0" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.ind.tree.0.tc" value="tc0" />
+          <property key="pop.subpop.0.species.ind.tree.1" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.ind.tree.1.tc" value="tc1" />
+          <property key="pop.subpop.0.species.ind.tree.2" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.ind.tree.2.tc" value="tc2" />
+          <property key="gp.tc.size" value="3" />
+          <property key="gp.tc.0" value="ec.gp.GPTreeConstraints" />
+          <property key="gp.tc.0.name" value="tc0" />
+          <property key="gp.tc.0.fset" value="f0" />
+          <property key="gp.tc.0.returns" value="nil" />
+          <property key="gp.tc.0.init" value="ec.gp.koza.GrowBuilder" />
+          <property key="gp.tc.0.init.growp" value="0.5" />
+          <property key="gp.tc.0.init.min" value="2" />
+          <property key="gp.tc.0.init.max" value="6" />
+          <property key="gp.tc.1" value="ec.gp.GPTreeConstraints" />
+          <property key="gp.tc.1.name" value="tc1" />
+          <property key="gp.tc.1.fset" value="f1" />
+          <property key="gp.tc.1.returns" value="nil" />
+          <property key="gp.tc.1.init" value="ec.gp.koza.GrowBuilder" />
+          <property key="gp.tc.1.init.growp" value="0.5" />
+          <property key="gp.tc.1.init.min" value="2" />
+          <property key="gp.tc.1.init.max" value="6" />
+          <property key="gp.tc.2" value="ec.gp.GPTreeConstraints" />
+          <property key="gp.tc.2.name" value="tc2" />
+          <property key="gp.tc.2.fset" value="f2" />
+          <property key="gp.tc.2.returns" value="nil" />
+          <property key="gp.tc.2.init" value="ec.gp.koza.GrowBuilder" />
+          <property key="gp.tc.2.init.growp" value="0.5" />
+          <property key="gp.tc.2.init.min" value="2" />
+          <property key="gp.tc.2.init.max" value="6" />
+          <property key="gp.fs.size" value="3" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.func.0" value="ec.app.parity.func.And" />
+          <property key="gp.fs.0.func.0.nc" value="nc2" />
+          <property key="gp.fs.0.func.1" value="ec.app.parity.func.Or" />
+          <property key="gp.fs.0.func.1.nc" value="nc2" />
+          <property key="gp.fs.0.func.2" value="ec.app.parity.func.Nand" />
+          <property key="gp.fs.0.func.2.nc" value="nc2" />
+          <property key="gp.fs.0.func.3" value="ec.app.parity.func.Nor" />
+          <property key="gp.fs.0.func.3.nc" value="nc2" />
+          <property key="gp.fs.0.func.4" value="ec.gp.ADF" />
+          <property key="gp.fs.0.func.4.nc" value="nc2" />
+          <property key="gp.fs.0.func.4.tree" value="1" />
+          <property key="gp.fs.0.func.4.name" value="ADF0" />
+          <property key="gp.fs.0.func.5" value="ec.gp.ADF" />
+          <property key="gp.fs.0.func.5.nc" value="nc3" />
+          <property key="gp.fs.0.func.5.tree" value="2" />
+          <property key="gp.fs.0.func.5.name" value="ADF1" />
+          <property key="gp.fs.0.func.6" value="ec.app.parity.func.D0" />
+          <property key="gp.fs.0.func.6.nc" value="nc0" />
+          <property key="gp.fs.0.func.7" value="ec.app.parity.func.D1" />
+          <property key="gp.fs.0.func.7.nc" value="nc0" />
+          <property key="gp.fs.0.func.8" value="ec.app.parity.func.D2" />
+          <property key="gp.fs.0.func.8.nc" value="nc0" />
+          <property key="gp.fs.0.func.9" value="ec.app.parity.func.D3" />
+          <property key="gp.fs.0.func.9.nc" value="nc0" />
+          <property key="gp.fs.0.func.10" value="ec.app.parity.func.D4" />
+          <property key="gp.fs.0.func.10.nc" value="nc0" />
+          <property key="gp.fs.0.func.11" value="ec.app.parity.func.D5" />
+          <property key="gp.fs.0.func.11.nc" value="nc0" />
+          <property key="gp.fs.0.func.12" value="ec.app.parity.func.D6" />
+          <property key="gp.fs.0.func.12.nc" value="nc0" />
+          <property key="gp.fs.0.func.13" value="ec.app.parity.func.D7" />
+          <property key="gp.fs.0.func.13.nc" value="nc0" />
+          <property key="gp.fs.0.func.14" value="ec.app.parity.func.D8" />
+          <property key="gp.fs.0.func.14.nc" value="nc0" />
+          <property key="gp.fs.0.func.15" value="ec.app.parity.func.D9" />
+          <property key="gp.fs.0.func.16.nc" value="nc0" />
+          <property key="gp.fs.0.func.16" value="ec.app.parity.func.D10" />
+          <property key="gp.fs.0.func.17" value="ec.app.parity.func.D11" />
+          <property key="gp.fs.0.func.17.nc" value="nc0" />
+          <property key="gp.fs.0.func.18" value="ec.app.parity.func.D12" />
+          <property key="gp.fs.0.func.18.nc" value="nc0" />
+          <property key="gp.fs.0.func.19" value="ec.app.parity.func.D13" />
+          <property key="gp.fs.0.func.19.nc" value="nc0" />
+          <property key="gp.fs.0.func.20" value="ec.app.parity.func.D14" />
+          <property key="gp.fs.0.func.20.nc" value="nc0" />
+          <property key="gp.fs.0.func.21" value="ec.app.parity.func.D15" />
+          <property key="gp.fs.0.func.21.nc" value="nc0" />
+          <property key="gp.fs.0.func.22" value="ec.app.parity.func.D16" />
+          <property key="gp.fs.0.func.22.nc" value="nc0" />
+          <property key="gp.fs.0.func.23" value="ec.app.parity.func.D17" />
+          <property key="gp.fs.0.func.23.nc" value="nc0" />
+          <property key="gp.fs.0.func.24" value="ec.app.parity.func.D18" />
+          <property key="gp.fs.0.func.24.nc" value="nc0" />
+          <property key="gp.fs.0.func.25" value="ec.app.parity.func.D19" />
+          <property key="gp.fs.0.func.25.nc" value="nc0" />
+          <property key="gp.fs.0.func.26" value="ec.app.parity.func.D20" />
+          <property key="gp.fs.0.func.26.nc" value="nc0" />
+          <property key="gp.fs.0.func.27" value="ec.app.parity.func.D21" />
+          <property key="gp.fs.0.func.27.nc" value="nc0" />
+          <property key="gp.fs.0.func.28" value="ec.app.parity.func.D22" />
+          <property key="gp.fs.0.func.28.nc" value="nc0" />
+          <property key="gp.fs.0.func.29" value="ec.app.parity.func.D23" />
+          <property key="gp.fs.0.func.29.nc" value="nc0" />
+          <property key="gp.fs.0.func.30" value="ec.app.parity.func.D24" />
+          <property key="gp.fs.0.func.30.nc" value="nc0" />
+          <property key="gp.fs.0.func.31" value="ec.app.parity.func.D25" />
+          <property key="gp.fs.0.func.31.nc" value="nc0" />
+          <property key="gp.fs.0.func.32" value="ec.app.parity.func.D26" />
+          <property key="gp.fs.0.func.32.nc" value="nc0" />
+          <property key="gp.fs.0.func.33" value="ec.app.parity.func.D27" />
+          <property key="gp.fs.0.func.33.nc" value="nc0" />
+          <property key="gp.fs.0.func.34" value="ec.app.parity.func.D28" />
+          <property key="gp.fs.0.func.34.nc" value="nc0" />
+          <property key="gp.fs.0.func.35" value="ec.app.parity.func.D29" />
+          <property key="gp.fs.0.func.35.nc" value="nc0" />
+          <property key="gp.fs.0.func.36" value="ec.app.parity.func.D30" />
+          <property key="gp.fs.0.func.36.nc" value="nc0" />
+          <property key="gp.fs.0.func.37" value="ec.app.parity.func.D31" />
+          <property key="gp.fs.0.func.37.nc" value="nc0" />
+          <property key="gp.fs.1.name" value="f1" />
+          <property key="gp.fs.1" value="ec.gp.GPFunctionSet" />
+          <property key="gp.fs.1.func.0" value="ec.app.parity.func.And" />
+          <property key="gp.fs.1.func.0.nc" value="nc2" />
+          <property key="gp.fs.1.func.1" value="ec.app.parity.func.Or" />
+          <property key="gp.fs.1.func.1.nc" value="nc2" />
+          <property key="gp.fs.1.func.2" value="ec.app.parity.func.Nand" />
+          <property key="gp.fs.1.func.2.nc" value="nc2" />
+          <property key="gp.fs.1.func.3" value="ec.app.parity.func.Nor" />
+          <property key="gp.fs.1.func.3.nc" value="nc2" />
+          <property key="gp.fs.1.func.4" value="ec.gp.ADFArgument" />
+          <property key="gp.fs.1.func.4.nc" value="nc0" />
+          <property key="gp.fs.1.func.4.arg" value="0" />
+          <property key="gp.fs.1.func.4.name" value="ARG0" />
+          <property key="gp.fs.1.func.5" value="ec.gp.ADFArgument" />
+          <property key="gp.fs.1.func.5.nc" value="nc0" />
+          <property key="gp.fs.1.func.5.arg" value="1" />
+          <property key="gp.fs.1.func.5.name" value="ARG1" />
+          <property key="gp.fs.1.func.6" value="ec.app.parity.func.D0" />
+          <property key="gp.fs.1.func.6.nc" value="nc0" />
+          <property key="gp.fs.1.func.7" value="ec.app.parity.func.D1" />
+          <property key="gp.fs.1.func.7.nc" value="nc0" />
+          <property key="gp.fs.1.func.8" value="ec.app.parity.func.D2" />
+          <property key="gp.fs.1.func.8.nc" value="nc0" />
+          <property key="gp.fs.1.func.9" value="ec.app.parity.func.D3" />
+          <property key="gp.fs.1.func.9.nc" value="nc0" />
+          <property key="gp.fs.1.func.10" value="ec.app.parity.func.D4" />
+          <property key="gp.fs.1.func.10.nc" value="nc0" />
+          <property key="gp.fs.1.func.11" value="ec.app.parity.func.D5" />
+          <property key="gp.fs.1.func.11.nc" value="nc0" />
+          <property key="gp.fs.1.func.12" value="ec.app.parity.func.D6" />
+          <property key="gp.fs.1.func.12.nc" value="nc0" />
+          <property key="gp.fs.1.func.13" value="ec.app.parity.func.D7" />
+          <property key="gp.fs.1.func.13.nc" value="nc0" />
+          <property key="gp.fs.1.func.14" value="ec.app.parity.func.D8" />
+          <property key="gp.fs.1.func.14.nc" value="nc0" />
+          <property key="gp.fs.1.func.15" value="ec.app.parity.func.D9" />
+          <property key="gp.fs.1.func.16.nc" value="nc0" />
+          <property key="gp.fs.1.func.16" value="ec.app.parity.func.D10" />
+          <property key="gp.fs.1.func.17" value="ec.app.parity.func.D11" />
+          <property key="gp.fs.1.func.17.nc" value="nc0" />
+          <property key="gp.fs.1.func.18" value="ec.app.parity.func.D12" />
+          <property key="gp.fs.1.func.18.nc" value="nc0" />
+          <property key="gp.fs.1.func.19" value="ec.app.parity.func.D13" />
+          <property key="gp.fs.1.func.19.nc" value="nc0" />
+          <property key="gp.fs.1.func.20" value="ec.app.parity.func.D14" />
+          <property key="gp.fs.1.func.20.nc" value="nc0" />
+          <property key="gp.fs.1.func.21" value="ec.app.parity.func.D15" />
+          <property key="gp.fs.1.func.21.nc" value="nc0" />
+          <property key="gp.fs.1.func.22" value="ec.app.parity.func.D16" />
+          <property key="gp.fs.1.func.22.nc" value="nc0" />
+          <property key="gp.fs.1.func.23" value="ec.app.parity.func.D17" />
+          <property key="gp.fs.1.func.23.nc" value="nc0" />
+          <property key="gp.fs.1.func.24" value="ec.app.parity.func.D18" />
+          <property key="gp.fs.1.func.24.nc" value="nc0" />
+          <property key="gp.fs.1.func.25" value="ec.app.parity.func.D19" />
+          <property key="gp.fs.1.func.25.nc" value="nc0" />
+          <property key="gp.fs.1.func.26" value="ec.app.parity.func.D20" />
+          <property key="gp.fs.1.func.26.nc" value="nc0" />
+          <property key="gp.fs.1.func.27" value="ec.app.parity.func.D21" />
+          <property key="gp.fs.1.func.27.nc" value="nc0" />
+          <property key="gp.fs.1.func.28" value="ec.app.parity.func.D22" />
+          <property key="gp.fs.1.func.28.nc" value="nc0" />
+          <property key="gp.fs.1.func.29" value="ec.app.parity.func.D23" />
+          <property key="gp.fs.1.func.29.nc" value="nc0" />
+          <property key="gp.fs.1.func.30" value="ec.app.parity.func.D24" />
+          <property key="gp.fs.1.func.30.nc" value="nc0" />
+          <property key="gp.fs.1.func.31" value="ec.app.parity.func.D25" />
+          <property key="gp.fs.1.func.31.nc" value="nc0" />
+          <property key="gp.fs.1.func.32" value="ec.app.parity.func.D26" />
+          <property key="gp.fs.1.func.32.nc" value="nc0" />
+          <property key="gp.fs.1.func.33" value="ec.app.parity.func.D27" />
+          <property key="gp.fs.1.func.33.nc" value="nc0" />
+          <property key="gp.fs.1.func.34" value="ec.app.parity.func.D28" />
+          <property key="gp.fs.1.func.34.nc" value="nc0" />
+          <property key="gp.fs.1.func.35" value="ec.app.parity.func.D29" />
+          <property key="gp.fs.1.func.35.nc" value="nc0" />
+          <property key="gp.fs.1.func.36" value="ec.app.parity.func.D30" />
+          <property key="gp.fs.1.func.36.nc" value="nc0" />
+          <property key="gp.fs.1.func.37" value="ec.app.parity.func.D31" />
+          <property key="gp.fs.1.func.37.nc" value="nc0" />
+          <property key="gp.fs.2.name" value="f2" />
+          <property key="gp.fs.2" value="ec.gp.GPFunctionSet" />
+          <property key="gp.fs.2.func.0" value="ec.app.parity.func.And" />
+          <property key="gp.fs.2.func.0.nc" value="nc2" />
+          <property key="gp.fs.2.func.1" value="ec.app.parity.func.Or" />
+          <property key="gp.fs.2.func.1.nc" value="nc2" />
+          <property key="gp.fs.2.func.2" value="ec.app.parity.func.Nand" />
+          <property key="gp.fs.2.func.2.nc" value="nc2" />
+          <property key="gp.fs.2.func.3" value="ec.app.parity.func.Nor" />
+          <property key="gp.fs.2.func.3.nc" value="nc2" />
+          <property key="gp.fs.2.func.4" value="ec.gp.ADFArgument" />
+          <property key="gp.fs.2.func.4.nc" value="nc0" />
+          <property key="gp.fs.2.func.4.arg" value="0" />
+          <property key="gp.fs.2.func.4.name" value="ARG0" />
+          <property key="gp.fs.2.func.5" value="ec.gp.ADFArgument" />
+          <property key="gp.fs.2.func.5.nc" value="nc0" />
+          <property key="gp.fs.2.func.5.arg" value="1" />
+          <property key="gp.fs.2.func.5.name" value="ARG1" />
+          <property key="gp.fs.2.func.6" value="ec.gp.ADFArgument" />
+          <property key="gp.fs.2.func.6.nc" value="nc0" />
+          <property key="gp.fs.2.func.6.arg" value="2" />
+          <property key="gp.fs.2.func.6.name" value="ARG2" />
+          <property key="gp.fs.2.func.7" value="ec.app.parity.func.D0" />
+          <property key="gp.fs.2.func.7.nc" value="nc0" />
+          <property key="gp.fs.2.func.8" value="ec.app.parity.func.D1" />
+          <property key="gp.fs.2.func.8.nc" value="nc0" />
+          <property key="gp.fs.2.func.9" value="ec.app.parity.func.D2" />
+          <property key="gp.fs.2.func.9.nc" value="nc0" />
+          <property key="gp.fs.2.func.10" value="ec.app.parity.func.D3" />
+          <property key="gp.fs.2.func.10.nc" value="nc0" />
+          <property key="gp.fs.2.func.11" value="ec.app.parity.func.D4" />
+          <property key="gp.fs.2.func.11.nc" value="nc0" />
+          <property key="gp.fs.2.func.12" value="ec.app.parity.func.D5" />
+          <property key="gp.fs.2.func.12.nc" value="nc0" />
+          <property key="gp.fs.2.func.13" value="ec.app.parity.func.D6" />
+          <property key="gp.fs.2.func.13.nc" value="nc0" />
+          <property key="gp.fs.2.func.14" value="ec.app.parity.func.D7" />
+          <property key="gp.fs.2.func.14.nc" value="nc0" />
+          <property key="gp.fs.2.func.15" value="ec.app.parity.func.D8" />
+          <property key="gp.fs.2.func.16.nc" value="nc0" />
+          <property key="gp.fs.2.func.16" value="ec.app.parity.func.D9" />
+          <property key="gp.fs.2.func.17" value="ec.app.parity.func.D10" />
+          <property key="gp.fs.2.func.17.nc" value="nc0" />
+          <property key="gp.fs.2.func.18" value="ec.app.parity.func.D11" />
+          <property key="gp.fs.2.func.18.nc" value="nc0" />
+          <property key="gp.fs.2.func.19" value="ec.app.parity.func.D12" />
+          <property key="gp.fs.2.func.19.nc" value="nc0" />
+          <property key="gp.fs.2.func.20" value="ec.app.parity.func.D13" />
+          <property key="gp.fs.2.func.20.nc" value="nc0" />
+          <property key="gp.fs.2.func.21" value="ec.app.parity.func.D14" />
+          <property key="gp.fs.2.func.21.nc" value="nc0" />
+          <property key="gp.fs.2.func.22" value="ec.app.parity.func.D15" />
+          <property key="gp.fs.2.func.22.nc" value="nc0" />
+          <property key="gp.fs.2.func.23" value="ec.app.parity.func.D16" />
+          <property key="gp.fs.2.func.23.nc" value="nc0" />
+          <property key="gp.fs.2.func.24" value="ec.app.parity.func.D17" />
+          <property key="gp.fs.2.func.24.nc" value="nc0" />
+          <property key="gp.fs.2.func.25" value="ec.app.parity.func.D18" />
+          <property key="gp.fs.2.func.25.nc" value="nc0" />
+          <property key="gp.fs.2.func.26" value="ec.app.parity.func.D19" />
+          <property key="gp.fs.2.func.26.nc" value="nc0" />
+          <property key="gp.fs.2.func.27" value="ec.app.parity.func.D20" />
+          <property key="gp.fs.2.func.27.nc" value="nc0" />
+          <property key="gp.fs.2.func.28" value="ec.app.parity.func.D21" />
+          <property key="gp.fs.2.func.28.nc" value="nc0" />
+          <property key="gp.fs.2.func.29" value="ec.app.parity.func.D22" />
+          <property key="gp.fs.2.func.29.nc" value="nc0" />
+          <property key="gp.fs.2.func.30" value="ec.app.parity.func.D23" />
+          <property key="gp.fs.2.func.30.nc" value="nc0" />
+          <property key="gp.fs.2.func.31" value="ec.app.parity.func.D24" />
+          <property key="gp.fs.2.func.31.nc" value="nc0" />
+          <property key="gp.fs.2.func.32" value="ec.app.parity.func.D25" />
+          <property key="gp.fs.2.func.32.nc" value="nc0" />
+          <property key="gp.fs.2.func.33" value="ec.app.parity.func.D26" />
+          <property key="gp.fs.2.func.33.nc" value="nc0" />
+          <property key="gp.fs.2.func.34" value="ec.app.parity.func.D27" />
+          <property key="gp.fs.2.func.34.nc" value="nc0" />
+          <property key="gp.fs.2.func.35" value="ec.app.parity.func.D28" />
+          <property key="gp.fs.2.func.35.nc" value="nc0" />
+          <property key="gp.fs.2.func.36" value="ec.app.parity.func.D29" />
+          <property key="gp.fs.2.func.36.nc" value="nc0" />
+          <property key="gp.fs.2.func.37" value="ec.app.parity.func.D30" />
+          <property key="gp.fs.2.func.37.nc" value="nc0" />
+          <property key="gp.fs.2.func.38" value="ec.app.parity.func.D31" />
+          <property key="gp.fs.2.func.38.nc" value="nc0" />
+          <property key="eval.problem" value="ec.app.parity.Parity" />
+          <property key="eval.problem.data" value="ec.app.parity.ParityData" />
+          <property key="eval.problem.bits" value="4" />
+          <property key="eval.problem.even" value="true" />
+          <property key="gp.fs.0.size" value="10" />
+          <property key="gp.fs.1.size" value="10" />
+          <property key="gp.fs.2.size" value="11" />
+        </file>
+        <file name="parity.params" propertyCount="80">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="gp.fs.size" value="1" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.func.0" value="ec.app.parity.func.And" />
+          <property key="gp.fs.0.func.0.nc" value="nc2" />
+          <property key="gp.fs.0.func.1" value="ec.app.parity.func.Or" />
+          <property key="gp.fs.0.func.1.nc" value="nc2" />
+          <property key="gp.fs.0.func.2" value="ec.app.parity.func.Nand" />
+          <property key="gp.fs.0.func.2.nc" value="nc2" />
+          <property key="gp.fs.0.func.3" value="ec.app.parity.func.Nor" />
+          <property key="gp.fs.0.func.3.nc" value="nc2" />
+          <property key="gp.fs.0.func.4" value="ec.app.parity.func.D0" />
+          <property key="gp.fs.0.func.4.nc" value="nc0" />
+          <property key="gp.fs.0.func.5" value="ec.app.parity.func.D1" />
+          <property key="gp.fs.0.func.5.nc" value="nc0" />
+          <property key="gp.fs.0.func.6" value="ec.app.parity.func.D2" />
+          <property key="gp.fs.0.func.6.nc" value="nc0" />
+          <property key="gp.fs.0.func.7" value="ec.app.parity.func.D3" />
+          <property key="gp.fs.0.func.7.nc" value="nc0" />
+          <property key="gp.fs.0.func.8" value="ec.app.parity.func.D4" />
+          <property key="gp.fs.0.func.8.nc" value="nc0" />
+          <property key="gp.fs.0.func.9" value="ec.app.parity.func.D5" />
+          <property key="gp.fs.0.func.9.nc" value="nc0" />
+          <property key="gp.fs.0.func.10" value="ec.app.parity.func.D6" />
+          <property key="gp.fs.0.func.10.nc" value="nc0" />
+          <property key="gp.fs.0.func.11" value="ec.app.parity.func.D7" />
+          <property key="gp.fs.0.func.11.nc" value="nc0" />
+          <property key="gp.fs.0.func.12" value="ec.app.parity.func.D8" />
+          <property key="gp.fs.0.func.12.nc" value="nc0" />
+          <property key="gp.fs.0.func.13" value="ec.app.parity.func.D9" />
+          <property key="gp.fs.0.func.13.nc" value="nc0" />
+          <property key="gp.fs.0.func.14" value="ec.app.parity.func.D10" />
+          <property key="gp.fs.0.func.14.nc" value="nc0" />
+          <property key="gp.fs.0.func.15" value="ec.app.parity.func.D11" />
+          <property key="gp.fs.0.func.15.nc" value="nc0" />
+          <property key="gp.fs.0.func.16" value="ec.app.parity.func.D12" />
+          <property key="gp.fs.0.func.16.nc" value="nc0" />
+          <property key="gp.fs.0.func.17" value="ec.app.parity.func.D13" />
+          <property key="gp.fs.0.func.17.nc" value="nc0" />
+          <property key="gp.fs.0.func.18" value="ec.app.parity.func.D14" />
+          <property key="gp.fs.0.func.18.nc" value="nc0" />
+          <property key="gp.fs.0.func.19" value="ec.app.parity.func.D15" />
+          <property key="gp.fs.0.func.19.nc" value="nc0" />
+          <property key="gp.fs.0.func.20" value="ec.app.parity.func.D16" />
+          <property key="gp.fs.0.func.20.nc" value="nc0" />
+          <property key="gp.fs.0.func.21" value="ec.app.parity.func.D17" />
+          <property key="gp.fs.0.func.21.nc" value="nc0" />
+          <property key="gp.fs.0.func.22" value="ec.app.parity.func.D18" />
+          <property key="gp.fs.0.func.22.nc" value="nc0" />
+          <property key="gp.fs.0.func.23" value="ec.app.parity.func.D19" />
+          <property key="gp.fs.0.func.23.nc" value="nc0" />
+          <property key="gp.fs.0.func.24" value="ec.app.parity.func.D20" />
+          <property key="gp.fs.0.func.24.nc" value="nc0" />
+          <property key="gp.fs.0.func.25" value="ec.app.parity.func.D21" />
+          <property key="gp.fs.0.func.25.nc" value="nc0" />
+          <property key="gp.fs.0.func.26" value="ec.app.parity.func.D22" />
+          <property key="gp.fs.0.func.26.nc" value="nc0" />
+          <property key="gp.fs.0.func.27" value="ec.app.parity.func.D23" />
+          <property key="gp.fs.0.func.27.nc" value="nc0" />
+          <property key="gp.fs.0.func.28" value="ec.app.parity.func.D24" />
+          <property key="gp.fs.0.func.28.nc" value="nc0" />
+          <property key="gp.fs.0.func.29" value="ec.app.parity.func.D25" />
+          <property key="gp.fs.0.func.29.nc" value="nc0" />
+          <property key="gp.fs.0.func.30" value="ec.app.parity.func.D26" />
+          <property key="gp.fs.0.func.30.nc" value="nc0" />
+          <property key="gp.fs.0.func.31" value="ec.app.parity.func.D27" />
+          <property key="gp.fs.0.func.31.nc" value="nc0" />
+          <property key="gp.fs.0.func.32" value="ec.app.parity.func.D28" />
+          <property key="gp.fs.0.func.32.nc" value="nc0" />
+          <property key="gp.fs.0.func.33" value="ec.app.parity.func.D29" />
+          <property key="gp.fs.0.func.33.nc" value="nc0" />
+          <property key="gp.fs.0.func.34" value="ec.app.parity.func.D30" />
+          <property key="gp.fs.0.func.34.nc" value="nc0" />
+          <property key="gp.fs.0.func.35" value="ec.app.parity.func.D31" />
+          <property key="gp.fs.0.func.35.nc" value="nc0" />
+          <property key="eval.problem" value="ec.app.parity.Parity" />
+          <property key="eval.problem.data" value="ec.app.parity.ParityData" />
+          <property key="eval.problem.bits" value="12" />
+          <property key="eval.problem.even" value="true" />
+          <property key="gp.fs.0.size" value="16" />
+        </file>
+      </files>
+    </directory>
+    <directory name="regression">
+      <files count="9">
+        <file name="erc.params" propertyCount="27">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="gp.fs.size" value="1" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.size" value="10" />
+          <property key="gp.fs.0.func.0" value="ec.app.regression.func.X" />
+          <property key="gp.fs.0.func.0.nc" value="nc0" />
+          <property key="gp.fs.0.func.1" value="ec.app.regression.func.Add" />
+          <property key="gp.fs.0.func.1.nc" value="nc2" />
+          <property key="gp.fs.0.func.2" value="ec.app.regression.func.Mul" />
+          <property key="gp.fs.0.func.2.nc" value="nc2" />
+          <property key="gp.fs.0.func.3" value="ec.app.regression.func.Sub" />
+          <property key="gp.fs.0.func.3.nc" value="nc2" />
+          <property key="gp.fs.0.func.4" value="ec.app.regression.func.Div" />
+          <property key="gp.fs.0.func.4.nc" value="nc2" />
+          <property key="gp.fs.0.func.5" value="ec.app.regression.func.Sin" />
+          <property key="gp.fs.0.func.5.nc" value="nc1" />
+          <property key="gp.fs.0.func.6" value="ec.app.regression.func.Cos" />
+          <property key="gp.fs.0.func.6.nc" value="nc1" />
+          <property key="gp.fs.0.func.7" value="ec.app.regression.func.Exp" />
+          <property key="gp.fs.0.func.7.nc" value="nc1" />
+          <property key="gp.fs.0.func.8" value="ec.app.regression.func.Log" />
+          <property key="gp.fs.0.func.8.nc" value="nc1" />
+          <property key="gp.fs.0.func.9" value="ec.app.regression.func.RegERC" />
+          <property key="gp.fs.0.func.9.nc" value="nc0" />
+          <property key="eval.problem" value="ec.app.regression.Regression" />
+          <property key="eval.problem.data" value="ec.app.regression.RegressionData" />
+          <property key="eval.problem.size" value="20" />
+        </file>
+        <file name="ge.params" propertyCount="6">
+          <property key="parent.0" value="../../gp/ge/ge.params" />
+          <property key="parent.1" value="erc.params" />
+          <property key="ge.species.file.0" value="regression.grammar" />
+          <property key="eval.problem.problem" value="ec.app.regression.Regression" />
+          <property key="eval.problem.problem.data" value="ec.app.regression.RegressionData" />
+          <property key="eval.problem.problem.size" value="20" />
+        </file>
+        <file name="noerc.params" propertyCount="2">
+          <property key="parent.0" value="./erc.params" />
+          <property key="gp.fs.0.size" value="9" />
+        </file>
+        <file name="noerc2.params" propertyCount="18">
+          <property key="parent.0" value="./noerc.params" />
+          <property key="gp.type.a.size" value="2" />
+          <property key="gp.type.a.0.name" value="nil" />
+          <property key="gp.type.a.1.name" value="root" />
+          <property key="gp.type.s.size" value="1" />
+          <property key="gp.type.s.0.name" value="nil-and-root" />
+          <property key="gp.type.s.0.size" value="2" />
+          <property key="gp.type.s.0.member.0" value="nil" />
+          <property key="gp.type.s.0.member.1" value="root" />
+          <property key="gp.nc.size" value="8" />
+          <property key="gp.nc.7" value="ec.gp.GPNodeConstraints" />
+          <property key="gp.nc.7.name" value="nc-returning-nil-and-root" />
+          <property key="gp.nc.7.returns" value="nil-and-root" />
+          <property key="gp.nc.7.size" value="2" />
+          <property key="gp.nc.7.child.0" value="nil" />
+          <property key="gp.nc.7.child.1" value="nil" />
+          <property key="gp.fs.0.func.4.nc" value="nc-returning-nil-and-root" />
+          <property key="gp.tc.0.returns" value="root" />
+        </file>
+        <file name="quinticerc.params" propertyCount="2">
+          <property key="parent.0" value="erc.params" />
+          <property key="eval.problem" value="ec.app.regression.Quintic" />
+        </file>
+        <file name="quinticnoerc.params" propertyCount="2">
+          <property key="parent.0" value="noerc.params" />
+          <property key="eval.problem" value="ec.app.regression.Quintic" />
+        </file>
+        <file name="sexticerc.params" propertyCount="2">
+          <property key="parent.0" value="erc.params" />
+          <property key="eval.problem" value="ec.app.regression.Sextic" />
+        </file>
+        <file name="sexticnoerc.params" propertyCount="2">
+          <property key="parent.0" value="noerc.params" />
+          <property key="eval.problem" value="ec.app.regression.Sextic" />
+        </file>
+        <file name="steadynoerc.params" propertyCount="7">
+          <property key="parent.0" value="../../steadystate/steadystate.params" />
+          <property key="parent.1" value="./noerc.params" />
+          <property key="breed.reproduce.source.0" value="ec.steadystate.MyDoubleTournamentSelection" />
+          <property key="gp.koza.xover.source.0" value="ec.steadystate.MyDoubleTournamentSelection" />
+          <property key="select.my-double-tournament.do-length-first" value="true" />
+          <property key="select.my-double-tournament.size" value="1.4" />
+          <property key="select.my-double-tournament.size2" value="7" />
+        </file>
+      </files>
+    </directory>
+    <directory name="sat">
+      <files count="1">
+        <file name="sat.params" propertyCount="17">
+          <property key="parent.0" value="../../simple/simple.params" />
+          <property key="seed.0" value="time" />
+          <property key="pop.subpop.0.species.genome-size" value="50" />
+          <property key="eval.problem" value="ec.app.sat.SAT" />
+          <property key="eval.problem.sat-filename" value="data-1000.cnf" />
+          <property key="pop.subpop.0.size" value="1000" />
+          <property key="generations" value="100" />
+          <property key="pop.subpop.0.species" value="ec.vector.VectorSpecies" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="same" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.BitVectorIndividual" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="select.tournament.size" value="2" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.05" />
+          <property key="pop.subpop.0.species.crossover-type" value="two" />
+        </file>
+      </files>
+    </directory>
+    <directory name="spatial">
+      <files count="2">
+        <file name="spatial.params" propertyCount="23">
+          <property key="parent.0" value="../../simple/simple.params" />
+          <property key="eval.problem" value="ec.app.ecsuite.ECSuite" />
+          <property key="eval.problem.type" value="rosenbrock" />
+          <property key="breed" value="ec.spatial.SpatialBreeder" />
+          <property key="pop.subpops" value="1" />
+          <property key="pop.subpop.0" value="ec.spatial.Spatial1DSubpopulation" />
+          <property key="pop.subpop.0.duplicate-retries" value="10" />
+          <property key="pop.subpop.0.size" value="16" />
+          <property key="pop.subpop.0.species" value="ec.vector.FloatVectorSpecies" />
+          <property key="pop.subpop.0.species.crossover-type" value="one" />
+          <property key="pop.subpop.0.species.genome-size" value="2" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.DoubleVectorIndividual" />
+          <property key="pop.subpop.0.species.min-gene" value="-5.12" />
+          <property key="pop.subpop.0.species.max-gene" value="5.12" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.mutation-type" value="gauss" />
+          <property key="pop.subpop.0.species.mutation-stdev" value="0.25" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.75" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.spatial.SpatialTournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.size" value="2" />
+          <property key="pop.subpop.0.species.pipe.source.0.neighborhood-size" value="2" />
+          <property key="pop.subpop.0.species.pipe.source.0.ind-competes" value="true" />
+        </file>
+        <file name="spatialcoevolve.params" propertyCount="26">
+          <property key="parent.0" value="../coevolve2/coevolve2.params" />
+          <property key="breed" value="ec.spatial.SpatialBreeder" />
+          <property key="eval" value="ec.spatial.SpatialMultiPopCoevolutionaryEvaluator" />
+          <property key="eval.subpop.0.use-same-location-partners" value="true" />
+          <property key="eval.subpop.0.num-partners" value="1" />
+          <property key="eval.subpop.0.select" value="ec.spatial.SpatialTournamentSelection" />
+          <property key="eval.subpop.0.select.size" value="1" />
+          <property key="eval.subpop.0.select.neighborhood-size" value="1" />
+          <property key="eval.subpop.1.use-same-location-partners" value="true" />
+          <property key="eval.subpop.1.num-partners" value="1" />
+          <property key="eval.subpop.1.select" value="ec.spatial.SpatialTournamentSelection" />
+          <property key="eval.subpop.1.select.size" value="1" />
+          <property key="eval.subpop.1.select.neighborhood-size" value="1" />
+          <property key="pop.subpops" value="2" />
+          <property key="pop.subpop.0" value="ec.spatial.Spatial1DSubpopulation" />
+          <property key="pop.subpop.0.size" value="32" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.spatial.SpatialTournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.size" value="2" />
+          <property key="pop.subpop.0.species.pipe.source.0.neighborhood-size" value="2" />
+          <property key="pop.subpop.0.species.pipe.source.0.ind-competes" value="true" />
+          <property key="pop.subpop.1" value="ec.spatial.Spatial1DSubpopulation" />
+          <property key="pop.subpop.1.size" value="32" />
+          <property key="pop.subpop.1.species.pipe.source.0" value="ec.spatial.SpatialTournamentSelection" />
+          <property key="pop.subpop.1.species.pipe.source.0.size" value="2" />
+          <property key="pop.subpop.1.species.pipe.source.0.neighborhood-size" value="2" />
+          <property key="pop.subpop.1.species.pipe.source.0.ind-competes" value="true" />
+        </file>
+      </files>
+    </directory>
+    <directory name="star">
+      <files count="6">
+        <file name="ant.master.params" propertyCount="2">
+          <property key="parent.0" value="../ant/ant.params" />
+          <property key="parent.1" value="../../eval/master.params" />
+        </file>
+        <file name="ant.slave.params" propertyCount="4">
+          <property key="parent.0" value="ant.master.params" />
+          <property key="eval.stat" value="ec.Statistics" />
+          <property key="eval.stat.num-children" value="0" />
+          <property key="eval.master.host" value="127.0.0.1" />
+        </file>
+        <file name="coevolve1.master.params" propertyCount="2">
+          <property key="parent.0" value="../coevolve1/coevolve1.params" />
+          <property key="parent.1" value="../../eval/master.params" />
+        </file>
+        <file name="coevolve1.slave.params" propertyCount="4">
+          <property key="parent.0" value="coevolve1.master.params" />
+          <property key="eval.stat" value="ec.Statistics" />
+          <property key="eval.stat.num-children" value="0" />
+          <property key="eval.master.host" value="127.0.0.1" />
+        </file>
+        <file name="coevolve2.master.params" propertyCount="2">
+          <property key="parent.0" value="../coevolve2/coevolve2.params" />
+          <property key="parent.1" value="../../eval/master.params" />
+        </file>
+        <file name="coevolve2.slave.params" propertyCount="4">
+          <property key="parent.0" value="coevolve2.master.params" />
+          <property key="eval.stat" value="ec.Statistics" />
+          <property key="eval.stat.num-children" value="0" />
+          <property key="eval.master.host" value="127.0.0.1" />
+        </file>
+      </files>
+      <directory name="old">
+        <files count="6">
+          <file name="ant.slave1.params" propertyCount="2">
+            <property key="parent.0" value="ant.master.params" />
+            <property key="eval.slave-name" value="first" />
+          </file>
+          <file name="ant.slave2.params" propertyCount="2">
+            <property key="parent.0" value="ant.master.params" />
+            <property key="eval.slave-name" value="second" />
+          </file>
+          <file name="ant.slave3.params" propertyCount="2">
+            <property key="parent.0" value="ant.master.params" />
+            <property key="eval.slave-name" value="third" />
+          </file>
+          <file name="coevolve1.slave1.params" propertyCount="2">
+            <property key="parent.0" value="coevolve1.star.params" />
+            <property key="eval.slave-name" value="first" />
+          </file>
+          <file name="coevolve1.slave2.params" propertyCount="2">
+            <property key="parent.0" value="coevolve1.star.params" />
+            <property key="eval.slave-name" value="second" />
+          </file>
+          <file name="coevolve1.slave3.params" propertyCount="1">
+            <property key="parent.0" value="coevolve1.star.params" />
+          </file>
+        </files>
+      </directory>
+    </directory>
+    <directory name="sum">
+      <files count="2">
+        <file name="steadysum.params" propertyCount="2">
+          <property key="parent.0" value="../../steadystate/steadystate.params" />
+          <property key="parent.1" value="sum.params" />
+        </file>
+        <file name="sum.params" propertyCount="18">
+          <property key="parent.0" value="../../simple/simple.params" />
+          <property key="pop.subpop.0.size" value="10" />
+          <property key="generations" value="20000" />
+          <property key="pop.subpop.0.duplicate-retries" value="0" />
+          <property key="pop.subpop.0.species" value="ec.vector.IntegerVectorSpecies" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.IntegerVectorIndividual" />
+          <property key="pop.subpop.0.species.min-gene" value="0" />
+          <property key="pop.subpop.0.species.max-gene" value="100" />
+          <property key="pop.subpop.0.species.genome-size" value="10" />
+          <property key="pop.subpop.0.species.crossover-type" value="one" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.1" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="select.tournament.size" value="2" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="same" />
+          <property key="eval.problem" value="ec.app.sum.Sum" />
+        </file>
+      </files>
+    </directory>
+    <directory name="tutorial1">
+      <files count="1">
+        <file name="tutorial1.params" propertyCount="35">
+          <property key="breedthreads" value="1" />
+          <property key="evalthreads" value="1" />
+          <property key="seed.0" value="4357" />
+          <property key="state" value="ec.simple.SimpleEvolutionState" />
+          <property key="pop" value="ec.Population" />
+          <property key="init" value="ec.simple.SimpleInitializer" />
+          <property key="finish" value="ec.simple.SimpleFinisher" />
+          <property key="breed" value="ec.simple.SimpleBreeder" />
+          <property key="eval" value="ec.simple.SimpleEvaluator" />
+          <property key="stat" value="ec.simple.SimpleStatistics" />
+          <property key="exch" value="ec.simple.SimpleExchanger" />
+          <property key="generations" value="200" />
+          <property key="quit-on-run-complete" value="true" />
+          <property key="checkpoint" value="false" />
+          <property key="prefix" value="ec" />
+          <property key="checkpoint-modulo" value="1" />
+          <property key="stat.file" value="$out.stat" />
+          <property key="pop.subpops" value="1" />
+          <property key="pop.subpop.0" value="ec.Subpopulation" />
+          <property key="pop.subpop.0.size" value="10" />
+          <property key="pop.subpop.0.duplicate-retries" value="0" />
+          <property key="pop.subpop.0.species" value="ec.vector.VectorSpecies" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.BitVectorIndividual" />
+          <property key="pop.subpop.0.species.genome-size" value="20" />
+          <property key="pop.subpop.0.species.crossover-type" value="one" />
+          <property key="pop.subpop.0.species.crossover-prob" value="1.0" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.01" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="ec.select.TournamentSelection" />
+          <property key="select.tournament.size" value="2" />
+          <property key="eval.problem" value="ec.app.tutorial1.MaxOnes" />
+        </file>
+      </files>
+    </directory>
+    <directory name="tutorial2">
+      <files count="1">
+        <file name="tutorial2.params" propertyCount="20">
+          <property key="parent.0" value="../../simple/simple.params" />
+          <property key="pop.subpop.0.size" value="100" />
+          <property key="generations" value="200" />
+          <property key="pop.subpop.0.species" value="ec.vector.IntegerVectorSpecies" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.IntegerVectorIndividual" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.0.species.min-gene" value="-12312" />
+          <property key="pop.subpop.0.species.max-gene" value="2341212" />
+          <property key="pop.subpop.0.species.genome-size" value="20" />
+          <property key="pop.subpop.0.species.crossover-type" value="two" />
+          <property key="pop.subpop.0.species.crossover-prob" value="1.0" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.05" />
+          <property key="pop.subpop.0.species.pipe" value="ec.app.tutorial2.OurMutatorPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.toss" value="true" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.select.FitProportionateSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1.size" value="5" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1.pick-worst" value="true" />
+          <property key="eval.problem" value="ec.app.tutorial2.AddSubtract" />
+        </file>
+      </files>
+    </directory>
+    <directory name="tutorial3">
+      <files count="1">
+        <file name="tutorial3.params" propertyCount="36">
+          <property key="parent.0" value="../../es/es.params" />
+          <property key="breed" value="ec.es.MuPlusLambdaBreeder" />
+          <property key="es.mu.0" value="5" />
+          <property key="es.lambda.0" value="100" />
+          <property key="pop.subpop.0.size" value="105" />
+          <property key="generations" value="200" />
+          <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.es.ESSelection" />
+          <property key="pop.subpop.0.species.pipe.source.1" value="ec.app.tutorial3.OurSelection" />
+          <property key="pop.subpop.0.species.pipe.source.1.middle-probability" value="0.5" />
+          <property key="eval.problem" value="ec.app.tutorial3.OddRosenbrock" />
+          <property key="pop.subpop.0.species" value="ec.vector.FloatVectorSpecies" />
+          <property key="pop.subpop.0.species.ind" value="ec.vector.DoubleVectorIndividual" />
+          <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+          <property key="pop.subpop.0.species.mutation-prob" value="1.0" />
+          <property key="pop.subpop.0.species.mutation-type" value="gauss" />
+          <property key="pop.subpop.0.species.mutation-stdev" value="0.5" />
+          <property key="pop.subpop.0.species.crossover-type" value="one" />
+          <property key="pop.subpop.0.species.genome-size" value="5" />
+          <property key="pop.subpop.0.species.min-gene.0" value="-5.12" />
+          <property key="pop.subpop.0.species.max-gene.0" value="5.12" />
+          <property key="pop.subpop.0.species.min-gene.1" value="-3" />
+          <property key="pop.subpop.0.species.max-gene.1" value="2" />
+          <property key="pop.subpop.0.species.min-gene.2" value="-7.6" />
+          <property key="pop.subpop.0.species.max-gene.2" value="1.1" />
+          <property key="pop.subpop.0.species.min-gene.3" value="0" />
+          <property key="pop.subpop.0.species.max-gene.3" value="1.0" />
+          <property key="pop.subpop.0.species.min-gene.4" value="-10.3" />
+          <property key="pop.subpop.0.species.max-gene.4" value="2.2" />
+          <property key="pop.subpop.0.species.min-gene" value="-100" />
+          <property key="pop.subpop.0.species.max-gene" value="100" />
+          <property key="stat.num-children" value="1" />
+          <property key="stat.child.0" value="ec.app.tutorial3.MyStatistics" />
+          <property key="stat.child.0.pop-file" value="pop.stat" />
+          <property key="stat.child.0.info-file" value="info.stat" />
+        </file>
+      </files>
+    </directory>
+    <directory name="tutorial4">
+      <files count="1">
+        <file name="tutorial4.params" propertyCount="17">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="gp.fs.size" value="1" />
+          <property key="gp.fs.0" value="ec.gp.GPFunctionSet" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.size" value="5" />
+          <property key="gp.fs.0.func.0" value="ec.app.tutorial4.X" />
+          <property key="gp.fs.0.func.0.nc" value="nc0" />
+          <property key="gp.fs.0.func.1" value="ec.app.tutorial4.Y" />
+          <property key="gp.fs.0.func.1.nc" value="nc0" />
+          <property key="gp.fs.0.func.2" value="ec.app.tutorial4.Add" />
+          <property key="gp.fs.0.func.2.nc" value="nc2" />
+          <property key="gp.fs.0.func.3" value="ec.app.tutorial4.Sub" />
+          <property key="gp.fs.0.func.3.nc" value="nc2" />
+          <property key="gp.fs.0.func.4" value="ec.app.tutorial4.Mul" />
+          <property key="gp.fs.0.func.4.nc" value="nc2" />
+          <property key="eval.problem" value="ec.app.tutorial4.MultiValuedRegression" />
+          <property key="eval.problem.data" value="ec.app.tutorial4.DoubleData" />
+        </file>
+      </files>
+    </directory>
+    <directory name="twobox">
+      <files count="2">
+        <file name="adf.params" propertyCount="78">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="pop.subpop.0.species.ind.numtrees" value="2" />
+          <property key="pop.subpop.0.species.ind.tree.0" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.ind.tree.0.tc" value="tc0" />
+          <property key="pop.subpop.0.species.ind.tree.1" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.ind.tree.1.tc" value="tc1" />
+          <property key="gp.tc.size" value="2" />
+          <property key="gp.tc.0" value="ec.gp.GPTreeConstraints" />
+          <property key="gp.tc.0.name" value="tc0" />
+          <property key="gp.tc.0.fset" value="f0" />
+          <property key="gp.tc.0.returns" value="nil" />
+          <property key="gp.tc.0.init" value="ec.gp.koza.HalfBuilder" />
+          <property key="gp.tc.0.init.growp" value="0.5" />
+          <property key="gp.tc.0.init.min" value="2" />
+          <property key="gp.tc.0.init.max" value="6" />
+          <property key="gp.tc.1" value="ec.gp.GPTreeConstraints" />
+          <property key="gp.tc.1.name" value="tc1" />
+          <property key="gp.tc.1.fset" value="f1" />
+          <property key="gp.tc.1.returns" value="nil" />
+          <property key="gp.tc.1.init" value="ec.gp.koza.HalfBuilder" />
+          <property key="gp.tc.1.init.growp" value="0.5" />
+          <property key="gp.tc.1.init.min" value="2" />
+          <property key="gp.tc.1.init.max" value="6" />
+          <property key="gp.fs.size" value="2" />
+          <property key="gp.fs.0" value="ec.gp.GPFunctionSet" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.size" value="11" />
+          <property key="gp.fs.0.func.0" value="ec.app.twobox.func.L0" />
+          <property key="gp.fs.0.func.0.nc" value="nc0" />
+          <property key="gp.fs.0.func.1" value="ec.app.twobox.func.W0" />
+          <property key="gp.fs.0.func.1.nc" value="nc0" />
+          <property key="gp.fs.0.func.2" value="ec.app.twobox.func.H0" />
+          <property key="gp.fs.0.func.2.nc" value="nc0" />
+          <property key="gp.fs.0.func.3" value="ec.app.twobox.func.L1" />
+          <property key="gp.fs.0.func.3.nc" value="nc0" />
+          <property key="gp.fs.0.func.4" value="ec.app.twobox.func.W1" />
+          <property key="gp.fs.0.func.4.nc" value="nc0" />
+          <property key="gp.fs.0.func.5" value="ec.app.twobox.func.H1" />
+          <property key="gp.fs.0.func.5.nc" value="nc0" />
+          <property key="gp.fs.0.func.6" value="ec.app.twobox.func.Add" />
+          <property key="gp.fs.0.func.6.nc" value="nc2" />
+          <property key="gp.fs.0.func.7" value="ec.app.twobox.func.Sub" />
+          <property key="gp.fs.0.func.7.nc" value="nc2" />
+          <property key="gp.fs.0.func.8" value="ec.app.twobox.func.Mul" />
+          <property key="gp.fs.0.func.8.nc" value="nc2" />
+          <property key="gp.fs.0.func.9" value="ec.app.twobox.func.Div" />
+          <property key="gp.fs.0.func.9.nc" value="nc2" />
+          <property key="gp.fs.0.func.10" value="ec.gp.ADF" />
+          <property key="gp.fs.0.func.10.tree" value="1" />
+          <property key="gp.fs.0.func.10.name" value="ADF0" />
+          <property key="gp.fs.0.func.10.nc" value="nc3" />
+          <property key="gp.fs.1" value="ec.gp.GPFunctionSet" />
+          <property key="gp.fs.1.name" value="f1" />
+          <property key="gp.fs.1.size" value="7" />
+          <property key="gp.fs.1.func.0" value="ec.app.twobox.func.Add" />
+          <property key="gp.fs.1.func.0.nc" value="nc2" />
+          <property key="gp.fs.1.func.1" value="ec.app.twobox.func.Sub" />
+          <property key="gp.fs.1.func.1.nc" value="nc2" />
+          <property key="gp.fs.1.func.2" value="ec.app.twobox.func.Mul" />
+          <property key="gp.fs.1.func.2.nc" value="nc2" />
+          <property key="gp.fs.1.func.3" value="ec.app.twobox.func.Div" />
+          <property key="gp.fs.1.func.3.nc" value="nc2" />
+          <property key="gp.fs.1.func.4" value="ec.gp.ADFArgument" />
+          <property key="gp.fs.1.func.4.arg" value="0" />
+          <property key="gp.fs.1.func.4.name" value="ARG0" />
+          <property key="gp.fs.1.func.4.nc" value="nc0" />
+          <property key="gp.fs.1.func.5" value="ec.gp.ADFArgument" />
+          <property key="gp.fs.1.func.5.arg" value="1" />
+          <property key="gp.fs.1.func.5.name" value="ARG1" />
+          <property key="gp.fs.1.func.5.nc" value="nc0" />
+          <property key="gp.fs.1.func.6" value="ec.gp.ADFArgument" />
+          <property key="gp.fs.1.func.6.arg" value="2" />
+          <property key="gp.fs.1.func.6.name" value="ARG2" />
+          <property key="gp.fs.1.func.6.nc" value="nc0" />
+          <property key="eval.problem" value="ec.app.twobox.TwoBox" />
+          <property key="eval.problem.data" value="ec.app.twobox.TwoBoxData" />
+          <property key="eval.problem.size" value="10" />
+          <property key="eval.problem.range" value="10" />
+        </file>
+        <file name="noadf.params" propertyCount="28">
+          <property key="parent.0" value="../../gp/koza/koza.params" />
+          <property key="gp.fs.size" value="1" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.fs.0.size" value="10" />
+          <property key="gp.fs.0.func.0" value="ec.app.twobox.func.L0" />
+          <property key="gp.fs.0.func.0.nc" value="nc0" />
+          <property key="gp.fs.0.func.1" value="ec.app.twobox.func.W0" />
+          <property key="gp.fs.0.func.1.nc" value="nc0" />
+          <property key="gp.fs.0.func.2" value="ec.app.twobox.func.H0" />
+          <property key="gp.fs.0.func.2.nc" value="nc0" />
+          <property key="gp.fs.0.func.3" value="ec.app.twobox.func.L1" />
+          <property key="gp.fs.0.func.3.nc" value="nc0" />
+          <property key="gp.fs.0.func.4" value="ec.app.twobox.func.W1" />
+          <property key="gp.fs.0.func.4.nc" value="nc0" />
+          <property key="gp.fs.0.func.5" value="ec.app.twobox.func.H1" />
+          <property key="gp.fs.0.func.5.nc" value="nc0" />
+          <property key="gp.fs.0.func.6" value="ec.app.twobox.func.Add" />
+          <property key="gp.fs.0.func.6.nc" value="nc2" />
+          <property key="gp.fs.0.func.7" value="ec.app.twobox.func.Sub" />
+          <property key="gp.fs.0.func.7.nc" value="nc2" />
+          <property key="gp.fs.0.func.8" value="ec.app.twobox.func.Mul" />
+          <property key="gp.fs.0.func.8.nc" value="nc2" />
+          <property key="gp.fs.0.func.9" value="ec.app.twobox.func.Div" />
+          <property key="gp.fs.0.func.9.nc" value="nc2" />
+          <property key="eval.problem" value="ec.app.twobox.TwoBox" />
+          <property key="eval.problem.data" value="ec.app.twobox.TwoBoxData" />
+          <property key="eval.problem.size" value="10" />
+          <property key="eval.problem.range" value="10" />
+        </file>
+      </files>
+    </directory>
+  </directory>
+  <directory name="de">
+    <files count="1">
+      <file name="de.params" propertyCount="7">
+        <property key="parent.0" value="../simple/simple.params" />
+        <property key="eval" value="ec.de.DEEvaluator" />
+        <property key="breed" value="ec.de.DEBreeder" />
+        <property key="breed.f" value="0.1" />
+        <property key="breed.cr" value="0.5" />
+        <property key="breed.f-noise" value="0.001" />
+        <property key="breed.pf" value="0.5" />
+      </file>
+    </files>
+  </directory>
+  <directory name="es">
+    <files count="1">
+      <file name="es.params" propertyCount="4">
+        <property key="parent.0" value="../simple/simple.params" />
+        <property key="es.mu.0" value="1" />
+        <property key="es.lambda.0" value="10" />
+        <property key="breed" value="ec.es.MuCommaLambdaBreeder" />
+      </file>
+    </files>
+  </directory>
+  <directory name="eval">
+    <files count="2">
+      <file name="master.params" propertyCount="6">
+        <property key="eval.masterproblem" value="ec.eval.MasterProblem" />
+        <property key="eval.masterproblem.debug-info" value="false" />
+        <property key="eval.masterproblem.max-jobs-per-slave" value="3" />
+        <property key="eval.masterproblem.job-size" value="100" />
+        <property key="eval.compression" value="true" />
+        <property key="eval.master.port" value="15000" />
+      </file>
+      <file name="slave.params" propertyCount="6">
+        <property key="parent.0" value="master.params" />
+        <property key="eval.master.host" value="127.0.0.1" />
+        <property key="eval.slave-name" value="my-slave-name" />
+        <property key="eval.run-evolve" value="true" />
+        <property key="eval.runtime" value="6000" />
+        <property key="eval.return-inds" value="false" />
+      </file>
+    </files>
+  </directory>
+  <directory name="exchange">
+    <files count="1">
+      <file name="inter.params" propertyCount="70">
+        <property key="parent.0" value="../app/ant/ant.params" />
+        <property key="pop.subpops" value="3" />
+        <property key="pop.subpop.0" value="ec.Subpopulation" />
+        <property key="pop.subpop.0.size" value="200" />
+        <property key="pop.subpop.0.species" value="ec.gp.GPSpecies" />
+        <property key="pop.subpop.0.species.fitness" value="ec.gp.koza.KozaFitness" />
+        <property key="pop.subpop.0.species.ind" value="ec.gp.GPIndividual" />
+        <property key="pop.subpop.0.duplicate-retries" value="100" />
+        <property key="pop.subpop.0.species.ind.numtrees" value="1" />
+        <property key="pop.subpop.0.species.ind.tree.0" value="ec.gp.GPTree" />
+        <property key="pop.subpop.0.species.ind.tree.0.tc" value="tc0" />
+        <property key="pop.subpop.0.species.pipe" value="ec.breed.MultiBreedingPipeline" />
+        <property key="pop.subpop.0.species.pipe.generate-max" value="false" />
+        <property key="pop.subpop.0.species.pipe.num-sources" value="2" />
+        <property key="pop.subpop.0.species.pipe.source.0" value="ec.gp.koza.CrossoverPipeline" />
+        <property key="pop.subpop.0.species.pipe.source.0.prob" value="0.9" />
+        <property key="pop.subpop.0.species.pipe.source.1" value="ec.breed.ReproductionPipeline" />
+        <property key="pop.subpop.0.species.pipe.source.1.prob" value="0.1" />
+        <property key="pop.subpop.1" value="ec.Subpopulation" />
+        <property key="pop.subpop.1.size" value="200" />
+        <property key="pop.subpop.1.species" value="ec.gp.GPSpecies" />
+        <property key="pop.subpop.1.species.fitness" value="ec.gp.koza.KozaFitness" />
+        <property key="pop.subpop.1.species.ind" value="ec.gp.GPIndividual" />
+        <property key="pop.subpop.1.duplicate-retries" value="100" />
+        <property key="pop.subpop.1.species.ind.numtrees" value="1" />
+        <property key="pop.subpop.1.species.ind.tree.0" value="ec.gp.GPTree" />
+        <property key="pop.subpop.1.species.ind.tree.0.tc" value="tc0" />
+        <property key="pop.subpop.1.species.pipe" value="ec.breed.MultiBreedingPipeline" />
+        <property key="pop.subpop.1.species.pipe.generate-max" value="false" />
+        <property key="pop.subpop.1.species.pipe.num-sources" value="2" />
+        <property key="pop.subpop.1.species.pipe.source.0" value="ec.gp.koza.CrossoverPipeline" />
+        <property key="pop.subpop.1.species.pipe.source.0.prob" value="0.9" />
+        <property key="pop.subpop.1.species.pipe.source.1" value="ec.breed.ReproductionPipeline" />
+        <property key="pop.subpop.1.species.pipe.source.1.prob" value="0.1" />
+        <property key="pop.subpop.2" value="ec.Subpopulation" />
+        <property key="pop.subpop.2.size" value="200" />
+        <property key="pop.subpop.2.species" value="ec.gp.GPSpecies" />
+        <property key="pop.subpop.2.species.fitness" value="ec.gp.koza.KozaFitness" />
+        <property key="pop.subpop.2.species.ind" value="ec.gp.GPIndividual" />
+        <property key="pop.subpop.2.duplicate-retries" value="100" />
+        <property key="pop.subpop.2.species.ind.numtrees" value="1" />
+        <property key="pop.subpop.2.species.ind.tree.0" value="ec.gp.GPTree" />
+        <property key="pop.subpop.2.species.ind.tree.0.tc" value="tc0" />
+        <property key="pop.subpop.2.species.pipe" value="ec.breed.MultiBreedingPipeline" />
+        <property key="pop.subpop.2.species.pipe.generate-max" value="false" />
+        <property key="pop.subpop.2.species.pipe.num-sources" value="2" />
+        <property key="pop.subpop.2.species.pipe.source.0" value="ec.gp.koza.CrossoverPipeline" />
+        <property key="pop.subpop.2.species.pipe.source.0.prob" value="0.9" />
+        <property key="pop.subpop.2.species.pipe.source.1" value="ec.breed.ReproductionPipeline" />
+        <property key="pop.subpop.2.species.pipe.source.1.prob" value="0.1" />
+        <property key="exch" value="ec.exchange.InterPopulationExchange" />
+        <property key="exch.subpop.0.select" value="ec.select.TournamentSelection" />
+        <property key="exch.subpop.0.mod" value="2" />
+        <property key="exch.subpop.0.start" value="0" />
+        <property key="exch.subpop.0.size" value="3" />
+        <property key="exch.subpop.0.num-dest" value="2" />
+        <property key="exch.subpop.0.dest.0" value="1" />
+        <property key="exch.subpop.0.dest.1" value="2" />
+        <property key="exch.subpop.1.select" value="ec.select.TournamentSelection" />
+        <property key="exch.subpop.1.mod" value="2" />
+        <property key="exch.subpop.1.start" value="0" />
+        <property key="exch.subpop.1.size" value="3" />
+        <property key="exch.subpop.1.num-dest" value="1" />
+        <property key="exch.subpop.1.dest.0" value="2" />
+        <property key="exch.subpop.2.select" value="ec.select.TournamentSelection" />
+        <property key="exch.subpop.2.mod" value="2" />
+        <property key="exch.subpop.2.start" value="0" />
+        <property key="exch.subpop.2.size" value="3" />
+        <property key="exch.subpop.2.num-dest" value="1" />
+        <property key="exch.subpop.2.dest.0" value="0" />
+      </file>
+    </files>
+    <directory name="2-Island-Server">
+      <files count="4">
+        <file name="client.params" propertyCount="6">
+          <property key="parent.0" value="../..//app/ant/ant.params" />
+          <property key="exch" value="ec.exchange.IslandExchange" />
+          <property key="exch.select" value="ec.select.TournamentSelection" />
+          <property key="exch.compressed" value="true" />
+          <property key="exch.server-addr" value="localhost" />
+          <property key="exch.server-port" value="8999" />
+        </file>
+        <file name="crete.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="Crete" />
+          <property key="stat.file" value="$crete.stat" />
+          <property key="seed.0" value="1001" />
+          <property key="exch.client-port" value="9001" />
+        </file>
+        <file name="minoa.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="Minoa" />
+          <property key="stat.file" value="$minoa.stat" />
+          <property key="seed.0" value="1000" />
+          <property key="exch.client-port" value="9000" />
+        </file>
+        <file name="server.params" propertyCount="17">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.i-am-server" value="true" />
+          <property key="exch.num-islands" value="2" />
+          <property key="exch.island.0.id" value="Minoa" />
+          <property key="exch.island.0.num-mig" value="1" />
+          <property key="exch.island.0.mig.0" value="Crete" />
+          <property key="exch.island.0.size" value="4" />
+          <property key="exch.island.0.mod" value="6" />
+          <property key="exch.island.0.start" value="3" />
+          <property key="exch.island.0.mailbox-capacity" value="20" />
+          <property key="exch.island.1.id" value="Crete" />
+          <property key="exch.island.1.num-mig" value="1" />
+          <property key="exch.island.1.mig.0" value="Minoa" />
+          <property key="exch.island.1.size" value="4" />
+          <property key="exch.island.1.mod" value="6" />
+          <property key="exch.island.1.start" value="5" />
+          <property key="exch.island.1.mailbox-capacity" value="20" />
+        </file>
+      </files>
+    </directory>
+    <directory name="3-Island">
+      <files count="5">
+        <file name="assateague.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="AssateagueIsland" />
+          <property key="stat.file" value="$assateague.stat" />
+          <property key="seed.0" value="1000" />
+          <property key="exch.client-port" value="9000" />
+        </file>
+        <file name="chincoteague.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="ChincoteagueIsland" />
+          <property key="stat.file" value="$chincoteague.stat" />
+          <property key="seed.0" value="1001" />
+          <property key="exch.client-port" value="9001" />
+        </file>
+        <file name="client.params" propertyCount="6">
+          <property key="parent.0" value="../../app/ant/ant.params" />
+          <property key="exch" value="ec.exchange.IslandExchange" />
+          <property key="exch.select" value="ec.select.TournamentSelection" />
+          <property key="exch.compressed" value="true" />
+          <property key="exch.server-addr" value="localhost" />
+          <property key="exch.server-port" value="8999" />
+        </file>
+        <file name="server.params" propertyCount="27">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.i-am-server" value="true" />
+          <property key="exch.num-islands" value="3" />
+          <property key="exch.island.0.id" value="WallopsIsland" />
+          <property key="exch.island.0.num-mig" value="2" />
+          <property key="exch.island.0.mig.0" value="AssateagueIsland" />
+          <property key="exch.island.0.mig.1" value="ChincoteagueIsland" />
+          <property key="exch.island.0.size" value="40" />
+          <property key="exch.island.0.mod" value="6" />
+          <property key="exch.island.0.start" value="1" />
+          <property key="exch.island.0.mailbox-capacity" value="200" />
+          <property key="exch.island.1.id" value="AssateagueIsland" />
+          <property key="exch.island.1.num-mig" value="2" />
+          <property key="exch.island.1.mig.0" value="ChincoteagueIsland" />
+          <property key="exch.island.1.mig.1" value="WallopsIsland" />
+          <property key="exch.island.1.size" value="40" />
+          <property key="exch.island.1.mod" value="6" />
+          <property key="exch.island.1.start" value="3" />
+          <property key="exch.island.1.mailbox-capacity" value="200" />
+          <property key="exch.island.2.id" value="ChincoteagueIsland" />
+          <property key="exch.island.2.num-mig" value="2" />
+          <property key="exch.island.2.mig.0" value="WallopsIsland" />
+          <property key="exch.island.2.mig.1" value="AssateagueIsland" />
+          <property key="exch.island.2.size" value="40" />
+          <property key="exch.island.2.mod" value="6" />
+          <property key="exch.island.2.start" value="5" />
+          <property key="exch.island.2.mailbox-capacity" value="200" />
+        </file>
+        <file name="wallops.params" propertyCount="5">
+          <property key="parent.0" value="server.params" />
+          <property key="exch.id" value="WallopsIsland" />
+          <property key="stat.file" value="$wallops.stat" />
+          <property key="seed.0" value="1002" />
+          <property key="exch.client-port" value="9002" />
+        </file>
+      </files>
+    </directory>
+    <directory name="8-Island">
+      <files count="10">
+        <file name="client.params" propertyCount="6">
+          <property key="parent.0" value="../../app/ant/ant.params" />
+          <property key="exch" value="ec.exchange.IslandExchange" />
+          <property key="exch.select" value="ec.select.TournamentSelection" />
+          <property key="exch.compressed" value="true" />
+          <property key="exch.server-addr" value="localhost" />
+          <property key="exch.server-port" value="8999" />
+        </file>
+        <file name="coney.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="ConeyIsland" />
+          <property key="stat.file" value="$coney.stat" />
+          <property key="seed.0" value="1000" />
+          <property key="exch.client-port" value="9000" />
+        </file>
+        <file name="ellis.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="EllisIsland" />
+          <property key="stat.file" value="$ellis.stat" />
+          <property key="seed.0" value="1001" />
+          <property key="exch.client-port" value="9001" />
+        </file>
+        <file name="fantasy.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="FantasyIsland" />
+          <property key="stat.file" value="$fantasy.stat" />
+          <property key="seed.0" value="1002" />
+          <property key="exch.client-port" value="9002" />
+        </file>
+        <file name="gilligans.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="GilligansIsland" />
+          <property key="stat.file" value="$gilligans.stat" />
+          <property key="seed.0" value="1003" />
+          <property key="exch.client-port" value="9003" />
+        </file>
+        <file name="rhode.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="RhodeIsland" />
+          <property key="stat.file" value="$rhode.stat" />
+          <property key="seed.0" value="1004" />
+          <property key="exch.client-port" value="9004" />
+        </file>
+        <file name="server.params" propertyCount="75">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.i-am-server" value="true" />
+          <property key="exch.num-islands" value="8" />
+          <property key="exch.island.0.id" value="SurvivorIsland" />
+          <property key="exch.island.0.num-mig" value="3" />
+          <property key="exch.island.0.mig.0" value="GilligansIsland" />
+          <property key="exch.island.0.mig.1" value="TemptationIsland" />
+          <property key="exch.island.0.mig.2" value="RhodeIsland" />
+          <property key="exch.island.0.size" value="4" />
+          <property key="exch.island.0.mod" value="4" />
+          <property key="exch.island.0.start" value="1" />
+          <property key="exch.island.0.mailbox-capacity" value="20" />
+          <property key="exch.island.1.id" value="GilligansIsland" />
+          <property key="exch.island.1.num-mig" value="3" />
+          <property key="exch.island.1.mig.0" value="SurvivorIsland" />
+          <property key="exch.island.1.mig.1" value="EllisIsland" />
+          <property key="exch.island.1.mig.2" value="FantasyIsland" />
+          <property key="exch.island.1.size" value="4" />
+          <property key="exch.island.1.mod" value="4" />
+          <property key="exch.island.1.start" value="2" />
+          <property key="exch.island.1.mailbox-capacity" value="20" />
+          <property key="exch.island.2.id" value="FantasyIsland" />
+          <property key="exch.island.2.num-mig" value="3" />
+          <property key="exch.island.2.mig.0" value="GilligansIsland" />
+          <property key="exch.island.2.mig.1" value="ConeyIsland" />
+          <property key="exch.island.2.mig.2" value="TemptationIsland" />
+          <property key="exch.island.2.size" value="4" />
+          <property key="exch.island.2.mod" value="4" />
+          <property key="exch.island.2.start" value="3" />
+          <property key="exch.island.2.mailbox-capacity" value="20" />
+          <property key="exch.island.3.id" value="TemptationIsland" />
+          <property key="exch.island.3.num-mig" value="3" />
+          <property key="exch.island.3.mig.0" value="TreasureIsland" />
+          <property key="exch.island.3.mig.1" value="SurvivorIsland" />
+          <property key="exch.island.3.mig.2" value="FantasyIsland" />
+          <property key="exch.island.3.size" value="4" />
+          <property key="exch.island.3.mod" value="4" />
+          <property key="exch.island.3.start" value="2" />
+          <property key="exch.island.3.mailbox-capacity" value="20" />
+          <property key="exch.island.4.id" value="RhodeIsland" />
+          <property key="exch.island.4.num-mig" value="3" />
+          <property key="exch.island.4.mig.0" value="TreasureIsland" />
+          <property key="exch.island.4.mig.1" value="SurvivorIsland" />
+          <property key="exch.island.4.mig.2" value="EllisIsland" />
+          <property key="exch.island.4.size" value="4" />
+          <property key="exch.island.4.mod" value="4" />
+          <property key="exch.island.4.start" value="2" />
+          <property key="exch.island.4.mailbox-capacity" value="20" />
+          <property key="exch.island.5.id" value="EllisIsland" />
+          <property key="exch.island.5.num-mig" value="3" />
+          <property key="exch.island.5.mig.0" value="GilligansIsland" />
+          <property key="exch.island.5.mig.1" value="ConeyIsland" />
+          <property key="exch.island.5.mig.2" value="RhodeIsland" />
+          <property key="exch.island.5.size" value="4" />
+          <property key="exch.island.5.mod" value="4" />
+          <property key="exch.island.5.start" value="3" />
+          <property key="exch.island.5.mailbox-capacity" value="20" />
+          <property key="exch.island.6.id" value="ConeyIsland" />
+          <property key="exch.island.6.num-mig" value="3" />
+          <property key="exch.island.6.mig.0" value="EllisIsland" />
+          <property key="exch.island.6.mig.1" value="TreasureIsland" />
+          <property key="exch.island.6.mig.2" value="FantasyIsland" />
+          <property key="exch.island.6.size" value="4" />
+          <property key="exch.island.6.mod" value="4" />
+          <property key="exch.island.6.start" value="1" />
+          <property key="exch.island.6.mailbox-capacity" value="20" />
+          <property key="exch.island.7.id" value="TreasureIsland" />
+          <property key="exch.island.7.num-mig" value="3" />
+          <property key="exch.island.7.mig.0" value="ConeyIsland" />
+          <property key="exch.island.7.mig.1" value="TemptationIsland" />
+          <property key="exch.island.7.mig.2" value="RhodeIsland" />
+          <property key="exch.island.7.size" value="4" />
+          <property key="exch.island.7.mod" value="4" />
+          <property key="exch.island.7.start" value="3" />
+          <property key="exch.island.7.mailbox-capacity" value="20" />
+        </file>
+        <file name="survivor.params" propertyCount="5">
+          <property key="parent.0" value="server.params" />
+          <property key="exch.id" value="SurvivorIsland" />
+          <property key="stat.file" value="$survivor.stat" />
+          <property key="seed.0" value="1005" />
+          <property key="exch.client-port" value="9005" />
+        </file>
+        <file name="temptation.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="TemptationIsland" />
+          <property key="stat.file" value="$temptation.stat" />
+          <property key="seed.0" value="1006" />
+          <property key="exch.client-port" value="9006" />
+        </file>
+        <file name="treasure.params" propertyCount="5">
+          <property key="parent.0" value="client.params" />
+          <property key="exch.id" value="TreasureIsland" />
+          <property key="stat.file" value="$treasure.stat" />
+          <property key="seed.0" value="1007" />
+          <property key="exch.client-port" value="9007" />
+        </file>
+      </files>
+    </directory>
+  </directory>
+  <directory name="gp">
+    <files count="1">
+      <file name="gp.params" propertyCount="5">
+        <property key="parent.0" value="../simple/simple.params" />
+        <property key="pop.subpop.0.species" value="ec.gp.GPSpecies" />
+        <property key="pop.subpop.0.species.ind" value="ec.gp.GPIndividual" />
+        <property key="pop.subpop.0.species.ind.numtrees" value="1" />
+        <property key="pop.subpop.0.species.ind.tree.0" value="ec.gp.GPTree" />
+      </file>
+    </files>
+    <directory name="breed">
+      <files count="1">
+        <file name="breed.params" propertyCount="12">
+          <property key="gp.breed.internal-xover.tries" value="5" />
+          <property key="gp.breed.internal-xover.maxdepth" value="17" />
+          <property key="gp.breed.internal-xover.ns.0" value="ec.gp.koza.KozaNodeSelector" />
+          <property key="gp.breed.internal-xover.ns.1" value="same" />
+          <property key="gp.breed.rehang.tries" value="1" />
+          <property key="gp.breed.mutate-swap.tries" value="1" />
+          <property key="gp.breed.mutate-all-nodes.ns.0" value="ec.gp.koza.KozaNodeSelector" />
+          <property key="gp.breed.mutate-one-node.ns.0" value="ec.gp.koza.KozaNodeSelector" />
+          <property key="gp.breed.mutate-demote.tries" value="1" />
+          <property key="gp.breed.mutate-demote.maxdepth" value="17" />
+          <property key="gp.breed.mutate-promote.tries" value="1" />
+          <property key="gp.breed.mutate-erc.ns.0" value="ec.gp.koza.KozaNodeSelector" />
+        </file>
+      </files>
+    </directory>
+    <directory name="ge">
+      <files count="1">
+        <file name="ge.params" propertyCount="36">
+          <property key="eval.problem" value="ec.gp.ge.GEProblem" />
+          <property key="pop.subpop.0.species" value="ec.gp.ge.GESpecies" />
+          <property key="pop.subpop.0.species.parser" value="ec.gp.ge.GrammarParser" />
+          <property key="pop.subpop.0.species.ind" value="ec.gp.ge.GEIndividual" />
+          <property key="pop.subpop.0.species.fitness" value="ec.gp.koza.KozaFitness" />
+          <property key="pop.subpop.0.species.min-gene" value="-128" />
+          <property key="pop.subpop.0.species.max-gene" value="127" />
+          <property key="pop.subpop.0.species.mutation-prob" value="0.01" />
+          <property key="pop.subpop.0.species.crossover-type" value="one" />
+          <property key="pop.subpop.0.species.genome-size" value="geometric" />
+          <property key="pop.subpop.0.species.geometric-prob" value="0.85" />
+          <property key="pop.subpop.0.species.min-initial-size" value="5" />
+          <property key="pop.subpop.0.species.pipe" value="ec.breed.MultiBreedingPipeline" />
+          <property key="pop.subpop.0.species.pipe.num-sources" value="3" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.ListCrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.gp.ge.breed.GETruncationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.0.source.1" value="same" />
+          <property key="pop.subpop.0.species.pipe.source.0.prob" value="0.2" />
+          <property key="pop.subpop.0.species.pipe.source.1" value="ec.vector.breed.GeneDuplicationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.1.source.0" value="ec.gp.ge.breed.GETruncationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.1.source.0.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.1.prob" value="0.55" />
+          <property key="pop.subpop.0.species.pipe.source.2" value="ec.vector.breed.VectorMutationPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.2.source.0" value="ec.select.TournamentSelection" />
+          <property key="pop.subpop.0.species.pipe.source.2.prob" value="0.05" />
+          <property key="select.tournament.size" value="7" />
+          <property key="pop.subpop.0.species.gp-species" value="ec.gp.GPSpecies" />
+          <property key="pop.subpop.0.species.gp-species.fitness" value="ec.gp.koza.KozaFitness" />
+          <property key="pop.subpop.0.species.gp-species.ind" value="ec.gp.GPIndividual" />
+          <property key="pop.subpop.0.species.gp-species.ind.numtrees" value="1" />
+          <property key="pop.subpop.0.species.gp-species.ind.tree.0" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.gp-species.ind.tree.0.tc" value="tc0" />
+          <property key="pop.subpop.0.species.gp-species.pipe" value="ec.breed.ReproductionPipeline" />
+          <property key="pop.subpop.0.species.gp-species.pipe.num-sources" value="1" />
+          <property key="pop.subpop.0.species.gp-species.pipe.source.0" value="ec.select.TournamentSelection" />
+        </file>
+      </files>
+    </directory>
+    <directory name="koza">
+      <files count="1">
+        <file name="koza.params" propertyCount="101">
+          <property key="parent.0" value="../../simple/simple.params" />
+          <property key="pop.subpop.0.species.fitness" value="ec.gp.koza.KozaFitness" />
+          <property key="init" value="ec.gp.GPInitializer" />
+          <property key="pop.subpop.0.species" value="ec.gp.GPSpecies" />
+          <property key="pop.subpop.0.species.ind" value="ec.gp.GPIndividual" />
+          <property key="pop.subpop.0.duplicate-retries" value="100" />
+          <property key="pop.subpop.0.species.ind.numtrees" value="1" />
+          <property key="pop.subpop.0.species.ind.tree.0" value="ec.gp.GPTree" />
+          <property key="pop.subpop.0.species.ind.tree.0.tc" value="tc0" />
+          <property key="pop.subpop.0.species.pipe" value="ec.breed.MultiBreedingPipeline" />
+          <property key="pop.subpop.0.species.pipe.generate-max" value="false" />
+          <property key="pop.subpop.0.species.pipe.num-sources" value="2" />
+          <property key="pop.subpop.0.species.pipe.source.0" value="ec.gp.koza.CrossoverPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.0.prob" value="0.9" />
+          <property key="pop.subpop.0.species.pipe.source.1" value="ec.breed.ReproductionPipeline" />
+          <property key="pop.subpop.0.species.pipe.source.1.prob" value="0.1" />
+          <property key="breed.reproduce.source.0" value="ec.select.TournamentSelection" />
+          <property key="gp.koza.xover.source.0" value="ec.select.TournamentSelection" />
+          <property key="gp.koza.xover.source.1" value="same" />
+          <property key="gp.koza.xover.ns.0" value="ec.gp.koza.KozaNodeSelector" />
+          <property key="gp.koza.xover.ns.1" value="same" />
+          <property key="gp.koza.xover.maxdepth" value="17" />
+          <property key="gp.koza.xover.tries" value="1" />
+          <property key="gp.koza.mutate.source.0" value="ec.select.TournamentSelection" />
+          <property key="gp.koza.mutate.ns.0" value="ec.gp.koza.KozaNodeSelector" />
+          <property key="gp.koza.mutate.build.0" value="ec.gp.koza.GrowBuilder" />
+          <property key="gp.koza.mutate.maxdepth" value="17" />
+          <property key="gp.koza.mutate.tries" value="1" />
+          <property key="select.tournament.size" value="7" />
+          <property key="gp.koza.grow.min-depth" value="5" />
+          <property key="gp.koza.grow.max-depth" value="5" />
+          <property key="gp.problem.stack" value="ec.gp.ADFStack" />
+          <property key="gp.adf-stack.context" value="ec.gp.ADFContext" />
+          <property key="gp.koza.ns.terminals" value="0.1" />
+          <property key="gp.koza.ns.nonterminals" value="0.9" />
+          <property key="gp.koza.ns.root" value="0.0" />
+          <property key="gp.fs.size" value="1" />
+          <property key="gp.fs.0" value="ec.gp.GPFunctionSet" />
+          <property key="gp.fs.0.name" value="f0" />
+          <property key="gp.type.a.size" value="1" />
+          <property key="gp.type.a.0.name" value="nil" />
+          <property key="gp.type.s.size" value="0" />
+          <property key="gp.tc.size" value="1" />
+          <property key="gp.tc.0" value="ec.gp.GPTreeConstraints" />
+          <property key="gp.tc.0.name" value="tc0" />
+          <property key="gp.tc.0.fset" value="f0" />
+          <property key="gp.tc.0.returns" value="nil" />
+          <property key="gp.tc.0.init" value="ec.gp.koza.HalfBuilder" />
+          <property key="gp.koza.half.min-depth" value="2" />
+          <property key="gp.koza.half.max-depth" value="6" />
+          <property key="gp.koza.half.growp" value="0.5" />
+          <property key="gp.nc.size" value="7" />
+          <property key="gp.nc.0" value="ec.gp.GPNodeConstraints" />
+          <property key="gp.nc.0.name" value="nc0" />
+          <property key="gp.nc.0.returns" value="nil" />
+          <property key="gp.nc.0.size" value="0" />
+          <property key="gp.nc.1" value="ec.gp.GPNodeConstraints" />
+          <property key="gp.nc.1.name" value="nc1" />
+          <property key="gp.nc.1.returns" value="nil" />
+          <property key="gp.nc.1.size" value="1" />
+          <property key="gp.nc.1.child.0" value="nil" />
+          <property key="gp.nc.2" value="ec.gp.GPNodeConstraints" />
+          <property key="gp.nc.2.name" value="nc2" />
+          <property key="gp.nc.2.returns" value="nil" />
+          <property key="gp.nc.2.size" value="2" />
+          <property key="gp.nc.2.child.0" value="nil" />
+          <property key="gp.nc.2.child.1" value="nil" />
+          <property key="gp.nc.3" value="ec.gp.GPNodeConstraints" />
+          <property key="gp.nc.3.name" value="nc3" />
+          <property key="gp.nc.3.returns" value="nil" />
+          <property key="gp.nc.3.size" value="3" />
+          <property key="gp.nc.3.child.0" value="nil" />
+          <property key="gp.nc.3.child.1" value="nil" />
+          <property key="gp.nc.3.child.2" value="nil" />
+          <property key="gp.nc.4" value="ec.gp.GPNodeConstraints" />
+          <property key="gp.nc.4.name" value="nc4" />
+          <property key="gp.nc.4.returns" value="nil" />
+          <property key="gp.nc.4.size" value="4" />
+          <property key="gp.nc.4.child.0" value="nil" />
+          <property key="gp.nc.4.child.1" value="nil" />
+          <property key="gp.nc.4.child.2" value="nil" />
+          <property key="gp.nc.4.child.3" value="nil" />
+          <property key="gp.nc.5" value="ec.gp.GPNodeConstraints" />
+          <property key="gp.nc.5.name" value="nc5" />
+          <property key="gp.nc.5.returns" value="nil" />
+          <property key="gp.nc.5.size" value="5" />
+          <property key="gp.nc.5.child.0" value="nil" />
+          <property key="gp.nc.5.child.1" value="nil" />
+          <property key="gp.nc.5.child.2" value="nil" />
+          <property key="gp.nc.5.child.3" value="nil" />
+          <property key="gp.nc.5.child.4" value="nil" />
+          <property key="gp.nc.6" value="ec.gp.GPNodeConstraints" />
+          <property key="gp.nc.6.name" value="nc6" />
+          <property key="gp.nc.6.returns" value="nil" />
+          <property key="gp.nc.6.size" value="6" />
+          <property key="gp.nc.6.child.0" value="nil" />
+          <property key="gp.nc.6.child.1" value="nil" />
+          <property key="gp.nc.6.child.2" value="nil" />
+          <property key="gp.nc.6.child.3" value="nil" />
+          <property key="gp.nc.6.child.4" value="nil" />
+          <property key="gp.nc.6.child.5" value="nil" />
+        </file>
+      </files>
+    </directory>
+  </directory>
+  <directory name="multiobjective">
+    <files count="1">
+      <file name="multiobjective.params" propertyCount="5">
+        <property key="multi.fitness.num-objectives" value="2" />
+        <property key="multi.fitness.max" value="1" />
+        <property key="multi.fitness.min" value="0" />
+        <property key="stat" value="ec.multiobjective.MultiObjectiveStatistics" />
+        <property key="stat.front" value="$front.stat" />
+      </file>
+    </files>
+    <directory name="nsga2">
+      <files count="1">
+        <file name="nsga2.params" propertyCount="5">
+          <property key="parent.0" value="../multiobjective.params" />
+          <property key="parent.1" value="../../simple/simple.params" />
+          <property key="pop.subpop.0.species.fitness" value="ec.multiobjective.nsga2.NSGA2MultiObjectiveFitness" />
+          <property key="eval" value="ec.multiobjective.nsga2.NSGA2Evaluator" />
+          <property key="breed" value="ec.multiobjective.nsga2.NSGA2Breeder" />
+        </file>
+      </files>
+    </directory>
+    <directory name="spea2">
+      <files count="1">
+        <file name="spea2.params" propertyCount="6">
+          <property key="parent.0" value="../multiobjective.params" />
+          <property key="parent.1" value="../../simple/simple.params" />
+          <property key="breed.elite.0" value="128" />
+          <property key="pop.subpop.0.species.fitness" value="ec.multiobjective.spea2.SPEA2MultiObjectiveFitness" />
+          <property key="eval" value="ec.multiobjective.spea2.SPEA2Evaluator" />
+          <property key="breed" value="ec.multiobjective.spea2.SPEA2Breeder" />
+        </file>
+      </files>
+    </directory>
+  </directory>
+  <directory name="pso">
+    <files count="1">
+      <file name="pso.params" propertyCount="36">
+        <property key="parent.0" value="../ec.params" />
+        <property key="eval.problem" value="ec.app.ecsuite.ECSuite" />
+        <property key="eval.problem.type" value="rosenbrock" />
+        <property key="seed.0" value="time" />
+        <property key="state" value="ec.simple.SimpleEvolutionState" />
+        <property key="init" value="ec.simple.SimpleInitializer" />
+        <property key="finish" value="ec.simple.SimpleFinisher" />
+        <property key="exch" value="ec.simple.SimpleExchanger" />
+        <property key="breed" value="ec.pso.PSOBreeder" />
+        <property key="eval" value="ec.simple.SimpleEvaluator" />
+        <property key="stat" value="ec.simple.SimpleStatistics" />
+        <property key="generations" value="200" />
+        <property key="quit-on-run-complete" value="true" />
+        <property key="pop" value="ec.Population" />
+        <property key="pop.subpops" value="1" />
+        <property key="pop.subpop.0" value="ec.pso.PSOSubpopulation" />
+        <property key="pop.subpop.0.duplicate-retries" value="2" />
+        <property key="pop.subpop.0.species" value="ec.vector.FloatVectorSpecies" />
+        <property key="pop.subpop.0.species.fitness" value="ec.simple.SimpleFitness" />
+        <property key="pop.subpop.0.species.pipe" value="ec.vector.breed.VectorMutationPipeline" />
+        <property key="pop.subpop.0.species.pipe.source.0" value="ec.vector.breed.VectorCrossoverPipeline" />
+        <property key="pop.subpop.0.species.pipe.source.0.source.0" value="ec.select.TournamentSelection" />
+        <property key="pop.subpop.0.species.pipe.source.0.source.1" value="same" />
+        <property key="pop.subpop.0.species.ind" value="ec.vector.DoubleVectorIndividual" />
+        <property key="pop.subpop.0.species.min-gene" value="-5.12" />
+        <property key="pop.subpop.0.species.max-gene" value="5.12" />
+        <property key="pop.subpop.0.species.genome-size" value="2" />
+        <property key="select.tournament.size" value="2" />
+        <property key="pop.subpop.0.species.mutation-prob" value="0.005" />
+        <property key="pop.subpop.0.species.crossover-type" value="one" />
+        <property key="pop.subpop.0.size" value="50" />
+        <property key="pop.subpop.0.neighborhood-size" value="20" />
+        <property key="pop.subpop.0.clamp" value="false" />
+        <property key="pop.subpop.0.initial-velocity-scale" value="1.0" />
+        <property key="pop.subpop.0.velocity-multiplier" value="1.5" />
+        <property key="stat.file" value="$out.stat" />
+      </file>
+    </files>
+  </directory>
+  <directory name="simple">
+    <files count="1">
+      <file name="simple.params" propertyCount="16">
+        <property key="parent.0" value="../ec.params" />
+        <property key="state" value="ec.simple.SimpleEvolutionState" />
+        <property key="init" value="ec.simple.SimpleInitializer" />
+        <property key="finish" value="ec.simple.SimpleFinisher" />
+        <property key="exch" value="ec.simple.SimpleExchanger" />
+        <property key="breed" value="ec.simple.SimpleBreeder" />
+        <property key="eval" value="ec.simple.SimpleEvaluator" />
+        <property key="stat" value="ec.simple.SimpleStatistics" />
+        <property key="generations" value="51" />
+        <property key="quit-on-run-complete" value="true" />
+        <property key="pop" value="ec.Population" />
+        <property key="pop.subpops" value="1" />
+        <property key="pop.subpop.0" value="ec.Subpopulation" />
+        <property key="pop.subpop.0.size" value="1024" />
+        <property key="pop.subpop.0.duplicate-retries" value="0" />
+        <property key="stat.file" value="$out.stat" />
+      </file>
+    </files>
+  </directory>
+  <directory name="steadystate">
+    <files count="1">
+      <file name="steadystate.params" propertyCount="10">
+        <property key="state" value="ec.steadystate.SteadyStateEvolutionState" />
+        <property key="evalthreads" value="1" />
+        <property key="breedthreads" value="1" />
+        <property key="exch" value="ec.simple.SimpleExchanger" />
+        <property key="breed" value="ec.steadystate.SteadyStateBreeder" />
+        <property key="eval" value="ec.steadystate.SteadyStateEvaluator" />
+        <property key="steady.deselector.0" value="ec.select.TournamentSelection" />
+        <property key="steady.deselector.0.size" value="1" />
+        <property key="steady.deselector.0.pick-worst" value="true" />
+        <property key="steady.duplicate-retries" value="100" />
+      </file>
+    </files>
+  </directory>
+</root>

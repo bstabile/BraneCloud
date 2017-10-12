@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9A7B8EFC-D36E-435D-99E2-10793AA3FFCD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BraneCloud.Evolution.EC.Configuration</RootNamespace>
+    <AssemblyName>BraneCloud.Evolution.EC.Configuration</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BadParameterException.cs" />
+    <Compile Include="PropertiesClass2.cs" />
+    <Compile Include="ECConfigurationAttribute.cs" />
+    <Compile Include="ECActivator.cs" />
+    <Compile Include="ParameterModel\Builder\BuilderError.cs" />
+    <Compile Include="ParameterModel\IParseParameter.cs" />
+    <Compile Include="ParameterModel\ITrackParameter.cs" />
+    <Compile Include="ParameterModel\Sources\IParameterSourceBuilder.cs" />
+    <Compile Include="ParameterModel\Sources\Xml\ParameterXmlReader.cs" />
+    <Compile Include="ParameterModel\Tree\IFileTree.cs" />
+    <Compile Include="ParameterModel\Forest\IParameterForest.cs" />
+    <Compile Include="ParameterModel\Builder\IParameterForestBuilder.cs" />
+    <Compile Include="ParameterModel\Sources\File\IFileDirectory.cs" />
+    <Compile Include="ParameterModel\IParameterSource.cs" />
+    <Compile Include="ParameterModel\Tree\IParameterTree.cs" />
+    <Compile Include="ParameterModel\Tree\ITree.cs" />
+    <Compile Include="ParameterModel\Builder\IParameterTreeBuilder.cs" />
+    <Compile Include="ParameterModel\Sources\ParameterSourceLocator.cs" />
+    <Compile Include="ParameterModel\Sources\ParameterSourceType.cs" />
+    <Compile Include="IParameter.cs" />
+    <Compile Include="ParameterDatabase\IParameterDatabase.cs" />
+    <Compile Include="ParamClassLoadException.cs" />
+    <Compile Include="Parameter.cs" />
+    <Compile Include="ParameterDatabase\ParameterDatabase_HIGH.cs" />
+    <Compile Include="ParameterDatabase\ParameterDatabaseEvent.cs" />
+    <Compile Include="ParameterDatabase\ParameterDatabaseListener.cs" />
+    <Compile Include="ParameterDatabase\ParameterDatabaseTreeModel.cs" />
+    <Compile Include="ParameterDatabase\ParameterDatabaseTreeNode.cs" />
+    <Compile Include="ParameterDatabase\ParameterDatabase_LOW.cs" />
+    <Compile Include="ParameterModel\Sources\File\FileDirectory.cs" />
+    <Compile Include="ParameterModel\Forest\ParameterForest.cs" />
+    <Compile Include="ParameterModel\Builder\ParameterForestBuilder.cs" />
+    <Compile Include="ParameterModel\Tree\ParametersTree_HIGH.cs" />
+    <Compile Include="ParameterModel\Tree\ParametersTree_LOW.cs" />
+    <Compile Include="ParameterModel\Sources\File\File.cs" />
+    <Compile Include="ParameterModel\Tree\FileTree.cs" />
+    <Compile Include="ParameterModel\Tree\ParameterTree.cs" />
+    <Compile Include="PropertiesClass.cs" />
+    <Compile Include="ParameterModel\Tree\FileDictionaryTree.cs" />
+    <Compile Include="PropertiesClass_OLD.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\BraneCloud.Evolution.Archetype\BraneCloud.Evolution.Archetype.csproj">
+      <Project>{07A344D1-F022-4785-8A3B-A90DD6E61557}</Project>
+      <Name>BraneCloud.Evolution.Archetype</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\BraneCloud.Evolution.Collections.Generic\BraneCloud.Evolution.Collections.Generic.csproj">
+      <Project>{78B9F0C7-5E96-4546-96BE-1856A7BFDE7B}</Project>
+      <Name>BraneCloud.Evolution.Collections.Generic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BraneCloud.Evolution.EC.Support\BraneCloud.Evolution.EC.Support.csproj">
+      <Project>{1669FD6F-D6A2-4498-A62B-F5A831B56A83}</Project>
+      <Name>BraneCloud.Evolution.EC.Support</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Readme.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

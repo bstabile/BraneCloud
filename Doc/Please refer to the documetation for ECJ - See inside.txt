@@ -1,0 +1,8 @@
+When I find the time. :-\
+
+Until that happens, please refer to the 
+ECJ documentation for the original Java version:
+
+http://www.cs.gmu.edu/~eclab/projects/ecj/
+
+BRS

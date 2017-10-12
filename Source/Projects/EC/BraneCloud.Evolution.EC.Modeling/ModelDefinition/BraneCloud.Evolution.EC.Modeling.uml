@@ -1,0 +1,1537 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<modelStoreModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/Kernel" xmlns:dm2="http://schemas.microsoft.com/dsltools/Component" xmlns:dm3="http://schemas.microsoft.com/dsltools/UseCase" xmlns:dm4="http://schemas.microsoft.com/dsltools/Activity" xmlns:dm5="http://schemas.microsoft.com/dsltools/Interaction" xmlns:dm6="http://schemas.microsoft.com/dsltools/UmlModelLibrary" xmlns:dm7="http://schemas.microsoft.com/dsltools/UmlDiagrams" xmlns:dm8="http://schemas.microsoft.com/dsltools/LogicalClassDesigner" xmlns:dm9="http://schemas.microsoft.com/VisualStudio/TeamArchitect/SequenceDesigner"
+  dslVersion="1.0.0.0"
+  Id="ca9eecf1-51d8-494a-8c4b-7463cab97242"
+  name="BraneCloud.EC.Modeling" xmlns="http://schemas.microsoft.com/dsltools/ModelStore">
+  <profileInstances>
+    <packageHasProfileInstances
+      Id="0caec977-1f8c-4ba3-a7db-8cc9ad9cc73b">
+      <profileInstance
+        Id="e34d544e-0fea-4ed6-ac5e-1b74119ac791"
+        name="StandardProfileL2" />
+    </packageHasProfileInstances>
+    <packageHasProfileInstances
+      Id="29349502-908c-4fda-9054-c48619c59ed0">
+      <profileInstance
+        Id="532ea607-fb19-44b8-8502-3351b05452be"
+        name="StandardProfileL3" />
+    </packageHasProfileInstances>
+  </profileInstances>
+  <packagedElements>
+    <packageHasNamedElement>
+      <interaction
+        Id="8971452e-655b-4df7-8cdf-4a5cf040f92f"
+        name="GPIndividualWriteBinary"
+        collapseFragmentsFlag="false"
+        isActiveClass="false"
+        isAbstract="false"
+        isLeaf="false"
+        isReentrant="false">
+        <fragments>
+          <messageOccurrenceSpecification
+            Id="4d30f75d-2927-4450-9386-4054a2b349d7"
+            name="MessageOccurrenceSpecification5">
+            <covered>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <behaviorExecutionSpecification
+            Id="23daccef-602a-4259-aa7b-fe4623d5b338"
+            name="BehaviorExecutionSpecification2">
+            <coveredLifelines>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </coveredLifelines>
+            <finish>
+              <executionOccurrenceSpecificationMoniker
+                Id="c28f6dbe-08c1-4d9a-8aa7-4a33e0d169a4"
+                LastKnownName="ExecutionOccurrenceSpecification4"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </finish>
+            <start>
+              <executionOccurrenceSpecificationMoniker
+                Id="74fa8d93-2312-4416-b19f-f2b674af8ddb"
+                LastKnownName="ExecutionOccurrenceSpecification3"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </start>
+            <nestedOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="58ec397d-8b1a-43e0-8635-c38c08b2bc73"
+                LastKnownName="MessageOccurrenceSpecification6"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </nestedOccurrences>
+          </behaviorExecutionSpecification>
+          <executionOccurrenceSpecification
+            Id="74fa8d93-2312-4416-b19f-f2b674af8ddb"
+            name="ExecutionOccurrenceSpecification3">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="4718b495-e8aa-46fb-a791-4ce41a010ea1"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="58ec397d-8b1a-43e0-8635-c38c08b2bc73"
+            name="MessageOccurrenceSpecification6">
+            <covered>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <executionOccurrenceSpecification
+            Id="c28f6dbe-08c1-4d9a-8aa7-4a33e0d169a4"
+            name="ExecutionOccurrenceSpecification4">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="0e080214-4de4-45eb-aeee-c91502dfde53"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="4944491b-ffcb-4ca3-8c9b-7537cc5cb679"
+            name="MessageOccurrenceSpecification13">
+            <covered>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <behaviorExecutionSpecification
+            Id="f05cfb61-1e63-4e8b-ac94-46ce14a21135"
+            name="BehaviorExecutionSpecification5">
+            <coveredLifelines>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </coveredLifelines>
+            <finish>
+              <executionOccurrenceSpecificationMoniker
+                Id="484309af-7972-43d1-b99d-4751a77e7980"
+                LastKnownName="ExecutionOccurrenceSpecification10"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </finish>
+            <start>
+              <executionOccurrenceSpecificationMoniker
+                Id="03899dcf-3832-4348-9112-775d0b69281e"
+                LastKnownName="ExecutionOccurrenceSpecification9"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </start>
+            <nestedOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="e2dce905-4b02-4b7d-b83f-e6306ac9835c"
+                LastKnownName="MessageOccurrenceSpecification14"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="0d119ead-01a7-4e19-a247-7f11069bd676"
+                LastKnownName="MessageOccurrenceSpecification15"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="f189db39-1cbb-4aa1-9e9d-ad670f94520b"
+                LastKnownName="MessageOccurrenceSpecification18"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </nestedOccurrences>
+          </behaviorExecutionSpecification>
+          <executionOccurrenceSpecification
+            Id="03899dcf-3832-4348-9112-775d0b69281e"
+            name="ExecutionOccurrenceSpecification9">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="12fc7a96-d9e7-40a8-ae0b-16d8b9e03395"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="e2dce905-4b02-4b7d-b83f-e6306ac9835c"
+            name="MessageOccurrenceSpecification14">
+            <covered>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <behaviorExecutionSpecification
+            Id="12c18c57-1277-4389-ba08-85ee74b1f30d"
+            name="BehaviorExecutionSpecification6">
+            <coveredLifelines>
+              <lifelineMoniker
+                Id="ae39bf52-cd04-4343-8224-e8b9a15c105d"
+                LastKnownName="GPTrees"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </coveredLifelines>
+            <finish>
+              <executionOccurrenceSpecificationMoniker
+                Id="714cda0a-93a0-4c44-aab1-9d2550b5e9c7"
+                LastKnownName="ExecutionOccurrenceSpecification12"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </finish>
+            <start>
+              <executionOccurrenceSpecificationMoniker
+                Id="3f3a9b31-6cac-4826-b115-f27729b654c3"
+                LastKnownName="ExecutionOccurrenceSpecification11"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </start>
+            <nestedOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="f19ccc2c-5a20-4b33-9743-74d5b529a0b7"
+                LastKnownName="MessageOccurrenceSpecification16"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="eeab9b56-8bf6-4f7d-b4b0-8e3d79deacb4"
+                LastKnownName="MessageOccurrenceSpecification21"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="8231bf96-f4af-4743-a078-ff19e639825f"
+                LastKnownName="MessageOccurrenceSpecification24"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="05be0ca5-2502-44bf-9302-d64eeea62811"
+                LastKnownName="MessageOccurrenceSpecification17"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </nestedOccurrences>
+          </behaviorExecutionSpecification>
+          <executionOccurrenceSpecification
+            Id="3f3a9b31-6cac-4826-b115-f27729b654c3"
+            name="ExecutionOccurrenceSpecification11">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="4d34da95-b8ab-4322-997c-fe5723cf76d1"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="ae39bf52-cd04-4343-8224-e8b9a15c105d"
+                LastKnownName="GPTrees"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="f19ccc2c-5a20-4b33-9743-74d5b529a0b7"
+            name="MessageOccurrenceSpecification16">
+            <covered>
+              <lifelineMoniker
+                Id="ae39bf52-cd04-4343-8224-e8b9a15c105d"
+                LastKnownName="GPTrees"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="0d119ead-01a7-4e19-a247-7f11069bd676"
+            name="MessageOccurrenceSpecification15">
+            <covered>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <behaviorExecutionSpecification
+            Id="100e6609-79d1-4532-b76c-8326c0879cbe"
+            name="BehaviorExecutionSpecification8">
+            <coveredLifelines>
+              <lifelineMoniker
+                Id="f99f5dc2-f1d3-4223-b262-ed2d9a386fc1"
+                LastKnownName="GPTree"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </coveredLifelines>
+            <finish>
+              <executionOccurrenceSpecificationMoniker
+                Id="9000d810-64ba-4bc1-931e-9843099d199e"
+                LastKnownName="ExecutionOccurrenceSpecification16"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </finish>
+            <start>
+              <executionOccurrenceSpecificationMoniker
+                Id="8816e232-9611-40c3-8b6c-f26a31fc4c49"
+                LastKnownName="ExecutionOccurrenceSpecification15"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </start>
+            <nestedOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="675007cc-c777-467c-8b2c-5fb56ba5dfa1"
+                LastKnownName="MessageOccurrenceSpecification22"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="9c0bfe6e-484b-403c-b686-61d0def71417"
+                LastKnownName="MessageOccurrenceSpecification25"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="3c7762ff-5aa9-419f-82d5-2f12993d1d89"
+                LastKnownName="MessageOccurrenceSpecification28"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="09208522-cb4e-4014-98a9-e9c25afff7d6"
+                LastKnownName="MessageOccurrenceSpecification23"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </nestedOccurrences>
+          </behaviorExecutionSpecification>
+          <executionOccurrenceSpecification
+            Id="8816e232-9611-40c3-8b6c-f26a31fc4c49"
+            name="ExecutionOccurrenceSpecification15">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="f2726a83-e327-438c-a892-5a7d8962f08d"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="f99f5dc2-f1d3-4223-b262-ed2d9a386fc1"
+                LastKnownName="GPTree"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="eeab9b56-8bf6-4f7d-b4b0-8e3d79deacb4"
+            name="MessageOccurrenceSpecification21">
+            <covered>
+              <lifelineMoniker
+                Id="ae39bf52-cd04-4343-8224-e8b9a15c105d"
+                LastKnownName="GPTrees"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="675007cc-c777-467c-8b2c-5fb56ba5dfa1"
+            name="MessageOccurrenceSpecification22">
+            <covered>
+              <lifelineMoniker
+                Id="f99f5dc2-f1d3-4223-b262-ed2d9a386fc1"
+                LastKnownName="GPTree"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <behaviorExecutionSpecification
+            Id="9e5af9bf-e66c-4f8d-a54a-39a3b26216c0"
+            name="BehaviorExecutionSpecification9">
+            <coveredLifelines>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </coveredLifelines>
+            <finish>
+              <executionOccurrenceSpecificationMoniker
+                Id="1870ab0b-b390-46c6-af0e-913375965cbf"
+                LastKnownName="ExecutionOccurrenceSpecification18"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </finish>
+            <start>
+              <executionOccurrenceSpecificationMoniker
+                Id="a67039c4-8174-43fd-bc9f-bd9ab9b2a0f3"
+                LastKnownName="ExecutionOccurrenceSpecification17"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </start>
+            <nestedOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="e3b58b2f-29d5-488d-b3ef-2094ca011915"
+                LastKnownName="MessageOccurrenceSpecification26"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="49a4305c-ce36-4198-a24d-24a51d8901da"
+                LastKnownName="MessageOccurrenceSpecification31"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="ae30b2af-53b1-4e4d-bd18-6b7ee585db6b"
+                LastKnownName="ExecutionOccurrenceSpecification21"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="bb57f5ab-875a-4406-91bc-56b310888ab0"
+                LastKnownName="ExecutionOccurrenceSpecification22"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="ec36cff0-491e-48c1-8800-fde643c4c3a7"
+                LastKnownName="MessageOccurrenceSpecification33"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="4f6e7f7a-600c-4220-819d-69b707b8a147"
+                LastKnownName="ExecutionOccurrenceSpecification23"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="cac35392-a083-418a-b241-ccdf6d3cdefb"
+                LastKnownName="ExecutionOccurrenceSpecification24"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="d1f9ca75-d833-4516-b60f-8f8a58f56482"
+                LastKnownName="MessageOccurrenceSpecification35"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="762b386b-793a-4f48-ad05-ccea47f56e31"
+                LastKnownName="ExecutionOccurrenceSpecification25"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="c37870e8-3e58-4832-a150-8b9bcf710364"
+                LastKnownName="ExecutionOccurrenceSpecification26"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="9e8eb4d2-3119-4d09-9e15-a3f01051baf9"
+                LastKnownName="MessageOccurrenceSpecification37"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="ca579eeb-ec41-4091-a7ad-655271f1f303"
+                LastKnownName="MessageOccurrenceSpecification40"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="8b1ebc9d-a5fe-42ea-aafa-47bbc85c96ed"
+                LastKnownName="MessageOccurrenceSpecification27"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </nestedOccurrences>
+          </behaviorExecutionSpecification>
+          <executionOccurrenceSpecification
+            Id="a67039c4-8174-43fd-bc9f-bd9ab9b2a0f3"
+            name="ExecutionOccurrenceSpecification17">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="05480fe6-8740-443b-bc64-0e8689e799ec"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="9c0bfe6e-484b-403c-b686-61d0def71417"
+            name="MessageOccurrenceSpecification25">
+            <covered>
+              <lifelineMoniker
+                Id="f99f5dc2-f1d3-4223-b262-ed2d9a386fc1"
+                LastKnownName="GPTree"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="e3b58b2f-29d5-488d-b3ef-2094ca011915"
+            name="MessageOccurrenceSpecification26">
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="49a4305c-ce36-4198-a24d-24a51d8901da"
+            name="MessageOccurrenceSpecification31">
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <behaviorExecutionSpecification
+            Id="047cb896-469b-48ec-a9a1-275157cce195"
+            name="BehaviorExecutionSpecification11">
+            <coveredLifelines>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </coveredLifelines>
+            <finish>
+              <executionOccurrenceSpecificationMoniker
+                Id="bb57f5ab-875a-4406-91bc-56b310888ab0"
+                LastKnownName="ExecutionOccurrenceSpecification22"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </finish>
+            <start>
+              <executionOccurrenceSpecificationMoniker
+                Id="ae30b2af-53b1-4e4d-bd18-6b7ee585db6b"
+                LastKnownName="ExecutionOccurrenceSpecification21"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </start>
+            <nestedOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="4aaeb639-d22b-4619-b761-b800df4dce91"
+                LastKnownName="MessageOccurrenceSpecification32"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </nestedOccurrences>
+          </behaviorExecutionSpecification>
+          <executionOccurrenceSpecification
+            Id="ae30b2af-53b1-4e4d-bd18-6b7ee585db6b"
+            name="ExecutionOccurrenceSpecification21">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="12e2d3d6-3e10-4e3b-8ad2-9f9bb86c9477"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="4aaeb639-d22b-4619-b761-b800df4dce91"
+            name="MessageOccurrenceSpecification32">
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <executionOccurrenceSpecification
+            Id="bb57f5ab-875a-4406-91bc-56b310888ab0"
+            name="ExecutionOccurrenceSpecification22">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="cda1b596-de53-4fb2-b11b-6a9ee2511da7"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="ec36cff0-491e-48c1-8800-fde643c4c3a7"
+            name="MessageOccurrenceSpecification33">
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <behaviorExecutionSpecification
+            Id="173fc30c-5045-458a-87dc-bfd5a1ae96ee"
+            name="BehaviorExecutionSpecification12">
+            <coveredLifelines>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </coveredLifelines>
+            <finish>
+              <executionOccurrenceSpecificationMoniker
+                Id="cac35392-a083-418a-b241-ccdf6d3cdefb"
+                LastKnownName="ExecutionOccurrenceSpecification24"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </finish>
+            <start>
+              <executionOccurrenceSpecificationMoniker
+                Id="4f6e7f7a-600c-4220-819d-69b707b8a147"
+                LastKnownName="ExecutionOccurrenceSpecification23"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </start>
+            <nestedOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="d372b654-1721-48db-bb45-b7d0fdfa3c66"
+                LastKnownName="MessageOccurrenceSpecification34"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </nestedOccurrences>
+          </behaviorExecutionSpecification>
+          <executionOccurrenceSpecification
+            Id="4f6e7f7a-600c-4220-819d-69b707b8a147"
+            name="ExecutionOccurrenceSpecification23">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="22f86162-3501-4a66-a366-fab972d762dd"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="d372b654-1721-48db-bb45-b7d0fdfa3c66"
+            name="MessageOccurrenceSpecification34">
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <executionOccurrenceSpecification
+            Id="cac35392-a083-418a-b241-ccdf6d3cdefb"
+            name="ExecutionOccurrenceSpecification24">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="a4543c9f-3f25-4133-add0-69038e7e535a"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="d1f9ca75-d833-4516-b60f-8f8a58f56482"
+            name="MessageOccurrenceSpecification35">
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <behaviorExecutionSpecification
+            Id="534abf52-3c99-4d7e-bbd4-8cc652e61134"
+            name="BehaviorExecutionSpecification13">
+            <coveredLifelines>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </coveredLifelines>
+            <finish>
+              <executionOccurrenceSpecificationMoniker
+                Id="c37870e8-3e58-4832-a150-8b9bcf710364"
+                LastKnownName="ExecutionOccurrenceSpecification26"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </finish>
+            <start>
+              <executionOccurrenceSpecificationMoniker
+                Id="762b386b-793a-4f48-ad05-ccea47f56e31"
+                LastKnownName="ExecutionOccurrenceSpecification25"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </start>
+            <nestedOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="044ccb65-3d11-4acf-b86d-721a426cbab8"
+                LastKnownName="MessageOccurrenceSpecification36"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </nestedOccurrences>
+          </behaviorExecutionSpecification>
+          <executionOccurrenceSpecification
+            Id="762b386b-793a-4f48-ad05-ccea47f56e31"
+            name="ExecutionOccurrenceSpecification25">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="2164fd33-2b90-4c71-a521-ec8ee73d3c1c"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="044ccb65-3d11-4acf-b86d-721a426cbab8"
+            name="MessageOccurrenceSpecification36">
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <executionOccurrenceSpecification
+            Id="c37870e8-3e58-4832-a150-8b9bcf710364"
+            name="ExecutionOccurrenceSpecification26">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="c1ebbab5-a91f-472b-8bd6-84d7c62ab07f"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <behaviorExecutionSpecification
+            Id="e92a8e5d-e547-46ca-8000-b42031635a53"
+            name="BehaviorExecutionSpecification14">
+            <coveredLifelines>
+              <lifelineMoniker
+                Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+                LastKnownName="Child"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </coveredLifelines>
+            <finish>
+              <executionOccurrenceSpecificationMoniker
+                Id="5dca2a41-e146-4bcc-bb5b-4fabdbe98340"
+                LastKnownName="ExecutionOccurrenceSpecification28"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </finish>
+            <start>
+              <executionOccurrenceSpecificationMoniker
+                Id="01d0b9d2-d0c1-456c-b8ae-61acd4ad50ee"
+                LastKnownName="ExecutionOccurrenceSpecification27"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </start>
+            <nestedOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="06acf0e7-1666-4fb8-9438-de92f6db4ed1"
+                LastKnownName="MessageOccurrenceSpecification38"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="ece2893d-c923-4d4a-a68e-fd76cee3b6db"
+                LastKnownName="MessageOccurrenceSpecification41"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="1dd8950a-49cc-4b0b-9660-624eed05975f"
+                LastKnownName="ExecutionOccurrenceSpecification29"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="487dbbf1-a558-4b9c-a112-d6a0e495e258"
+                LastKnownName="ExecutionOccurrenceSpecification30"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="76cdbc87-2b12-4de4-a30e-867b1f9855ca"
+                LastKnownName="MessageOccurrenceSpecification39"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </nestedOccurrences>
+          </behaviorExecutionSpecification>
+          <executionOccurrenceSpecification
+            Id="01d0b9d2-d0c1-456c-b8ae-61acd4ad50ee"
+            name="ExecutionOccurrenceSpecification27">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="8a19e00f-666e-47e4-b5d9-95836ca799b1"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+                LastKnownName="Child"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="9e8eb4d2-3119-4d09-9e15-a3f01051baf9"
+            name="MessageOccurrenceSpecification37">
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="06acf0e7-1666-4fb8-9438-de92f6db4ed1"
+            name="MessageOccurrenceSpecification38">
+            <covered>
+              <lifelineMoniker
+                Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+                LastKnownName="Child"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="ece2893d-c923-4d4a-a68e-fd76cee3b6db"
+            name="MessageOccurrenceSpecification41">
+            <covered>
+              <lifelineMoniker
+                Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+                LastKnownName="Child"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <behaviorExecutionSpecification
+            Id="f9fdcd82-4d98-468d-9f38-38b8a23197b6"
+            name="BehaviorExecutionSpecification15">
+            <coveredLifelines>
+              <lifelineMoniker
+                Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+                LastKnownName="Child"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </coveredLifelines>
+            <finish>
+              <executionOccurrenceSpecificationMoniker
+                Id="487dbbf1-a558-4b9c-a112-d6a0e495e258"
+                LastKnownName="ExecutionOccurrenceSpecification30"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </finish>
+            <start>
+              <executionOccurrenceSpecificationMoniker
+                Id="1dd8950a-49cc-4b0b-9660-624eed05975f"
+                LastKnownName="ExecutionOccurrenceSpecification29"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </start>
+            <nestedOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="1c5f4a71-0845-414f-9023-07b7c6c649cf"
+                LastKnownName="MessageOccurrenceSpecification42"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </nestedOccurrences>
+          </behaviorExecutionSpecification>
+          <executionOccurrenceSpecification
+            Id="1dd8950a-49cc-4b0b-9660-624eed05975f"
+            name="ExecutionOccurrenceSpecification29">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="bfa91af9-afa7-4f44-8227-6b703aa60e8c"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+                LastKnownName="Child"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="1c5f4a71-0845-414f-9023-07b7c6c649cf"
+            name="MessageOccurrenceSpecification42">
+            <covered>
+              <lifelineMoniker
+                Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+                LastKnownName="Child"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <executionOccurrenceSpecification
+            Id="487dbbf1-a558-4b9c-a112-d6a0e495e258"
+            name="ExecutionOccurrenceSpecification30">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="d289a258-411a-49d1-8f27-5ff7531841b6"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+                LastKnownName="Child"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="ca579eeb-ec41-4091-a7ad-655271f1f303"
+            name="MessageOccurrenceSpecification40">
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="76cdbc87-2b12-4de4-a30e-867b1f9855ca"
+            name="MessageOccurrenceSpecification39">
+            <covered>
+              <lifelineMoniker
+                Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+                LastKnownName="Child"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <executionOccurrenceSpecification
+            Id="5dca2a41-e146-4bcc-bb5b-4fabdbe98340"
+            name="ExecutionOccurrenceSpecification28">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="4eec0667-5f14-40a7-ae36-d8f25bb4e959"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+                LastKnownName="Child"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="3c7762ff-5aa9-419f-82d5-2f12993d1d89"
+            name="MessageOccurrenceSpecification28">
+            <covered>
+              <lifelineMoniker
+                Id="f99f5dc2-f1d3-4223-b262-ed2d9a386fc1"
+                LastKnownName="GPTree"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="8b1ebc9d-a5fe-42ea-aafa-47bbc85c96ed"
+            name="MessageOccurrenceSpecification27">
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <executionOccurrenceSpecification
+            Id="1870ab0b-b390-46c6-af0e-913375965cbf"
+            name="ExecutionOccurrenceSpecification18">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="a4a0d9cc-a2a0-4730-9d37-9aa022fd0904"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+                LastKnownName="GPNode"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="09208522-cb4e-4014-98a9-e9c25afff7d6"
+            name="MessageOccurrenceSpecification23">
+            <covered>
+              <lifelineMoniker
+                Id="f99f5dc2-f1d3-4223-b262-ed2d9a386fc1"
+                LastKnownName="GPTree"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="8231bf96-f4af-4743-a078-ff19e639825f"
+            name="MessageOccurrenceSpecification24">
+            <covered>
+              <lifelineMoniker
+                Id="ae39bf52-cd04-4343-8224-e8b9a15c105d"
+                LastKnownName="GPTrees"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <executionOccurrenceSpecification
+            Id="9000d810-64ba-4bc1-931e-9843099d199e"
+            name="ExecutionOccurrenceSpecification16">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="4b0e2da0-6c70-4983-9499-3d05cd27a208"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="f99f5dc2-f1d3-4223-b262-ed2d9a386fc1"
+                LastKnownName="GPTree"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="05be0ca5-2502-44bf-9302-d64eeea62811"
+            name="MessageOccurrenceSpecification17">
+            <covered>
+              <lifelineMoniker
+                Id="ae39bf52-cd04-4343-8224-e8b9a15c105d"
+                LastKnownName="GPTrees"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <messageOccurrenceSpecification
+            Id="f189db39-1cbb-4aa1-9e9d-ad670f94520b"
+            name="MessageOccurrenceSpecification18">
+            <covered>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </messageOccurrenceSpecification>
+          <executionOccurrenceSpecification
+            Id="714cda0a-93a0-4c44-aab1-9d2550b5e9c7"
+            name="ExecutionOccurrenceSpecification12">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="01dcd82b-8d94-4334-92b6-1a69a7ad6212"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="ae39bf52-cd04-4343-8224-e8b9a15c105d"
+                LastKnownName="GPTrees"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+          <executionOccurrenceSpecification
+            Id="484309af-7972-43d1-b99d-4751a77e7980"
+            name="ExecutionOccurrenceSpecification10">
+            <event>
+              <executionOccurrenceSpecificationReferencesEvent>
+                <executionEventMoniker
+                  Id="72111c31-a6fa-42cd-bab2-ea7ea1c24fcd"
+                  LastKnownName="ExecutionEvent"
+                  LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              </executionOccurrenceSpecificationReferencesEvent>
+            </event>
+            <covered>
+              <lifelineMoniker
+                Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+                LastKnownName="GPIndividual"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </covered>
+          </executionOccurrenceSpecification>
+        </fragments>
+        <lifelines>
+          <lifeline
+            Id="0ea207f6-fc7a-46d3-ace2-2603b279e39b"
+            name="GPIndividual"
+            isActor="false"
+            lifelineDisplayName="GPIndividual">
+            <topLevelOccurrences>
+              <messageOccurrenceSpecificationMoniker
+                Id="4d30f75d-2927-4450-9386-4054a2b349d7"
+                LastKnownName="MessageOccurrenceSpecification5"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="74fa8d93-2312-4416-b19f-f2b674af8ddb"
+                LastKnownName="ExecutionOccurrenceSpecification3"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="c28f6dbe-08c1-4d9a-8aa7-4a33e0d169a4"
+                LastKnownName="ExecutionOccurrenceSpecification4"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <messageOccurrenceSpecificationMoniker
+                Id="4944491b-ffcb-4ca3-8c9b-7537cc5cb679"
+                LastKnownName="MessageOccurrenceSpecification13"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="03899dcf-3832-4348-9112-775d0b69281e"
+                LastKnownName="ExecutionOccurrenceSpecification9"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="484309af-7972-43d1-b99d-4751a77e7980"
+                LastKnownName="ExecutionOccurrenceSpecification10"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </topLevelOccurrences>
+          </lifeline>
+          <lifeline
+            Id="ae39bf52-cd04-4343-8224-e8b9a15c105d"
+            name="GPTrees"
+            isActor="false"
+            lifelineDisplayName="GPTrees">
+            <topLevelOccurrences>
+              <executionOccurrenceSpecificationMoniker
+                Id="3f3a9b31-6cac-4826-b115-f27729b654c3"
+                LastKnownName="ExecutionOccurrenceSpecification11"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="714cda0a-93a0-4c44-aab1-9d2550b5e9c7"
+                LastKnownName="ExecutionOccurrenceSpecification12"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </topLevelOccurrences>
+          </lifeline>
+          <lifeline
+            Id="f99f5dc2-f1d3-4223-b262-ed2d9a386fc1"
+            name="GPTree"
+            isActor="false"
+            lifelineDisplayName="GPTree">
+            <topLevelOccurrences>
+              <executionOccurrenceSpecificationMoniker
+                Id="8816e232-9611-40c3-8b6c-f26a31fc4c49"
+                LastKnownName="ExecutionOccurrenceSpecification15"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="9000d810-64ba-4bc1-931e-9843099d199e"
+                LastKnownName="ExecutionOccurrenceSpecification16"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </topLevelOccurrences>
+          </lifeline>
+          <lifeline
+            Id="65d38cf9-4f88-4869-a8a8-2e4abf80483c"
+            name="GPNode"
+            isActor="false"
+            lifelineDisplayName="GPNode">
+            <topLevelOccurrences>
+              <executionOccurrenceSpecificationMoniker
+                Id="a67039c4-8174-43fd-bc9f-bd9ab9b2a0f3"
+                LastKnownName="ExecutionOccurrenceSpecification17"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="1870ab0b-b390-46c6-af0e-913375965cbf"
+                LastKnownName="ExecutionOccurrenceSpecification18"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </topLevelOccurrences>
+          </lifeline>
+          <lifeline
+            Id="41a5b45b-f5da-4ec1-8773-9f8db7c81149"
+            name="Child"
+            isActor="false"
+            lifelineDisplayName="Child">
+            <topLevelOccurrences>
+              <executionOccurrenceSpecificationMoniker
+                Id="01d0b9d2-d0c1-456c-b8ae-61acd4ad50ee"
+                LastKnownName="ExecutionOccurrenceSpecification27"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+              <executionOccurrenceSpecificationMoniker
+                Id="5dca2a41-e146-4bcc-bb5b-4fabdbe98340"
+                LastKnownName="ExecutionOccurrenceSpecification28"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </topLevelOccurrences>
+          </lifeline>
+        </lifelines>
+        <messages>
+          <message
+            Id="d9f96db2-2abc-4d42-9948-e9030d729bbe"
+            name="Write(Trees.Length)"
+            messageKind="Complete"
+            messageSort="SynchCall"
+            createSelfMessage="true">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="4d30f75d-2927-4450-9386-4054a2b349d7"
+                LastKnownName="MessageOccurrenceSpecification5"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="58ec397d-8b1a-43e0-8635-c38c08b2bc73"
+                LastKnownName="MessageOccurrenceSpecification6"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="49fb5461-2ddd-4231-8d5c-0f910dd21ab2"
+            name="WriteGenotype"
+            messageKind="Complete"
+            messageSort="SynchCall"
+            createSelfMessage="true">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="4944491b-ffcb-4ca3-8c9b-7537cc5cb679"
+                LastKnownName="MessageOccurrenceSpecification13"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="e2dce905-4b02-4b7d-b83f-e6306ac9835c"
+                LastKnownName="MessageOccurrenceSpecification14"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="e002c1d5-6ee7-4ed9-852b-6bef0e5f0deb"
+            name="foreach"
+            messageKind="Complete"
+            messageSort="SynchCall"
+            createSelfMessage="false">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="0d119ead-01a7-4e19-a247-7f11069bd676"
+                LastKnownName="MessageOccurrenceSpecification15"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="f19ccc2c-5a20-4b33-9743-74d5b529a0b7"
+                LastKnownName="MessageOccurrenceSpecification16"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="6529ef9a-464b-47f9-a1d6-1948a905675d"
+            name="&lt;&lt;return&gt;&gt;"
+            messageKind="Complete"
+            messageSort="Reply"
+            createSelfMessage="false">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="05be0ca5-2502-44bf-9302-d64eeea62811"
+                LastKnownName="MessageOccurrenceSpecification17"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="f189db39-1cbb-4aa1-9e9d-ad670f94520b"
+                LastKnownName="MessageOccurrenceSpecification18"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="888bf401-2611-46ee-83b5-d09ac1e84eb7"
+            name="WriteTree"
+            messageKind="Complete"
+            messageSort="SynchCall"
+            createSelfMessage="false">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="eeab9b56-8bf6-4f7d-b4b0-8e3d79deacb4"
+                LastKnownName="MessageOccurrenceSpecification21"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="675007cc-c777-467c-8b2c-5fb56ba5dfa1"
+                LastKnownName="MessageOccurrenceSpecification22"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="d44334bf-e998-4555-a1af-7d31fc0a352f"
+            name="&lt;&lt;return&gt;&gt;"
+            messageKind="Complete"
+            messageSort="Reply"
+            createSelfMessage="false">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="09208522-cb4e-4014-98a9-e9c25afff7d6"
+                LastKnownName="MessageOccurrenceSpecification23"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="8231bf96-f4af-4743-a078-ff19e639825f"
+                LastKnownName="MessageOccurrenceSpecification24"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="f0f5747f-54ec-4cd2-858c-646122334c24"
+            name="WriteRootedTree"
+            messageKind="Complete"
+            messageSort="SynchCall"
+            createSelfMessage="false">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="9c0bfe6e-484b-403c-b686-61d0def71417"
+                LastKnownName="MessageOccurrenceSpecification25"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="e3b58b2f-29d5-488d-b3ef-2094ca011915"
+                LastKnownName="MessageOccurrenceSpecification26"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="956267a4-687a-4161-8092-ad0be0cec2bd"
+            name="&lt;&lt;return&gt;&gt;"
+            messageKind="Complete"
+            messageSort="Reply"
+            createSelfMessage="false">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="8b1ebc9d-a5fe-42ea-aafa-47bbc85c96ed"
+                LastKnownName="MessageOccurrenceSpecification27"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="3c7762ff-5aa9-419f-82d5-2f12993d1d89"
+                LastKnownName="MessageOccurrenceSpecification28"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="df6a9c05-fdfa-4f65-9fa0-b546a53bb593"
+            name="Write(Children.Length)"
+            messageKind="Complete"
+            messageSort="SynchCall"
+            createSelfMessage="true">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="49a4305c-ce36-4198-a24d-24a51d8901da"
+                LastKnownName="MessageOccurrenceSpecification31"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="4aaeb639-d22b-4619-b761-b800df4dce91"
+                LastKnownName="MessageOccurrenceSpecification32"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="e3a690e4-0037-4d4e-8a20-672fe94c8c3a"
+            name="Write(TypeIndex)"
+            messageKind="Complete"
+            messageSort="SynchCall"
+            createSelfMessage="true">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="ec36cff0-491e-48c1-8800-fde643c4c3a7"
+                LastKnownName="MessageOccurrenceSpecification33"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="d372b654-1721-48db-bb45-b7d0fdfa3c66"
+                LastKnownName="MessageOccurrenceSpecification34"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="b294d7d3-fe1c-4722-b0e3-b1cbfcedd386"
+            name="WriteNode(self)"
+            messageKind="Complete"
+            messageSort="SynchCall"
+            createSelfMessage="true">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="d1f9ca75-d833-4516-b60f-8f8a58f56482"
+                LastKnownName="MessageOccurrenceSpecification35"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="044ccb65-3d11-4acf-b86d-721a426cbab8"
+                LastKnownName="MessageOccurrenceSpecification36"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="04a48060-0300-4c69-8414-eb9c58cd9dd5"
+            name="foreach"
+            messageKind="Complete"
+            messageSort="SynchCall"
+            createSelfMessage="false">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="9e8eb4d2-3119-4d09-9e15-a3f01051baf9"
+                LastKnownName="MessageOccurrenceSpecification37"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="06acf0e7-1666-4fb8-9438-de92f6db4ed1"
+                LastKnownName="MessageOccurrenceSpecification38"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="6c8a7094-bef2-4186-b717-ec3d167d4ba2"
+            name="&lt;&lt;return&gt;&gt;"
+            messageKind="Complete"
+            messageSort="Reply"
+            createSelfMessage="false">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="76cdbc87-2b12-4de4-a30e-867b1f9855ca"
+                LastKnownName="MessageOccurrenceSpecification39"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="ca579eeb-ec41-4091-a7ad-655271f1f303"
+                LastKnownName="MessageOccurrenceSpecification40"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+          <message
+            Id="76fcd039-0ca4-4ae5-a35b-1a5f86ef1cc9"
+            name="WriteRootedTree(recursive)"
+            messageKind="Complete"
+            messageSort="SynchCall"
+            createSelfMessage="true">
+            <sendEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="ece2893d-c923-4d4a-a68e-fd76cee3b6db"
+                LastKnownName="MessageOccurrenceSpecification41"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </sendEvent>
+            <receiveEvent>
+              <messageOccurrenceSpecificationMoniker
+                Id="1c5f4a71-0845-414f-9023-07b7c6c649cf"
+                LastKnownName="MessageOccurrenceSpecification42"
+                LastKnownLocation="BraneCloud.EC.Modeling.uml" />
+            </receiveEvent>
+          </message>
+        </messages>
+      </interaction>
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="4718b495-e8aa-46fb-a791-4ce41a010ea1"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="0e080214-4de4-45eb-aeee-c91502dfde53"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="12fc7a96-d9e7-40a8-ae0b-16d8b9e03395"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="72111c31-a6fa-42cd-bab2-ea7ea1c24fcd"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="4d34da95-b8ab-4322-997c-fe5723cf76d1"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="01dcd82b-8d94-4334-92b6-1a69a7ad6212"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="f2726a83-e327-438c-a892-5a7d8962f08d"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="4b0e2da0-6c70-4983-9499-3d05cd27a208"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="05480fe6-8740-443b-bc64-0e8689e799ec"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="a4a0d9cc-a2a0-4730-9d37-9aa022fd0904"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="12e2d3d6-3e10-4e3b-8ad2-9f9bb86c9477"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="cda1b596-de53-4fb2-b11b-6a9ee2511da7"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="22f86162-3501-4a66-a366-fab972d762dd"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="a4543c9f-3f25-4133-add0-69038e7e535a"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="2164fd33-2b90-4c71-a521-ec8ee73d3c1c"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="c1ebbab5-a91f-472b-8bd6-84d7c62ab07f"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="8a19e00f-666e-47e4-b5d9-95836ca799b1"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="4eec0667-5f14-40a7-ae36-d8f25bb4e959"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="bfa91af9-afa7-4f44-8227-6b703aa60e8c"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <executionEvent
+        Id="d289a258-411a-49d1-8f27-5ff7531841b6"
+        name="ExecutionEvent" />
+    </packageHasNamedElement>
+  </packagedElements>
+  <primitiveType
+    Id="220a3521-e091-4221-bae9-3ef9018e845c"
+    name="Integer"
+    isAbstract="false"
+    isLeaf="false" />
+  <primitiveType
+    Id="8943dc84-709e-4f62-b15a-a3273aa6f165"
+    name="Boolean"
+    isAbstract="false"
+    isLeaf="false" />
+  <primitiveType
+    Id="59259974-6d55-42c6-b7bd-763d77ac8ef9"
+    name="String"
+    isAbstract="false"
+    isLeaf="false" />
+  <primitiveType
+    Id="3ab42e7d-4969-445a-b209-471f5cb8209c"
+    name="UnlimitedNatural"
+    isAbstract="false"
+    isLeaf="false" />
+</modelStoreModel>

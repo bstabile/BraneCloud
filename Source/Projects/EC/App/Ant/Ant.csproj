@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A2E43409-4108-4EE6-A804-B3625C9BE684}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BraneCloud.Evolution.EC.App.ArtificialAnt</RootNamespace>
+    <AssemblyName>BraneCloud.Evolution.EC.App.ArtificialAnt</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Bin\app\Ant\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Bin\app\Ant\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Ant.cs" />
+    <Compile Include="AntData.cs" />
+    <Compile Include="Func\IEvalPrint.cs" />
+    <Compile Include="Func\IfFoodAhead.cs" />
+    <Compile Include="Func\Left.cs" />
+    <Compile Include="Func\Move.cs" />
+    <Compile Include="Func\Progn2.cs" />
+    <Compile Include="Func\Progn3.cs" />
+    <Compile Include="Func\Progn4.cs" />
+    <Compile Include="Func\Right.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Configuration\BraneCloud.Evolution.EC.Configuration.csproj">
+      <Project>{9A7B8EFC-D36E-435D-99E2-10793AA3FFCD}</Project>
+      <Name>BraneCloud.Evolution.EC.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Evaluation\BraneCloud.Evolution.EC.Evaluation.csproj">
+      <Project>{A8AB0B32-952F-4FBA-8C34-C22CCB897977}</Project>
+      <Name>BraneCloud.Evolution.EC.Evaluation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Logging\BraneCloud.Evolution.EC.Logging.csproj">
+      <Project>{E5ECCEA3-0448-40CD-98B2-BC70578807B1}</Project>
+      <Name>BraneCloud.Evolution.EC.Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Runtime\BraneCloud.Evolution.EC.Runtime.csproj">
+      <Project>{926F38F4-D132-458C-91DB-6314AE9F2FAD}</Project>
+      <Name>BraneCloud.Evolution.EC.Runtime</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Support\BraneCloud.Evolution.EC.Support.csproj">
+      <Project>{1669FD6F-D6A2-4498-A62B-F5A831B56A83}</Project>
+      <Name>BraneCloud.Evolution.EC.Support</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC\BraneCloud.Evolution.EC.csproj">
+      <Project>{197FC1BD-8578-4DE7-9AEA-D7098A3505EA}</Project>
+      <Name>BraneCloud.Evolution.EC</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Params\App\Ant\ge.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Params\ec.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Params\GP\GE\ge.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="Grammar\ant.grammar">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Params\GP\Koza\koza.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Params\Simple\simple.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Trails\losaltos.trl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="Params\App\Ant\ant.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Params\App\Ant\progn4.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Trails\santafe.trl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

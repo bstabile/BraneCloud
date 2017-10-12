@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<OrderedTest name="OrderedFileParsingTests" storage="w:\BraneCloud.trunk\eccs\projects\eccs\BraneCloud.ec.configuration.tests\orderedfileparsingtests.orderedtest" id="4972542a-8a33-47fb-8107-b2c494852701" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestLinks>
+    <TestLink id="bc33fd2d-8d03-9929-980a-fd93b79112c4" name="parse_ec_params" storage="bin\debug\BraneCloud.ec.configuration.tests.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  </TestLinks>
+</OrderedTest>
