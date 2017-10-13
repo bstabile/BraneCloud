@@ -1,6 +1,8 @@
 # BraneCloud
 ## Industrial-Strength Evolutionary Computation for .NET 4.x
 
+### Coming Soon: Conversion to ECJ v25+ (New 3-year academic grant for further development by Sean and his team at GMU)
+
 This is an independent port of Sean Luke's venerable ECJ project (GMU EC Lab) Version 20
 
 NOTE: This conversion to C# cannot and will not in any way be supported by Sean or any other member of his team at GMU. Please do not even ask! It is incredible that software of this caliber is made available in open-source form, and that is more than enough support! 
