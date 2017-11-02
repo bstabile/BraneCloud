@@ -98,6 +98,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         /// <summary>
         /// The subpop delimiter. 
         /// </summary>
@@ -203,9 +205,9 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
 
             IParameter p;
 
-            var localBase = ParamBase.Push(P_SUBPOP);
+            var localBase = paramBase.Push(P_SUBPOP);
 
-            Chatty = state.Parameters.GetBoolean(ParamBase.Push(P_CHATTY), null, true);
+            Chatty = state.Parameters.GetBoolean(paramBase.Push(P_CHATTY), null, true);
 
             for (var i = 0; i < numsubpops; i++)
             {

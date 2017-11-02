@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.Problems.Lawnmower.Func
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         public override void Eval(IEvolutionState state,
             int thread,
@@ -48,24 +48,24 @@ namespace BraneCloud.Evolution.EC.Problems.Lawnmower.Func
             GPIndividual individual,
             IProblem problem)
         {
-            var p = (LawnmowerProblem)problem;
+            var p = (Lawnmower)problem;
             var d = (LawnmowerData)input;
 
             switch (p.Orientation)
             {
-                case LawnmowerProblem.O_UP:
+                case Lawnmower.O_UP:
                     p.PosY--;
                     if (p.PosY < 0) p.PosY = p.MaxY - 1;
                     break;
-                case LawnmowerProblem.O_LEFT:
+                case Lawnmower.O_LEFT:
                     p.PosX--;
                     if (p.PosX < 0) p.PosX = p.MaxX - 1;
                     break;
-                case LawnmowerProblem.O_DOWN:
+                case Lawnmower.O_DOWN:
                     p.PosY++;
                     if (p.PosY >= p.MaxY) p.PosY = 0;
                     break;
-                case LawnmowerProblem.O_RIGHT:
+                case Lawnmower.O_RIGHT:
                     p.PosX++;
                     if (p.PosX >= p.MaxX) p.PosX = 0;
                     break;
@@ -75,7 +75,7 @@ namespace BraneCloud.Evolution.EC.Problems.Lawnmower.Func
             }
 
             p.Moves++;
-            if (p.Map[p.PosX][p.PosY] == LawnmowerProblem.UNMOWED)
+            if (p.Map[p.PosX][p.PosY] == Lawnmower.UNMOWED)
             {
                 p.Sum++;
                 p.Map[p.PosX][p.PosY] = p.Moves;

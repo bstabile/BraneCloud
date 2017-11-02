@@ -19,9 +19,8 @@
 using System;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
-using BraneCloud.Evolution.EC.Problems.Ant;
 
-namespace BraneCloud.Evolution.EC.Problems.AntApp
+namespace BraneCloud.Evolution.EC.Problems.Ant.Func
 {
     [ECConfiguration("ec.problems.ant.func.IfFoodAhead")]
     public class IfFoodAhead : GPNode, IEvalPrint
@@ -37,7 +36,7 @@ namespace BraneCloud.Evolution.EC.Problems.AntApp
         //                           individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 2; } }
+        public override int ExpectedChildren => 2;
 
         public override void Eval(
             IEvolutionState state, 
@@ -47,26 +46,26 @@ namespace BraneCloud.Evolution.EC.Problems.AntApp
             GPIndividual individual, 
             IProblem problem)
         {
-            var p = (AntProblem)problem;
+            var p = (Ant)problem;
             switch (p.Orientation)
             {
-                case AntProblem.O_UP:
-                    if (p.Map[p.PosX][(p.PosY - 1 + p.MaxY) % p.MaxY] == AntProblem.FOOD)
+                case Ant.O_UP:
+                    if (p.Map[p.PosX][(p.PosY - 1 + p.MaxY) % p.MaxY] == Ant.FOOD)
                         Children[0].Eval(state, thread, input, stack, individual, problem);
                     else Children[1].Eval(state, thread, input, stack, individual, problem);
                     break;
-                case AntProblem.O_LEFT:
-                    if (p.Map[(p.PosX - 1 + p.MaxX) % p.MaxX][p.PosY] == AntProblem.FOOD)
+                case Ant.O_LEFT:
+                    if (p.Map[(p.PosX - 1 + p.MaxX) % p.MaxX][p.PosY] == Ant.FOOD)
                         Children[0].Eval(state, thread, input, stack, individual, problem);
                     else Children[1].Eval(state, thread, input, stack, individual, problem);
                     break;
-                case AntProblem.O_DOWN:
-                    if (p.Map[p.PosX][(p.PosY + 1) % p.MaxY] == AntProblem.FOOD)
+                case Ant.O_DOWN:
+                    if (p.Map[p.PosX][(p.PosY + 1) % p.MaxY] == Ant.FOOD)
                         Children[0].Eval(state, thread, input, stack, individual, problem);
                     else Children[1].Eval(state, thread, input, stack, individual, problem);
                     break;
-                case AntProblem.O_RIGHT:
-                    if (p.Map[(p.PosX + 1) % p.MaxX][p.PosY] == AntProblem.FOOD)
+                case Ant.O_RIGHT:
+                    if (p.Map[(p.PosX + 1) % p.MaxX][p.PosY] == Ant.FOOD)
                         Children[0].Eval(state, thread, input, stack, individual, problem);
                     else Children[1].Eval(state, thread, input, stack, individual, problem);
                     break;
@@ -85,26 +84,26 @@ namespace BraneCloud.Evolution.EC.Problems.AntApp
             IProblem problem, 
             int[][] map2)
         {
-            var p = (AntProblem)problem;
+            var p = (Ant)problem;
             switch (p.Orientation)
             {
-                case AntProblem.O_UP:
-                    if (p.Map[p.PosX][(p.PosY - 1 + p.MaxY) % p.MaxY] == AntProblem.FOOD)
+                case Ant.O_UP:
+                    if (p.Map[p.PosX][(p.PosY - 1 + p.MaxY) % p.MaxY] == Ant.FOOD)
                         ((IEvalPrint)Children[0]).EvalPrint(state, thread, input, stack, individual, problem, map2);
                     else ((IEvalPrint)Children[1]).EvalPrint(state, thread, input, stack, individual, problem, map2);
                     break;
-                case AntProblem.O_LEFT:
-                    if (p.Map[(p.PosX - 1 + p.MaxX) % p.MaxX][p.PosY] == AntProblem.FOOD)
+                case Ant.O_LEFT:
+                    if (p.Map[(p.PosX - 1 + p.MaxX) % p.MaxX][p.PosY] == Ant.FOOD)
                         ((IEvalPrint)Children[0]).EvalPrint(state, thread, input, stack, individual, problem, map2);
                     else ((IEvalPrint)Children[1]).EvalPrint(state, thread, input, stack, individual, problem, map2);
                     break;
-                case AntProblem.O_DOWN:
-                    if (p.Map[p.PosX][(p.PosY + 1) % p.MaxY] == AntProblem.FOOD)
+                case Ant.O_DOWN:
+                    if (p.Map[p.PosX][(p.PosY + 1) % p.MaxY] == Ant.FOOD)
                         ((IEvalPrint)Children[0]).EvalPrint(state, thread, input, stack, individual, problem, map2);
                     else ((IEvalPrint)Children[1]).EvalPrint(state, thread, input, stack, individual, problem, map2);
                     break;
-                case AntProblem.O_RIGHT:
-                    if (p.Map[(p.PosX + 1) % p.MaxX][p.PosY] == AntProblem.FOOD)
+                case Ant.O_RIGHT:
+                    if (p.Map[(p.PosX + 1) % p.MaxX][p.PosY] == Ant.FOOD)
                         ((IEvalPrint)Children[0]).EvalPrint(state, thread, input, stack, individual, problem, map2);
                     else ((IEvalPrint)Children[1]).EvalPrint(state, thread, input, stack, individual, problem, map2);
                     break;

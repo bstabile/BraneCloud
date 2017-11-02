@@ -57,7 +57,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
         {
             // are our elites small enough?
             for (var x = 0; x < state.Population.Subpops.Length; x++)
-                if (Elite[x] > state.Population.Subpops[x].Individuals.Length)
+                if (NumElites(state, x) > state.Population.Subpops[x].Individuals.Length)
                     state.Output.Error("The number of elites for subpopulation " + x + " exceeds the actual size of the subpopulation",
                         new Parameter(EvolutionState.P_BREEDER).Push(P_ELITE).Push("" + x));
             state.Output.ExitIfErrors();
@@ -68,7 +68,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
                 var newInds = newpop.Subpops[sub].Individuals;  // The new population after we are done picking the elites                 
                 var oldInds = state.Population.Subpops[sub].Individuals;   // The old population from which to pick elites
 
-                BuildArchive(state, oldInds, newInds, Elite[sub]);
+                BuildArchive(state, oldInds, newInds, NumElites(state, sub));
             }
 
             // optionally force reevaluation

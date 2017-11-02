@@ -27,6 +27,11 @@ namespace BraneCloud.Evolution.EC.Configuration
 {
     public interface IParameterDatabase : IParseParameter, ITrackParameter, ISerializable
     {
+        /// <summary>
+        /// This serializes and deserializes the instance (using BinaryFormatter) to create an exact copy.
+        /// </summary>
+        /// <returns>A new instance of the ParameterDatabase.</returns>
+        IParameterDatabase DeepClone();
 
         #region ITrackParameter
 

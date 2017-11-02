@@ -84,11 +84,6 @@ namespace BraneCloud.Evolution.EC.Parsimony
         public const string P_SIZE = "size";
 
         /// <summary>
-        /// Default size
-        /// </summary>
-        public const int DEFAULT_SIZE = 7;
-
-        /// <summary>
         /// If the worst individual should be picked in the tournament
         /// </summary>
         public const string P_PICKWORST = "pick-worst";

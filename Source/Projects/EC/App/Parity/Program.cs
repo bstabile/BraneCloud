@@ -41,6 +41,7 @@ namespace BraneCloud.Evolution.EC.App.Parity
             // Either of the two provided param files can be used. 
             // Choose "parity.params" to NOT use ADFs, or choose "adf.params" to use them.
             Evolve.Run(new[] { "-file", @"Params\App\Parity\parity.params" });
+            //Evolve.Run(new[] { "-file", @"Params\App\Parity\adf.params" }); // TODO: Not working right!
             Console.WriteLine("\nDone!");
             Console.ReadLine();
         }

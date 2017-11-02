@@ -23,24 +23,22 @@ using BraneCloud.Evolution.EC.Simple;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Vector;
 
-namespace BraneCloud.Evolution.EC.App.ECSuite.Test
+namespace BraneCloud.Evolution.EC.App.ECSuite
 {
-    /// <summary>
-    /// Several standard Evolutionary Computation functions are implemented: Rastrigin, De Jong's test suite
-    /// F1-F4 problems (Sphere, Rosenbrock, Step, Noisy-Quartic), Booth (from [Schwefel, 1995]), and Griewangk.
-    /// As the SimpleFitness is used for maximization problems, the mapping f(x) --> -f(x) is used to transform
-    /// the problems into maximization ones.
-    /// 
-    /// <p/>Problems have been set up so that their traditional ranges are scaled so you can use a min-gene of -1.0
-    /// and a max-gene of 1.0
-    /// 
-    /// <p/><b>Parameters</b><br/>
-    /// <table>
-    /// <tr><td valign="top"><i>base</i>.<tt>type</tt><br/>
-    /// <font size="-1">String, one of: rosenbrock rastrigin sphere step noisy-quartic kdj-f1 kdj-f2 kdj-f3 kdj-f4 booth median schwefel product [or] griewangk</font></td>
-    /// <td valign="top">(The vector problem to test against.  Some of the types are synonyms: kdj-f1 = sphere, kdj-f2 = rosenbrock, kdj-f3 = step, kdj-f4 = noisy-quartic.  "kdj" stands for "Ken DeJong", and the numbers are the problems in his test suite)</td></tr>
-    /// </table>
-    /// </summary>
+    /**
+       Several standard Evolutionary Computation functions are implemented.
+       As the SimpleFitness is used for maximization problems, the mapping f(x) --> -f(x) is used to transform
+       the problems into maximization ones.
+
+       <p><b>Parameters</b><br>
+       <table>
+       <tr><td valign=top><i>base</i>.<tt>type</tt><br>
+       <font size=-1>String, one of: rosenbrock rastrigin sphere step noisy-quartic kdj-f1 kdj-f2 kdj-f3 kdj-f4 booth griewank median sum product schwefel min rotated-rastrigin rotated-schwefel rotated-griewank langerman lennard-jones lunacek</font></td>
+       <td valign=top>(The vector problem to test against.  Some of the types are synonyms: kdj-f1 = sphere, kdj-f2 = rosenbrock, kdj-f3 = step, kdj-f4 = noisy-quartic.  "kdj" stands for "Ken DeJong", and the numbers are the problems in his test suite)</td></tr>
+       </table>
+
+*/
+
     [ECConfiguration("ec.app.ecsuite.ECSuite")]
     public class ECSuite : Problem, ISimpleProblem
     {
@@ -67,6 +65,10 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
         public const string V_MIN = "min";
         public const string V_ROTATED_RASTRIGIN = "rotated-rastrigin";
         public const string V_ROTATED_SCHWEFEL = "rotated-schwefel";
+        public const string V_ROTATED_GRIEWANK = "rotated-griewank";
+        public const string V_LANGERMAN = "langerman";
+        public const string V_LENNARDJONES = "lennard-jones";
+        public const string V_LUNACEK = "lunacek";
 
         public const int PROB_ROSENBROCK = 0;
         public const int PROB_RASTRIGIN = 1;
@@ -82,6 +84,10 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
         public const int PROB_MIN = 11;
         public const int PROB_ROTATED_RASTRIGIN = 12;
         public const int PROB_ROTATED_SCHWEFEL = 13;
+        public const int PROB_ROTATED_GRIEWANK = 14;
+        public const int PROB_LANGERMAN = 15;
+        public const int PROB_LENNARDJONES = 16;
+        public const int PROB_LUNACEK = 17;
 
         // For the Rotation Facility
         /// <summary>
@@ -92,26 +98,28 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
         #endregion // Constants
         #region Static
 
-        public static readonly string[] ProblemName = new[]
-                                                          {
-                                                              V_ROSENBROCK,
-                                                              V_RASTRIGIN,
-                                                              V_SPHERE,
-                                                              V_STEP,
-                                                              V_NOISY_QUARTIC,
-                                                              V_BOOTH,
-                                                              V_GRIEWANK,
-                                                              V_MEDIAN,
-                                                              V_SUM,
-                                                              V_PRODUCT,
-                                                              V_SCHWEFEL,
-                                                              V_MIN,
-                                                              V_ROTATED_RASTRIGIN,
-                                                              V_ROTATED_SCHWEFEL
-                                                          };
+        public static readonly string[] ProblemName = {
+                                                            V_ROSENBROCK,
+                                                            V_RASTRIGIN,
+                                                            V_SPHERE,
+                                                            V_STEP,
+                                                            V_NOISY_QUARTIC,
+                                                            V_BOOTH,
+                                                            V_GRIEWANK,
+                                                            V_MEDIAN,
+                                                            V_SUM,
+                                                            V_PRODUCT,
+                                                            V_SCHWEFEL,
+                                                            V_MIN,
+                                                            V_ROTATED_RASTRIGIN,
+                                                            V_ROTATED_SCHWEFEL,
+                                                            V_ROTATED_GRIEWANK,
+                                                            V_LANGERMAN,
+                                                            V_LENNARDJONES,
+                                                            V_LUNACEK,
+                                                        };
 
-        public static readonly double[] MinRange = new[]
-                                                       {
+        public static readonly double[] MinRange = {
                                                            -2.048, // rosenbrock
                                                            -5.12, // rastrigin
                                                            -5.12, // sphere
@@ -126,10 +134,9 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
                                                            0.0, // min
                                                            -5.12, // rotated-rastrigin
                                                            -512.03 // rotated-schwefel
-                                                       };
+                                                    };
 
-        public static readonly double[] MaxRange = new[]
-                                                       {
+        public static readonly double[] MaxRange = {
                                                            2.048, // rosenbrock
                                                            5.12, // rastrigin
                                                            5.12, // sphere
@@ -144,9 +151,11 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
                                                            1.0, // min
                                                            5.12, // rotated-rastrigin
                                                            511.97 // rotated-schwefel
-                                                       };
+                                                    };
+
 
         #region Rotation Facility
+
         /*	
        -----------------
        Rotation facility
@@ -160,7 +169,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
        correctness in gathering results over multiple jobs.  But you can change that easily if you like.	
        */
 
-        public static double[][][] RotationMatrix = new double[1][][];  // the actual matrix is stored in rotationMatrix[0] -- a hack
+        public static double[][][] RotationMatrix = new double[1][][];  // the actual matrix is stored in RotationMatrix[0] -- a hack
 
         /// <summary>
         /// Dot product between two column vectors.  Does not modify the original vectors.
@@ -266,7 +275,77 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
         #endregion // Static
         #region Fields
 
-        bool _alreadyChecked = false;
+        bool _alreadyChecked;
+
+        #region Magic Arrays for the Langerman Problem
+
+        private readonly double[][] _afox10 =
+            {
+                new [] {9.681, 0.667, 4.783, 9.095, 3.517, 9.325, 6.544, 0.211, 5.122, 2.020},
+                new [] {9.400, 2.041, 3.788, 7.931, 2.882, 2.672, 3.568, 1.284, 7.033, 7.374},
+                new [] {8.025, 9.152, 5.114, 7.621, 4.564, 4.711, 2.996, 6.126, 0.734, 4.982},
+                new [] {2.196, 0.415, 5.649, 6.979, 9.510, 9.166, 6.304, 6.054, 9.377, 1.426},
+                new [] {8.074, 8.777, 3.467, 1.863, 6.708, 6.349, 4.534, 0.276, 7.633, 1.567},
+                new [] {7.650, 5.658, 0.720, 2.764, 3.278, 5.283, 7.474, 6.274, 1.409, 8.208},
+                new [] {1.256, 3.605, 8.623, 6.905, 0.584, 8.133, 6.071, 6.888, 4.187, 5.448},
+                new [] {8.314, 2.261, 4.224, 1.781, 4.124, 0.932, 8.129, 8.658, 1.208, 5.762},
+                new [] {0.226, 8.858, 1.420, 0.945, 1.622, 4.698, 6.228, 9.096, 0.972, 7.637},
+                new [] {7.305, 2.228, 1.242, 5.928, 9.133, 1.826, 4.060, 5.204, 8.713, 8.247},
+                new [] {0.652, 7.027, 0.508, 4.876, 8.807, 4.632, 5.808, 6.937, 3.291, 7.016},
+                new [] {2.699, 3.516, 5.874, 4.119, 4.461, 7.496, 8.817, 0.690, 6.593, 9.789},
+                new [] {8.327, 3.897, 2.017, 9.570, 9.825, 1.150, 1.395, 3.885, 6.354, 0.109},
+                new [] {2.132, 7.006, 7.136, 2.641, 1.882, 5.943, 7.273, 7.691, 2.880, 0.564},
+                new [] {4.707, 5.579, 4.080, 0.581, 9.698, 8.542, 8.077, 8.515, 9.231, 4.670},
+                new [] {8.304, 7.559, 8.567, 0.322, 7.128, 8.392, 1.472, 8.524, 2.277, 7.826},
+                new [] {8.632, 4.409, 4.832, 5.768, 7.050, 6.715, 1.711, 4.323, 4.405, 4.591},
+                new [] {4.887, 9.112, 0.170, 8.967, 9.693, 9.867, 7.508, 7.770, 8.382, 6.740},
+                new [] {2.440, 6.686, 4.299, 1.007, 7.008, 1.427, 9.398, 8.480, 9.950, 1.675},
+                new [] {6.306, 8.583, 6.084, 1.138, 4.350, 3.134, 7.853, 6.061, 7.457, 2.258},
+                new [] {0.652, 0.343, 1.370, 0.821, 1.310, 1.063, 0.689, 8.819, 8.833, 9.070},
+                new [] {5.558, 1.272, 5.756, 9.857, 2.279, 2.764, 1.284, 1.677, 1.244, 1.234},
+                new [] {3.352, 7.549, 9.817, 9.437, 8.687, 4.167, 2.570, 6.540, 0.228, 0.027},
+                new [] {8.798, 0.880, 2.370, 0.168, 1.701, 3.680, 1.231, 2.390, 2.499, 0.064},
+                new [] {1.460, 8.057, 1.336, 7.217, 7.914, 3.615, 9.981, 9.198, 5.292, 1.224},
+                new [] {0.432, 8.645, 8.774, 0.249, 8.081, 7.461, 4.416, 0.652, 4.002, 4.644},
+                new [] {0.679, 2.800, 5.523, 3.049, 2.968, 7.225, 6.730, 4.199, 9.614, 9.229},
+                new [] {4.263, 1.074, 7.286, 5.599, 8.291, 5.200, 9.214, 8.272, 4.398, 4.506},
+                new [] {9.496, 4.830, 3.150, 8.270, 5.079, 1.231, 5.731, 9.494, 1.883, 9.732},
+                new [] {4.138, 2.562, 2.532, 9.661, 5.611, 5.500, 6.886, 2.341, 9.699, 6.500}
+        };
+
+        private readonly double[] _cfox10 =
+            {
+                0.806,  0.517,  1.5,    0.908,  0.965,
+                0.669,  0.524,  0.902,  0.531,  0.876,
+                0.462,  0.491,  0.463,  0.714,  0.352,
+                0.869,  0.813,  0.811,  0.828,  0.964,
+                0.789,  0.360,  0.369,  0.992,  0.332,
+                0.817,  0.632,  0.883,  0.608,  0.326
+            };
+
+        private double langerman(double[] genome)
+        {
+
+            double sum = 0;
+
+            for (int i = 0; i < 30; i++)
+            {
+                // compute squared distance
+                double distsq = 0.0;
+                double t;
+                double[] afox10i = _afox10[i];
+                for (int j = 0; j < genome.Length; j++)
+                {
+                    t = genome[j] - afox10i[j];
+                    distsq += t * t;
+                }
+
+                sum += _cfox10[i] * Math.Exp(-distsq / Math.PI) * Math.Cos(distsq * Math.PI);
+            }
+            return 0 - sum;
+        }
+
+        #endregion
 
         #endregion // Fields
         #region Properties
@@ -274,12 +353,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
         /// <summary>
         /// Defaults on Rosenbrock
         /// </summary>
-        public int ProblemType
-        {
-            get { return _problemType; }
-            set { _problemType = value; }
-        }
-        private int _problemType = PROB_ROSENBROCK;
+        public int ProblemType { get; set; } = PROB_ROSENBROCK;
 
         #endregion // Properties
         #region Setup
@@ -290,39 +364,47 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
             base.Setup(state, paramBase);
             var wp = state.Parameters.GetStringWithDefault(paramBase.Push(P_WHICH_PROBLEM), null, "");
             if (wp.CompareTo(V_ROSENBROCK) == 0 || wp.CompareTo(V_F2) == 0)
-                _problemType = PROB_ROSENBROCK;
+                ProblemType = PROB_ROSENBROCK;
             else if (wp.CompareTo(V_RASTRIGIN) == 0)
-                _problemType = PROB_RASTRIGIN;
+                ProblemType = PROB_RASTRIGIN;
             else if (wp.CompareTo(V_SPHERE) == 0 || wp.CompareTo(V_F1) == 0)
-                _problemType = PROB_SPHERE;
+                ProblemType = PROB_SPHERE;
             else if (wp.CompareTo(V_STEP) == 0 || wp.CompareTo(V_F3) == 0)
-                _problemType = PROB_STEP;
+                ProblemType = PROB_STEP;
             else if (wp.CompareTo(V_NOISY_QUARTIC) == 0 || wp.CompareTo(V_F4) == 0)
-                _problemType = PROB_NOISY_QUARTIC;
+                ProblemType = PROB_NOISY_QUARTIC;
             else if (wp.CompareTo(V_BOOTH) == 0)
-                _problemType = PROB_BOOTH;
+                ProblemType = PROB_BOOTH;
             else if (wp.CompareTo(V_GRIEWANK) == 0)
-                _problemType = PROB_GRIEWANK;
+                ProblemType = PROB_GRIEWANK;
             else if (wp.CompareTo(V_GRIEWANGK) == 0)
             {
                 state.Output.Warning("Incorrect parameter name (\"griewangk\") used, should be \"griewank\"",
                                      paramBase.Push(P_WHICH_PROBLEM), null);
-                _problemType = PROB_GRIEWANK;
+                ProblemType = PROB_GRIEWANK;
             }
             else if (wp.CompareTo(V_MEDIAN) == 0)
-                _problemType = PROB_MEDIAN;
+                ProblemType = PROB_MEDIAN;
             else if (wp.CompareTo(V_SUM) == 0)
-                _problemType = PROB_SUM;
+                ProblemType = PROB_SUM;
             else if (wp.CompareTo(V_PRODUCT) == 0)
-                _problemType = PROB_PRODUCT;
+                ProblemType = PROB_PRODUCT;
             else if (wp.CompareTo(V_SCHWEFEL) == 0)
-                _problemType = PROB_SCHWEFEL;
+                ProblemType = PROB_SCHWEFEL;
             else if (wp.CompareTo(V_MIN) == 0)
-                _problemType = PROB_MIN;
+                ProblemType = PROB_MIN;
             else if (wp.CompareTo(V_ROTATED_RASTRIGIN) == 0)
-                _problemType = PROB_ROTATED_RASTRIGIN;
+                ProblemType = PROB_ROTATED_RASTRIGIN;
             else if (wp.CompareTo(V_ROTATED_SCHWEFEL) == 0)
-                _problemType = PROB_ROTATED_SCHWEFEL;
+                ProblemType = PROB_ROTATED_SCHWEFEL;
+            else if (wp.CompareTo(V_ROTATED_GRIEWANK) == 0)
+                ProblemType = PROB_ROTATED_GRIEWANK;
+            else if (wp.CompareTo(V_LANGERMAN) == 0)
+                ProblemType = PROB_LANGERMAN;
+            else if (wp.CompareTo(V_LENNARDJONES) == 0)
+                ProblemType = PROB_LENNARDJONES;
+            else if (wp.CompareTo(V_LUNACEK) == 0)
+                ProblemType = PROB_LUNACEK;
             else
                 state.Output.Fatal(
                     "Invalid value for parameter, or parameter not found.\n" +
@@ -340,14 +422,18 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
                     "  " + V_SCHWEFEL + "\n" +
                     "  " + V_MIN + "\n" +
                     "  " + V_ROTATED_RASTRIGIN + "\n" +
-                    "  " + V_ROTATED_SCHWEFEL + "\n",
+                    "  " + V_ROTATED_SCHWEFEL + "\n" +
+                    "  " + V_ROTATED_GRIEWANK + "\n" +
+                    "  " + V_LANGERMAN + "\n" +
+                    "  " + V_LENNARDJONES + "\n" +
+                    "  " + V_LUNACEK + "\n",
                     paramBase.Push(P_WHICH_PROBLEM));
         }
 
         #endregion // Setup
         #region Operations
 
-        public void CheckRange(IEvolutionState state, int problem)
+        public void CheckRange(IEvolutionState state, int problem, double[] genome)
         {
             if (_alreadyChecked || state.Generation > 0) return;
             _alreadyChecked = true;
@@ -359,7 +445,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
                     state.Output.Fatal("ECSuite requires species " + i + " to be a FloatVectorSpecies, but it is a: " +
                                        state.Population.Subpops[i].Species);
                 }
-                var species = (FloatVectorSpecies)(state.Population.Subpops[i].Species);
+                var species = (FloatVectorSpecies)state.Population.Subpops[i].Species;
                 for (var k = 0; k < species.MinGenes.Length; k++)
                 {
                     if (species.MinGenes[k] != MinRange[problem] ||
@@ -374,6 +460,19 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
                     }
                 }
             }
+            if (ProblemType == PROB_LANGERMAN)
+            {
+                // Langerman has a maximum genome size of 10
+                if (genome.Length > 10)
+                    state.Output.Fatal("The Langerman function requires that the genome size be a value from 1 to 10 inclusive.  It is presently " + genome.Length);
+            }
+
+            else if (ProblemType == PROB_LENNARDJONES)
+            {
+                // Lennard-Jones requires that its genomes be multiples of 3
+                if (genome.Length % 3 != 0)
+                    state.Output.Fatal("The Lennard-Jones function requires that the genome size be a multiple of 3.  It is presently " + genome.Length);
+            }
         }
 
         public void Evaluate(IEvolutionState state,
@@ -381,21 +480,24 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
             int subpop,
             int threadnum)
         {
+            if (ind.Evaluated)  // don't bother reevaluating
+                return;
+
             if (!(ind is DoubleVectorIndividual))
                 state.Output.Fatal("The individuals for this problem should be DoubleVectorIndividuals.");
 
             var temp = (DoubleVectorIndividual)ind;
-            var genome = temp.genome;
+            double[] genome = temp.genome;
             var len = genome.Length;
 
             // this curious break-out makes it easy to use the isOptimal() and function() methods
             // for other purposes, such as coevolutionary versions of this class.
 
             // compute the fitness on a per-function basis
-            var fit = (Function(state, _problemType, temp.genome, threadnum));
+            double fit = Function(state, ProblemType, temp.genome, threadnum);
 
             // compute if we're optimal on a per-function basis
-            var isOptimal = IsOptimal(_problemType, fit);
+            bool isOptimal = IsOptimal(ProblemType, fit);
 
             // set the fitness appropriately
             if ((float)fit < (0.0f - float.MaxValue))  // uh oh -- can be caused by Product for example
@@ -405,19 +507,19 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
             }
             else if ((float)fit > float.MaxValue)  // uh oh -- can be caused by Product for example
             {
-                ((SimpleFitness)(ind.Fitness)).SetFitness(state, float.MaxValue, isOptimal);
+                ((SimpleFitness)ind.Fitness).SetFitness(state, float.MaxValue, isOptimal);
                 state.Output.WarnOnce("'Product' type used: some fitnesses are negative infinity, setting to lowest legal negative number.");
             }
             else
             {
-                ((SimpleFitness)(ind.Fitness)).SetFitness(state, (float)fit, isOptimal);
+                ((SimpleFitness)ind.Fitness).SetFitness(state, (float)fit, isOptimal);
             }
             ind.Evaluated = true;
         }
 
         public bool IsOptimal(int function, double fitness)
         {
-            switch (_problemType)
+            switch (ProblemType)
             {
                 case PROB_ROSENBROCK:
                 case PROB_RASTRIGIN:
@@ -433,7 +535,11 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
                 case PROB_SCHWEFEL:
                 case PROB_ROTATED_RASTRIGIN:	// not sure
                 case PROB_ROTATED_SCHWEFEL:
+                case PROB_ROTATED_GRIEWANK:
                 case PROB_MIN:
+                case PROB_LANGERMAN:        // may be around -1.4
+                case PROB_LENNARDJONES:
+                case PROB_LUNACEK:
                 default:
                     return false;
             }
@@ -441,7 +547,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
 
         public double Function(IEvolutionState state, int function, double[] genome, int threadnum)
         {
-            CheckRange(state, function);
+            CheckRange(state, function, genome);
 
             double value = 0;
             double len = genome.Length;
@@ -463,7 +569,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
                     for (var i = 0; i < len; i++)
                     {
                         var gi = genome[i];
-                        value += (gi * gi - A * Math.Cos(2 * Math.PI * gi));
+                        value += gi * gi - A * Math.Cos(2 * Math.PI * gi);
                     }
                     return -value;
 
@@ -584,8 +690,83 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
                         }
 
                         // now we know the matrix exists rotate the matrix and return its value
-                        var val = Mul(RotationMatrix[0], genome);
+                        double[] val = Mul(RotationMatrix[0], genome);
                         return Function(state, PROB_SCHWEFEL, val, threadnum);
+                    }
+
+                case PROB_ROTATED_GRIEWANK:
+                    {
+                        lock (RotationMatrix.SyncRoot)            // synchronizations are rare in ECJ.  :-(
+                        {
+                            if (RotationMatrix[0] == null)
+                                RotationMatrix[0] = BuildRotationMatrix(ROTATION_SEED, (int)len);
+                        }
+
+                        // now we know the matrix exists rotate the matrix and return its value
+                        double[] val = Mul(RotationMatrix[0], genome);
+                        return Function(state, PROB_GRIEWANK, val, threadnum);
+                    }
+
+                case PROB_LANGERMAN:
+                    {
+                        return 0.0 - langerman(genome);
+                    }
+
+                case PROB_LENNARDJONES:
+                    {
+                        int numAtoms = genome.Length / 3;
+                        double v = 0.0;
+
+                        for (int i = 0; i < numAtoms - 1; i++)
+                        {
+                            for (int j = i + 1; j < numAtoms; j++)
+                            {
+                                // double d = dist(genome, i, j);
+                                double a = genome[i * 3] - genome[j * 3];
+                                double b = genome[i * 3 + 1] - genome[j * 3 + 1];
+                                double c = genome[i * 3 + 2] - genome[j * 3 + 2];
+
+                                double d = Math.Sqrt(a * a + b * b + c * c);
+
+                                double r12 = Math.Pow(d, -12.0);
+                                double r6 = Math.Pow(d, -6.0);
+                                double e = r12 - r6;
+                                v += e;
+                            }
+                        }
+                        v *= -4.0;
+                        return v;
+                    }
+
+                case PROB_LUNACEK:
+                    {
+                        // Lunacek function: for more information, please see --
+                        // http://arxiv.org/pdf/1207.4318.pdf
+                        // http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.154.1657
+                        // // // //
+                        double s = 0.7; // The shape of the boundary of the double sphere, 
+                                        // could be like [0.2 - 1.4] but not 0.0.
+                                        // > 1.0 or < 1.0 means a parabolic shape, 1.0 means a linear boundary.
+                        double d = 1.0; // depth of the sphere, could be 1, 2, 3, or 4. 1 is deeper than 4
+                                        // this could be also be a fraction I guess.
+                        double mu1 = 0.0;
+                        for (int i = 0; i < genome.Length; i++)
+                            mu1 = genome[i];
+                        double mu2 = -1.0 * Math.Sqrt(((mu1 * mu1) - d) / s);
+                        double sigma1 = 0.0;
+                        double sigma2 = 0.0;
+                        for (int i = 0; i < genome.Length; i++)
+                        {
+                            sigma1 = (genome[i] - mu1) * (genome[i] - mu1);
+                            sigma2 = (genome[i] - mu2) * (genome[i] - mu2);
+                        }
+                        sigma2 = d * genome.Length + s * sigma1;
+                        double sphere = Math.Min(sigma1, sigma2);
+                        double rastrigin = Function(state, PROB_RASTRIGIN, genome, threadnum);
+                        // + or - ? not sure, I always get confused.
+                        // Lunacek function is a combination of Rastrigin and a Double Sphere.
+                        // As the Rastrigin is -, so this function should be.
+                        return -1.0 * (sphere + rastrigin);
                     }
 
                 default:

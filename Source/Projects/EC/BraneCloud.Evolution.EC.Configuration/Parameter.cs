@@ -100,18 +100,20 @@ namespace BraneCloud.Evolution.EC.Configuration
 
         public string Param
         {
-            get { return _param; }
-            set { _param = value; }
+            get => _param;
+            set => _param = value;
         }
-        protected string _param;		
-        
+        private string _param;
+
         /// <summary>
         /// Returns a new parameter with s added to the end of the current path items. 
+        /// If s is empty, nothing is pushed on (and no delimiter is added to the end).
         /// </summary>
         public virtual IParameter Push(string s)
         {
             if (s == null)
                 throw new BadParameterException("Parameter pushed with null string");
+            if (s == "") return new Parameter(Param);
             return new Parameter(Param + Delimiter + s);
         }
                 

@@ -38,7 +38,7 @@ namespace BraneCloud.Evolution.EC.App.Parity.Func
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         public override void Eval(IEvolutionState state,
             int thread,

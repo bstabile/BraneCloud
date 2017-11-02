@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 using BraneCloud.Evolution.EC.Configuration;
@@ -716,25 +715,25 @@ namespace BraneCloud.Evolution.EC.App.Regression
 
                         // first load the number of input variables
                         var scan = new Scanner(training_file);
-                        if (scan.hasNextInt())
-                            numInputs = scan.nextInt();
+                        if (scan.HasNextInt())
+                            numInputs = scan.NextInt();
                         else state.Output.Fatal("Number of input variables not provided at beginning of training file ", paramBase.Push(P_TRAINING_FILE), null);
 
                         // Load into an array list each element
                         var input = new List<double[]>();
                         var output = new List<double>();
-                        while (scan.hasNextDouble())
+                        while (scan.HasNextDouble())
                         {
                             var in_ = new double[numInputs];
                             var out_ = 0.0;
                             for (var i = 0; i < numInputs; i++)
                             {
-                                if (scan.hasNextDouble())
-                                    in_[i] = scan.nextDouble();
+                                if (scan.HasNextDouble())
+                                    in_[i] = scan.NextDouble();
                                 else state.Output.Fatal("Non-normal number of data points in training file ", paramBase.Push(P_TRAINING_FILE), null);
                             }
-                            if (scan.hasNextDouble())
-                                out_ = scan.nextDouble();
+                            if (scan.HasNextDouble())
+                                out_ = scan.NextDouble();
                             else state.Output.Fatal("Non-normal number of data points in training file ", paramBase.Push(P_TRAINING_FILE), null);
                             input.Add(in_);
                             output.Add(out_);
@@ -757,25 +756,25 @@ namespace BraneCloud.Evolution.EC.App.Regression
 
 
                         scan = new Scanner(testing_file);
-                        if (scan.hasNextInt())
-                            numInputs = scan.nextInt();
+                        if (scan.HasNextInt())
+                            numInputs = scan.NextInt();
                         else state.Output.Fatal("Number of input variables not provided at beginning of testing file ", paramBase.Push(P_TESTING_FILE), null);
 
                         // Load into an array list each element
                         input = new List<double[]>();
                         output = new List<double>();
-                        while (scan.hasNextDouble())
+                        while (scan.HasNextDouble())
                         {
                             var in_ = new double[numInputs];
                             var out_ = 0.0;
                             for (var i = 0; i < numInputs; i++)
                             {
-                                if (scan.hasNextDouble())
-                                    in_[i] = scan.nextDouble();
+                                if (scan.HasNextDouble())
+                                    in_[i] = scan.NextDouble();
                                 else state.Output.Fatal("Non-normal number of data points in testing file ", paramBase.Push(P_TESTING_FILE), null);
                             }
-                            if (scan.hasNextDouble())
-                                out_ = scan.nextDouble();
+                            if (scan.HasNextDouble())
+                                out_ = scan.NextDouble();
                             else state.Output.Fatal("Non-normal number of data points in testing file ", paramBase.Push(P_TESTING_FILE), null);
                             input.Add(in_);
                             output.Add(out_);

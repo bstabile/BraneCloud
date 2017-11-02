@@ -2,34 +2,6 @@
 # Licensed under the Academic Free License version 3.0
 # See the file "LICENSE" for more information
 
-parent.0	=	bbob.params
-
-breed		=     ec.de.DEBreeder
-# Other breed choices: ec.de.Best1BinDEBreeder, ec.de.Rand1EitherOrDEBreeder, ec.de.Rand1ExpDEBreeder
-
-# BRS: This appears to be necessary here?
-eval = ec.de.DEEvaluator
-
-# BRS: Adding these because they were not specified elsewhere (thus causing problems when we go to get the parameters)
-# BRS: I have no idea at the moment if the following are appropriate!
-breed.f = 0.5
-breed.cr = 1.0
-
-
-# Differential Evolution requires a special statistics object 
-# (ec.de.DEStatistics) to deal with certain issues that arise in parent/child 
-# competition.  See the DEStatistics documentation for more discussion.  The 
-# way we use the object is as the primary statistics object, and then we hang
-# SimpleStatistics as a subsidiary statistics object off of it like so:
-
-# BRS: DEStatistics was removed in ECJ v20. 
-#      Here I have commented out the original and just directly used SimpleStatistics.
-
-stat = 			ec.simple.SimpleStatistics
-stat.file =		../../../out.stat
-
-#stat = 					ec.de.DEStatistics
-#stat.num-children = 			1
-#stat.child.0 = 				ec.simple.SimpleStatistics
-#stat.child.0.file = 			../../../out.stat
+parent.0	=	../../de/de.params
+parent.1	=	bbob.params
 

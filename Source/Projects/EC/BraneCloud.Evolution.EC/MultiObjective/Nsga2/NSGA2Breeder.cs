@@ -44,10 +44,15 @@ namespace BraneCloud.Evolution.EC.MultiObjective.NSGA2
         {
             base.Setup(state, paramBase);
             // make sure SimpleBreeder's elites facility isn't being used
-            foreach (var t in Elite.Where(t => t != 0))
-            {
-                state.Output.Warning("Elites may not be used with NSGA2Breeder, and will be ignored.");
-            }
+            //foreach (var t in Elite.Where(t => t != 0))
+            //{
+            //    state.Output.Warning("Elites may not be used with NSGA2Breeder, and will be ignored.");
+            //}
+            for (int i = 0; i < Elite.Length; i++)  // we use elite.length here instead of pop.subpops.length because the population hasn't been made yet.
+                if (UsingElitism(i))
+                    state.Output.Warning("You're using elitism with NSGA2Breeder, which is not permitted and will be ignored.  However the reevaluate-elites parameter *will* bre recognized by NSGAEvaluator.",
+                        paramBase.Push(P_ELITE).Push("" + i));
+
 
             if (SequentialBreeding) // uh oh, haven't tested with this
                 state.Output.Fatal("NSGA2Breeder does not support sequential evaluation.",

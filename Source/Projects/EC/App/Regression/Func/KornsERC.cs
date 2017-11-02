@@ -21,7 +21,7 @@ namespace BraneCloud.Evolution.EC.App.Regression.Func
     /// </summary>
     public class KornsERC : RegERC
     {
-        public override string Name { get { return "KornsERC"; } }
+        public override string Name => "KornsERC";
 
         public override void ResetNode(IEvolutionState state, int thread)
         {

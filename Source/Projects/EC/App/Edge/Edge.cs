@@ -50,6 +50,8 @@ namespace BraneCloud.Evolution.EC.App.Edge
     [ECConfiguration("ec.app.edge.Edge")]
     public class Edge : GPProblem, ISimpleProblem
     {
+        private const long SerialVersionUID = 1;
+
         public const string P_GENERALIZE = "generalize";
         public const string P_ALLPOS = "allpos";
         public const string P_ALLNEG = "allneg";
@@ -64,9 +66,6 @@ namespace BraneCloud.Evolution.EC.App.Edge
         public const int READING0 = 1;
         public const int READING1 = 2;
         public const int EPSILON = 3;
-
-        // we'll need to deep clone this one though.
-        public EdgeData Input;
 
         // building graph
         public bool[] Start;
@@ -101,22 +100,9 @@ namespace BraneCloud.Evolution.EC.App.Edge
         // generalize?
         public bool Generalize;
 
-        public override object Clone()
-        {
             // we don't need to copy any of our arrays, they're null until
-            // we actually start using them.
+            // we actually start using them (i.e. deep clone unnecessary here).
 
-            var myobj = (Edge)(base.Clone());
-
-            // we also don't need to clone the positive/negative
-            // examples, since they don't change through the course
-            // of our run (I hope!)  Otherwise we'd need to clone them
-            // here.
-
-            // clone our data object
-            myobj.Input = (EdgeData)(Input.Clone());
-            return myobj;
-        }
 
         public static String Fill(int num, char c)
         {
@@ -232,8 +218,7 @@ namespace BraneCloud.Evolution.EC.App.Edge
 
         public bool[][] Slurp(Stream f) // throws IOException
         {
-            var r =
-                new StreamReader(new GZipStream(f, CompressionMode.Decompress));
+            var r = new StreamReader(new GZipStream(f, CompressionMode.Decompress));
             string bits;
 
             var v = new List<bool[]>();
@@ -265,15 +250,12 @@ namespace BraneCloud.Evolution.EC.App.Edge
 
         public void PrintBits(IEvolutionState state, bool[][] bits)
         {
-            StringBuilder s;
-            for (var x = 0; x < bits.Length; x++)
+            foreach (bool[] t in bits)
             {
-                s = new StringBuilder();
-                for (var y = 0; y < bits[x].Length; y++)
-                    if (bits[x][y]) s.Append('1');
-                    else s.Append('0');
-                if (s.Length == 0) state.Output.Message("(empty)");
-                else state.Output.Message(s.ToString());
+                var s = new StringBuilder();
+                foreach (bool t1 in t)
+                    s.Append(t1 ? '1' : '0');
+                state.Output.Message(s.Length == 0 ? "(empty)" : s.ToString());
             }
         }
 
@@ -286,31 +268,6 @@ namespace BraneCloud.Evolution.EC.App.Edge
             Generalize = state.Parameters.GetBoolean(paramBase.Push(P_GENERALIZE), null, false);
 
             // load the test examples here
-
-            //FileInfo ap = null;
-            //FileInfo an = null;
-            //FileInfo tp = null;
-            //FileInfo tn = null;
-            //int restriction;
-
-            //if (Generalize)
-            //{
-            //    ap = state.Parameters.GetFile(paramBase.Push(P_ALLPOS), null);
-            //    an = state.Parameters.GetFile(paramBase.Push(P_ALLNEG), null);
-            //}
-
-            //tp = state.Parameters.GetFile(paramBase.Push(P_TESTPOS), null);
-            //tn = state.Parameters.GetFile(paramBase.Push(P_TESTNEG), null);
-
-            //if (Generalize)
-            //{
-            //    if (ap == null) state.Output.Error("File doesn't exist", paramBase.Push(P_ALLPOS));
-            //    if (an == null) state.Output.Error("File doesn't exist", paramBase.Push(P_ALLNEG));
-            //}
-
-            //if (tp == null) state.Output.Error("File doesn't exist", paramBase.Push(P_TESTPOS));
-            //if (tn == null) state.Output.Error("File doesn't exist", paramBase.Push(P_TESTNEG));
-            //state.Output.ExitIfErrors();
 
             Stream ap = null;
             Stream an = null;
@@ -393,12 +350,6 @@ namespace BraneCloud.Evolution.EC.App.Edge
             state.Output.Message("");
 
             state.Output.ExitIfErrors();
-
-
-            // set up our input -- don't want to use the default base, it's unsafe
-            Input = (EdgeData)state.Parameters.GetInstanceForParameterEq(
-                paramBase.Push(P_DATA), null, typeof(EdgeData));
-            Input.Setup(state, paramBase.Push(P_DATA));
         }
 
         public bool Test(bool[] sample)
@@ -512,7 +463,7 @@ namespace BraneCloud.Evolution.EC.App.Edge
             NumNodes = 2;
             NumEdges = 1; From[0] = 0; To[0] = 1;
             Start[0] = Start[1] = Accept[0] = Accept[1] = false;
-            Input.edge = 0;
+            ((EdgeData)Input).edge = 0;
 
             // generate the graph
             ((GPIndividual)ind).Trees[0].Child.Eval(
@@ -589,27 +540,29 @@ namespace BraneCloud.Evolution.EC.App.Edge
 
             if (!ind.Evaluated)  // don't bother reevaluating
             {
+                EdgeData input = (EdgeData) Input;
+
                 FullTest(state, ind, threadnum, PosT, NegT);
                 // the fitness better be KozaFitness!
-                var f = ((KozaFitness)ind.Fitness);
+                var f = (KozaFitness)ind.Fitness;
 
                 // this is an awful fitness metric, but it's the standard
                 // one used for these problems.  :-(
 
                 f.SetStandardizedFitness(state, (float)
-                        (1.0 - ((double)(_totpos + _totneg)) /
+                        (1.0 - (double)(_totpos + _totneg) /
                         (PosT.Length + NegT.Length)));
 
                 // here are two other more reasonable fitness metrics
-                /*
-                  f.setStandardizedFitness(state,(float)
-                  (1.0 - Math.min(((double)totpos)/posT.length,
-                  ((double)totneg)/negT.length)));
 
-                  f.setStandardizedFitness(state,(float)
-                  (1.0 - (((double)totpos)/posT.length +
-                  ((double)totneg)/negT.length)/2.0));
-                */
+                  //f.SetStandardizedFitness(state,(float)
+                  //(1.0 - Math.Min(((double)_totpos)/PosT.Length,
+                  //((double)_totneg)/NegT.Length)));
+
+                  //f.SetStandardizedFitness(state,(float)
+                  //(1.0 - (((double)_totpos)/PosT.Length +
+                  //((double)_totneg)/NegT.Length)/2.0));
+
 
                 f.Hits = _totpos + _totneg;
                 ind.Evaluated = true;

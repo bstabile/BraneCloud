@@ -27,15 +27,15 @@ namespace BraneCloud.Evolution.EC.App.Tutorial4
     [ECConfiguration("ec.app.tutorial4.MultiValuedRegression")]
     public class MultiValuedRegression : GPProblem, ISimpleProblem
     {
+        private const long SerialVersionUID = 1;
+
         public double currentX;
         public double currentY;
-
-        public DoubleData input;
 
         public override object Clone()
         {
             var newobj = (MultiValuedRegression)(base.Clone());
-            newobj.input = (DoubleData)(input.Clone());
+            newobj.Input = (DoubleData)Input.Clone();
             return newobj;
         }
 
@@ -44,13 +44,13 @@ namespace BraneCloud.Evolution.EC.App.Tutorial4
             // very important, remember this
             base.Setup(state, paramBase);
 
-            // set up our input -- don't want to use the default base, it's unsafe here
-            input = (DoubleData)state.Parameters.GetInstanceForParameterEq(
-                paramBase.Push(P_DATA), null, typeof(DoubleData));
-            input.Setup(state, paramBase.Push(P_DATA));
+            // verify our input is the right class (or subclasses from it)
+            if (!(Input is DoubleData))
+            state.Output.Fatal("GPData class must subclass from " + typeof(DoubleData).Name,
+            paramBase.Push(P_DATA), null);
         }
 
-        public void Evaluate(IEvolutionState state,
+    public void Evaluate(IEvolutionState state,
             Individual ind,
             int subpop,
             int threadnum)
@@ -64,15 +64,15 @@ namespace BraneCloud.Evolution.EC.App.Tutorial4
                     currentX = state.Random[threadnum].NextDouble();
                     currentY = state.Random[threadnum].NextDouble();
                     var expectedResult = currentX * currentX * currentY + currentX * currentY + currentY;
-                    ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, input, Stack, ((GPIndividual)ind), this);
+                    ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, Input, Stack, ((GPIndividual)ind), this);
 
-                    var result = Math.Abs(expectedResult - input.x);
+                    var result = Math.Abs(expectedResult - ((DoubleData)Input).x);
                     if (result <= 0.01) hits++;
                     sum += result;
                 }
 
                 // the fitness better be KozaFitness!
-                var f = ((KozaFitness)ind.Fitness);
+                var f = (KozaFitness)ind.Fitness;
                 f.SetStandardizedFitness(state, (float)sum);
                 f.Hits = hits;
                 ind.Evaluated = true;

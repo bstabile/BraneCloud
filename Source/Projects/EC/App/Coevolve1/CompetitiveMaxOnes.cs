@@ -25,6 +25,8 @@ using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Simple;
 using BraneCloud.Evolution.EC.Vector;
 
+//using BraneCloud.Evolution.EC.Vector;
+
 namespace BraneCloud.Evolution.EC.App.Coevolve1
 {
     [ECConfiguration("ec.app.coevolve1.CompetitiveMaxOnes")]

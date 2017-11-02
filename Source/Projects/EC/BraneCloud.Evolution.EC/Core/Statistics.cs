@@ -74,6 +74,8 @@ namespace BraneCloud.Evolution.EC
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_NUMCHILDREN = "num-children";
         public const string P_CHILD = "child";
 

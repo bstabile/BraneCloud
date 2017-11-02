@@ -61,4 +61,7 @@ eval.problem.data = ec.app.multiplexer.MultiplexerData
 eval.problem.bits = 3
 gp.fs.0.size = 15
 
+breedthreads = auto
+evalthreads = auto
+
 

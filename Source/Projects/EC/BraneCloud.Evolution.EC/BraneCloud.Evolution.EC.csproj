@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BraneCloud.Evolution.EC</RootNamespace>
     <AssemblyName>BraneCloud.Evolution.EC</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -35,6 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,6 +45,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -53,6 +55,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Threading.Tasks.Dataflow, Version=4.5.24.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Solutions\EC\packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -65,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Breed\BreedDefaults.cs" />
+    <Compile Include="Breed\BreederThread.cs" />
     <Compile Include="Breed\BufferedBreedingPipeline.cs" />
     <Compile Include="Breed\ForceBreedingPipeline.cs" />
     <Compile Include="Breed\GenerationSwitchPipeline.cs" />
@@ -104,6 +111,7 @@
     <Compile Include="Eval\ISlaveMonitor.cs" />
     <Compile Include="Eval\SlaveEvaluationType.cs" />
     <Compile Include="Eval\SlaveReturnType.cs" />
+    <Compile Include="GP\Breed\SizeFairCrossoverPipeline.cs" />
     <Compile Include="GP\Build\UniformGPNodeStorage.cs" />
     <Compile Include="GP\GE\Breed\GETruncationPipeline.cs" />
     <Compile Include="GP\GE\GEDefaults.cs" />
@@ -116,6 +124,13 @@
     <Compile Include="GP\GE\GrammarRuleNode.cs" />
     <Compile Include="GP\GE\IGPProblemParent.cs" />
     <Compile Include="GP\IGPProblem.cs" />
+    <Compile Include="CloneNotSupportedException.cs" />
+    <Compile Include="GP\Push\Nonterminal.cs" />
+    <Compile Include="GP\Push\PushBuilder.cs" />
+    <Compile Include="GP\Push\PushDefaults.cs" />
+    <Compile Include="GP\Push\PushInstruction.cs" />
+    <Compile Include="GP\Push\PushProblem.cs" />
+    <Compile Include="GP\Push\Terminal.cs" />
     <Compile Include="MultiObjective\MultiObjectiveFitnessComparator.cs" />
     <Compile Include="MultiObjective\MultiObjectiveStatistics.cs" />
     <Compile Include="MultiObjective\Nsga2\INSGA2Evaluator.cs" />
@@ -123,6 +138,7 @@
     <Compile Include="MultiObjective\Nsga2\NSGA2MultiObjectiveFitness.cs" />
     <Compile Include="MultiObjective\Nsga2\NSGA2MultiObjectiveFitnessComparator.cs" />
     <Compile Include="MultiObjective\Spea2\ISPEA2Evaluator.cs" />
+    <Compile Include="PSO\Particle.cs" />
     <Compile Include="Select\BoltzmannSelection.cs" />
     <Compile Include="Select\SigmaScalingSelection.cs" />
     <Compile Include="Select\SUSSelection.cs" />
@@ -262,8 +278,9 @@
     <Compile Include="Util\ISortComparator.cs" />
     <Compile Include="Util\ISortComparatorL.cs" />
     <Compile Include="Util\TensorFactory.cs" />
-    <Compile Include="Util\Version.cs" />
+    <Compile Include="Util\ECVersion.cs" />
     <Compile Include="Vector\BitVectorIndividual.cs" />
+    <Compile Include="Vector\BitVectorSpecies.cs" />
     <Compile Include="Vector\Breed\GeneDuplicationPipeline.cs" />
     <Compile Include="Vector\Breed\ListCrossoverPipeline.cs" />
     <Compile Include="Vector\Breed\MultipleVectorCrossoverPipeline.cs" />
@@ -273,16 +290,14 @@
     <Compile Include="Vector\DoubleVectorIndividual.cs" />
     <Compile Include="Vector\FloatVectorIndividual.cs" />
     <Compile Include="Vector\FloatVectorSpecies.cs" />
+    <Compile Include="Vector\Gene.cs" />
     <Compile Include="Vector\GeneVectorIndividual.cs" />
     <Compile Include="Vector\GeneVectorSpecies.cs" />
     <Compile Include="Vector\IntegerVectorIndividual.cs" />
     <Compile Include="Vector\IntegerVectorSpecies.cs" />
-    <Compile Include="Vector\IntegralVectorIndividual_EXP.cs" />
-    <Compile Include="Vector\IntegralVectorSpecies_EXP.cs" />
     <Compile Include="Vector\LongVectorIndividual.cs" />
     <Compile Include="Vector\ShortVectorIndividual.cs" />
     <Compile Include="Vector\VectorDefaults.cs" />
-    <Compile Include="Vector\VectorGene.cs" />
     <Compile Include="Vector\VectorIndividual.cs" />
     <Compile Include="Vector\VectorSpecies.cs" />
   </ItemGroup>
@@ -295,6 +310,10 @@
       <Project>{E5ECCEA3-0448-40CD-98B2-BC70578807B1}</Project>
       <Name>BraneCloud.Evolution.EC.Logging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BraneCloud.Evolution.EC.Psh\BraneCloud.Evolution.EC.Psh.csproj">
+      <Project>{cfdb1e93-1a72-496d-89ef-ede6695b70af}</Project>
+      <Name>BraneCloud.Evolution.EC.Psh</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BraneCloud.Evolution.EC.Randomization\BraneCloud.Evolution.EC.Randomization.csproj">
       <Project>{5993FC6C-820B-482F-AB46-961F89FC8EA1}</Project>
       <Name>BraneCloud.Evolution.EC.Randomization</Name>
@@ -306,6 +325,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

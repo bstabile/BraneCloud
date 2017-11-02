@@ -19,7 +19,7 @@
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 
-namespace BraneCloud.Evolution.EC.App.TwoBox
+namespace BraneCloud.Evolution.EC.Problems.TwoBox
 {
     [ECConfiguration("ec.problems.twobox.TwoBoxData")]
     public class TwoBoxData : GPData

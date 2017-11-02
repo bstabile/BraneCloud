@@ -70,6 +70,8 @@ namespace BraneCloud.Evolution.EC.GP.GE
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public new const string P_PROBLEM = "problem";
 
         #endregion // Constants

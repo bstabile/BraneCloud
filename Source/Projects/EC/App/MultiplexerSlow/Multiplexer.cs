@@ -43,9 +43,11 @@ namespace BraneCloud.Evolution.EC.App.MultiplexerSlow
     /// <td>species (the GPData object)</td></tr>
     /// </table>
     /// </summary>
-    [ECConfiguration("ec.app.multiplexerslow.Multiplexer")]
+    [ECConfiguration("ec.app.multiplexer.Multiplexer")]
     public class Multiplexer : GPProblem, ISimpleProblem
     {
+        private const long SerialVersionUID = 1;
+
         public const int NUMINPUTS = 20;
         public const string P_NUMBITS = "bits";
 
@@ -55,13 +57,10 @@ namespace BraneCloud.Evolution.EC.App.MultiplexerSlow
         public int addressPart;  // the current address part
         public int dataPart;     // the current data part
 
-        // we'll need to deep clone this one though.
-        public MultiplexerData input;
-
         public override object Clone()
         {
-            var myobj = (Multiplexer)(base.Clone());
-            myobj.input = (MultiplexerData)(input.Clone());
+            var myobj = (Multiplexer)base.Clone();
+            myobj.Input = (MultiplexerData)Input.Clone();
             return myobj;
         }
 
@@ -85,9 +84,9 @@ namespace BraneCloud.Evolution.EC.App.MultiplexerSlow
             for (var x = 0; x < amax; x++) dmax *= 2;   // safer than Math.pow(...)
 
             // set up our input
-            input = (MultiplexerData)state.Parameters.GetInstanceForParameterEq(
+            Input = (MultiplexerData)state.Parameters.GetInstanceForParameterEq(
                 paramBase.Push(P_DATA), null, typeof(MultiplexerData));
-            input.Setup(state, paramBase.Push(P_DATA));
+            Input.Setup(state, paramBase.Push(P_DATA));
         }
 
         public void Evaluate(IEvolutionState state, Individual ind, int subpop, int threadnum)
@@ -100,7 +99,7 @@ namespace BraneCloud.Evolution.EC.App.MultiplexerSlow
                     for (dataPart = 0; dataPart < dmax; dataPart++)
                     {
                         ((GPIndividual)ind).Trees[0].Child.Eval(
-                            state, threadnum, input, Stack, ((GPIndividual)ind), this);
+                            state, threadnum, Input, Stack, ((GPIndividual)ind), this);
                         sum += 1 - (                  /* "Not" */
                             ((dataPart >> addressPart) & 1) /* extracts the address-th 
                                                             bit in data and moves 
@@ -108,7 +107,7 @@ namespace BraneCloud.Evolution.EC.App.MultiplexerSlow
                                                             clearing out all 
                                                             other bits */
                             ^                   /* "Is Different from" */
-                            (input.x & 1));      /* A 1 if input.x is 
+                            (((MultiplexerData)Input).x & 1));      /* A 1 if input.x is 
                                                 non-zero, else 0. */
                     }
 

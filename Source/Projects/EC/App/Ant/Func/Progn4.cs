@@ -40,7 +40,7 @@ namespace BraneCloud.Evolution.EC.App.AntApp
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 4; } }
+        public override int ExpectedChildren => 4;
 
         public override void Eval(
             IEvolutionState state, 

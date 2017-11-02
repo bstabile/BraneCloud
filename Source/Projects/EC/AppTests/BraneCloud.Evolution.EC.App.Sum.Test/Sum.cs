@@ -50,7 +50,7 @@ namespace BraneCloud.Evolution.EC.App.Sum.Test
             for (var x = 0; x < ind2.genome.Length; x++)
             {
                 sum += ind2.genome[x];
-                max += (int)(s.MaxGene(x));  // perhaps this neededn't be computed over and over again
+                max += (int)s.GetMaxGene(x);  // perhaps this neededn't be computed over and over again
             }
 
             // Now we know that max is the maximum possible value, and sum is the fitness.

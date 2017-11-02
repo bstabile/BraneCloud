@@ -57,6 +57,8 @@ namespace BraneCloud.Evolution.EC.SteadyState
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_DESELECTOR = "deselector";
 
         #endregion // Constants

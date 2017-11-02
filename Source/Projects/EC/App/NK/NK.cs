@@ -26,7 +26,7 @@ namespace BraneCloud.Evolution.EC.App.NK
 {
     /// <summary>
     /// NK implmements the NK-landscape developed by Stuart Kauffman (in the book <i>The Origins of
-    /// Order: Self-Organization and Selection in Evolution</a>).  In the NK model, the fitness 
+    /// Order: Self-Organization and Selection in Evolution</i>).  In the NK model, the fitness 
     /// contribution of each allele depends on how that allele interacts with K other alleles.  Based on 
     /// this interaction, each gene contributes a random number between 0 and 1.  The individual's 
     /// fitness is the average of these N random numbers.  
@@ -48,20 +48,20 @@ namespace BraneCloud.Evolution.EC.App.NK
         public const string P_K = "k";
         public const string P_ADJACENT = "adjacent";
 
-        int k;
-        bool adjacentNeighborhoods;
-        Hashtable oldValues;
+        int _k;
+        bool _adjacentNeighborhoods;
+        Hashtable _oldValues;
 
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
             base.Setup(state, paramBase);
 
-            k = state.Parameters.GetInt(paramBase.Push(P_K), null, 1);
-            if ((k < 0) || (k > 31))
+            _k = state.Parameters.GetInt(paramBase.Push(P_K), null, 1);
+            if ((_k < 0) || (_k > 31))
                 state.Output.Fatal("Value of k must be between 0 and 31", paramBase.Push(P_K));
 
-            adjacentNeighborhoods = state.Parameters.GetBoolean(paramBase.Push(P_ADJACENT), null, true);
-            oldValues = new Hashtable();
+            _adjacentNeighborhoods = state.Parameters.GetBoolean(paramBase.Push(P_ADJACENT), null, true);
+            _oldValues = new Hashtable();
         }
 
         public void Evaluate(IEvolutionState state, Individual ind, int subpop, int threadnum)
@@ -72,14 +72,14 @@ namespace BraneCloud.Evolution.EC.App.NK
 
             for (var i = 0; i < n; i++)
             {
-                var tmpInd = new bool[k + 1];
+                var tmpInd = new bool[_k + 1];
                 tmpInd[0] = ind2.genome[i];
 
                 double val;
-                if (adjacentNeighborhoods)
+                if (_adjacentNeighborhoods)
                 {
-                    var offset = n - k / 2;
-                    for (int j = 0; j < k; j++)
+                    var offset = n - _k / 2;
+                    for (int j = 0; j < _k; j++)
                     {
                         tmpInd[j + 1] = ind2.genome[(j + i + offset) % n];
                     }
@@ -87,15 +87,15 @@ namespace BraneCloud.Evolution.EC.App.NK
                 else
                 {
                     int j;
-                    for (var l = 0; l < k; l++)
+                    for (var l = 0; l < _k; l++)
                     {
-                        while ((j = state.Random[0].NextInt(k)) == i) ;
+                        while ((j = state.Random[0].NextInt(_k)) == i) ;
                         tmpInd[l + 1] = ind2.genome[j];
                     }
                 }
 
-                if (oldValues.ContainsKey(tmpInd))
-                    val = (Double)oldValues[tmpInd];
+                if (_oldValues.ContainsKey(tmpInd))
+                    val = (Double)_oldValues[tmpInd];
                 else
                 {
                     double tmp = 0;
@@ -103,7 +103,7 @@ namespace BraneCloud.Evolution.EC.App.NK
                         if (tmpInd[j]) tmp += 1 << j;
                     val = tmp / Int32.MaxValue;
 
-                    oldValues[tmpInd] = val;
+                    _oldValues[tmpInd] = val;
                 }
 
                 fitness += val;

@@ -20,7 +20,7 @@ using System;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 
-namespace BraneCloud.Evolution.EC.Problems.AntApp
+namespace BraneCloud.Evolution.EC.Problems.Ant.Func
 {
     [ECConfiguration("ec.problems.ant.func.Progn2")]
     public class Progn2 : GPNode, IEvalPrint
@@ -36,7 +36,7 @@ namespace BraneCloud.Evolution.EC.Problems.AntApp
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 2; } }
+        public override int ExpectedChildren => 2;
 
         public override void Eval(
             IEvolutionState state, 

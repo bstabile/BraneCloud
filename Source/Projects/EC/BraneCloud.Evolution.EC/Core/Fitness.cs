@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.IO;
 
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.Logging;
 
 namespace BraneCloud.Evolution.EC
 {
@@ -77,59 +76,19 @@ namespace BraneCloud.Evolution.EC
 
         public abstract IParameter DefaultBase { get; }
 
-        /// <summary>
-        /// Should return an absolute fitness value ranging from negative
-        /// infinity to infinity, NOT inclusive (thus infinity, negative
-        /// infinity, and NaN are NOT valid fitness values).  This should
-        /// be interpreted as: negative infinity is worse than the WORST
-        /// possible fitness, and positive infinity is better than the IDEAL
-        /// fitness.
-        /// 
-        /// <p/>You are free to restrict this range any way you like: for example,
-        /// your fitness values might fall in the range [-5.32, 2.3]
-        /// 
-        /// <p/>Selection methods relying on fitness proportionate information will
-        /// <b>assume the fitness is non-negative</b> and should throw an error
-        /// if it is not.  Thus if you plan on using FitProportionateSelection, 
-        /// BestSelection, or
-        /// GreedyOverselection, for example, your fitnesses should assume that 0
-        /// is the worst fitness and positive fitness are better.  If you're using
-        /// other selection methods (Tournament selection, various ES selection
-        /// procedures, etc.) your fitness values can be anything.
-        /// 
-        /// <p/>Similarly, if you're writing a selection method and it needs positive
-        /// fitnesses, you should check for negative values and issue an error; and
-        /// if your selection method doesn't need an <i>absolute</i> fitness
-        /// value, it should use the equivalentTo() and betterThan() methods instead.
-        /// 
-        /// <p/> If your fitness scheme does not use a metric quantifiable to
-        /// a single positive value (for example, MultiObjectiveFitness), you should 
-        /// perform some reasonable translation.
-        /// </summary>
+        /// <inheritdoc />
         public abstract float Value { get; /* protected set; */ } // The actual value should be handled in each derived type!
 
-        /// <summary>
-        /// Should return true if this is a good enough fitness to end the run 
-        /// </summary>
+        /// <inheritdoc />
         public abstract bool IsIdeal { get; }
 
-        /// <summary>
-        /// Auxiliary variable, used by coevolutionary processes, to compute the
-        /// number of trials used to compute this Fitness value.  By default Trials = null and stays that way.
-        /// If you set this variable, all of the elements of the List must be immutable -- once they're
-        /// set they never change internally.
-        /// </summary>
-        public List<double> Trials { get { return _trials; } set { _trials = value; } }
+        /// <inheritdoc />
+        public List<double> Trials { get => _trials; set => _trials = value; }
 
         private List<double> _trials;
 
-        /// <summary>
-        /// Auxiliary variable, used by coevolutionary processes, to store the individuals
-        /// involved in producing this given Fitness value.  By default context=null and stays that way.
-        /// Note that individuals stored here may possibly not themselves have Fitness values to avoid
-        /// circularity when cloning.
-        /// </summary>
-        public Individual[] Context { get { return _context; } set { _context = value; } }
+        /// <inheritdoc />
+        public Individual[] Context { get => _context; set => _context = value; }
         private Individual[] _context;
 
         #endregion // Properties
@@ -143,21 +102,7 @@ namespace BraneCloud.Evolution.EC
         #endregion // Setup
         #region Operations
 
-        /// <summary>
-        /// Merges the other fitness into this fitness.  May destroy the other Fitness in the process.
-        /// This method is typically called by coevolution in combination with distributed evauation where
-        /// the Individual may be sent to various different sites to have trials performed on it, and
-        /// the results must be merged together to form a relevant fitness.  By default merging occurs as follows.
-        /// First, the trials arrays are concatenated.  Then whoever has the best trial has his context retained:
-        /// this Fitness is determined by calling contextIsBetterThan(other).  By default that method assumes
-        /// that trials are Doubles, and that higher values are better.  You will wish to override that method 
-        /// if trials are different.  In coevolution nothing
-        /// else needs to be merged usually, though you may need to override this to handle other things specially.
-        /// 
-        /// <p/>This method only works properly if the other Fitness had its trials deleted before it was sent off
-        /// for evaluation on a remote machine: thus all of the trials are new and can be concatenated in.  This
-        /// is what sim.eval.Job presently does in its method copyIndividualsForward().
-        /// </summary>
+        /// <inheritdoc />
         public void Merge(IEvolutionState state, IFitness other)
         {
             // first let's merge trials.  We assume they're Doubles
@@ -201,6 +146,7 @@ namespace BraneCloud.Evolution.EC
             SetContext(cont);
             cont[index] = ind;
         }
+
         public void SetContext(Individual[] cont)
         {
             if (cont == null)
@@ -228,28 +174,10 @@ namespace BraneCloud.Evolution.EC
             }
         }
 
-        /// <summary>
-        /// Treat the Individual[] you receive from this as read-only.
-        /// </summary>
-        /// <returns>An array of Individuals</returns>
+        /// <inheritdoc />
         public Individual[] GetContext()
         {
             return Context;
-        }
-
-        /// <summary>
-        /// Given another Fitness, 
-        /// returns true if the trial which produced my current context is "better" in fitness than
-        /// the trial which produced his current context, and thus should be retained in lieu of his.
-        /// This method by default assumes that trials are Doubles, and that higher Doubles are better.
-        /// If you are using distributed evaluation and coevolution and your tirals are otherwise, you
-        /// need to override this method.
-        /// </summary>
-        public bool ContextIsBetterThan(IFitness other)
-        {
-            if (other.Trials == null) return true; // I win
-            if (Trials == null) return false; // he wins
-            return BestTrial(Trials) < BestTrial(other.Trials);
         }
 
         #endregion
@@ -257,37 +185,22 @@ namespace BraneCloud.Evolution.EC
         #endregion // Operations
         #region Comparison
 
-        /// <summary>
-        /// Should return true if this fitness is in the same equivalence class
-        /// as _fitness, that is, neither is clearly better or worse than the
-        /// other.  You may assume that _fitness is of the same class as yourself.
-        /// For any two fitnesses fit1 and fit2 of the same class,
-        /// it must be the case that fit1.equivalentTo(fit2) == fit2.equivalentTo(fit1),
-        /// and that only one of fit1.BetterThan(fit2), fit1.equivalentTo(fit2),
-        /// and fit2.BetterThan(fit1) can be true.
-        /// </summary>
+        /// <inheritdoc />
         public abstract bool EquivalentTo(IFitness other);
 
-        /// <summary>
-        /// Should return true if this fitness is clearly better than _fitness;
-        /// You may assume that _fitness is of the same class as yourself. 
-        /// For any two fitnesses fit1 and fit2 of the same class,
-        /// it must be the case that fit1.equivalentTo(fit2) == fit2.equivalentTo(fit1),
-        /// and that only one of fit1.BetterThan(fit2), fit1.equivalentTo(fit2),
-        /// and fit2.BetterThan(fit1) can be true.
-        /// </summary>
+        /// <inheritdoc />
         public abstract bool BetterThan(IFitness other);
 
-        /// <summary>
-        /// This method currently defers to the original ECJ methods "BetterThan" and "EquivalentTo"
-        /// for comparison. Those are both abstract here, and must be overridden to meet specific needs.
-        /// This simply makes the ultimate implementation conform to the "expected" .NET comparison style.
-        /// </summary>
-        /// <remarks>
-        /// If the legacy "methods of comparison" go away at some point,
-        /// this MUST become abstract to allow for concrete implementation.
-        /// </remarks>
-        public int CompareTo(IFitness other)
+        /// <inheritdoc />
+        public virtual bool ContextIsBetterThan(IFitness other)
+        {
+            if (other.Trials == null) return true; // I win
+            if (Trials == null) return false; // he wins
+            return BestTrial(Trials) < BestTrial(other.Trials);
+        }
+
+        /// <inheritdoc />
+        public virtual int CompareTo(IFitness other)
         {
             // If the following is not valid, the derivation should override
             if (other == null || BetterThan(other)) return 1;
@@ -298,8 +211,47 @@ namespace BraneCloud.Evolution.EC
         int IComparable.CompareTo(object other)
         {
             if (!(other is IFitness))
-                throw new ArgumentException(String.Format("Argument is not of the correct type. It must be typeof({0}).", GetType().Name), "other");
+                throw new ArgumentException(
+                    $"Argument is not of the correct type. It must be typeof({GetType().Name}).", nameof(other));
             return CompareTo((IFitness)other);
+        }
+
+        /// <summary>
+        /// Sets the fitness to be the same value as the best of the provided fitnesses.  This method calls
+        /// setToMeanOf(...), so if that method is unimplemented, this method will also fail.
+        /// </summary>
+        public virtual void SetToBestOf(IEvolutionState state, IFitness[] fitnesses)
+        {
+            var f2 = (IFitness[])fitnesses.Clone();
+            Array.Sort(f2);
+            SetToMeanOf(state, new[] { f2[0] });
+        }
+
+        /// <summary>
+        /// Sets the fitness to be the same value as the mean of the provided fitnesses.  The default
+        /// version of this method exits with an "unimplemented" error; you should override this.
+        /// </summary>
+        public virtual void SetToMeanOf(IEvolutionState state, IFitness[] fitnesses)
+        {
+            state.Output.Fatal("SetToMeanOf(EvolutionState, IFitness[]) not implemented in " + GetType());
+        }
+
+        /// <summary>
+        /// Sets the fitness to be the median of the provided fitnesses.  This method calls
+        /// SetToMeanOf(...), so if that method is unimplemented, this method will also fail.
+        /// </summary>
+        public virtual void SetToMedianOf(IEvolutionState state, IFitness[] fitnesses)
+        {
+            var f2 = (IFitness[])fitnesses.Clone();
+            Array.Sort(f2);
+            if (f2.Length % 2 == 1)
+            {
+                SetToMeanOf(state, new[] { f2[f2.Length / 2] });   // for example, 5/2 = 2, and 0, 1, *2*, 3, 4
+            }
+            else
+            {
+                SetToMeanOf(state, new[] { f2[f2.Length / 2 - 1], f2[f2.Length / 2] });  // for example, 6/2 = 3, and 0, 1, *2<, *3*, 4, 5
+            }
         }
 
         #endregion // Comparison
@@ -323,24 +275,13 @@ namespace BraneCloud.Evolution.EC
         #endregion // Cloning
         #region ToString
 
-        /// <summary>
-        /// Print to a string the fitness in a fashion readable by humans, and not intended
-        /// to be parsed in again.  The default form
-        /// simply calls ToString(), but you'll probably want to override this to something else. 
-        /// </summary>
+        /// <inheritdoc />
         public virtual string FitnessToStringForHumans()
         {
             return ToString();
         }
 
-        /// <summary>
-        /// Print to a string the fitness in a fashion intended
-        /// to be parsed in again via ReadFitness(...).
-        /// The fitness and evaluated flag should not be included.  The default form
-        /// simply calls ToString(), which is almost certainly wrong, 
-        /// and you'll probably want to override this to something else.  When overriding, you
-        /// may wish to check to see if the 'trials' variable is non-null, and issue an error if so.
-        /// </summary>
+        /// <inheritdoc />
         public virtual string FitnessToString()
         {
             return ToString();
@@ -349,13 +290,8 @@ namespace BraneCloud.Evolution.EC
         #endregion // ToString
         #region IO
 
-        /// <summary>
-        /// Should print the fitness out fashion pleasing for humans to read, 
-        /// using state.Output.PrintLn(...,log).  The default version
-        /// of this method calls FitnessToStringForHumans(), adds context (collaborators) if any,
-        /// and PrintLns the resultant string.
-        /// </summary>
-        public void PrintFitnessForHumans(IEvolutionState state, int log)
+        /// <inheritdoc />
+        public virtual void PrintFitnessForHumans(IEvolutionState state, int log)
         {
             var s = FitnessToStringForHumans();
             if (Context != null)
@@ -381,62 +317,38 @@ namespace BraneCloud.Evolution.EC
             state.Output.PrintLn(s, log);
         }
 
-        /// <summary>
-        /// Should print the fitness out in a computer-readable fashion.
-        /// </summary>
-        public void PrintFitness(IEvolutionState state, int log)
+        /// <inheritdoc />
+        public virtual void PrintFitness(IEvolutionState state, int log)
         {
             state.Output.PrintLn(ToString(), log);
         }
 
-        /// <summary>
-        /// Should print the fitness out in a computer-readable fashion, 
-        /// using writer.PrintLn(...).  You might use
-        /// ec.util.Code to encode fitness values.  The default version
-        /// of this method calls FitnessToString() and PrintLn's the
-        /// resultant string.
-        /// </summary>
+        /// <inheritdoc />
         public virtual void PrintFitness(IEvolutionState state, StreamWriter writer)
         {
             writer.WriteLine(ToString());
         }
 
-        /// <summary>
-        /// Reads in the fitness from a form outputted by FitnessToString() and thus
-        /// PrintFitnessForHumans(...).  
-        /// The default version exits the program with an "unimplemented" error; you should override this, and be
-        /// certain to also write the 'trials' variable as well.        /// </summary>
+        /// <inheritdoc />
         public virtual void ReadFitness(IEvolutionState state, StreamReader reader)
         {
             state.Output.Fatal("readFitness(IEvolutionState, StreamReader)  not implemented in " + GetType().Name);
         }
 
-        /// <summary>
-        /// Writes the binary form of an individual out to a DataOutput.  This is not for serialization:
-        /// the object should only write out the data relevant to the object sufficient to rebuild it from a DataInput.
-        /// The default version exits the program with an "unimplemented" error; you should override this, and be
-        /// certain to also write the 'trials' variable as well.        
-        /// </summary>
+        /// <inheritdoc />
         public virtual void WriteFitness(IEvolutionState state, BinaryWriter writer)
         {
             state.Output.Fatal("WriteFitness(EvolutionState, DataOutput) not implemented in " + GetType().Name);
         }
 
-        /// <summary>
-        /// Reads the binary form of an individual from a DataInput.  This is not for serialization:
-        /// the object should only read in the data written out via printIndividual(state,dataInput).  
-        /// The default version exits the program with an "unimplemented" error; 
-        /// you should override this, and be certain to also write the 'trials' variable as well.
-        /// </summary>
+        /// <inheritdoc />
         public virtual void ReadFitness(IEvolutionState state, BinaryReader reader)
         {
             state.Output.Fatal("ReadFitness(IEvolutionState, BinaryReader) not implemented in " + GetType());
         }
 
-        /// <summary>
-        ///  Writes trials out to DataOutput
-        /// </summary>
-        public void WriteTrials(IEvolutionState state, BinaryWriter writer)
+        /// <inheritdoc />
+        public virtual void WriteTrials(IEvolutionState state, BinaryWriter writer)
         {
             if (Trials == null)
                 writer.Write(-1);
@@ -449,10 +361,8 @@ namespace BraneCloud.Evolution.EC
             }
         }
 
-        /// <summary>
-        /// Reads trials in from a BinaryReader.
-        /// </summary>
-        public void ReadTrials(IEvolutionState state, BinaryReader reader)
+        /// <inheritdoc />
+        public virtual void ReadTrials(IEvolutionState state, BinaryReader reader)
         {
             var len = reader.ReadInt32();
             if (len >= 0)

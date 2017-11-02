@@ -153,14 +153,14 @@ namespace BraneCloud.Evolution.EC.GP
         }
 
         /// <summary>
-        /// Returns the number of children this node expects to have.  This method is
+        /// Returns the number of children this node expects to have.  This property is
         /// only called by the default implementation of checkConstraints(...), and by default
         /// it returns CHILDREN_UNKNOWN.  You can override this method to return a value >= 0,
         /// which will be checked for in the default checkConstraints(...), or you can leave
         /// this method alone and override checkConstraints(...) to check for more complex constraints
         /// as you see fit.
         /// </summary>
-        public virtual int ExpectedChildren { get { return CHILDREN_UNKNOWN; } }
+        public virtual int ExpectedChildren => CHILDREN_UNKNOWN;
 
         #endregion // Properties
         #region Setup
@@ -737,7 +737,7 @@ namespace BraneCloud.Evolution.EC.GP
         {
             try
             {
-                var node = (GPNode) (MemberwiseClone());
+                var node = (GPNode) MemberwiseClone();
                 var len = Children.Length;
                 // we'll share arrays -- probably just using GPNodeConstraints.ZeroChildren anyway
                 node.Children = len == 0 ? Children : new GPNode[len];
@@ -1211,23 +1211,20 @@ namespace BraneCloud.Evolution.EC.GP
         #endregion // CTree
         #region Lisp
 
-        private StringBuilder MakeLispTree(StringBuilder buf)
+        public StringBuilder MakeLispTree(StringBuilder buf)
         {
             if (Children.Length == 0)
                 return buf.Append(ToStringForHumans());
 
             buf.Append("(");
             buf.Append(ToStringForHumans());
-            // String s = "(" + toStringForHumans();
-            for (var x = 0; x < Children.Length; x++)
+            foreach (GPNode t in Children)
             {
                 buf.Append(" ");
-                Children[x].MakeLispTree(buf);
-                //s = s + " " + children[x].makeLispTree();
+                t.MakeLispTree(buf);
             }
             buf.Append(")");
             return buf;
-            //return s + ")";
         }
 
         /// <summary>
@@ -1237,13 +1234,6 @@ namespace BraneCloud.Evolution.EC.GP
         /// </summary>
         public String MakeLispTree()
         {
-            //if (Children.Length == 0)
-            //    return ToStringForHumans();
-
-            //var s = "(" + ToStringForHumans();
-            //s = Children.Aggregate(s, (current, t) => current + " " + t.MakeLispTree());
-            //return s + ")";
-
             return MakeLispTree(new StringBuilder()).ToString();
         }
 
@@ -1399,7 +1389,7 @@ namespace BraneCloud.Evolution.EC.GP
                         + REPLACEMENT_CHAR + "':\n" + dret.Data;
 
                 state.Output.Fatal(msg);
-                throw new InvalidOperationException(msg);
+                //throw new InvalidOperationException(msg);
             }
 
             node.Parent = parent;

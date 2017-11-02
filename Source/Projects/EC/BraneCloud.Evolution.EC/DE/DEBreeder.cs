@@ -44,6 +44,7 @@ namespace BraneCloud.Evolution.EC.DE
 
         public const String P_F = "f";
         public const String P_Cr = "cr";
+        public const String P_OUT_OF_BOUNDS_RETRIES = "out-of-bounds-retries";
 
         #endregion // Constants
         #region Properties
@@ -63,6 +64,8 @@ namespace BraneCloud.Evolution.EC.DE
             set { _cr = value; }
         }
         private double _cr = CR_UNSPECIFIED;
+
+        public int Retries { get; set; }
 
         /// <summary>
         /// The previous population is stored in order to have parents compete directly with their children
@@ -92,6 +95,10 @@ namespace BraneCloud.Evolution.EC.DE
             F = state.Parameters.GetDouble(paramBase.Push(P_F), null, 0.0);
             if (F < 0.0 || F > 1.0)
                 state.Output.Fatal("Parameter not found, or its value is outside of [0.0,1.0].", paramBase.Push(P_F), null);
+
+            Retries = state.Parameters.GetInt(paramBase.Push(P_OUT_OF_BOUNDS_RETRIES), null, 0);
+            if (Retries < 0)
+                state.Output.Fatal(" Retries must be a value >= 0.0.", paramBase.Push(P_OUT_OF_BOUNDS_RETRIES), null);
         }
 
         #endregion // Setup
@@ -151,8 +158,8 @@ namespace BraneCloud.Evolution.EC.DE
         /// </summary>
         public bool Valid(DoubleVectorIndividual ind)
         {
-            var species = (FloatVectorSpecies)(ind.Species);
-            return (!(species.MutationIsBounded && !ind.IsInRange));
+            //var species = (FloatVectorSpecies)ind.Species;
+            return ind.IsInRange;
         }
 
         public virtual DoubleVectorIndividual CreateIndividual(IEvolutionState state, int subpop, int index, int thread)
@@ -160,10 +167,13 @@ namespace BraneCloud.Evolution.EC.DE
             var inds = state.Population.Subpops[subpop].Individuals;
 
             var v = (DoubleVectorIndividual)
-                (state.Population.Subpops[subpop].Species.NewIndividual(state, thread));
+                state.Population.Subpops[subpop].Species.NewIndividual(state, thread);
 
+            var retry = -1;
             do
             {
+                retry++;
+
                 // select three indexes different from each other and from that of the current parent
                 int r0, r1, r2;
                 do
@@ -189,9 +199,14 @@ namespace BraneCloud.Evolution.EC.DE
                 for (var i = 0; i < v.genome.Length; i++)
                     v.genome[i] = g0.genome[i] + F * (g1.genome[i] - g2.genome[i]);
             }
-            while (!Valid(v));
+            while (!Valid(v) && retry < Retries);
+            if (retry >= Retries && !Valid(v))  // we reached our maximum
+            {
+                // completely reset and be done with it
+                v.Reset(state, thread);
+            }
 
-            return Crossover(state, (DoubleVectorIndividual)(inds[index]), v, thread);
+            return Crossover(state, (DoubleVectorIndividual)inds[index], v, thread);
         }
 
         /// <summary>

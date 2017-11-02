@@ -65,7 +65,7 @@ namespace BraneCloud.Evolution.EC.App.Edge.Test
         public const int EPSILON = 3;
 
         // we'll need to deep clone this one though.
-        public EdgeData Input;
+        public new EdgeData Input;
 
         // building graph
         public bool[] Start;

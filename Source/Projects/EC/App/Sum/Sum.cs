@@ -27,10 +27,8 @@ namespace BraneCloud.Evolution.EC.App.Sum
     {
         public const string P_SUM = "sum";
 
-        public override IParameter DefaultBase
-        {
-            get { return base.DefaultBase.Push(P_SUM); }
-        }
+        public override IParameter DefaultBase => base.DefaultBase.Push(P_SUM);
+       
 
         public void Evaluate(IEvolutionState state,
             Individual ind,
@@ -50,7 +48,7 @@ namespace BraneCloud.Evolution.EC.App.Sum
             for (var x = 0; x < ind2.genome.Length; x++)
             {
                 sum += ind2.genome[x];
-                max += (int)(s.MaxGene(x));  // perhaps this neededn't be computed over and over again
+                max += (int)s.GetMaxGene(x);  // perhaps this neededn't be computed over and over again
             }
 
             // Now we know that max is the maximum possible value, and sum is the fitness.

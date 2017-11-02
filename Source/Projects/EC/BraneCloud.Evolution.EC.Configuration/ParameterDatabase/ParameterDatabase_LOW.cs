@@ -27,6 +27,8 @@ using BraneCloud.Evolution.EC.Support;
 
 namespace BraneCloud.Evolution.EC.Configuration
 {
+    // BRS: Most of the methods in ParameterDatabase are synchronized using _syncLock.
+
     public partial class ParameterDatabase : PropertiesClass, IParameterDatabase
     {
         private readonly object _syncLock = new object();
@@ -1016,6 +1018,9 @@ namespace BraneCloud.Evolution.EC.Configuration
 
         #region Get, Take, Remove, Exists
 
+        /// <summary>
+        /// This is called by the higher-level ParameterExits(parameter, defaultParameter).
+        /// </summary>
         private bool _exists(IParameter parameter)
         {
             lock(_syncLock)
@@ -1048,7 +1053,12 @@ namespace BraneCloud.Evolution.EC.Configuration
         }
 
         /// <summary>
-        /// Private helper function 
+        /// Private helper function.
+        /// Called by several higher level methods:
+        ///     ListGotten
+        ///     ListNotGotten
+        ///     ListAccessed
+        ///     ListNotAccessed
         /// </summary>
         private string _get(string parameter)
         {
@@ -1068,7 +1078,7 @@ namespace BraneCloud.Evolution.EC.Configuration
                     var size = Parents.Count;
                     for (var x = 0; x < size; x++)
                     {
-                        result = ((ParameterDatabase)(Parents[x]))._get(parameter);
+                        result = ((ParameterDatabase)Parents[x])._get(parameter);
                         if (result != null)
                         {
                             return result;
@@ -1087,7 +1097,39 @@ namespace BraneCloud.Evolution.EC.Configuration
         }
 
         /// <summary>
-        /// Private helper function 
+        /// Private helper function. 
+        /// This is called by the higher-level method GetLocation(parameter).
+        /// </summary>
+        private IParameterDatabase _getLocation(string parameter)
+        {
+            lock (_syncLock)
+            {
+                if (parameter == null)
+                    return null;
+                if (CheckState)
+                    return null; // we already searched this path
+                CheckState = true;
+                var result = GetProperty(parameter);
+                if (result == null)
+                {
+                    var size = Parents.Count;
+                    for (var x = 0; x < size; x++)
+                    {
+                        var loc = ((ParameterDatabase)Parents[x])._getLocation(parameter);
+                        if (loc != null)
+                        {
+                            return loc;
+                        }
+                    }
+                    return null;
+                }
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// Private helper function.
+        /// Called by higher-level method RemoveDeeply(parameter). 
         /// </summary>
         private void _removeDeeply(IParameter parameter)
         {
@@ -1162,8 +1204,9 @@ namespace BraneCloud.Evolution.EC.Configuration
         {
             lock (_syncLock)
             {
-                var sep = Path.DirectorySeparatorChar.ToString();
-                var root = new ParameterDatabaseTreeNode(Directory.FullName + sep + Filename);
+                //var sep = Path.DirectorySeparatorChar.ToString();
+                //var root = new ParameterDatabaseTreeNode(Directory.FullName + sep + Filename);
+                var root = new ParameterDatabaseTreeNode(Label);
                 var model = new ParameterDatabaseTreeModel(root);
 
                 _buildTreeModel(model, root);

@@ -67,7 +67,7 @@ namespace BraneCloud.Evolution.EC.App.Lawnmower
         /// <summary>
         /// We'll deep clone this
         /// </summary>
-        public LawnmowerData Input;
+        public new LawnmowerData Input;
 
         /// <summary>
         /// Our map

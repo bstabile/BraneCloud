@@ -58,6 +58,8 @@ namespace BraneCloud.Evolution.EC.GP.Breed
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_MUTATEALLNODES = "mutate-all-nodes";
         public const int NUM_SOURCES = 1;
 

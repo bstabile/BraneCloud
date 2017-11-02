@@ -59,7 +59,8 @@ namespace BraneCloud.Evolution.EC.Util
             {
                 fileName = Path.Combine(state.CheckpointDirectory.FullName,
                     "" + state.CheckpointPrefix + "." + state.Generation + ".gz");
-            } try
+            }
+            try
             {
                 using (var w = new BinaryWriter(new GZipStream(new FileStream(fileName, FileMode.Create), CompressionMode.Compress)))
                 {

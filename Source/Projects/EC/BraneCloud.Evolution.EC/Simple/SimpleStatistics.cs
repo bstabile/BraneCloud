@@ -66,6 +66,14 @@ namespace BraneCloud.Evolution.EC.Simple
         /// </summary>
         public const string P_COMPRESS = "gzip";
 
+        public const string P_MUZZLE = "muzzle";
+
+        public const string P_DO_FINAL = "do-final";
+        public const string P_DO_GENERATION = "do-generation";
+        public const string P_DO_MESSAGE = "do-message";
+        public const string P_DO_DESCRIPTION = "do-description";
+        public const string P_DO_PER_GENERATION_DESCRIPTION = "do-per-generation-description";
+
         #endregion // Constants
         #region Properties
 
@@ -84,14 +92,17 @@ namespace BraneCloud.Evolution.EC.Simple
         /// </summary>
         public bool Compress { get; set; }
 
+        public bool DoFinal { get; set; }
+        public bool DoGeneration { get; set; }
+        public bool DoMessage { get; set; }
+        public bool DoDescription { get; set; }
+        public bool DoPerGenerationDescription { get; set; }
+
+        /** Should we even open up a file and write to it at all? */
+        public bool Muzzle { get; set; }
+
         #endregion // Properties
         #region Setup
-
-        public SimpleStatistics()
-        {
-            BestOfRun = null;
-            StatisticsLog = 0; /* stdout */
-        }
 
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
@@ -101,19 +112,38 @@ namespace BraneCloud.Evolution.EC.Simple
 
             var statisticsFile = state.Parameters.GetFile(paramBase.Push(P_STATISTICS_FILE), null);
 
-            if (statisticsFile != null)
+            DoFinal = state.Parameters.GetBoolean(paramBase.Push(P_DO_FINAL), null, true);
+            DoGeneration = state.Parameters.GetBoolean(paramBase.Push(P_DO_GENERATION), null, true);
+            DoMessage = state.Parameters.GetBoolean(paramBase.Push(P_DO_MESSAGE), null, true);
+            DoDescription = state.Parameters.GetBoolean(paramBase.Push(P_DO_DESCRIPTION), null, true);
+            DoPerGenerationDescription =
+                state.Parameters.GetBoolean(paramBase.Push(P_DO_PER_GENERATION_DESCRIPTION), null, false);
+
+            Muzzle = state.Parameters.GetBoolean(paramBase.Push(P_MUZZLE), null, false);
+
+            if (Muzzle)
+            {
+                StatisticsLog = Output.NO_LOGS;
+            }
+            else if (statisticsFile != null)
+            {
                 try
                 {
                     StatisticsLog = state.Output.AddLog(statisticsFile, !Compress, Compress);
                 }
                 catch (IOException i)
                 {
-                    state.Output.Fatal("An IOException occurred while trying to create the log " + statisticsFile + ":\n" + i);
+                    state.Output.Fatal("An IOException occurred while trying to create the log " + statisticsFile +
+                                       ":\n" + i);
                 }
+            }
         }
 
         #endregion // Setup
         #region Operations
+
+
+        public Individual[] GetBestSoFar() { return BestOfRun; } // TODO: Why?
 
         public override void PostInitializationStatistics(IEvolutionState state)
         {
@@ -146,20 +176,25 @@ namespace BraneCloud.Evolution.EC.Simple
             }
 
             // print the best-of-generation individual
-            state.Output.PrintLn("\nGeneration: " + state.Generation, StatisticsLog);
-            state.Output.PrintLn("Best Individual:", StatisticsLog);
+            if (DoGeneration) state.Output.PrintLn("\nGeneration: " + state.Generation, StatisticsLog);
+            if (DoGeneration) state.Output.PrintLn("Best Individual:", StatisticsLog);
             for (var x = 0; x < state.Population.Subpops.Length; x++)
             {
-                state.Output.PrintLn("Subpopulation " + x + ":", StatisticsLog);
-                bestI[x].PrintIndividualForHumans(state, StatisticsLog);
-                if (bestI[x].Evaluated)
+                if (DoGeneration) state.Output.PrintLn("Subpopulation " + x + ":", StatisticsLog);
+                if (DoGeneration) bestI[x].PrintIndividualForHumans(state, StatisticsLog);
+                if (DoMessage)
                     state.Output.Message("Subpop " + x + " best fitness of generation: " +
+                                         (bestI[x].Evaluated ? " " : " (evaluated flag not set): ") +
                                          bestI[x].Fitness.FitnessToStringForHumans());
-                else
-                    state.Output.Message("Subpop " + x + " not evaluated.");
-                // can happen if we're doing sequential coevolution            
+
+                // describe the winner if there is a description
+                if (DoGeneration && DoPerGenerationDescription)
+                {
+                    if (state.Evaluator.p_problem is ISimpleProblem)
+                    ((ISimpleProblem)state.Evaluator.p_problem.Clone()).Describe(state, bestI[x], x, 0, StatisticsLog);
+                }
             }
-        }
+}
 
         /// <summary>
         /// Logs the best individual of the run. 
@@ -170,18 +205,20 @@ namespace BraneCloud.Evolution.EC.Simple
 
             // for now we just print the best fitness 
 
-            state.Output.PrintLn("\nBest Individual of Run:", StatisticsLog);
+            if (DoFinal) state.Output.PrintLn("\nBest Individual of Run:", StatisticsLog);
 
             for (var x = 0; x < state.Population.Subpops.Length; x++)
             {
-                BestOfRun[x].PrintIndividualForHumans(state, StatisticsLog);
-                state.Output.Message("Subpop " + x + " best fitness of run: " + BestOfRun[x].Fitness.FitnessToStringForHumans());
+                if (DoFinal) state.Output.PrintLn("Subpopulation " + x + ":", StatisticsLog);
+                if (DoFinal) BestOfRun[x].PrintIndividualForHumans(state, StatisticsLog);
+                if (DoMessage) state.Output.Message("Subpop " + x + " best fitness of run: " + BestOfRun[x].Fitness.FitnessToStringForHumans());
 
                 // finally describe the winner if there is a description
-                if (state.Evaluator.p_problem is ISimpleProblem)
-                    ((ISimpleProblem)state.Evaluator.p_problem.Clone()).Describe(state, BestOfRun[x], x, 0, StatisticsLog);
+                if (DoFinal && DoDescription)
+                    if (state.Evaluator.p_problem is ISimpleProblem)
+                ((ISimpleProblem)(state.Evaluator.p_problem.Clone())).Describe(state, BestOfRun[x], x, 0, StatisticsLog);
             }
-        }
+    }
 
         #endregion // Operations
     }

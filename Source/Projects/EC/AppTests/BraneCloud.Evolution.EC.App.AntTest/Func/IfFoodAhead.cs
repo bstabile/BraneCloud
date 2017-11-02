@@ -17,11 +17,10 @@
  */
 
 using System;
-using BraneCloud.Evolution.EC.App.AntTest;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 
-namespace BraneCloud.Evolution.EC.App.AntTest
+namespace BraneCloud.Evolution.EC.App.AntTest.Func
 {
     [ECConfiguration("ec.app.ant.func.IfFoodAhead")]
     public class IfFoodAhead : GPNode, IEvalPrint
@@ -37,7 +36,7 @@ namespace BraneCloud.Evolution.EC.App.AntTest
         //                           individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 2; } }
+        public override int ExpectedChildren => 2;
 
         public override void Eval(
             IEvolutionState state, 

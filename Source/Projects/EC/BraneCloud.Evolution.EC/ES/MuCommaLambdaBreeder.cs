@@ -19,9 +19,11 @@
 using System;
 using System.Collections;
 using System.Threading;
-
+using System.Threading.Tasks.Dataflow;
+using BraneCloud.Evolution.EC.Breed;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Simple;
 
 namespace BraneCloud.Evolution.EC.ES
 {
@@ -112,6 +114,7 @@ namespace BraneCloud.Evolution.EC.ES
         #region Constants
 
         public const string P_MU = "mu";
+        public const string P_MU_FRACTION = "mu-fraction";
         public const string P_LAMBDA = "lambda";
 
         public const sbyte C_OVER_ONE_FIFTH_BETTER = 1;
@@ -123,6 +126,12 @@ namespace BraneCloud.Evolution.EC.ES
 
         public int[] Mu { get; set; }
         public int[] Lambda { get; set; }
+
+        /** lambda should be no SMALLER than mu times this value. 
+            This varies between (mu,lambda) (where it's 2) and
+            (mu + lambda) (where it's 1).
+        */
+        public int MaximumMuLambdaDivisor { get; protected set; } = 2;
 
         public Population ParentPopulation { get; set; }
 
@@ -153,14 +162,93 @@ namespace BraneCloud.Evolution.EC.ES
             // load mu and Lambda data
             for (var x = 0; x < size; x++)
             {
-                Lambda[x] = state.Parameters.GetInt(ESDefaults.ParamBase.Push(P_LAMBDA).Push("" + x), null, 1);
-                if (Lambda[x] == 0)
-                    state.Output.Error("Lambda must be an integer >= 1", ESDefaults.ParamBase.Push(P_LAMBDA).Push("" + x));
-                Mu[x] = state.Parameters.GetInt(ESDefaults.ParamBase.Push(P_MU).Push("" + x), null, 1);
-                if (Mu[x] == 0)
-                    state.Output.Error("mu must be an integer >= 1", ESDefaults.ParamBase.Push(P_MU).Push("" + x));
-                else if ((Lambda[x] / Mu[x]) * Mu[x] != Lambda[x]) // note integer division
-                    state.Output.Error("mu must be a multiple of Lambda", ESDefaults.ParamBase.Push(P_MU).Push("" + x));
+                IParameter pp = new Parameter(Initializer.P_POP).Push(Population.P_SUBPOP).Push("" + x)
+                    .Push(Subpopulation.P_SUBPOPSIZE);
+                int ppval = state.Parameters.GetInt(pp, null, 1);
+
+                // we have a lambda
+                if (state.Parameters.ParameterExists(ESDefaults.ParamBase.Push(P_LAMBDA).Push("" + x), null)) 
+                {
+                    Lambda[x] = state.Parameters.GetInt(ESDefaults.ParamBase.Push(P_LAMBDA).Push("" + x), null, 1);
+                    if (Lambda[x] == 0)
+                        state.Output.Error("Lambda must be an integer >= 1",
+                            ESDefaults.ParamBase.Push(P_LAMBDA).Push("" + x));
+                }
+                else
+                {
+                    state.Output.Warning(
+                        "lambda not specified for subpopulation " + x +
+                        ", setting it to the subopulation size, that is, " + ppval + ".",
+                        ESDefaults.ParamBase.Push(P_LAMBDA).Push("" + x), null);
+                    Lambda[x] = ppval;
+                    if (Lambda[x] == 0)
+                        state.Output.Error("Subpouplation Size must be >= 1", pp, null);
+                }
+
+                // we defined mu
+                if (state.Parameters.ParameterExists(ESDefaults.ParamBase.Push(P_MU).Push("" + x), null))
+                {
+                    // did we also define a mu-fraction?
+                    if (state.Parameters.ParameterExists(ESDefaults.ParamBase.Push(P_MU_FRACTION).Push("" + x), null))
+                        state.Output.Warning(
+                            "Defined both a mu and mu-fraction for subpopulation " + x + ".  Only mu will be used. ",
+                            ESDefaults.ParamBase.Push(P_MU).Push("" + x),
+                            ESDefaults.ParamBase.Push(P_MU_FRACTION).Push("" + x));
+
+                    Mu[x] = state.Parameters.GetInt(ESDefaults.ParamBase.Push(P_MU).Push("" + x), null, 1);
+                    if (Mu[x] == 0)
+                        state.Output.Error("mu must be an integer >= 1", ESDefaults.ParamBase.Push(P_MU).Push("" + x));
+                    else if (Lambda[x] % Mu[x] != 0)
+                    {
+                        if (Mu[x] > Lambda[x] / MaximumMuLambdaDivisor)
+                        {
+                            state.Output.Warning("mu (" + Mu[x] + ") for subpopulation " + x +
+                                                 " is greater than lambda (" + Lambda[x] + ") / " +
+                                                 MaximumMuLambdaDivisor +
+                                                 ".  Mu will be set to half of lambda, that is, " +
+                                                 Lambda[x] / MaximumMuLambdaDivisor + ".");
+                            Mu[x] = Lambda[x] / MaximumMuLambdaDivisor;
+                        }
+
+                        if (Lambda[x] % Mu[x] != 0) // check again
+                            state.Output.Error("mu must be a divisor of lambda",
+                                ESDefaults.ParamBase.Push(P_MU).Push("" + x));
+                    }
+                    else if (Mu[x] > ppval)
+                    {
+                        state.Output.Warning(
+                            "mu is presently > the initial subpopulation size.  Mu will be set to the subpopulation size, that is, " +
+                            ppval + ".", ESDefaults.ParamBase.Push(P_MU).Push("" + x), null);
+                        Mu[x] = ppval;
+                    }
+                }
+                else if (state.Parameters.ParameterExists(ESDefaults.ParamBase.Push(P_MU_FRACTION).Push("" + x),
+                    null)) // we defined mu in terms of a fraction
+                {
+                    double mufrac = state.Parameters.GetDoubleWithMax(
+                        ESDefaults.ParamBase.Push(P_MU_FRACTION).Push("" + x), null, 0.0,
+                        1.0 / MaximumMuLambdaDivisor);
+                    if (mufrac < 0.0)
+                        state.Output.Fatal(
+                            "Mu-Fraction must be a value between 0.0 and " + 1.0 / MaximumMuLambdaDivisor,
+                            ESDefaults.ParamBase.Push(P_MU_FRACTION).Push("" + x), null);
+
+                    int m = (int) Math.Max(Lambda[x] * mufrac, 1.0);
+                    Mu[x] = m;
+                    // find the largest divisor of lambda[x] which is <= m. This is ugly
+                    double val = Lambda[x] / (double) Mu[x];
+                    while (val != (int) val)
+                    {
+                        Mu[x]--;
+                        val = Lambda[x] / (double) Mu[x];
+                    }
+                    state.Output.Message(
+                        "Mu-Fraction " + mufrac + " yields a mu of " + m + ", adjusted to " + Mu[x]);
+                }
+                else
+                    state.Output.Fatal("Neither a Mu or a Mu-Fraction was provided for subpopulation " + x,
+                        ESDefaults.ParamBase.Push(P_MU).Push("" + x),
+                        ESDefaults.ParamBase.Push(P_MU_FRACTION).Push("" + x));
             }
             state.Output.ExitIfErrors();
         }
@@ -240,19 +328,6 @@ namespace BraneCloud.Evolution.EC.ES
             state.Output.ExitIfErrors();
 
 
-
-
-            var numinds = new int[state.BreedThreads][];
-            for (var i = 0; i < state.BreedThreads; i++)
-            {
-                numinds[i] = new int[state.Population.Subpops.Length];
-            }
-            var from = new int[state.BreedThreads][];
-            for (var i2 = 0; i2 < state.BreedThreads; i2++)
-            {
-                from[i2] = new int[state.Population.Subpops.Length];
-            }
-
             // sort evaluation to get the Mu best of each subpop
 
             for (var x = 0; x < state.Population.Subpops.Length; x++)
@@ -272,60 +347,108 @@ namespace BraneCloud.Evolution.EC.ES
 
             // divvy up the Lambda individuals to create
 
-            for (var y = 0; y < state.BreedThreads; y++)
-                for (var x = 0; x < state.Population.Subpops.Length; x++)
+            // how many threads do we really need?  No more than the maximum number of individuals in any subpopulation
+            int numThreads = 0;
+            for (int x = 0; x < state.Population.Subpops.Length; x++)
+                numThreads = Math.Max(numThreads, Lambda[x]);
+            numThreads = Math.Min(numThreads, state.BreedThreads);
+            if (numThreads < state.BreedThreads)
+                state.Output.WarnOnce("Largest lambda size (" + numThreads + ") is smaller than number of breedthreads (" + state.BreedThreads +
+                                      "), so fewer breedthreads will be created.");
+
+            var numinds = new int[state.BreedThreads][];
+            for (var i = 0; i < state.BreedThreads; i++)
+            {
+                numinds[i] = new int[state.Population.Subpops.Length];
+            }
+            var from = new int[state.BreedThreads][];
+            for (var i2 = 0; i2 < state.BreedThreads; i2++)
+            {
+                from[i2] = new int[state.Population.Subpops.Length];
+            }
+
+            for (int x = 0; x < state.Population.Subpops.Length; x++)
+            {
+                int length = Lambda[x];
+
+                // we will have some extra individuals.  We distribute these among the early subpopulations
+                int individualsPerThread = length / numThreads;  // integer division
+                int slop = length - numThreads * individualsPerThread;
+                int currentFrom = 0;
+
+                for (int y = 0; y < numThreads; y++)
                 {
-                    // figure numinds
-                    if (y < state.BreedThreads - 1)
-                        // not last one
-                        numinds[y][x] = Lambda[x] / state.BreedThreads;
-                    // in case we're slightly off in division
+                    if (slop > 0)
+                    {
+                        numinds[y][x] = individualsPerThread + 1;
+                        slop--;
+                    }
                     else
-                        numinds[y][x] = Lambda[x] / state.BreedThreads + (Lambda[x] - (Lambda[x] / state.BreedThreads) * state.BreedThreads);
+                        numinds[y][x] = individualsPerThread;
 
-                    // figure from
-                    from[y][x] = (Lambda[x] / state.BreedThreads) * y;
+                    if (numinds[y][x] == 0)
+                    {
+                        state.Output.WarnOnce("More threads exist than can be used to breed some subpopulations (first example: subpopulation " + x + ")");
+                    }
+
+                    from[y][x] = currentFrom;
+                    currentFrom += numinds[y][x];
                 }
+            }
 
-            if (state.BreedThreads == 1)
+            //for (var y = 0; y < state.BreedThreads; y++)
+            //    for (var x = 0; x < state.Population.Subpops.Length; x++)
+            //    {
+            //        // figure numinds
+            //        if (y < state.BreedThreads - 1)
+            //            // not last one
+            //            numinds[y][x] = Lambda[x] / state.BreedThreads;
+            //        // in case we're slightly off in division
+            //        else
+            //            numinds[y][x] = Lambda[x] / state.BreedThreads + (Lambda[x] - (Lambda[x] / state.BreedThreads) * state.BreedThreads);
+
+            //        // figure from
+            //        from[y][x] = (Lambda[x] / state.BreedThreads) * y;
+            //    }
+
+            if (numThreads == 1)
             {
                 BreedPopChunk(newpop, state, numinds[0], from[0], 0);
             }
             else
             {
-                var t = new ThreadClass[state.BreedThreads];
-
-                // start up the threads
-                for (var y = 0; y < state.BreedThreads; y++)
-                {
-                    var r = new MuLambdaBreederThread
-                    {
-                        ThreadNum = y,
-                        NewPop = newpop,
-                        NumInds = numinds[y],
-                        From = from[y],
-                        Me = this,
-                        State = state
-                    };
-                    t[y] = new ThreadClass(new ThreadStart(r.Run));
-                    t[y].Start();
-                }
-
-                // gather the threads
-                for (var y = 0; y < state.BreedThreads; y++)
-                {
-                    try
-                    {
-                        t[y].Join();
-                    }
-                    catch (ThreadInterruptedException)
-                    {
-                        state.Output.Fatal("Whoa! The main breeding thread got interrupted!  Dying...");
-                    }
-                }
+                ParallelBreeding(state, newpop, from, numinds, this);
             }
 
             return PostProcess(newpop, state.Population, state);
+        }
+
+        void ParallelBreeding(IEvolutionState state, Population newpop, int[][] origin, int[][] numinds, MuCommaLambdaBreeder breeder)
+        {
+            // BRS: TPL DataFlow is cleaner and safer than using raw threads.
+
+            // Limit the concurrency in case the user has gone overboard!
+            var maxDegree = Math.Min(Environment.ProcessorCount, state.BreedThreads);
+            var options = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = maxDegree };
+
+            Action<BreederThread> act = t => t.Run();
+            var actionBlock = new ActionBlock<BreederThread>(act, options);
+
+            for (var i = 0; i < state.BreedThreads; i++)
+            {
+                var runnable = new BreederThread
+                {
+                    ThreadNum = i,
+                    State = state,
+                    NewPop = newpop,
+                    NumInds = numinds[i],
+                    From = origin[i],
+                    Breeder = breeder,
+                };
+                actionBlock.Post(runnable);
+            }
+            actionBlock.Complete();
+            actionBlock.Completion.Wait();
         }
 
         /// <summary>
@@ -343,7 +466,7 @@ namespace BraneCloud.Evolution.EC.ES
         /// public (for the benefit of a private helper class in this file),
         /// you should not call it. 
         /// </summary>        
-        public virtual void BreedPopChunk(Population newpop, IEvolutionState state, int[] numinds, int[] from, int threadnum)
+        public override void BreedPopChunk(Population newpop, IEvolutionState state, int[] numinds, int[] from, int threadnum)
         {
             for (var subpop = 0; subpop < newpop.Subpops.Length; subpop++)
             {
@@ -365,7 +488,7 @@ namespace BraneCloud.Evolution.EC.ES
                 bp.PrepareToProduce(state, subpop, threadnum);
                 if (Count[threadnum] == 0)
                     // the ESSelection didn't set it to nonzero to inform us of his existence
-                    state.Output.Warning("Whoa!  Breeding Pipeline for subpop " + subpop
+                    state.Output.WarnOnce("Whoa!  Breeding Pipeline for subpop " + subpop
                         + " doesn't have an ESSelection, but is being used by MuCommaLambdaBreeder or MuPlusLambdaBreeder."
                         + "  That's probably not right.");
                 // reset again
@@ -389,21 +512,4 @@ namespace BraneCloud.Evolution.EC.ES
         
         #endregion // Operations
      }
-        
-    /// <summary>
-    /// A private helper class for implementing multithreaded breeding. 
-    /// </summary>
-    class MuLambdaBreederThread : IThreadRunnable
-    {
-        internal Population NewPop;
-        public int[] NumInds;
-        public int[] From;
-        public MuCommaLambdaBreeder Me;
-        public IEvolutionState State;
-        public int ThreadNum;
-        public virtual void  Run()
-        {
-            Me.BreedPopChunk(NewPop, State, NumInds, From, ThreadNum);
-        }
-    }
 }

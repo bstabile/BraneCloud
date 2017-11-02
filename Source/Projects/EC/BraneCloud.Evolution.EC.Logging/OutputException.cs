@@ -25,7 +25,7 @@ namespace BraneCloud.Evolution.EC.Logging
 	/// </summary>
 	
 	[Serializable]
-	public class OutputException : SystemException
+	public class OutputException : Exception
 	{
 		public OutputException(string s) : base(s)
 		{

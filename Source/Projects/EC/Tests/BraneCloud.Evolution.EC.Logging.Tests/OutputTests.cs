@@ -92,7 +92,7 @@ namespace BraneCloud.Evolution.EC.Logging.Tests
         [TestMethod]
         public void AllLogsEqualsMinusOne()
         {
-            Assert.AreEqual(Output.ALL_LOGS, -1);
+            Assert.AreEqual(Output.ALL_MESSAGE_LOGS, -1);
         }
 
         #endregion // Constants
@@ -587,49 +587,52 @@ namespace BraneCloud.Evolution.EC.Logging.Tests
         #endregion // Message to Registered System Logs
         #region Fatal to Registered System Logs
 
-        // Note that we use the overloads that take a boolean "exit" argument. This allows us to avoid crashing the test agents!
-
         [TestMethod]
-        [Description("This writes a Fatal message to all registered logs.")]
-        public void FatalToStandardErrorAndOutputStreams()
+        [ExpectedException(typeof(OutputExitException))]
+        public void FatalToConsoleErrorAndOutputLog()
         {
             var output = new Output();
+            Assert.IsNotNull(output);
+            // Setting ThrowsErrors to true ensures that we don't exit the process!
+            output.ThrowsErrors = true;
             output.AddLog(Log.D_STDERR, true);
             output.AddLog(Log.D_STDOUT, true);
-            output.Fatal("Yikes!", false); // Do NOT exit because this causes test agent to crash!
-            Assert.AreEqual(output.NumAnnouncements, 2); // one for each registered log
-            context.WriteLine("NumAnnouncements = {0}", output.NumAnnouncements);
+            output.Fatal("Ooops!");
+            Assert.AreEqual(output.NumLogs, 2);
             output.Close();
         }
 
         [TestMethod]
-        [Description("This writes a Fatal message to two registered logs with One Bad Parameter argument. Note that this creates 4 announcements.")]
-        public void FatalToStandardErrorAndOutputStreamsWithOneParameterToBlame()
+        [ExpectedException(typeof(OutputExitException))]
+        public void FatalToConsoleErrorAndOutputLogWithOneParameterToBlame()
         {
             var output = new Output();
+            Assert.IsNotNull(output);
+            // Setting ThrowsErrors to true ensures that we don't exit the process!
+            output.ThrowsErrors = true;
             output.AddLog(Log.D_STDERR, true);
             output.AddLog(Log.D_STDOUT, true);
-            output.Fatal("Yikes!", new Parameter("BadParameter"), false); // Do NOT exit because this causes test agent to crash!
-            Assert.AreEqual(output.NumAnnouncements, 4); // Note how many Announcements we end up with here!
-            context.WriteLine("NumAnnouncements = {0}", output.NumAnnouncements);
+            output.Fatal("Ooops!", new Parameter("BadParameter"));
+            Assert.AreEqual(output.NumLogs, 2);
             output.Close();
         }
 
         [TestMethod]
-        [Description("This writes a Fatal message to two registered logs with Two Bad Parameter arguments. Note that this creates 6 announcements.")]
-        public void FatalToStandardErrorAndOutputStreamsWithTwoParametersToBlame()
+        [ExpectedException(typeof(OutputExitException))]
+        public void FatalToConsoleErrorAndOutputLogWithTwoParametersToBlame()
         {
             var output = new Output();
+            Assert.IsNotNull(output);
+            // Setting ThrowsErrors to true ensures that we don't exit the process!
+            output.ThrowsErrors = true;
             output.AddLog(Log.D_STDERR, true);
             output.AddLog(Log.D_STDOUT, true);
-            output.Fatal("Yikes!", new Parameter("FirstBadParameter"), new Parameter("SecondBadParameter"), false); // Do NOT exit because this causes test agent to crash!
-            Assert.AreEqual(output.NumAnnouncements, 6); // Note how many Announcements we end up with here!
-            context.WriteLine("NumAnnouncements = {0}", output.NumAnnouncements);
+            output.Fatal("Ooops!", new Parameter("FirstBadParameter"), new Parameter("SecondBadParameter"));
+            Assert.AreEqual(output.NumLogs, 2);
             output.Close();
         }
 
-
-        #endregion // Fatal to Registered System Logs
+        #endregion Error to Registered System Logs
         #region Error to Registered System Logs
 
         [TestMethod]

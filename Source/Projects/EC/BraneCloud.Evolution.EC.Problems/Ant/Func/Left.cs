@@ -19,9 +19,8 @@
 using System;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
-using BraneCloud.Evolution.EC.Problems.Ant;
 
-namespace BraneCloud.Evolution.EC.Problems.AntApp
+namespace BraneCloud.Evolution.EC.Problems.Ant.Func
 {
     [ECConfiguration("ec.problems.ant.func.Left")]
     public class Left : GPNode, IEvalPrint
@@ -49,20 +48,20 @@ namespace BraneCloud.Evolution.EC.Problems.AntApp
             GPIndividual individual, 
             IProblem problem)
         {
-            var p = (AntProblem)problem;
+            var p = (Ant)problem;
             switch (p.Orientation)
             {
-                case AntProblem.O_UP:
-                    p.Orientation = AntProblem.O_LEFT;
+                case Ant.O_UP:
+                    p.Orientation = Ant.O_LEFT;
                     break;
-                case AntProblem.O_LEFT:
-                    p.Orientation = AntProblem.O_DOWN;
+                case Ant.O_LEFT:
+                    p.Orientation = Ant.O_DOWN;
                     break;
-                case AntProblem.O_DOWN:
-                    p.Orientation = AntProblem.O_RIGHT;
+                case Ant.O_DOWN:
+                    p.Orientation = Ant.O_RIGHT;
                     break;
-                case AntProblem.O_RIGHT:
-                    p.Orientation = AntProblem.O_UP;
+                case Ant.O_RIGHT:
+                    p.Orientation = Ant.O_UP;
                     break;
                 default:  // whoa!
                     state.Output.Fatal("Whoa, somehow I got a bad orientation! (" + p.Orientation + ")");

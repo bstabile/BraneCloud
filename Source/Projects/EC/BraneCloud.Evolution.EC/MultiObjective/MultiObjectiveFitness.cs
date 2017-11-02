@@ -31,23 +31,80 @@ namespace BraneCloud.Evolution.EC.MultiObjective
     /// multi-objective mechanisms suitable for being used with a variety of
     /// multi-objective selection mechanisms, including ones using pareto-optimality.
     /// 
-    /// <p/>The object contains two items: an array of floating point values
-    /// representing the various multiple fitnesses (ranging from 0.0 (worst)
-    /// to 1.0 inclusive).  By default, isIdealFitness() always returns false;
-    /// you'll probably want to override that [if appropriate to your problem].
-    /// <p/><b>Parameters</b><br/>
+    /// <p/>
+    /// The object contains two items: an array of floating point values representing
+    /// the various multiple fitnesses, and a flag(maximize) indicating whether
+    /// higher is considered better.By default, isIdealFitness() always returns
+    /// false; you might want to override that, though it'd be unusual -- what is the
+    /// ideal fitness from the perspective of a pareto front?
+    ///
+    /// <p/>
+    /// The object also contains maximum and minimum fitness values suggested for the
+    /// problem, on a per-objective basis.By default the maximum values are all 1.0
+    /// and the minimum values are all 0.0, but you can change these.Note that
+    /// maximum does not mean "best" unless maximize is true.
+    ///
+    /// <p/>The class also contains utility methods or computing pareto dominance, 
+    /// Pareto Fronts and Pareto Front Ranks, and distance in multiobjective space.
+    /// The default comparison operators use Pareto Dominance, though this is often
+    /// overridden by subclasses.
+    ///
+    /// <p/>The fitness() method returns the maximum of the fitness values, which is
+    /// clearly nonsensical: you should not be using this method.
+    ///
+    /// <p/>Subclasses of this class may add certain auxiliary fitness measures which
+    /// are printed out by MultiObjectiveStatistics along with the multiple objectives.
+    /// To have these values printed out, override the getAuxiliaryFitnessNames()
+    /// and getAuxiliaryFitnessValues() methods.
+    ///
+    /// <p/>
+    /// <b>Parameters</b><br/>
     /// <table>
-    /// <tr><td valign="top"><i>base</i>.<tt>numobjectives</tt><br/>
-    /// (else)<tt>multi.numobjectives</tt><br/>
-    /// <font size="-1">int &gt;= 1</font></td>
-    /// <td valign="top">(the number of fitnesses in the MultiFitness array)</td></tr>
-    /// <tr><td valign="top"><i>base</i>.<tt>criterion-is-and</tt><br/>
-    /// <font size="-1"> bool = <tt>true</tt> (default) or <tt>false</tt></font></td>
-    /// <td valign="top">(is the ideal individual one whose fitness values are <i>all</i> 1.0 
-    /// (as opposed to one which contains <i>at least</i> one fitness value of 1.0))</td></tr>
+    /// <tr>
+    /// <td valign ="top"><i> base </i>.<tt> num-objectives </tt ><br/>
+    /// (else)<tt>multi.num-objectives</tt><br/>
+    /// <font size ="-1"> int &gt;= 1</font></td>
+    /// <td valign ="top"> (the number of fitnesses in the objectives array)</td>
+    /// </tr>
+    ///
+    /// <tr>
+    /// <td valign ="top"><i> base </i>.<tt> maximize </tt>.<i> i </i><br/>
+    /// <font size="-1"> bool = <tt>true</tt> (default) or<tt>false</tt></font></td>
+    /// <td valign ="top"> (are higher values considered "better"?).  Overrides the
+    /// all-objecgive maximization setting.</td>
+    /// </tr>
+    ///
+    /// <tr>
+    /// <td valign="top"><i>base</i>.<tt>max</tt><br/>
+    /// <font size="-1"> float (<tt>1.0</tt> default)</font></td>
+    /// <td valign="top"> (maximum fitness value for all objectives)</td>
+    /// </tr>
+    ///
+    /// <tr>
+    /// <td valign="top"><i>base</i>.<tt>max</tt>.<i>i</i><br/>
+    /// <font size="-1"> float (<tt>1.0</tt> default)</font></td>
+    /// <td valign="top"> (maximum fitness value for objective<i> i</i>. Overrides the
+    /// all-objective maximum fitness.)</td>
+    /// </tr>
+    ///
+    /// <tr>
+    /// <td valign="top"><i>base</i>.<tt>min</tt><br/>
+    /// <font size="-1"> float (<tt>0.0</tt> (default)</font></td>
+    /// <td valign="top"> (minimum fitness value for all objectives)</td>
+    /// </tr>
+    /// 
+    /// <tr>
+    /// <td valign="top"><i>base</i>.<tt>min</tt>.<i>i</i><br/>
+    /// <font size="-1"> float = <tt>0.0</tt> (default)</font></td>
+    /// <td valign="top"> (minimum fitness value for objective<i> i</i>. Overrides the
+    /// all-objective minimum fitness.)</td>
+    /// </tr>
     /// </table>
-    /// <p/><b>Default Base</b><br/>
-    /// multi.Fitness
+    ///
+    /// <p/>
+    /// <b>Default Base</b><br/>
+    /// multi.fitness
+    ///
     /// </summary>
     [Serializable]
     [ECConfiguration("ec.multiobjective.MultiObjectiveFitness")]
@@ -79,6 +136,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         public const string FITNESS_POSTAMBLE = "]";
 
         #endregion // Constants
+
         #region Static
 
         /// <summary>
@@ -97,7 +155,8 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// If you provide null for the front, a List will be created for you.  If you provide
         /// null for the nonFront, non-front individuals will not be added to it.  This algorithm is O(n^2).
         /// </summary>
-        public static IList<Individual> PartitionIntoParetoFront(Individual[] inds, IList<Individual> front, IList<Individual> nonFront)
+        public static IList<Individual> PartitionIntoParetoFront(Individual[] inds, IList<Individual> front,
+            IList<Individual> nonFront)
         {
             if (front == null)
                 front = new List<Individual>();
@@ -119,20 +178,22 @@ namespace BraneCloud.Evolution.EC.MultiObjective
                     var frontmember = front[j];
 
                     // if the front member is better than the individual, dump the individual and go to the next one
-                    if (((MultiObjectiveFitness)(frontmember.Fitness)).ParetoDominates((MultiObjectiveFitness)(ind.Fitness)))
+                    if (((MultiObjectiveFitness) (frontmember.Fitness)).ParetoDominates(
+                        (MultiObjectiveFitness) (ind.Fitness)))
                     {
                         if (nonFront != null) nonFront.Add(ind);
                         noOneWasBetter = false;
-                        break;  // failed.  He's not in the front
+                        break; // failed.  He's not in the front
                     }
                     // if the individual was better than the front member, dump the front member.  But look over the
                     // other front members (don't break) because others might be dominated by the individual as well.
-                    if (((MultiObjectiveFitness)(ind.Fitness)).ParetoDominates((MultiObjectiveFitness)(frontmember.Fitness)))
+                    if (((MultiObjectiveFitness) (ind.Fitness)).ParetoDominates(
+                        (MultiObjectiveFitness) (frontmember.Fitness)))
                     {
                         Yank(j, front);
                         // a front member is dominated by the new individual.  Replace him
                         frontSize--; // member got removed
-                        j--;  // because there's another guy we now need to consider in his place
+                        j--; // because there's another guy we now need to consider in his place
                         if (nonFront != null) nonFront.Add(frontmember);
                     }
                 }
@@ -164,6 +225,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         }
 
         #endregion // Static
+
         #region Properties
 
         public override IParameter DefaultBase
@@ -176,46 +238,51 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// Default always returns false.  
         /// You may want to override this. 
         /// </summary>
-        public override bool IsIdeal { get { return false; } }
+        public override bool IsIdeal
+        {
+            get { return false; }
+        }
 
         /// <summary>
         /// Desired maximum fitness values. By default these are 1.0. Shared.
         /// </summary>
-        public float[] MaxObjective { get { return _maxObjective; } set { _maxObjective = value; } }
-        private float[] _maxObjective = new float[0]; // initialize to zero length array (in case anyone tries to access this)
+        public float[] MaxObjective
+        {
+            get { return _maxObjective; }
+            set { _maxObjective = value; }
+        }
+
+        private float[] _maxObjective = new float[0]
+            ; // initialize to zero length array (in case anyone tries to access this)
 
         /// <summary>
         /// Desired minimum fitness values. By default these are 0.0. Shared.
         /// </summary>
-        public float[] MinObjective { get { return _minObjective; } set { _minObjective = value; } }
-        private float[] _minObjective = new float[0]; // initialize to zero length array (in case anyone tries to access this)
+        public float[] MinObjective
+        {
+            get { return _minObjective; }
+            set { _minObjective = value; }
+        }
+
+        private float[] _minObjective = new float[0]
+            ; // initialize to zero length array (in case anyone tries to access this)
 
         /// <summary>
         /// The various fitnesses (values range from 0 (worst) to 1 INCLUSIVE).
         /// </summary>
-        public float[] Objectives
-        {
-            get { return _objectives; }
-            set { _objectives = value; }
-        }
+        public float[] Objectives { get; set; }
 
-        private float[] _objectives = new float[0];
+        /// <summary>
+        /// Maximization.  Shared.
+        /// </summary>
+        public bool[] Maximize { get; set; }
 
-        public bool Maximize
-        {
-            get { return _maximize; }
-            set { _maximize = value; }
-        }
-        private bool _maximize = true;
-
-        public bool IsMaximizing
-        {
-            get { return _maximize; }
-        }
+        public bool IsMaximizing() => Maximize[0];
+        public bool IsMaximizing(int objective) => Maximize[objective];
 
         public int NumObjectives
         {
-            get { return _objectives.Length; }
+            get { return Objectives.Length; }
         }
 
         /// <summary>
@@ -227,10 +294,10 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         {
             get
             {
-                var fit = _objectives[0];
-                for (var x = 1; x < _objectives.Length; x++)
-                    if (fit < _objectives[x])
-                        fit = _objectives[x];
+                var fit = Objectives[0];
+                for (var x = 1; x < Objectives.Length; x++)
+                    if (fit < Objectives[x])
+                        fit = Objectives[x];
                 return fit;
             }
         }
@@ -256,6 +323,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         //}
 
         #endregion // Properties
+
         #region Setup
 
         public MultiObjectiveFitness()
@@ -273,7 +341,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         {
             _minObjective = new float[numObjectives];
             _maxObjective = new float[numObjectives];
-            _objectives = new float[numObjectives];
+            Objectives = new float[numObjectives];
         }
 
         /// <summary>
@@ -289,36 +357,40 @@ namespace BraneCloud.Evolution.EC.MultiObjective
             var numFitnesses = state.Parameters.GetInt(paramBase.Push(P_NUMOBJECTIVES), def.Push(P_NUMOBJECTIVES), 0);
             if (numFitnesses <= 0)
                 state.Output.Fatal("The number of objectives must be an integer >= 1.", paramBase.Push(P_NUMOBJECTIVES),
-                                   def.Push(P_NUMOBJECTIVES));
+                    def.Push(P_NUMOBJECTIVES));
 
-            _maximize = state.Parameters.GetBoolean(paramBase.Push(P_MAXIMIZE), def.Push(P_MAXIMIZE), true);
-
-            _objectives = new float[numFitnesses];
+            Objectives = new float[numFitnesses];
             MaxObjective = new float[numFitnesses];
             MinObjective = new float[numFitnesses];
+            Maximize = new bool[numFitnesses];
 
             for (var i = 0; i < numFitnesses; i++)
             {
                 // load default globals
                 MinObjective[i] = state.Parameters.GetFloatWithDefault(paramBase.Push(P_MINOBJECTIVES),
-                                                                       def.Push(P_MINOBJECTIVES), 0.0f);
+                    def.Push(P_MINOBJECTIVES), 0.0f);
                 MaxObjective[i] = state.Parameters.GetFloatWithDefault(paramBase.Push(P_MAXOBJECTIVES),
-                                                                       def.Push(P_MAXOBJECTIVES), 1.0f);
+                    def.Push(P_MAXOBJECTIVES), 1.0f);
+                Maximize[i] = state.Parameters.GetBoolean(paramBase.Push(P_MAXIMIZE), def.Push(P_MAXIMIZE), true);
 
                 // load specifics if any
                 MinObjective[i] = state.Parameters.GetFloatWithDefault(paramBase.Push(P_MINOBJECTIVES).Push("" + i),
-                                                                       def.Push(P_MINOBJECTIVES).Push("" + i), MinObjective[i]);
+                    def.Push(P_MINOBJECTIVES).Push("" + i), MinObjective[i]);
                 MaxObjective[i] = state.Parameters.GetFloatWithDefault(paramBase.Push(P_MAXOBJECTIVES).Push("" + i),
-                                                                       def.Push(P_MAXOBJECTIVES).Push("" + i), MaxObjective[i]);
+                    def.Push(P_MAXOBJECTIVES).Push("" + i), MaxObjective[i]);
+                Maximize[i] = state.Parameters.GetBoolean(paramBase.Push(P_MAXIMIZE).Push("" + i), 
+                    def.Push(P_MAXIMIZE).Push("" + i), Maximize[i]);
 
                 // test for validity
                 if (MinObjective[i] >= MaxObjective[i])
-                    state.Output.Error("For objective " + i + "the min fitness must be strictly less than the max fitness.");
+                    state.Output.Error("For objective " + i +
+                                       "the min fitness must be strictly less than the max fitness.");
             }
             state.Output.ExitIfErrors();
         }
 
         #endregion // Setup
+
         #region Operations
 
         /// <summary>
@@ -326,14 +398,20 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// By default, an empty array is returned, but various algorithms may override this to provide additional columns.
         /// </summary>
         /// <returns></returns>
-        public virtual string[] GetAuxilliaryFitnessNames() { return new string[] { }; }
+        public virtual string[] GetAuxilliaryFitnessNames()
+        {
+            return new string[] { };
+        }
 
         /// <summary>
         /// Returns auxilliary fitness values to be printed by the statistics object.
         /// By default, an empty array is returned, but various algorithms may override this to provide additional columns.
         /// </summary>
         /// <returns></returns>
-        public virtual double[] GetAuxilliaryFitnessValues() { return new double[] { }; }
+        public virtual double[] GetAuxilliaryFitnessValues()
+        {
+            return new double[] { };
+        }
 
         /// <summary>
         /// Returns the objectives as an array. Note that this is the *actual array*.
@@ -343,12 +421,12 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// <returns></returns>
         public float[] GetObjectives()
         {
-            return _objectives;
+            return Objectives;
         }
 
         public float GetObjective(int i)
         {
-            return _objectives[i];
+            return Objectives[i];
         }
 
         public void SetObjectives(IEvolutionState state, float[] newObjectives)
@@ -358,7 +436,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
                 state.Output.Fatal("Null objective array provided to MultiObjectiveFitness.");
                 throw new ArgumentNullException("newObjectives");
             }
-            if (newObjectives.Length != _objectives.Length)
+            if (newObjectives.Length != Objectives.Length)
             {
                 state.Output.Fatal("New objective array length does not match current length.");
             }
@@ -367,14 +445,15 @@ namespace BraneCloud.Evolution.EC.MultiObjective
                 var f = newObjectives[i];
                 if (f == Single.PositiveInfinity || f == Single.NegativeInfinity || Single.IsNaN(f))
                 {
-                    state.Output.Warning("Bad objective #" + i + ": " + f + ", setting to worst value for that objective.");
-                    if (_maximize)
+                    state.Output.Warning("Bad objective #" + i + ": " + f +
+                                         ", setting to worst value for that objective.");
+                    if (Maximize[i])
                         newObjectives[i] = MinObjective[i];
                     else
                         newObjectives[i] = MaxObjective[i];
                 }
             }
-            _objectives = newObjectives;
+            Objectives = newObjectives;
         }
 
         /// <summary>
@@ -387,28 +466,30 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         public bool ParetoDominates(MultiObjectiveFitness other)
         {
             var abeatsb = false;
-            if (_maximize != other._maximize)
+
+            if (Objectives.Length != other.Objectives.Length)
                 throw new ApplicationException(
-                    "Attempt made to compare two multiobjective fitnesses; but one expects higher values to be better and the other expectes lower values to be better.");
-            if (_objectives.Length != other._objectives.Length)
-                throw new ApplicationException("Attempt made to compare two multiobjective fitnesses; but they have different numbers of objectives.");
-            if (_maximize)
+                    "Attempt made to compare two multiobjective fitnesses; but they have different numbers of objectives.");
+
+            for (int x = 0; x < Objectives.Length; x++)
             {
-                for (var x = 0; x < _objectives.Length; x++)
+                if (Maximize[x] != other.Maximize[x])  // uh oh
+                    throw new InvalidOperationException(
+                        "Attempt made to compare two multiobjective fitnesses; but for objective #" + x +
+                        ", one expects higher values to be better and the other expectes lower values to be better.");
+
+                if (Maximize[x])
                 {
-                    if (_objectives[x] > other._objectives[x])
+                    if (Objectives[x] > other.Objectives[x])
                         abeatsb = true;
-                    else if (_objectives[x] < other._objectives[x])
+                    else if (Objectives[x] < other.Objectives[x])
                         return false;
                 }
-            }
-            else
-            {
-                for (var x = 0; x < _objectives.Length; x++)
+                else
                 {
-                    if (_objectives[x] < other._objectives[x])
+                    if (Objectives[x] < other.Objectives[x])
                         abeatsb = true;
-                    else if (_objectives[x] > other._objectives[x])
+                    else if (Objectives[x] > other.Objectives[x])
                         return false;
                 }
             }
@@ -420,7 +501,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         public static int[] GetRankings(Individual[] inds)
         {
             var r = new int[inds.Length];
-            var ranks = PartitionIntoRanks(inds);  // get all the ranks
+            var ranks = PartitionIntoRanks(inds); // get all the ranks
 
             // build a mapping of Individual -> index in inds array
             var m = new Dictionary<Individual, int>();
@@ -428,15 +509,15 @@ namespace BraneCloud.Evolution.EC.MultiObjective
                 m.Add(inds[i], i);
 
             var numRanks = ranks.Count;
-            for (var rank = 0; rank < numRanks; rank++)  // for each rank...
+            for (var rank = 0; rank < numRanks; rank++) // for each rank...
             {
                 var front = ranks[rank];
                 var numInds = front.Count;
-                for (var ind = 0; ind < numInds; ind++)  // for each individual in that rank ...
+                for (var ind = 0; ind < numInds; ind++) // for each individual in that rank ...
                 {
                     // get the index of the individual in the inds array
                     var i = m[front[ind]];
-                    r[i] = rank;  // set the rank in the corresponding ranks array
+                    r[i] = rank; // set the rank in the corresponding ranks array
                 }
             }
             return r;
@@ -450,9 +531,9 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         public double SumSquaredObjectiveDistance(MultiObjectiveFitness other)
         {
             double s = 0;
-            for (var i = 0; i < _objectives.Length; i++)
+            for (var i = 0; i < Objectives.Length; i++)
             {
-                double a = (_objectives[i] - other._objectives[i]);
+                double a = (Objectives[i] - other.Objectives[i]);
                 s += a * a;
             }
             return s;
@@ -464,14 +545,15 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         public double ManhattanObjectiveDistance(MultiObjectiveFitness other)
         {
             double s = 0;
-            for (var i = 0; i < _objectives.Length; i++)
+            for (var i = 0; i < Objectives.Length; i++)
             {
-                s += Math.Abs(_objectives[i] - other._objectives[i]);
+                s += Math.Abs(Objectives[i] - other.Objectives[i]);
             }
             return s;
         }
 
         #endregion // Operations
+
         #region Comparison
 
         /// <summary>
@@ -484,35 +566,35 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// </summary>
         public override bool EquivalentTo(IFitness fitness)
         {
-            var other = (MultiObjectiveFitness)fitness;
+            var other = (MultiObjectiveFitness) fitness;
             var abeatsb = false;
             var bbeatsa = false;
 
-            if (_maximize != other._maximize)
-                throw new ApplicationException(
-                    "Attempt made to compare two multiobjective fitnesses; but one expects higher values to be better and the other expectes lower values to be better.");
-            if (_objectives.Length != other._objectives.Length)
-                throw new ApplicationException("Attempt made to compare two multiobjective fitnesses; but they have different numbers of objectives.");
-            if (_maximize)
+            if (Objectives.Length != other.Objectives.Length)
+                throw new InvalidOperationException(
+                    "Attempt made to compare two multiobjective fitnesses; but they have different numbers of objectives.");
+
+            for (var x = 0; x < Objectives.Length; x++)
             {
-                for (var x = 0; x < _objectives.Length; x++)
+                if (Maximize[x] != other.Maximize[x]) // uh oh
+                    throw new InvalidOperationException(
+                        "Attempt made to compare two multiobjective fitnesses; but for objective #" + x +
+                        ", one expects higher values to be better and the other expectes lower values to be better.");
+
+                if (Maximize[x])
                 {
-                    if (_objectives[x] > other._objectives[x])
+                    if (Objectives[x] > other.Objectives[x])
                         abeatsb = true;
-                    if (_objectives[x] < other._objectives[x])
+                    if (Objectives[x] < other.Objectives[x])
                         bbeatsa = true;
                     if (abeatsb && bbeatsa)
                         return true;
                 }
-            }
-            else
-            // lower is better
-            {
-                for (var x = 0; x < _objectives.Length; x++)
+                else
                 {
-                    if (_objectives[x] < other._objectives[x])
+                    if (Objectives[x] < other.Objectives[x])
                         abeatsb = true;
-                    if (_objectives[x] > other._objectives[x])
+                    if (Objectives[x] > other.Objectives[x])
                         bbeatsa = true;
                     if (abeatsb && bbeatsa)
                         return true;
@@ -533,21 +615,23 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// <returns></returns>
         public override bool BetterThan(IFitness fitness)
         {
-            return ParetoDominates((MultiObjectiveFitness)fitness);
+            return ParetoDominates((MultiObjectiveFitness) fitness);
         }
 
         #endregion // Comparison
+
         #region Cloning
 
         public override object Clone()
         {
-            var f = (MultiObjectiveFitness)base.Clone();
-            f._objectives = (float[])_objectives.Clone(); // cloning an array
-            // note that we do NOT clone max and min fitness -- they're shared
+            var f = (MultiObjectiveFitness) base.Clone();
+            f.Objectives = (float[]) Objectives.Clone(); // cloning an array
+            // note that we do NOT clone max and min fitness, or maximizing -- they're shared
             return f;
         }
 
         #endregion // Cloning
+
         #region ToString
 
         /// <summary>
@@ -556,14 +640,12 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         public override string FitnessToString()
         {
             var s = FITNESS_PREAMBLE + MULTI_FITNESS_POSTAMBLE;
-            for (var x = 0; x < _objectives.Length; x++)
+            for (var x = 0; x < Objectives.Length; x++)
             {
                 if (x > 0)
                     s = s + " ";
-                s = s + Code.Encode(_objectives[x]);
+                s = s + Code.Encode(Objectives[x]);
             }
-            s = s + " ";
-            s = s + Code.Encode(_maximize);
             return s + FITNESS_POSTAMBLE;
         }
 
@@ -573,54 +655,47 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         public override string FitnessToStringForHumans()
         {
             var s = FITNESS_PREAMBLE + MULTI_FITNESS_POSTAMBLE;
-            for (var x = 0; x < _objectives.Length; x++)
+            for (var x = 0; x < Objectives.Length; x++)
             {
                 if (x > 0)
                     s = s + " ";
-                s = s + _objectives[x];
+                s = s + Objectives[x];
             }
-            s = s + " ";
-            s = s + (_maximize ? "max" : "min");
             return s + FITNESS_POSTAMBLE;
         }
 
         #endregion // ToString
+
         #region IO
 
         public override void ReadFitness(IEvolutionState state, StreamReader reader)
         {
             var d = Code.CheckPreamble(FITNESS_PREAMBLE + MULTI_FITNESS_POSTAMBLE, state, reader);
-            for (var x = 0; x < _objectives.Length; x++)
+            for (var x = 0; x < Objectives.Length; x++)
             {
                 Code.Decode(d);
                 if (d.Type != DecodeReturn.T_FLOAT)
-                    state.Output.Fatal("Reading Line " + d.LineNumber + ": " + "Bad Fitness (objectives value #" + x + ").");
-                _objectives[x] = (float)d.D;
+                    state.Output.Fatal("Reading Line " + d.LineNumber + ": " + "Bad Fitness (objectives value #" + x +
+                                       ").");
+                Objectives[x] = (float) d.D;
             }
-            Code.Decode(d);
-            if (d.Type != DecodeReturn.T_BOOLEAN || !d.B.HasValue)
-                state.Output.Fatal("Reading Line " + d.LineNumber + ": " + "Information missing about whether higher is better");
-
-            _maximize = !d.B.HasValue || d.B.Value; // Default is true (but if HasValue == false we will be aborting anyway!)
         }
 
         public override void WriteFitness(IEvolutionState state, BinaryWriter writer)
         {
-            writer.Write(_objectives.Length);
-            foreach (var t in _objectives)
+            writer.Write(Objectives.Length);
+            foreach (var t in Objectives)
                 writer.Write(t);
-            writer.Write(_maximize);
             WriteTrials(state, writer);
         }
 
         public override void ReadFitness(IEvolutionState state, BinaryReader reader)
         {
             var len = reader.ReadInt32();
-            if (_objectives == null || _objectives.Length != len)
-                _objectives = new float[len];
-            for (var x = 0; x < _objectives.Length; x++)
-                _objectives[x] = reader.ReadSingle();
-            _maximize = reader.ReadBoolean();
+            if (Objectives == null || Objectives.Length != len)
+                Objectives = new float[len];
+            for (var x = 0; x < Objectives.Length; x++)
+                Objectives[x] = reader.ReadSingle();
             ReadTrials(state, reader);
         }
 

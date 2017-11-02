@@ -86,6 +86,6 @@ pop.subpop.0.duplicate-retries =	0
 
 # output statistics to the file "out.stat" in the directory
 # the run was started in
-stat.file				../../out.stat
+stat.file				$out.stat
 
 

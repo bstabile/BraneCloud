@@ -23,8 +23,8 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using BraneCloud.Evolution.EC.Eval;
-using BraneCloud.Evolution.EC.Evaluation;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Logging;
@@ -34,7 +34,7 @@ using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
 
 namespace BraneCloud.Evolution.EC.Runtime.Eval
-{    
+{
     /// <summary> 
     /// Slave
     /// 
@@ -100,33 +100,12 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
     /// <tr><td valign="top"><tt>eval.return-inds</tt><br/>
     /// <font size="-1"> bool = <tt>true</tt> or <tt>false</tt> (default) </font></td>
     /// <td valign="top">(should we return whole individuals or (if false) just the fitnesses of the individuals?  This must be TRUE if eval.run-evolve is true.)</td></tr>
-    /// <!-- 
-    /// <tr><td valign="top"><tt>nostore</tt><br/>
-    /// <font size="-1"> bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
-    /// <td valign="top">(should the ec.util.Output facility <i>not</i> store announcements in memory?)</td></tr>
-    /// <tr><td valign="top"><tt>flush</tt><br/>
-    /// <font size="-1"> bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
-    /// <td valign="top">(should I flush all output as soon as it's printed (useful for debugging when an exception occurs))</td></tr>
-    /// -->
-    /// <tr><td valign="top"><tt>state</tt><br/>
-    /// <font size="-1">classname, inherits and != ec.EvolutionState</font></td>
-    /// <td valign="top">(the EvolutionState object class)</td></tr>
-    /// <tr><td valign="top"><tt>print-accessed-params</tt><br/>
-    /// <font size="-1"/>bool = <tt>true</tt> or <tt>false</tt> (default)</td>
-    /// <td valign="top">(at the end of a run, do we print out a list of all the parameters requested during the run?)</td></tr>
-    /// <tr><td valign="top"><tt>print-used-params</tt><br/>
-    /// <font size="-1"/>bool = <tt>true</tt> or <tt>false</tt> (default)</td>
-    /// <td valign="top">(at the end of a run, do we print out a list of all the parameters actually <i>used</i> during the run?)</td></tr>
-    /// <tr><td valign="top"><tt>print-unaccessed-params</tt><br/>
-    /// <font size="-1"/>bool = <tt>true</tt> or <tt>false</tt> (default)</td>
-    /// <td valign="top">(at the end of a run, do we print out a list of all the parameters NOT requested during the run?)</td></tr>
-    /// <tr><td valign="top"><tt>print-unused-params</tt><br/>
-    /// <font size="-1"/>bool = <tt>true</tt> or <tt>false</tt> (default)</td>
-    /// <td valign="top">(at the end of a run, do we print out a list of all the parameters NOT actually used during the run?)</td></tr>
-    /// <tr><td valign="top"><tt>print-all-params</tt><br/>
-    /// <font size="-1"/>bool = <tt>true</tt> or <tt>false</tt> (default)</td>
-    /// <td valign="top">(at the end of a run, do we print out a list of all the parameters stored in the parameter database?)</td></tr>
+    /// 
+    /// <tr><td valign="top"><tt>eval.one-shot</tt><br/>
+    /// <font size="-1"> bool = <tt>true</tt> (default) or <tt>false</tt></font></td>
+    /// <td valign="top">(Should the slave quit when the master quits, or loop continuously in the background processing new masters?)</td></tr>
     /// </table>
+    /// 
     /// </summary>	
     [Serializable]
     [ECConfiguration("ec.eval.Slave")]
@@ -134,18 +113,21 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
     {
         #region Constants
 
-        public const string P_PRINTACCESSEDPARAMETERS = "print-accessed-params";
-        public const string P_PRINTUSEDPARAMETERS = "print-used-params";
-        public const string P_PRINTALLPARAMETERS = "print-all-params";
-        public const string P_PRINTUNUSEDPARAMETERS = "print-unused-params";
-        public const string P_PRINTUNACCESSEDPARAMETERS = "print-unaccessed-params";
-        public const string P_EVALSLAVENAME = "eval.slave-name";
+        public const string P_EVALSLAVENAME = "eval.slave.name";
         public const string P_EVALMASTERHOST = "eval.master.host";
         public const string P_EVALMASTERPORT = "eval.master.port";
         public const string P_EVALCOMPRESSION = "eval.compression";
         public const string P_RETURNINDIVIDUALS = "eval.return-inds";
 
-        public const string P_SUBPOP = "pop.subpop";
+        public const string P_MUZZLE = "eval.slave.muzzle";
+
+        public const byte V_NOTHING = 0;
+        public const byte V_INDIVIDUAL = 1;
+        public const byte V_FITNESS = 2;
+
+        public const byte V_SHUTDOWN = 0;
+        public const byte V_EVALUATESIMPLE = 1;
+        public const byte V_EVALUATEGROUPED = 2;
 
         /// <summary>
         /// The argument indicating that we're starting fresh from a new parameter file. 
@@ -153,19 +135,17 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
         public const string A_FILE = "-file";
 
         /// <summary>
-        /// State parameter. 
-        /// </summary>
-        public const string P_STATE = "state";
-
-        /// <summary>
         /// Time to run evolution on the slaves in seconds. 
         /// </summary>
-        public const string P_RUNTIME = "eval.runtime";
+        public const string P_RUNTIME = "eval.slave.runtime";
 
         /// <summary>
         /// Should slave run its own evolutionary process? 
         /// </summary>
-        public const string P_RUNEVOLVE = "eval.run-evolve";
+        public const string P_RUNEVOLVE = "eval.slave.run-evolve";
+
+        /** Should slave go into an infinite loop looking for new masters after the master has quit, or not? */
+        public const string P_ONESHOT = "eval.slave.one-shot"; 
 
         /// <summary>
         /// How long we sleep in between attempts to connect to the master (in milliseconds). 
@@ -178,6 +158,11 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
         public static int RunTime;
 
         public static bool RunEvolve;
+
+        public static bool OneShot = false;
+
+        // NOTE: We should use the framework's thread pool!
+        //public static ThreadPool Pool = new ThreadPool();
 
         #endregion // Static
         #region Operations
@@ -218,130 +203,202 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
 
             // Read the individual(s) from the stream and evaluate 
 
-            var updateFitness = new bool[numInds];
-            var inds = new Individual[numInds];
-
             // Either evaluate all the individuals once and return them immediately
             // (we'll do so in a steady-state-ish fashion, firing off threads as soon as we read in individuals,
             // and returning them as soon as they come in, albeit in the proper order)
             if (!RunEvolve)
             {
-                var tasks = new Task<ECTaskArgs>[numInds];
-                var problems = new ISimpleProblem[numInds];
-                var indForThread = new int[numInds];
-
-                try
-                {
-                    // start up all the threads
-                    for (var i = 0; i < numInds; i++)
-                    {
-                        // load individual
-                        inds[i] = state.Population.Subpops[subpops[i]].Species.NewIndividual(state, dataIn);
-                        updateFitness[i] = dataIn.ReadBoolean();
-
-                        problems[i] = ((ISimpleProblem) (state.Evaluator.p_problem.Clone()));
-                        // TODO : Fix the Task implementation
-                        //var task = new Task<ECTaskArgs>((o) =>
-                        //                                     {
-                        //                                         var a = (ECTaskArgs) o;
-                        //                                         a.Problem.Evaluate(a.State, a.Individual, a.SubpopIndex,
-                        //                                                            a.ThreadNum);
-                        //                                         return a;
-                        //                                     };
-                        //                                );
-                        //tasks[i] = task;
-                    }
-                    // gather everyone
-                    for (var i = 0; i < numInds; i++)
-                    {
-                        ReturnIndividualsToMaster(state, inds, updateFitness, dataOut, returnIndividuals,
-                                                      indForThread[i]); // return just that individual
-                    }
-                }
-                catch (IOException e)
-                {
-                    state.Output.Fatal("Unable to read individual from master." + e);
-                }
-                try
-                {
-                    dataOut.Flush();
-                }
-                catch (IOException e)
-                {
-                    state.Output.Fatal("Caught fatal IOException\n" + e);
-                }
+                EvaluateSimpleProblemCore(state, returnIndividuals, dataIn, dataOut, numInds, subpops);
             }
-
             // OR we will do some evolution.  Here we'll read in ALL the individuals, do some evolution, then
             // write them ALL out, very slightly less efficient
             else // (runEvolve) 
             {
-                try // load up all the individuals
+                EvolveSimpleProblemCore(state, returnIndividuals, dataIn, dataOut, numInds, subpops, indsPerSubpop);
+            }
+        }
+
+        private static void EvaluateSimpleProblemCore(IEvolutionState state, bool returnIndividuals,
+            BinaryReader dataIn, BinaryWriter dataOut, int numInds, int[] subpops)
+        {
+            // TODO: Refactor this to use TPL DataFlow!
+
+            var problems = new ISimpleProblem[numInds];
+            var updateFitness = new bool[numInds];
+            var inds = new Individual[numInds];
+            var indForThread = new int[numInds];
+
+           //int t = 0; // thread index
+
+            try
+            {
+                // BRS: TPL DataFlow BEGIN
+                var maxDegree = Math.Min(Environment.ProcessorCount, state.EvalThreads);
+                var options = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = maxDegree };
+                var block = new TransformBlock<SlaveEvalThread, Individual>(eval =>
                 {
-                    for (var i = 0; i < numInds; i++)
+                    eval.Run();
+                    return eval.Ind;
+                }, options);
+
+                for (var i = 0; i < numInds; i++)
+                {
+                    var ind = state.Population.Subpops[subpops[i]].Species.NewIndividual(state, dataIn);
+                    if (problems[i] == null)
+                        problems[i] = (ISimpleProblem)state.Evaluator.p_problem.Clone();
+                    updateFitness[i] = dataIn.ReadBoolean();
+
+                    var runnable = new SlaveEvalThread
                     {
-                        inds[i] = state.Population.Subpops[subpops[i]].Species.NewIndividual(state, dataIn);
-                        updateFitness[i] = dataIn.ReadBoolean();
-                    }
+                        ThreadNum = i,
+                        State = state,
+                        Problem = problems[i],
+                        Ind = ind,
+                        Subpop = subpops[i]
+                    };
+
+                    block.Post(runnable);
                 }
-                catch (IOException e)
-                {
-                    state.Output.Fatal("Unable to read individual from master." + e);
-                }
-
-                var stopWatch = Stopwatch.StartNew();
-
-                // Now we need to reset the subpopulations.  They were already set up with the right
-                // classes, Species, etc. in state.setup(), so all we need to do is modify the number
-                // of individuals in each subpopulation.
-
-                for (var subpop = 0; subpop < state.Population.Subpops.Length; subpop++)
-                {
-                    if (state.Population.Subpops[subpop].Individuals.Length != indsPerSubpop[subpop])
-                        state.Population.Subpops[subpop].Individuals = new Individual[indsPerSubpop[subpop]];
-                }
-
-                // Disperse into the population
-                var counts = new int[state.Population.Subpops.Length];
                 for (var i = 0; i < numInds; i++)
-                    state.Population.Subpops[subpops[i]].Individuals[counts[subpops[i]]++] = inds[i];
-
-                // Evaluate the population until time is up, or the evolution stops
-                var result = EvolutionState.R_NOTDONE;
-                while (result == EvolutionState.R_NOTDONE)
                 {
-                    result = state.Evolve();
-                    if (stopWatch.ElapsedMilliseconds > RunTime)
-                        break;
+                    // This preserves the original block posting order so we can just use the index.
+                    var ind = block.Receive(); 
+                    // Return the evaluated Individual by index...
+                    ReturnIndividualsToMaster(state, inds, updateFitness, dataOut, returnIndividuals, individualInQuestion: i);  // return just that individual
                 }
+                // BRS: TPL DataFlow END
 
-                // re-gather from population in the same order
-                counts = new int[state.Population.Subpops.Length];
-                for (var i = 0; i < numInds; i++)
-                    inds[i] = state.Population.Subpops[subpops[i]].Individuals[counts[subpops[i]]++];
+                //    // start up all the threads
+                //    for (var i = 0; i < numInds; i++)
+                //    {
+                //        // may throw IOException here
+                //        inds[i] = state.Population.Subpops[subpops[i]].Species.NewIndividual(state, dataIn);
+                //        updateFitness[i] = dataIn.ReadBoolean();
 
-                state.Finish(result);
-                Evolve.Cleanup(state);
+                //        // fire up evaluation thread on individual
+                //        if (t >= state.EvalThreads) t = 0;       // we can only be here if evalthreads > numInds
+                //        if (tasks[t] != null)
+                //        {
+                //            pool.joinAndReturn(threads[t]);  // ran out of threads, wait for new ones
+                //            returnIndividualsToMaster(state, inds, updateFitness, dataOut, returnIndividuals, indForThread[t]);  // return just that individual
+                //        }
+                //        if (problems[t] == null) problems[t] = ((SimpleProblemForm)(state.evaluator.p_problem.clone()));
 
-                // Return the evaluated individual to the master
-                try
+                //        final int j = i;
+                //        final int s = t;
+                //        indForThread[t] = i;
+                //        threads[t] = pool.startThread("Evaluation of individual " + i, new Runnable()
+                //        {
+                //            public void run() { problems[s].evaluate(state, inds[j], subpops[j], 0); }
+                //    });
+                //    t++;
+                //}
+            }
+            catch (IOException e)
+            {
+                state.Output.Fatal("Unable to read individual from master." + e);
+            }
+
+            // gather everyone
+            for (var i = 0; i < numInds; i++)
+            {
+                ReturnIndividualsToMaster(state, inds, updateFitness, dataOut, returnIndividuals,
+                    indForThread[i]); // return just that individual
+            }
+
+            try
+            {
+                dataOut.Flush();
+            }
+            catch (IOException e)
+            {
+                state.Output.Fatal("Caught fatal IOException\n" + e);
+            }
+        }
+
+        class SlaveEvalThread : IThreadRunnable
+        {
+            public int ThreadNum;
+            public IEvolutionState State;
+            public ISimpleProblem Problem;
+            public Individual Ind;
+            public int Subpop;
+
+            private readonly object _syncLock = new object();
+
+            public void Run()
+            {
+                lock (_syncLock)
                 {
-                    ReturnIndividualsToMaster(state, inds, updateFitness, dataOut, returnIndividuals, -1);
-                    // -1 == write all individuals
-                    dataOut.Flush();
-                }
-                catch (IOException e)
-                {
-                    state.Output.Fatal("Caught fatal IOException\n" + e);
+                    Problem.Evaluate(State, Ind, Subpop, ThreadNum);
                 }
             }
         }
 
-        private static ECTaskArgs RunSimpleProblem(ECTaskArgs args)
+        private static void EvolveSimpleProblemCore(IEvolutionState state, bool returnIndividuals,
+            BinaryReader dataIn, BinaryWriter dataOut, int numInds, int[] subpops, int[] indsPerSubpop)
         {
-            args.Problem.Evaluate(args.State, args.Individual, args.SubpopIndex, args.ThreadNum);
-            var fitness = args.Individual.Fitness;
-            return args;
+            var updateFitness = new bool[numInds];
+            var inds = new Individual[numInds];
+
+            try // load up ALL the individuals
+            {
+                for (var i = 0; i < numInds; i++)
+                {
+                    inds[i] = state.Population.Subpops[subpops[i]].Species.NewIndividual(state, dataIn);
+                    updateFitness[i] = dataIn.ReadBoolean();
+                }
+            }
+            catch (IOException e)
+            {
+                state.Output.Fatal("Unable to read individual from master." + e);
+            }
+
+            var stopWatch = Stopwatch.StartNew();
+
+            // Now we need to reset the subpopulations.  They were already set up with the right
+            // classes, Species, etc. in state.setup(), so all we need to do is modify the number
+            // of individuals in each subpopulation.
+
+            for (var subpop = 0; subpop < state.Population.Subpops.Length; subpop++)
+            {
+                if (state.Population.Subpops[subpop].Individuals.Length != indsPerSubpop[subpop])
+                    state.Population.Subpops[subpop].Individuals = new Individual[indsPerSubpop[subpop]];
+            }
+
+            // Disperse into the population
+            var counts = new int[state.Population.Subpops.Length];
+            for (var i = 0; i < numInds; i++)
+                state.Population.Subpops[subpops[i]].Individuals[counts[subpops[i]]++] = inds[i];
+
+            // Evaluate the population until time is up, or the evolution stops
+            var result = EvolutionState.R_NOTDONE;
+            while (result == EvolutionState.R_NOTDONE)
+            {
+                result = state.Evolve();
+                if (stopWatch.ElapsedMilliseconds > RunTime)
+                    break;
+            }
+
+            // re-gather from population in the same order
+            counts = new int[state.Population.Subpops.Length];
+            for (var i = 0; i < numInds; i++)
+                inds[i] = state.Population.Subpops[subpops[i]].Individuals[counts[subpops[i]]++];
+
+            state.Finish(result);
+            Evolve.Cleanup(state);
+
+            // Return the evaluated individual to the master
+            try
+            {
+                ReturnIndividualsToMaster(state, inds, updateFitness, dataOut, returnIndividuals, -1);
+                // -1 == write all individuals
+                dataOut.Flush();
+            }
+            catch (IOException e)
+            {
+                state.Output.Fatal("Caught fatal IOException\n" + e);
+            }
         }
 
         public static void EvaluateGroupedProblem(IEvolutionState state, bool returnIndividuals, BinaryReader dataIn, BinaryWriter dataOut)
@@ -395,7 +452,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
             }
 
             // Evaluate the individuals together
-            ((IGroupedProblem) (state.Evaluator.p_problem)).Evaluate(state, inds, updateFitness, countVictoriesOnly, subpops, 0);
+            ((IGroupedProblem) state.Evaluator.p_problem).Evaluate(state, inds, updateFitness, countVictoriesOnly, subpops, 0);
 
             try
             {
@@ -416,8 +473,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
         {
             // Return the evaluated individual to the master
             // just write evaluated and fitness
-            var startInd = (individualInQuestion == -1 ? 0 : individualInQuestion);
-            var endInd = (individualInQuestion == -1 ? inds.Count : individualInQuestion + 1);
+            var startInd = individualInQuestion == -1 ? 0 : individualInQuestion;
+            var endInd = individualInQuestion == -1 ? inds.Count : individualInQuestion + 1;
             for (var i = startInd; i < endInd; i++)
             {
                 dataOut.Write((byte) (returnIndividuals
@@ -493,17 +550,27 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
 
             var returnIndividuals = parameters.GetBoolean(new Parameter(P_RETURNINDIVIDUALS), null, false);
 
+            // 5.5 should we muzzle?
+            bool muzzle = parameters.GetBoolean(new Parameter(P_MUZZLE), null, false);
 
             // 6. Open a server socket and listen for requests
             var slaveName = parameters.GetString(new Parameter(P_EVALSLAVENAME), null);
 
             var masterHost = parameters.GetString(new Parameter(P_EVALMASTERHOST), null);
-            var masterPort = parameters.GetInt(new Parameter(P_EVALMASTERPORT), null);
+            if (masterHost == null)
+                Output.InitialError("Master Host missing", new Parameter(P_EVALMASTERHOST));
+
+            var masterPort = parameters.GetInt(new Parameter(P_EVALMASTERPORT), null, 0);
+            if (masterPort == -1)
+                Output.InitialError("Master Port missing", new Parameter(P_EVALMASTERPORT));
+
             var useCompression = parameters.GetBoolean(new Parameter(P_EVALCOMPRESSION), null, false);
 
             RunTime = parameters.GetInt(new Parameter(P_RUNTIME), null, 0);
 
             RunEvolve = parameters.GetBoolean(new Parameter(P_RUNEVOLVE), null, false);
+
+            OneShot = parameters.GetBoolean(new Parameter(P_ONESHOT), null, true);
 
             if (RunEvolve && !returnIndividuals)
             {
@@ -514,23 +581,28 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     // This was originally part of the InitialError call in ECJ. But we make Slave responsible.
             }
 
-            Output.InitialMessage("ECCS Slave");
-            if (RunEvolve)
-                Output.InitialMessage("Running in Evolve mode, evolve time is " + RunTime + " milliseconds");
-            if (returnIndividuals)
-                Output.InitialMessage("Whole individuals will be returned");
-            else
-                Output.InitialMessage("Only fitnesses will be returned");
+            if (!muzzle)
+            {
+                Output.InitialMessage("ECCS Slave");
+                if (RunEvolve)
+                    Output.InitialMessage("Running in Evolve mode, evolve time is " + RunTime + " milliseconds");
+                if (returnIndividuals)
+                    Output.InitialMessage("Whole individuals will be returned");
+                else
+                    Output.InitialMessage("Only fitnesses will be returned");
+            }
 
 
             // Continue to serve new masters until killed.
+            TcpClient socket = null; // BRS: TcpClient is a wrapper around the Socket class
             while (true)
             {
                 try
                 {
-                    TcpClient socket;
                     long connectAttemptCount = 0;
-                    Output.InitialMessage("Connecting to master at " + masterHost + ":" + masterPort);
+                    if (!muzzle)
+                        Output.InitialMessage("Connecting to master at " + masterHost + ":" + masterPort);
+
                     while (true)
                     {
                         try
@@ -551,7 +623,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                             }
                         }
                     }
-                    Output.InitialMessage("Connected to master after " + (connectAttemptCount*SLEEP_TIME) + " ms");
+                    if (!muzzle)
+                        Output.InitialMessage("Connected to master after " + (connectAttemptCount*SLEEP_TIME) + " ms");
 
                     BinaryReader dataIn = null;
                     BinaryWriter dataOut = null;
@@ -572,10 +645,10 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                             tmpOut = Output.MakeCompressingOutputStream(tmpOut);
                             if (tmpIn == null || tmpOut == null)
                             {
-                                Output.InitialError(
+                                if (!muzzle)
+                                    Output.InitialError(
                                     "You do not appear to have JZLib installed on your system, and so must set eval.compression=false.  "
-                                    +
-                                    "To get JZLib, download from the ECJ website or from http://www.jcraft.com/jzlib/",
+                                    + "To get JZLib, download from the ECJ website or from http://www.jcraft.com/jzlib/",
                                     false);
                                 Environment.Exit(1);
                                     // This was originally part of the InitialError call in ECJ. But we make Slave responsible.
@@ -587,7 +660,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     }
                     catch (IOException e)
                     {
-                        Output.InitialError("Unable to open input stream from socket:\n" + e, false);
+                        if (!muzzle)
+                            Output.InitialError("Unable to open input stream from socket:\n" + e, false);
                         Environment.Exit(1);
                             // This was originally part of the InitialError call in ECJ. But we make Slave responsible.
                     }
@@ -597,7 +671,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     {
                         // BRS : TODO : Check equivalence of the address returned from .NET socket.Client.LocalEndPoint
                         slaveName = socket.Client.LocalEndPoint + "/" + (DateTime.Now.Ticks - 621355968000000000)/10000;
-                        Output.InitialMessage("No slave name specified.  Using: " + slaveName);
+                        if (!muzzle)
+                            Output.InitialMessage("No slave name specified.  Using: " + slaveName);
                     }
 
                     dataOut.Write(slaveName); // Default encoding of BinaryWriter is UTF-8
@@ -608,50 +683,38 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
 
                     if (output != null)
                         output.Close();
-                    output = new Output(true);
-
-                    //output.setFlush(
-                    //    parameters.GetBoolean(new Parameter(P_FLUSH),null,false));
+                    output = new Output(storeAnnouncementsInMemory: false) // do not store messages, just print them
+                    {
+                        ThrowsErrors = true // don't do System.exit(1)
+                    }; 
+                    
 
                     // stdout is always log #0. stderr is always log #1.
-                    // stderr accepts announcements, and both are fully verbose
-                    // by default.
+                    // stderr accepts announcements, and both are fully verbose by default.
                     output.AddLog(Log.D_STDOUT, false);
                     output.AddLog(Log.D_STDERR, true);
 
-                    output.SystemMessage(ECVersion.Message());
+                    if (muzzle)
+                    {
+                        output.GetLog(0).Muzzle = true;
+                        output.GetLog(1).Muzzle = true;
+                    }
+
+                    if (!muzzle) output.SystemMessage(ECVersion.Message());
 
 
                     // 2. set up thread values
 
-                    /*
-                    int breedthreads = parameters.GetInt(
-                    new Parameter(Evolve.P_BREEDTHREADS),null,1);
-                    
-                    if (breedthreads < 1)
-                    output.Fatal("Number of breeding threads should be an integer >0.",
-                    new Parameter(Evolve.P_BREEDTHREADS),null);
-                    
-                    
-                    int evalthreads = parameters.GetInt(
-                    new Parameter(Evolve.P_EVALTHREADS),null,1);
-                    
-                    if (evalthreads < 1)
-                    output.Fatal("Number of eval threads should be an integer >0.",
-                    new Parameter(Evolve.P_EVALTHREADS),null);*/
-
-                    var breedthreads = Evolve.DetermineThreads(output, parameters, new Parameter(Evolve.P_BREEDTHREADS));
-                    var evalthreads = Evolve.DetermineThreads(output, parameters, new Parameter(Evolve.P_EVALTHREADS));
+                    int breedthreads = Evolve.DetermineThreads(output, parameters, new Parameter(Evolve.P_BREEDTHREADS));
+                    int evalthreads = Evolve.DetermineThreads(output, parameters, new Parameter(Evolve.P_EVALTHREADS));
 
                     // Note that either breedthreads or evalthreads (or both) may be 'auto'.  We don't warn about this because
                     // the user isn't providing the thread seeds.
 
 
-                    // 3. create the Mersenne Twister random number generators,
-                    // one per thread
+                    // 3. create the Mersenne Twister random number generators, one per thread
 
-                    IMersenneTwister[] random =
-                        new MersenneTwisterFast[breedthreads > evalthreads ? breedthreads : evalthreads];
+                    var random = new IMersenneTwister[breedthreads > evalthreads ? breedthreads : evalthreads];
 
                     var seed = dataIn.ReadInt32();
                     for (var i = 0; i < random.Length; i++)
@@ -663,7 +726,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     // what evolution state to use?
                     state =
                         (IEvolutionState)
-                        parameters.GetInstanceForParameter(new Parameter(P_STATE), null, typeof (IEvolutionState));
+                        parameters.GetInstanceForParameter(new Parameter(Evolve.P_STATE), null, typeof (IEvolutionState));
                     state.Parameters = new ParameterDatabase();
                     state.Parameters.AddParent(parameters);
                     state.Random = random;
@@ -701,16 +764,18 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                             }
 
                             // 0 means to shut down
-                            Console.Error.WriteLine("reading next problem");
+                            //Console.Error.WriteLine("reading next problem");
                             int problemType = dataIn.ReadByte();
-                            Console.Error.WriteLine("Read problem: " + problemType);
+                            //Console.Error.WriteLine("Read problem: " + problemType);
                             switch (problemType)
                             {
 
                                 case (int) SlaveEvaluationType.Shutdown:
                                     socket.Close();
+                                    if (OneShot)
                                     return; // we're outa here
-
+                                    else
+                                        throw new OutputExitException("SHUTDOWN");
                                 case (int) SlaveEvaluationType.Simple:
                                     EvaluateSimpleProblem(newState, returnIndividuals, dataIn, dataOut, args);
                                     break;
@@ -733,15 +798,46 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                         // on it's end, we don't necessarily have to exit.  Maybe we don't
                         // even need to print a warning, but we'll do so just to indicate
                         // something happened.
-                        state.Output.Warning(
+                        state.Output.Fatal(
                             "Unable to read type of evaluation from master.  Maybe the master closed its socket and exited?:\n" +
                             e);
                     }
+                    catch (Exception e)
+                    {
+                        if (state != null)
+                            state.Output.Fatal(e.Message);
+                        else if (!muzzle) Console.Error.WriteLine("FATAL ERROR (EvolutionState not created yet): " + e.Message);
+                    }
                 }
-                catch (Exception e)
+                catch (OutputExitException e)
                 {
-                    state.Output.Fatal(e.Message);
+                    // here we restart if necessary
+                    try { socket.Close(); } catch (Exception e2) { }
+                    if (OneShot) Environment.Exit(0);
                 }
+                catch (OutOfMemoryException e)
+                {
+                    // Let's try fixing things
+                    state = null;
+
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+
+                    try { socket.Close(); } catch (Exception e2) { }
+                    socket = null;
+
+                    // TODO: Overkill? Track memory before and after.
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+
+                    Console.Error.WriteLine(e);
+                    if (OneShot) Environment.Exit(0);
+                }
+                if (!muzzle) Output.InitialMessage("\n\nResetting...");
             }
         }
 

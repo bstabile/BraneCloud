@@ -29,7 +29,7 @@ namespace BraneCloud.Evolution.EC.Vector
 {
     /// <summary> 
     /// DoubleVectorIndividual is a VectorIndividual whose genome is an array of
-    /// doubles. Gene values may range from species.MinGene(x) to species.MaxGene(x),
+    /// doubles. Gene values may range from species.GetMinGene(x) to species.GetMaxGene(x),
     /// inclusive. The default mutation method randomizes genes to new values in this
     /// range, with <tt>species.MutationProbability</tt>. It can also add gaussian
     /// noise to the genes, if so directed in the FloatVectorSpecies. If the gaussian
@@ -83,6 +83,8 @@ namespace BraneCloud.Evolution.EC.Vector
 
         public const string P_DOUBLEVECTORINDIVIDUAL = "double-vect-ind";
 
+        public const double MAXIMUM_INTEGER_IN_DOUBLE = 9.007199254740992E15;
+
         #endregion // Constants
         #region Properties
 
@@ -120,8 +122,8 @@ namespace BraneCloud.Evolution.EC.Vector
             {
                 var species = (FloatVectorSpecies)Species;
                 for (var i = 0; i < GenomeLength; i++)
-                    if (genome[i] < species.MinGene(i) ||
-                        genome[i] > species.MaxGene(i)) return false;
+                    if (genome[i] < species.GetMinGene(i) ||
+                        genome[i] > species.GetMaxGene(i)) return false;
                 return true;
             }
         }
@@ -198,12 +200,12 @@ namespace BraneCloud.Evolution.EC.Vector
             var species = (FloatVectorSpecies)Species;
             for (var i = 0; i < Length; i++)
             {
-                var minGene = species.MinGene(i);
+                var minGene = species.GetMinGene(i);
                 if (genome[i] < minGene)
                     genome[i] = minGene;
                 else
                 {
-                    var maxGene = species.MaxGene(i);
+                    var maxGene = species.GetMaxGene(i);
                     if (genome[i] > maxGene)
                         genome[i] = maxGene;
                 }
@@ -216,8 +218,22 @@ namespace BraneCloud.Evolution.EC.Vector
         public override void Reset(IEvolutionState state, int thread)
         {
             var s = (FloatVectorSpecies)Species;
-            for (var x = 0; x < genome.Length; x++)
-                genome[x] = (s.MinGene(x) + state.Random[thread].NextDouble() * (s.MaxGene(x) - s.MinGene(x)));
+            IMersenneTwister random = state.Random[thread];
+            for (int x = 0; x < genome.Length; x++)
+            {
+                int type = s.GetMutationType(x);
+                if (type == FloatVectorSpecies.C_INTEGER_RESET_MUTATION ||
+                    type == FloatVectorSpecies.C_INTEGER_RANDOM_WALK_MUTATION)  // integer type
+                {
+                    long minGene = (long)Math.Floor(s.GetMinGene(x));
+                    long maxGene = (long)Math.Floor(s.GetMaxGene(x));
+                    genome[x] = RandomValueFromClosedInterval(minGene, maxGene, random); //minGene + random.nextLong(maxGene - minGene + 1);
+                }
+                else
+                {
+                    genome[x] = (s.GetMinGene(x) + random.NextDouble(true, true) * (s.GetMaxGene(x) - s.GetMinGene(x)));
+                }
+            }
         }
 
         #endregion // Genome
@@ -274,12 +290,12 @@ namespace BraneCloud.Evolution.EC.Vector
 
                 case VectorSpecies.C_LINE_RECOMB:
                     {
-                        var alpha = state.Random[thread].NextDouble() * (1 + 2 * s.LineDistance) - s.LineDistance;
-                        var beta = state.Random[thread].NextDouble() * (1 + 2 * s.LineDistance) - s.LineDistance;
+                        var alpha = state.Random[thread].NextDouble(includeZero: true, includeOne: true) * (1 + 2 * s.LineDistance) - s.LineDistance;
+                        var beta = state.Random[thread].NextDouble(includeZero: true, includeOne: true) * (1 + 2 * s.LineDistance) - s.LineDistance;
                         for (var x = 0; x < genome.Length; x++)
                         {
-                            var min = s.MinGene(x);
-                            var max = s.MaxGene(x);
+                            var min = s.GetMinGene(x);
+                            var max = s.GetMaxGene(x);
                             var t = alpha * genome[x] + (1 - alpha) * i.genome[x];
                             var u = beta * i.genome[x] + (1 - beta) * genome[x];
                             if ((t < min || t > max || u < min || u > max)) continue;
@@ -299,10 +315,10 @@ namespace BraneCloud.Evolution.EC.Vector
                             double max;
                             do
                             {
-                                var alpha = state.Random[thread].NextDouble() * (1 + 2 * s.LineDistance) - s.LineDistance;
-                                var beta = state.Random[thread].NextDouble() * (1 + 2 * s.LineDistance) - s.LineDistance;
-                                min = s.MinGene(x);
-                                max = s.MaxGene(x);
+                                var alpha = state.Random[thread].NextDouble(includeZero: true, includeOne: true) * (1 + 2 * s.LineDistance) - s.LineDistance;
+                                var beta = state.Random[thread].NextDouble(includeZero: true, includeOne: true) * (1 + 2 * s.LineDistance) - s.LineDistance;
+                                min = s.GetMinGene(x);
+                                max = s.GetMaxGene(x);
                                 t = alpha * genome[x] + (1 - alpha) * i.genome[x];
                                 u = beta * i.genome[x] + (1 - beta) * genome[x];
                             } while (t < min || t > max || u < min || u > max);
@@ -396,75 +412,170 @@ namespace BraneCloud.Evolution.EC.Vector
         public override void DefaultMutate(IEvolutionState state, int thread)
         {
             var s = (FloatVectorSpecies)Species;
-            if (!(s.MutationProbability > 0.0))
-                return;
-            var mutationIsBounded = s.MutationIsBounded;
+
             var rng = state.Random[thread];
 
-            switch (s.MutationType)
-            {
-                case FloatVectorSpecies.C_GAUSS_MUTATION:
-                    for (var x = 0; x < genome.Length; x++)
-                        if (rng.NextBoolean(s.MutationProbability))
+            for (int x = 0; x < genome.Length; x++)
+                if (rng.NextBoolean(s.GetMutationProbability(x)))
+                {
+                    double old = genome[x];
+                    for (int retries = 0; retries < s.GetDuplicateRetries(x) + 1 + 1; retries++)
+                    {
+                        switch (s.GetMutationType(x))
                         {
-                            double val;
-                            var min = s.MinGene(x);
-                            var max = s.MaxGene(x);
-                            var stdev = s.GaussMutationStdev;
-                            var outOfBoundsLeftOverTries = s.OutOfBoundsRetries;
-                            var givingUpAllowed = s.OutOfBoundsRetries != 0;
-                            do
-                            {
-                                val = rng.NextGaussian() * stdev + genome[x];
-                                outOfBoundsLeftOverTries--;
-                                if (mutationIsBounded && (val > max || val < min))
-                                {
-                                    if (givingUpAllowed && (outOfBoundsLeftOverTries == 0))
-                                    {
-                                        val = min + rng.NextFloat() * (max - min);
-                                        s.OutOfRangeRetryLimitReached(state); // it better get inlined
-                                        break;
-                                    }
-                                }
-                                else
-                                    break;
-                            }
-                            while (true);
-                            genome[x] = val;
+                            case FloatVectorSpecies.C_GAUSS_MUTATION:
+                                GaussianMutation(state, rng, s, x);
+                                break;
+                            case FloatVectorSpecies.C_POLYNOMIAL_MUTATION:
+                                PolynomialMutation(state, rng, s, x);
+                                break;
+                            case FloatVectorSpecies.C_RESET_MUTATION:
+                                FloatResetMutation(rng, s, x);
+                                break;
+                            case FloatVectorSpecies.C_INTEGER_RESET_MUTATION:
+                                IntegerResetMutation(rng, s, x);
+                                break;
+                            case FloatVectorSpecies.C_INTEGER_RANDOM_WALK_MUTATION:
+                                IntegerRandomWalkMutation(rng, s, x);
+                                break;
                         }
-                    break;
-                case FloatVectorSpecies.C_POLYNOMIAL_MUTATION:
-                    PolynomialMutate(state.Random[thread], s.CrossoverDistributionIndex, s.PolynomialIsAlternative, s.MutationIsBounded);
-                    break;
-                case FloatVectorSpecies.C_RESET_MUTATION:
-                    for (var x = 0; x < genome.Length; x++)
-                        if (rng.NextBoolean(s.MutationProbability))
-                            genome[x] = s.MinGene(x) + rng.NextDouble() * (s.MaxGene(x) - s.MinGene(x));
-                    break;
-                default:
-                    throw new InvalidOperationException(String.Format("Mutation type '{0}' is not supported!", s.MutationType));
+                        if (genome[x] != old) break;
+                        // else genome[x] = old;  // try again
+                    }
+                }
+        }
+
+        void IntegerRandomWalkMutation(IMersenneTwister random, FloatVectorSpecies species, int index)
+        {
+            double min = species.GetMinGene(index);
+            double max = species.GetMaxGene(index);
+            if (!species.GetMutationIsBounded(index))
+            {
+                // okay, technically these are still bounds, but we can't go beyond this without weird things happening
+                max = MAXIMUM_INTEGER_IN_DOUBLE;
+                min = -(max);
             }
+            do
+            {
+                int n = (int)(random.NextBoolean() ? 1 : -1);
+                double g = Math.Floor(genome[index]);
+                if ((n == 1 && g < max) ||
+                    (n == -1 && g > min))
+                    genome[index] = g + n;
+                else if ((n == -1 && g < max) ||
+                    (n == 1 && g > min))
+                    genome[index] = g - n;
+            }
+            while (random.NextBoolean(species.GetRandomWalkProbability(index)));
+        }
+
+        void IntegerResetMutation(IMersenneTwister random, FloatVectorSpecies species, int index)
+        {
+            long minGene = (long)Math.Floor(species.GetMinGene(index));
+            long maxGene = (long)Math.Floor(species.GetMaxGene(index));
+            genome[index] = RandomValueFromClosedInterval(minGene, maxGene, random); //minGene + random.NextLong(maxGene - minGene + 1);
+        }
+
+        void FloatResetMutation(IMersenneTwister random, FloatVectorSpecies species, int index)
+        {
+            double minGene = species.GetMinGene(index);
+            double maxGene = species.GetMaxGene(index);
+            genome[index] = minGene + random.NextDouble(true, true) * (maxGene - minGene);
+        }
+
+        void GaussianMutation(IEvolutionState state, IMersenneTwister random, FloatVectorSpecies species, int index)
+        {
+            double val;
+            double min = species.GetMinGene(index);
+            double max = species.GetMaxGene(index);
+            double stdev = species.GetGaussMutationStdev(index);
+            int outOfBoundsLeftOverTries = species.OutOfBoundsRetries;
+            bool givingUpAllowed = species.OutOfBoundsRetries != 0;
+            do
+            {
+                val = random.NextGaussian() * stdev + genome[index];
+                outOfBoundsLeftOverTries--;
+                if (species.GetMutationIsBounded(index) && (val > max || val < min))
+                {
+                    if (givingUpAllowed && (outOfBoundsLeftOverTries == 0))
+                    {
+                        val = min + random.NextFloat() * (max - min);
+                        species.OutOfRangeRetryLimitReached(state);// it better get inlined
+                        break;
+                    }
+                }
+                else break;
+            }
+            while (true);
+            genome[index] = val;
+        }
+
+        void PolynomialMutation(IEvolutionState state, IMersenneTwister random, FloatVectorSpecies species, int index)
+        {
+            double eta_m = species.GetMutationDistributionIndex(index);
+            bool alternativePolynomialVersion = species.GetPolynomialIsAlternative(index);
+
+            double rnd, delta1, delta2, mut_pow, deltaq;
+            double y, yl, yu, val, xy;
+            double y1;
+
+            y1 = y = genome[index];  // ind[index];
+            yl = species.GetMinGene(index); // min_realvar[index];
+            yu = species.GetMaxGene(index); // max_realvar[index];
+            delta1 = (y - yl) / (yu - yl);
+            delta2 = (yu - y) / (yu - yl);
+
+            int totalTries = species.OutOfBoundsRetries;
+            int tries = 0;
+            for (tries = 0; tries < totalTries || totalTries == 0; tries++)  // keep trying until totalTries is reached if it's not zero.  If it's zero, go on forever.
+            {
+                rnd = random.NextDouble();
+                mut_pow = 1.0 / (eta_m + 1.0);
+                if (rnd <= 0.5)
+                {
+                    xy = 1.0 - delta1;
+                    val = 2.0 * rnd + (alternativePolynomialVersion ? (1.0 - 2.0 * rnd) * (Math.Pow(xy, (eta_m + 1.0))) : 0.0);
+                    deltaq = Math.Pow(val, mut_pow) - 1.0;
+                }
+                else
+                {
+                    xy = 1.0 - delta2;
+                    val = 2.0 * (1.0 - rnd) + (alternativePolynomialVersion ? 2.0 * (rnd - 0.5) * (Math.Pow(xy, (eta_m + 1.0))) : 0.0);
+                    deltaq = 1.0 - (Math.Pow(val, mut_pow));
+                }
+                y1 = y + deltaq * (yu - yl);
+                if (!species.GetMutationIsBounded(index) || (y1 >= yl && y1 <= yu)) break;  // yay, found one
+            }
+
+            // at this point, if tries is totalTries, we failed
+            if (totalTries != 0 && tries == totalTries)
+            {
+                // just randomize
+                y1 = (double)(species.GetMinGene(index) + random.NextDouble(true, true) * (species.GetMaxGene(index) - species.GetMinGene(index)));  //(double)(min_realvar[index] + random.NextDouble() * (max_realvar[index] - min_realvar[index]));
+                species.OutOfRangeRetryLimitReached(state);// it better get inlined
+            }
+            genome[index] = y1; // ind[index] = y1;
         }
 
         /// <summary>
         /// This function is broken out to keep it identical to NSGA-II's mutation.c code. 
         /// eta_m is the distribution index.
         /// </summary>
-        public void PolynomialMutate(IMersenneTwister random, double eta_m, bool alternativePolynomialVersion, bool mutationIsBounded)
+        public void PolynomialMutate(IEvolutionState state, IMersenneTwister random, double eta_m, bool alternativePolynomialVersion, bool mutationIsBounded)
         {
             var s = (FloatVectorSpecies)Species;
-            var ind = genome;
-            var minRealvar = s.MinGenes;
-            var maxRealvar = s.MaxGenes;
+            double[] ind = genome;
+            //var minRealvar = s.MinGenes;
+            //var maxRealvar = s.MaxGenes;
 
             for (var j = 0; j < ind.Length; j++)
             {
-                if (!random.NextBoolean(s.MutationProbability)) continue;
+                if (!random.NextBoolean(s.MutationProbability[j])) continue;
          
                 double y;
                 var y1 = y = ind[j];
-                var yl = minRealvar[j];
-                var yu = maxRealvar[j];
+                var yl = s.GetMinGene(j); //min_realvar[j];
+                var yu = s.GetMaxGene(j); //max_realvar[j];
                 var delta1 = (y - yl) / (yu - yl);
                 var delta2 = (yu - y) / (yu - yl);
 
@@ -490,17 +601,32 @@ namespace BraneCloud.Evolution.EC.Vector
                         deltaq = 1.0 - (Math.Pow(val, mutPow));
                     }
                     y1 = y + deltaq * (yu - yl);
-                    if (mutationIsBounded && (y1 >= yl && y1 <= yu)) break;  // yay, found one
+                    if (!mutationIsBounded || (y1 >= yl && y1 <= yu)) break;  // yay, found one
                 }
 
                 // at this point, if tries is totalTries, we failed
                 if (totalTries != 0 && tries == totalTries)
                 {
                     // just randomize
-                    y1 = minRealvar[j] + random.NextDouble() * (maxRealvar[j] - minRealvar[j]);
+                    //y1 = minRealvar[j] + random.NextDouble() * (maxRealvar[j] - minRealvar[j]);
+                    y1 = (double)(s.GetMinGene(j) + random.NextDouble(true, true) * (s.GetMaxGene(j) - s.GetMinGene(j)));
+                    s.OutOfRangeRetryLimitReached(state);// it better get inlined
                 }
                 ind[j] = y1;
             }
+        }
+
+        // for longs
+        long RandomValueFromClosedInterval(long min, long max, IMersenneTwister random)
+        {
+            if (max - min < 0) // we had an overflow
+            {
+                long l = 0;
+                do l = random.NextInt();
+                while (l < min || l > max);
+                return l;
+            }
+            return min + random.NextLong(max - min + 1);
         }
 
         #endregion // Breeding
@@ -525,6 +651,7 @@ namespace BraneCloud.Evolution.EC.Vector
 
         public override bool Equals(object ind)
         {
+            if (ind == null) return false;
             if (!(GetType().Equals(ind.GetType())))
                 return false; // SimpleRuleIndividuals are special.
             var i = (DoubleVectorIndividual)ind;
@@ -571,7 +698,10 @@ namespace BraneCloud.Evolution.EC.Vector
 
         public override string GenotypeToStringForHumans()
         {
-            return genome.Aggregate("", (current, t) => current + " " + t);
+            StringBuilder s = new StringBuilder();
+            for (int i = 0; i < genome.Length; i++)
+            { if (i > 0) s.Append(" "); s.Append(genome[i]); }
+            return s.ToString();
         }
 
         public override string GenotypeToString()
@@ -592,6 +722,8 @@ namespace BraneCloud.Evolution.EC.Vector
             var s = reader.ReadLine();
             var d = new DecodeReturn(s);
             Code.Decode(d);
+            if (d.Type != DecodeReturn.T_INTEGER)  // uh oh
+                state.Output.Fatal("Individual with genome:\n" + s + "\n... does not have an integer at the beginning indicating the genome count.");
             var lll = (int)(d.L);
 
             genome = new double[lll];

@@ -122,7 +122,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
                         " is not of the species form GPSpecies." +
                         "  Cannot do timing statistics with KozaShortStatistics.");
 
-                var i = (GPIndividual)(state.Population.Subpops[x].Individuals[0]);
+                var i = (GPIndividual)state.Population.Subpops[x].Individuals[0];
                 _totalDepthSoFarTree[x] = new long[i.Trees.Length];
                 _totalSizeSoFarTree[x] = new long[i.Trees.Length];
             }
@@ -182,7 +182,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
             //long totalDepthThisGenPop = 0;
             //long totalDepthSoFarPop = 0;
 
-            var subpops = state.Population.Subpops.Length;
+            int subpops = state.Population.Subpops.Length;
 
             for (var y = 0; y < subpops; y++)
             {

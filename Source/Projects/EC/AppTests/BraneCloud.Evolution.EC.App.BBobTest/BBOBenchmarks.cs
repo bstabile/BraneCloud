@@ -36,24 +36,25 @@ namespace BraneCloud.Evolution.EC.App.BBobTest
     /// <p/>
     /// <b>Parameters</b><br/>
     /// <table>
-    /// <tr/>
+    /// <tr>
+    /// <td valign="top"><i>base</i>.<tt>type</tt><br/>
+    /// <font size="-1"> String = <tt>none </tt>(default)
+    /// <tt>, sphere, ellipsoidal, rastrigin, buch-rastrigin, linear-slope, attractive-sector, step-elipsoidal, 
+    /// rosenbrock, rosenbrock-rotated, ellipsoidal-2, discus, bent-cigar, sharp-ridge, different-powers, rastrigin-2,
+    /// weierstrass, schaffers-f7, schaffers-f7-2, griewak-rosenbrock, schwefel, gallagher-gaussian-101me, gallagher-gaussian-21hi, katsuura, lunacek</tt>
+    /// </font></td>
+    /// <td valign="top">(The particular function)</td></tr>
+    /// <tr>
     /// <td valign="top"><i>base</i>.<tt>noise</tt><br/>
     /// <font size="-1"> String = <tt>none </tt>(default)
     /// <tt>, gauss, uniform, cauchy, gauss-moderate, uniform-moderate, cauchy-moderate</tt>
     /// </font></td>
-    /// <td valign="top"/>(what type of noise (if any) to add to the function value)
-    /// <tr/>
-    /// <td valign="top"><i>base</i>.<tt>genome-size</tt><br/>
-    /// <font size="-1"> integer &gt; 0 </tt>
+    /// <td valign="top">(what type of noise (if any) to add to the function value)</td></tr>
+    /// <tr>
+    /// <td valign="top"><i>base</i>.<tt>reevaluate-noisy-problems</tt><br/>
+    /// <font size="-1"> boolean = <tt>true</tt>(default)
     /// </font></td>
-    /// <td valign="top"/>(genome size)
-    /// <tr/>
-    /// <td valign="top"><i>base</i>.<tt>noise</tt><br/>
-    /// <font size="-1"> String = <tt>none </tt>(default)
-    /// <tt>, sphere, ellipsoidal, rastrigin, buch-rastrigin, linear-slope, attractive-sector, step-elipsoidal, rosenbrock, rosenbrock-rotated, ellipsoidal-2, discus, bent-cigar, sharp-ridge, different-powers, rastrigin-2,
-    /// weierstrass, schaffers-f7, schaffers-f7-2, griewak-rosenbrock, schwefel, gallagher-gaussian-101me, gallagher-gaussian-21hi, katsuura, lunacek</tt>
-    /// </font></td>
-    /// <td valign="top"/>(The particular function)
+    /// <td valign="top">(whether to reevaluate noisy problems)</td></tr>    
     /// </table>
     /// </summary>
     [ECConfiguration("ec.app.bbob.BBOBenchmarks")]
@@ -62,6 +63,7 @@ namespace BraneCloud.Evolution.EC.App.BBobTest
         public const string P_GENOME_SIZE = "genome-size";
         public const string P_WHICH_PROBLEM = "type";
         public const string P_NOISE = "noise";
+        public const string P_REEVALUATE_NOISY_PROBLEMS = "reevaluate-noisy-problems";
 
         public string[] problemTypes =
         { "sphere", "ellipsoidal", "rastrigin", "buche-rastrigin", "linear-slope", "attractive-sector", "step-ellipsoidal", "rosenbrock", "rosenbrock-rotated", "ellipsoidal-2", "discus", "bent-cigar", "sharp-ridge", "different-powers", "rastrigin-2",
@@ -107,6 +109,8 @@ namespace BraneCloud.Evolution.EC.App.BBobTest
 
         public int noise = NONE; // defaults to NONE
 
+        public bool reevaluateNoisyProblems;
+
         public int NHIGHPEAKS21 = 101;
         public int NHIGHPEAKS22 = 21;
 
@@ -144,10 +148,12 @@ namespace BraneCloud.Evolution.EC.App.BBobTest
             int i, j, k;
             IParameter p = new Parameter(Initializer.P_POP);
             var genomeSize = state.Parameters.GetInt(p.Push(Population.P_SUBPOP).Push("0").Push(Subpopulation.P_SPECIES).Push(P_GENOME_SIZE), null, 1);
-            var noiseStr = state.Parameters.GetString(new Parameter(P_NOISE), null);
+            var noiseStr = state.Parameters.GetString(paramBase.Push(P_NOISE), null);
             for (i = 0; i < noiseTypes.Length; i++)
                 if (noiseStr.Equals(noiseTypes[i]))
                     noise = i;
+
+            reevaluateNoisyProblems = state.Parameters.GetBoolean(paramBase.Push(P_REEVALUATE_NOISY_PROBLEMS), null, true);
 
             var condition = 10.0;
             var alpha = 100.0;

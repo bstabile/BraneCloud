@@ -103,22 +103,12 @@ namespace BraneCloud.Evolution.EC.Select
         /// <summary>
         /// Should we shuffle first?
         /// </summary>
-        public bool Shuffled
-        {
-            get { return _shuffled; }
-            set { _shuffled = value; }
-        }
-        private bool _shuffled = true;
+        public bool Shuffle { get; protected set; } = true;
 
         /// <summary>
         /// The floating point value to consider for the next selected individual.
         /// </summary>
-        public float Offset
-        {
-            get { return _offset; }
-            set { _offset = value; }
-        }
-        private float _offset = 0.0f;
+        public float Offset { get; protected set; }
 
         /// <summary>
         /// The index in the array of the last individual selected.
@@ -138,7 +128,7 @@ namespace BraneCloud.Evolution.EC.Select
             base.Setup(state, paramBase);
 
             var def = DefaultBase;
-            _shuffled = state.Parameters.GetBoolean(paramBase.Push(P_SHUFFLED), def.Push(P_SHUFFLED), true);
+            Shuffle = state.Parameters.GetBoolean(paramBase.Push(P_SHUFFLED), def.Push(P_SHUFFLED), true);
         }
 
         #endregion // Setup
@@ -147,8 +137,19 @@ namespace BraneCloud.Evolution.EC.Select
         /// <summary>
         /// Largely stolen from sim.util.Bag.  Shuffles both the indices and the floats.
         /// </summary>
-        void Shuffle(IMersenneTwister random)
+        /// <remarks>
+        /// BRS: I'm not really sure what the point is of passing in these arrays as arguments???
+        /// They are simply references to the instance member arrays.
+        /// </remarks>
+        void ShuffleFitnessesAndIndices(IMersenneTwister random, float[] fitnesses, int[] indices)
         {
+            // TODO : Figure out why Sean passes these into this method.
+            //        The member arrays are basically overwritten in PrepareToProduce
+            //        and the arguments here are just references to those arrays.
+            //        Why not just operate on the member arrays directly?
+            //        I suppose this allows one to pass in other arrays
+            //        but that is currently not done anywhere.
+
             var numObjs = Fitnesses.Length;
             //var fitnesses = Fitnesses;
             //var indices = Indices;
@@ -156,13 +157,13 @@ namespace BraneCloud.Evolution.EC.Select
             for (var x = numObjs - 1; x >= 1; x--)
             {
                 var rand = random.NextInt(x + 1);
-                var f = Fitnesses[x];
-                Fitnesses[x] = Fitnesses[rand];
-                Fitnesses[rand] = f;
+                var f = fitnesses[x];
+                fitnesses[x] = fitnesses[rand];
+                fitnesses[rand] = f;
 
-                var i = Indices[x];
-                Indices[x] = Indices[rand];
-                Indices[rand] = i;
+                var i = indices[x];
+                indices[x] = indices[rand];
+                indices[rand] = i;
             }
         }
 
@@ -176,7 +177,7 @@ namespace BraneCloud.Evolution.EC.Select
             Fitnesses = new float[s.Population.Subpops[subpop].Individuals.Length];
 
             // compute offset
-            _offset = (float)(s.Random[thread].NextDouble() / Fitnesses.Length);
+            Offset = (float)(s.Random[thread].NextDouble() / Fitnesses.Length);
 
             // load fitnesses but don't build distribution yet
             for (var x = 0; x < Fitnesses.Length; x++)
@@ -189,7 +190,7 @@ namespace BraneCloud.Evolution.EC.Select
             // construct and optionally shuffle fitness distribution and indices
             Indices = new int[s.Population.Subpops[subpop].Individuals.Length];
             for (var i = 0; i < Indices.Length; i++) Indices[i] = i;
-            if (_shuffled) Shuffle(s.Random[thread]);
+            if (Shuffle) ShuffleFitnessesAndIndices(s.Random[thread], Fitnesses, Indices);
 
             // organize the distribution.  All zeros in fitness is fine
             RandomChoice.OrganizeDistribution(Fitnesses, true);
@@ -200,18 +201,18 @@ namespace BraneCloud.Evolution.EC.Select
             if (Steps >= Fitnesses.Length)  // we've gone too far, clearly an error
             {
                 state.Output.Warning("SUSSelection was asked for too many individuals, so we're re-shuffling.  This will give you proper results, but it might suggest an error in your code.");
-                var s = _shuffled;
-                _shuffled = true;
+                var s = Shuffle;
+                Shuffle = true;
                 PrepareToProduce(state, subpop, thread);  // rebuild
-                _shuffled = s; // just in case
+                Shuffle = s; // just in case
             }
 
             // find the next index
             for ( /* empty */ ; LastIndex < Fitnesses.Length - 1; LastIndex++)
-                if ((LastIndex == 0 || _offset >= Fitnesses[LastIndex - 1]) && _offset < Fitnesses[LastIndex])
+                if ((LastIndex == 0 || Offset >= Fitnesses[LastIndex - 1]) && Offset < Fitnesses[LastIndex])
                     break;
 
-            _offset += (float)(1.0 / Fitnesses.Length);  // update for next time
+            Offset += (float)(1.0 / Fitnesses.Length);  // update for next time
             Steps++;
             return Indices[LastIndex];
         }

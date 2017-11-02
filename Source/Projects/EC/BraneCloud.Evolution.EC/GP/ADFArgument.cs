@@ -58,16 +58,13 @@ namespace BraneCloud.Evolution.EC.GP
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPDefaults.ParamBase.Push(P_ADFARGUMENT); }
-        }
+        public override IParameter DefaultBase => GPDefaults.ParamBase.Push(P_ADFARGUMENT);
 
         public int Argument { get; set; }
 
         public string FunctionName { get; set; }
 
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         #endregion // Properties
         #region Setup
@@ -76,7 +73,7 @@ namespace BraneCloud.Evolution.EC.GP
         {
             base.Setup(state, paramBase);
             
-            var def = DefaultBase;
+            IParameter def = DefaultBase;
             
             Argument = state.Parameters.GetInt(paramBase.Push(P_ARGUMENT), def.Push(P_ARGUMENT), 0);
             if (Argument < 0)

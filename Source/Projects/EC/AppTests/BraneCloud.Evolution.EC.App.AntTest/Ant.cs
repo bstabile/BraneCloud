@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using BraneCloud.Evolution.EC.App.AntTest.Func;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 using BraneCloud.Evolution.EC.GP.Koza;
@@ -32,7 +33,7 @@ namespace BraneCloud.Evolution.EC.App.AntTest
     /// <p/><b>Parameters</b><br/>
     /// <table>
     /// <tr><td valign="top"><i>base</i>.<tt>data</tt><br/>
-    /// <font size="-1">classname, inherits or == ec.app.ant.AntData</font></td>
+    /// <font size="-1">classname, inherits or == ec.gp.GPData</font></td>
     /// <td valign="top">(the class for the prototypical GPData object for the Ant problem)</td></tr>
     /// <tr><td valign="top"><i>base</i>.<tt>file</tt><br/>
     /// <font size="-1">String</font></td>
@@ -71,11 +72,6 @@ namespace BraneCloud.Evolution.EC.App.AntTest
 
         #endregion // Constants
         #region Properties
-
-        /// <summary>
-        /// We'll deep clone this anyway, even though we don't need it by default!
-        /// </summary>
-        public AntData Input { get; set; }
 
         /// <summary>
         /// Maximum number of moves
@@ -131,7 +127,6 @@ namespace BraneCloud.Evolution.EC.App.AntTest
         public override object Clone()
         {
             var myobj = (Ant)(base.Clone());
-            myobj.Input = (AntData)(Input.Clone());
             myobj.Map = new int[Map.Length][];
             for (var x = 0; x < Map.Length; x++)
                 myobj.Map[x] = (int[])(Map[x].Clone());
@@ -146,12 +141,9 @@ namespace BraneCloud.Evolution.EC.App.AntTest
             // very important, remember this
             base.Setup(state, paramBase);
 
-            // not using any default base -- it's not safe
+            // No need to verify the GPData object
 
-            // set up our input
-            Input = (AntData)state.Parameters.GetInstanceForParameterEq(
-                paramBase.Push(P_DATA), null, typeof(AntData));
-            Input.Setup(state, paramBase.Push(P_DATA));
+            // not using any default base -- it's not safe
 
             // how many maxMoves?
             MaxMoves = state.Parameters.GetInt(paramBase.Push(P_MOVES), null, 1);
@@ -162,15 +154,15 @@ namespace BraneCloud.Evolution.EC.App.AntTest
             //var fileInfo = state.Parameters.GetFile(paramBase.Push(P_FILE), null);
             //if (fileInfo == null)
             //    state.Output.Fatal("Ant trail file name not provided.");
-            Stream str = state.Parameters.GetResource(paramBase.Push(P_FILE), null);
-            if (str == null)
+            var stream = state.Parameters.GetResource(paramBase.Push(P_FILE), null);
+            if (stream == null)
                 state.Output.Fatal("Error loading file or resource", paramBase.Push(P_FILE), null);
 
             Food = 0;
             try
             {
                 //var lnr = new StreamReader(fileInfo.FullName);
-                var lnr = new StreamReader(str);
+                var lnr = new StreamReader(stream);
 
                 var st = new Tokenizer(lnr.ReadLine()); // ugh
                 MaxX = Int32.Parse(st.NextToken());
@@ -207,7 +199,7 @@ namespace BraneCloud.Evolution.EC.App.AntTest
                                 break;
                             default:
                                 state.Output.Error("Bad character '" + s[x] + "' on line number " + y
-                                    /*lnr.GetLineNumber()*/+ " of the Ant trail file.");
+                                                   /*lnr.GetLineNumber()*/+ " of the Ant trail file.");
                                 break;
                         }
                     }
@@ -260,7 +252,7 @@ namespace BraneCloud.Evolution.EC.App.AntTest
                     ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, Input, Stack, ((GPIndividual)ind), this);
 
                 // the fitness better be KozaFitness!
-                var f = ((KozaFitness)ind.Fitness);
+                var f = (KozaFitness)ind.Fitness;
                 f.SetStandardizedFitness(state, (Food - Sum));
                 f.Hits = Sum;
                 ind.Evaluated = true;
@@ -287,7 +279,7 @@ namespace BraneCloud.Evolution.EC.App.AntTest
 
             map2[PosX][PosY] = PMod; PMod++;
             for (Moves = 0; Moves < MaxMoves && Sum < Food; )
-                ((IEvalPrint)(((GPIndividual)ind).Trees[0].Child)).EvalPrint(state, threadnum, Input, Stack, ((GPIndividual)ind), this, map2);
+                ((IEvalPrint)((GPIndividual)ind).Trees[0].Child).EvalPrint(state, threadnum, Input, Stack, (GPIndividual)ind, this, map2);
             // print out the map
             for (var y = 0; y < map2.Length; y++)
             {

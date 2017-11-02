@@ -58,11 +58,8 @@ namespace BraneCloud.Evolution.EC.Logging
         void SystemMessage(string s);
 
         void Fatal(string s);
-        void Fatal(string s, bool exit);
         void Fatal(string s, IParameter p1);
-        void Fatal(string s, IParameter p1, bool exit);
         void Fatal(string s, IParameter p1, IParameter p2);
-        void Fatal(string s, IParameter p1, IParameter p2, bool exit);
 
         void Error(string s);
         void Error(string s, IParameter p1);

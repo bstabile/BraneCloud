@@ -21,7 +21,7 @@ namespace BraneCloud.Evolution.EC.Problems.Regression.Func
     {
         public override string ToString() { return "square"; }
 
-        public override int ExpectedChildren { get { return 1; } }
+        public override int ExpectedChildren => 1;
 
         public override void Eval(IEvolutionState state,
             int thread,

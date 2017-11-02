@@ -61,6 +61,18 @@ namespace BraneCloud.Evolution.EC.Randomization
     /// 
     /// <h3>About this Version</h3>
     /// 
+    /// <p/><b>Changes since V20:</b> Added clearGuassian().  Modified stateEquals()
+    /// to be synchronizd on both objects for MersenneTwister, and changed its
+    /// documentation.Added synchronization to both setSeed() methods, to
+    /// writeState(), and to readState() in MersenneTwister.Removed synchronization
+    /// from readObject() in MersenneTwister.
+    ///
+    /// <p/><b>Changes since V19:</b> nextFloat(boolean, boolean) now returns float,
+    /// not double.
+    ///
+    /// <p/><b>Changes since V18:</b> Removed old final declarations, which used to
+    /// potentially speed up the code, but no longer.
+    ///
     /// <p/><b>Changes since V17:</b> Removed vestigial references to &= 0xffffffff
     /// which stemmed from the original C code.  The C code could not guarantee that
     /// ints were 32 bit, hence the masks.  The vestigial references in the Java
@@ -118,7 +130,7 @@ namespace BraneCloud.Evolution.EC.Randomization
     /// milliseconds.
     /// 
     /// <p/><b>Changes Since V4:</b> New initialization algorithms.  See
-    /// (see <a href="http://www.math.keio.ac.jp/matumoto/MT2002/emt19937ar.html"</a>
+    /// (see <a href="http://www.math.keio.ac.jp/matumoto/MT2002/emt19937ar.html"/>
     /// http://www.math.keio.ac.jp/matumoto/MT2002/emt19937ar.html</a>)
     /// 
     /// <p/>The MersenneTwister code is based on standard MT19937 C/C++ 
@@ -178,12 +190,11 @@ namespace BraneCloud.Evolution.EC.Randomization
     /// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
     /// POSSIBILITY OF SUCH DAMAGE.
     /// </summary>
-    
     [Serializable]
     public class MersenneTwister : System.Random, IMersenneTwister
     {
         // Serialization
-        private const long serialVersionUID = - 4035832775130174188L; // locked as of Version 15
+        private const long SerialVersionUID = - 4035832775130174188L; // locked as of Version 15
         
         // Period parameters
         private const int N = 624;
@@ -225,23 +236,33 @@ namespace BraneCloud.Evolution.EC.Randomization
                 throw new ApplicationException("Clone Not Supported");
             } // should never happen
         }
-        
-        public virtual bool StateEquals(Object o)
+
+        /** Returns true if the MersenneTwister's current internal state is equal to another MersenneTwister. 
+            This is roughly the same as equals(other), except that it compares based on value but does not
+            guarantee the contract of immutability (obviously random number generators are immutable).
+            Note that this does NOT check to see if the internal gaussian storage is the same
+            for both.  You can guarantee that the internal gaussian storage is the same (and so the
+            nextGaussian() methods will return the same values) by calling clearGaussian() on both
+            objects. */
+        public virtual bool StateEquals(IMersenneTwister o)
         {
             if (o == this)
                 return true;
             if (o == null || !(o is MersenneTwister))
                 return false;
             var other = (MersenneTwister) o;
-            if (_mti != other._mti)
-                return false;
-            for (var x = 0; x < _mag01.Length; x++)
-                if (_mag01[x] != other._mag01[x])
+            lock (other)
+            {
+                if (_mti != other._mti)
                     return false;
-            for (var x = 0; x < _mt.Length; x++)
-                if (_mt[x] != other._mt[x])
-                    return false;
-            return true;
+                for (var x = 0; x < _mag01.Length; x++)
+                    if (_mag01[x] != other._mag01[x])
+                        return false;
+                for (var x = 0; x < _mt.Length; x++)
+                    if (_mt[x] != other._mt[x])
+                        return false;
+                return true;
+            }
         }
         
         /// <summary>Reads the entire state of the MersenneTwister RNG from the stream </summary>
@@ -661,7 +682,14 @@ namespace BraneCloud.Evolution.EC.Randomization
                 return v1 * multiplier;
             }
         }
-        
+
+        /** 
+            Clears the internal gaussian variable from the RNG.  You only need to do this
+            in the rare case that you need to guarantee that two RNGs have identical internal
+            state.  Otherwise, disregard this method.  See stateEquals(other).
+        */
+        public void ClearGaussian() { __haveNextNextGaussian = false; }
+
         /// <summary> Tests the code.</summary>
         [STAThread]
         public static void Main(String[] args)

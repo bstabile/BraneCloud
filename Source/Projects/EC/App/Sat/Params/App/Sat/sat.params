@@ -9,12 +9,13 @@ seed.0 = time
 pop.subpop.0.species.genome-size = 50 
 
 eval.problem = ec.app.sat.SAT
-eval.problem.sat-filename = data-1000.cnf
+# NOTE: Data files are relative to the executing program (unlike param files which are relative to each other).
+eval.problem.sat-filename = cnf/data-1000.cnf
 
 pop.subpop.0.size = 1000 
 generations = 100 
 
-pop.subpop.0.species = ec.vector.VectorSpecies 
+pop.subpop.0.species = ec.vector.BitVectorSpecies 
 pop.subpop.0.species.pipe = ec.vector.breed.VectorMutationPipeline 
 pop.subpop.0.species.pipe.source.0 = ec.vector.breed.VectorCrossoverPipeline
 pop.subpop.0.species.pipe.source.0.source.0 = ec.select.TournamentSelection

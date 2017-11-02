@@ -99,7 +99,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.NSGA2
 
         public override string FitnessToStringForHumans()
         {
-            return base.FitnessToStringForHumans() + "\n" + "R=" + Rank + " S=" + Sparsity;
+            return base.FitnessToStringForHumans() + "\n" + NSGA2_RANK_PREAMBLE + Rank + "\n" + NSGA2_SPARSITY_PREAMBLE + Sparsity;
         }
 
         #endregion // ToString

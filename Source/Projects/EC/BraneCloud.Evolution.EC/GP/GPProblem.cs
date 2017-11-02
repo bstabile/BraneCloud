@@ -67,10 +67,7 @@ namespace BraneCloud.Evolution.EC.GP
         /// <summary>
         /// GPProblem defines a default base so your subclass doesn't absolutely have to. 
         /// </summary>
-        public override IParameter DefaultBase
-        {
-            get { return GPDefaults.ParamBase.Push(P_GPPROBLEM); }
-        }
+        public override IParameter DefaultBase => GPDefaults.ParamBase.Push(P_GPPROBLEM);
 
         /// <summary>
         /// The GPProblem's Stack 
@@ -78,9 +75,9 @@ namespace BraneCloud.Evolution.EC.GP
         public ADFStack Stack { get; set; }
 
         /// <summary>
-        /// The GPProblems' GPData 
+        /// The GPProblem's GPData 
         /// </summary>
-        public GPData Data { get; set; }
+        public virtual GPData Input { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -92,12 +89,12 @@ namespace BraneCloud.Evolution.EC.GP
             // BRS: MUST set up GPData before ADFStack, so that ADFContext has access to state.Evaluator.p_problem.Data
             // This avoids a reference to GPProblem.P_DATA, and thus allows us to use interfaces instead of concrete types
             // Important for decoupling and Inversion of Control (IoC).
-            var p = paramBase.Push(P_DATA);
-            Data = (GPData)(state.Parameters.GetInstanceForParameter(p, def.Push(P_DATA), typeof(GPData)));
-            Data.Setup(state, p);
+            IParameter p = paramBase.Push(P_DATA);
+            Input = (GPData)state.Parameters.GetInstanceForParameterEq(p, def.Push(P_DATA), typeof(GPData));
+            Input.Setup(state, p);
 
             p = paramBase.Push(P_STACK);
-            Stack = (ADFStack)(state.Parameters.GetInstanceForParameterEq(p, def.Push(P_STACK), typeof(ADFStack)));
+            Stack = (ADFStack)state.Parameters.GetInstanceForParameterEq(p, def.Push(P_STACK), typeof(ADFStack));
             Stack.Setup(state, p);
 
         }
@@ -110,7 +107,7 @@ namespace BraneCloud.Evolution.EC.GP
             var prob = (GPProblem) (base.Clone());
             
             // deep-clone the Stack; it's not shared
-            prob.Stack = (ADFStack) (Stack.Clone());
+            prob.Input = (GPData) Input.Clone();
             return prob;
         }
 

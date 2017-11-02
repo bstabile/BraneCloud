@@ -88,6 +88,8 @@ namespace BraneCloud.Evolution.EC.Rule
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         /// <summary>The size of a byte </summary>
         //public const int SIZE_OF_BYTE = 256;
 

@@ -96,7 +96,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
 
         public override string FitnessToStringForHumans()
         {
-            return base.FitnessToStringForHumans() + "\n" + "S=" + Strength + " D=" + KthNNDistance + " " + SPEA2_FITNESS_PREAMBLE + Fitness;
+            return base.FitnessToStringForHumans() + "\n" + SPEA2_STRENGTH_PREAMBLE + Strength + SPEA2_DISTANCE_PREAMBLE + KthNNDistance + " " + SPEA2_FITNESS_PREAMBLE + Fitness;
         }
 
         #endregion // ToString

@@ -146,10 +146,11 @@ namespace BraneCloud.Evolution.EC.GP
 
             // does the associated tree exist?
 
-            if (AssociatedTree < 0 || AssociatedTree > typicalIndividual.Trees.Length)
+            if (AssociatedTree < 0 || AssociatedTree >= typicalIndividual.Trees.Length)
             {
                 state.Output.Error("The node " + ToStringForError() + " of individual " + individualBase
-                            + " must have an associated tree that is >= 0 and < " + typicalIndividual.Trees.Length);
+                            + " must have an associated tree that is >= 0 and < " + typicalIndividual.Trees.Length 
+                            + ".  Value provided was: " + AssociatedTree);
             }
             else
             {
@@ -240,7 +241,7 @@ namespace BraneCloud.Evolution.EC.GP
         {
             // get a context and prepare it
             var c = stack.Take();
-            c.PrepareADF(this);
+            c.PrepareADF(this, (GPProblem) problem);
 
             // evaluate my Arguments and load 'em in 
             for (var x = 0; x < Children.Length; x++)

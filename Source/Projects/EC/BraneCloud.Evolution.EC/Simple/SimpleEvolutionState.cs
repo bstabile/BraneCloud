@@ -33,7 +33,7 @@ namespace BraneCloud.Evolution.EC.Simple
     /// 
     /// <p/>Evolution stops when an ideal individual is found (if QuitOnRunComplete
     /// is set to true), or when the number of generations (loops of <b>(A)</b>)
-    /// exceeds the parameter value numGenerations.  Each generation the system
+    /// exceeds the parameter value NumGenerations.  Each generation the system
     /// will perform garbage collection and checkpointing, if the appropriate
     /// parameters were set.
     /// 
@@ -56,7 +56,34 @@ namespace BraneCloud.Evolution.EC.Simple
             Statistics.PreInitializationStatistics(this);
             Population = Initializer.InitialPopulation(this, 0); // unthreaded
             Statistics.PostInitializationStatistics(this);
-            
+
+            // Compute generations from evaluations if necessary
+            if (NumEvaluations > UNDEFINED)
+            {
+                // compute a generation's number of individuals
+                int generationSize = 0;
+                for (int sub = 0; sub < Population.Subpops.Length; sub++)
+                {
+                    generationSize += Population.Subpops[sub].Individuals.Length;  // so our sum total 'generationSize' will be the initial total number of individuals
+                }
+
+                if (NumEvaluations < generationSize)
+                {
+                    NumEvaluations = generationSize;
+                    NumGenerations = 1;
+                    Output.Warning("Using evaluations, but evaluations is less than the initial total population size (" + generationSize + ").  Setting to the populatiion size.");
+                }
+                else
+                {
+                    if (NumEvaluations % generationSize != 0)
+                        Output.Warning("Using evaluations, but initial total population size does not divide evenly into it.  Modifying evaluations to a smaller value ("
+                                       + ((NumEvaluations / generationSize) * generationSize) + ") which divides evenly.");  // note integer division
+                    NumGenerations = (int)(NumEvaluations / generationSize);  // note integer division
+                    NumEvaluations = NumGenerations * generationSize;
+                }
+                Output.Message("Generations will be " + NumGenerations);
+            }
+
             // INITIALIZE CONTACTS -- done after initialization to allow
             // a hook for the user to do things in Initializer before
             // an attempt is made to connect to island models etc.

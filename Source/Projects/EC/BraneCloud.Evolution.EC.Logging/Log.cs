@@ -116,6 +116,24 @@ namespace BraneCloud.Evolution.EC.Logging
 
         // basic log features
 
+        #region Constants
+
+        private const long SerialVersionUID = 1;
+
+        // values for specifying logs based on System.out or System.err
+
+        /// <summary>
+        /// Specifies that the log should write to stdout (System.out) 
+        /// </summary>
+        public const int D_STDOUT = 0;
+
+        /// <summary>
+        /// Specifies that the log should write to stderr (System.err) 
+        /// </summary>
+        public const int D_STDERR = 1;
+
+        #endregion
+
         /// <summary>
         /// Should we write to this log at all?
         /// </summary>
@@ -124,8 +142,8 @@ namespace BraneCloud.Evolution.EC.Logging
         /// <summary>The log's Writer </summary>
         public TextWriter Writer
         {
-            get { return _writer; }
-            set { _writer = value; }
+            get => _writer;
+            set => _writer = value;
         }
         [NonSerialized]
         private TextWriter _writer;
@@ -133,16 +151,16 @@ namespace BraneCloud.Evolution.EC.Logging
         /// <summary>A filename, if the writer writes to a file </summary>
         public FileInfo FileInfo
         {
-            get { return _fileInfo; }
-            set { _fileInfo = value; }
+            get => _fileInfo;
+            set => _fileInfo = value;
         }
         private FileInfo _fileInfo;
 
         /// <summary>Should the log post announcements? </summary>
         public bool PostAnnouncements
         {
-            get { return _postAnnouncements; }
-            set { _postAnnouncements = value; }
+            get => _postAnnouncements;
+            set => _postAnnouncements = value;
         }
         private bool _postAnnouncements = true;
         
@@ -151,18 +169,18 @@ namespace BraneCloud.Evolution.EC.Logging
         /// <summary>The log's Restarter </summary>
         public LogRestarter Restarter
         {
-            get { return _restarter; }
-            set { _restarter = value; }
+            get => _restarter;
+            set => _restarter = value;
         }
         private LogRestarter _restarter;
 
         /// <summary>Should the log repost all announcements on restart </summary>
         public bool RepostAnnouncementsOnRestart
         {
-            get { return _repostAnnouncementsOnRestart; }
-            set { _repostAnnouncementsOnRestart = value; }
+            get => _repostAnnouncementsOnRestart;
+            set => _repostAnnouncementsOnRestart = value;
         }
-        protected bool _repostAnnouncementsOnRestart;
+        private bool _repostAnnouncementsOnRestart;
         
         /// <summary>
         /// If the log writes to a file, should it append to the file on restart,
@@ -170,31 +188,19 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public bool AppendOnRestart
         {
-            get { return _appendOnRestart; }
-            set { _appendOnRestart = value; }
+            get => _appendOnRestart;
+            set => _appendOnRestart = value;
         }
-        protected bool _appendOnRestart;
+        private bool _appendOnRestart;
 
         public bool IsLoggingToSystemOut
         {
-            get { return _isLoggingToSystemOut; }
-            set { _isLoggingToSystemOut = value; }
+            get => _isLoggingToSystemOut;
+            set => _isLoggingToSystemOut = value;
         }
         private bool _isLoggingToSystemOut;
         
-        // values for specifying logs based on System.out or System.err
-        
-        /// <summary>
-        /// Specifies that the log should write to stdout (System.out) 
-        /// </summary>
-        public const int D_STDOUT = 0;
-        
-        /// <summary>
-        /// Specifies that the log should write to stderr (System.err) 
-        /// </summary>
-        public const int D_STDERR = 1;
-        
-        ~Log()
+       ~Log()
         {
             // BRS : For some reason this was throwing an exception when running in multi-threaded MSTest agent cases.
             // For now we're just swallowing it. But it would be nice to know why this is happening! :-/

@@ -38,7 +38,7 @@ namespace BraneCloud.Evolution.EC.App.Multiplexer
                                                     Assembly.GetAssembly(typeof(Multiplexer))
                                                 });
 
-            Evolve.Run(new[] { "-file", @"Params\App\Multiplexer\6.params" });
+            Evolve.Run(new[] { "-file", @"Params\App\Multiplexer\11.params" });
             Console.WriteLine("\nDone!");
             Console.ReadLine();
         }

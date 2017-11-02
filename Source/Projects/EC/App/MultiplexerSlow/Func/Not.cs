@@ -22,7 +22,7 @@ using BraneCloud.Evolution.EC.GP;
 
 namespace BraneCloud.Evolution.EC.App.MultiplexerSlow.Func
 {
-    [ECConfiguration("ec.app.multiplexerslow.func.Not")]
+    [ECConfiguration("ec.app.multiplexer.func.Not")]
     public class Not : GPNode
     {
         public override string ToString() { return "not"; }
@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.App.MultiplexerSlow.Func
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 1; } }
+        public override int ExpectedChildren => 1;
 
         public override void Eval(IEvolutionState state,
             int thread,

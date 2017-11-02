@@ -76,14 +76,25 @@ namespace BraneCloud.Evolution.EC
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_SUBPOPULATION = "subpop";
         public const string P_FILE = "file";
         public const string P_SUBPOPSIZE = "size"; // parameter for number of subpops or pops
         public const string P_SPECIES = "species";
         public const string P_RETRIES = "duplicate-retries";
+        public const string P_EXTRA_BEHAVIOR = "extra-behavior";
+        public const string V_TRUNCATE = "truncate";
+        public const string V_WRAP = "wrap";
+        public const string V_FILL = "fill";
 
         public const string NUM_INDIVIDUALS_PREAMBLE = "Number of Individuals: ";
         public const string INDIVIDUAL_INDEX_PREAMBLE = "Individual Number: ";
+
+        // TODO: Should these be part of an enum?
+        public const int TRUNCATE = 0;
+        public const int WRAP = 1;
+        public const int FILL = 2;
 
         #endregion // Constants
         #region Properties
@@ -93,6 +104,7 @@ namespace BraneCloud.Evolution.EC
         /// otherwise they should be created at random.
         /// </summary>
         public IParameter FileParam { get; set; }
+
         public bool LoadInds { get; set; }
 
         /// <summary>
@@ -110,6 +122,11 @@ namespace BraneCloud.Evolution.EC
         /// </summary>
         public int NumDuplicateRetries { get; set; }
 
+        /// <summary>
+        /// What is our fill behavior beyond files?
+        /// </summary>
+        public int ExtraBehavior { get; set; }
+
         #endregion // Properties
         #region Setup
 
@@ -125,23 +142,43 @@ namespace BraneCloud.Evolution.EC
             // do we load from a file?
             FileParam = paramBase.Push(P_FILE);
             LoadInds = state.Parameters.ParameterExists(FileParam, null);
+            
             // what species do we use?
-
             Species = (Species)state.Parameters.GetInstanceForParameter(paramBase.Push(P_SPECIES), def.Push(P_SPECIES), typeof(Species));
             Species.Setup(state, paramBase.Push(P_SPECIES));
 
             // how big should our subpop be?
-
             var size = state.Parameters.GetInt(paramBase.Push(P_SUBPOPSIZE), def.Push(P_SUBPOPSIZE), 1);
             if (size <= 0)
                 state.Output.Fatal("Subpopulation size must be an integer >= 1.\n", paramBase.Push(P_SUBPOPSIZE), def.Push(P_SUBPOPSIZE));
 
             // How often do we retry if we find a duplicate?
+            // Note that EvolutionState.Setup() has similar code, so if you change this, change it there too.
+
             NumDuplicateRetries = state.Parameters.GetInt(paramBase.Push(P_RETRIES), def.Push(P_RETRIES), 0);
             if (NumDuplicateRetries < 0)
                 state.Output.Fatal("The number of retries for duplicates must be an integer >= 0.\n", paramBase.Push(P_RETRIES), def.Push(P_RETRIES));
 
             Individuals = new Individual[size];
+
+            ExtraBehavior = TRUNCATE;
+            if (LoadInds)
+            {
+                string extra = state.Parameters.GetStringWithDefault(paramBase.Push(P_EXTRA_BEHAVIOR), def.Push(P_EXTRA_BEHAVIOR), null);
+
+                if (extra == null)  // uh oh
+                    state.Output.Warning("Subpopulation is reading from a file, but no " + P_EXTRA_BEHAVIOR +
+                                         " provided.  By default, subpopulation will be truncated to fit the file size.");
+                else if (extra.ToLower() == V_TRUNCATE.ToLower())
+                    ExtraBehavior = TRUNCATE;  // duh
+                else if (extra.ToLower() == V_FILL.ToLower())
+                    ExtraBehavior = FILL;
+                else if (extra.ToLower() == V_WRAP.ToLower())
+                    ExtraBehavior = WRAP;
+                else state.Output.Fatal("Subpouplation given a bad " + P_EXTRA_BEHAVIOR + ": " + extra,
+                    paramBase.Push(P_EXTRA_BEHAVIOR), def.Push(P_EXTRA_BEHAVIOR));
+            }
+
         }
 
         /// <summary>
@@ -158,6 +195,9 @@ namespace BraneCloud.Evolution.EC
 
         public virtual void Populate(IEvolutionState state, int thread)
         {
+            int len = Individuals.Length;  // original length of individual array
+            int start = 0;                 // where to start filling new individuals in -- may get modified if we read some individuals in
+
             // should we load individuals from a file? -- duplicates are permitted
             if (LoadInds)
             {
@@ -178,16 +218,59 @@ namespace BraneCloud.Evolution.EC
                         state.Parameters.GetString(FileParam, null) + ".  The IOException was: \n" + e,
                         FileParam, null);
                 }
-                //try { readSubpopulation(state, new LineNumberReader(new FileReader(loadInds))); }
-                //catch (IOException e) { state.output.fatal("An IOException occurred when trying to read from the file " + loadInds + ".  The IOException was: \n" + e); }
+
+                if (len < Individuals.Length)
+                {
+                    state.Output.Message("Old subpopulation was of size " + len + ", expanding to size " + Individuals.Length);
+                    return;
+                }
+
+                if (len > Individuals.Length)   // the population was shrunk, there's more space yet
+                {
+                    // What do we do with the remainder?
+                    if (ExtraBehavior == TRUNCATE)
+                    {
+                        state.Output.Message("Old subpopulation was of size " + len + ", truncating to size " + Individuals.Length);
+                        return;  // we're done
+                    }
+                    else if (ExtraBehavior == WRAP)
+                    {
+                        state.Output.Message("Only " + Individuals.Length + " individuals were read in.  Subpopulation will stay size " + len +
+                            ", and the rest will be filled with copies of the read-in individuals.");
+
+                        var oldInds = Individuals;
+                        Individuals = new Individual[len];
+                        Array.Copy(oldInds, 0, Individuals, 0, oldInds.Length);
+                        start = oldInds.Length;
+
+                        int count = 0;
+                        for (int i = start; i < Individuals.Length; i++)
+                        {
+                            Individuals[i] = (Individual)Individuals[count].Clone();
+                            if (++count >= start) count = 0;
+                        }
+                        return;
+                    }
+                    else // if (extraBehavior == FILL)
+                    {
+                        state.Output.Message("Only " + Individuals.Length + " individuals were read in.  Subpopulation will stay size " + len +
+                            ", and the rest will be filled using randomly generated individuals.");
+
+                        var oldInds = Individuals;
+                        Individuals = new Individual[len];
+                        Array.Copy(oldInds, 0, Individuals, 0, oldInds.Length);
+                        start = oldInds.Length;
+                        // now go on to fill the rest below...
+                    }
+                }
             }
             else
             {
                 Hashtable h = null;
                 if (NumDuplicateRetries >= 1)
-                    h = Hashtable.Synchronized(new Hashtable(Individuals.Length / 2)); // seems reasonable
+                    h = new Hashtable((Individuals.Length - start) / 2); // seems reasonable
 
-                for (var x = 0; x < Individuals.Length; x++)
+                for (var x = start; x < Individuals.Length; x++)
                 {
                     for (var tries = 0; tries <= NumDuplicateRetries; tries++)
                     {
@@ -195,9 +278,9 @@ namespace BraneCloud.Evolution.EC
 
                         if (NumDuplicateRetries >= 1)
                         {
+                            // TODO: Test this! Java has a Hashtable and a HashMap (used by newer versions of ECJ)
                             // check for duplicates
-                            var o = h[Individuals[x]];
-                            if (o == null)
+                            if (!h.Contains(Individuals[x]))
                             // found nothing, we're safe
                             // hash it and go
                             {
@@ -236,7 +319,7 @@ namespace BraneCloud.Evolution.EC
             } // never happens
         }
 
-        virtual public object Clone()
+        public virtual object Clone()
         {
             return MemberwiseClone();
         }
@@ -297,19 +380,27 @@ namespace BraneCloud.Evolution.EC
             // read in number of individuals and check to see if this appears to be a valid subpop
             var numInds = Code.ReadIntWithPreamble(NUM_INDIVIDUALS_PREAMBLE, state, reader);
 
+            if (numInds < 1)
+                state.Output.Fatal("On reading subpopulation from text stream, the subpopulation size must be >= 1.  The provided value was: " + numInds + ".");
+
             // read in individuals
             if (numInds != Individuals.Length)
             {
-                state.Output.WarnOnce("On reading subpop from text stream, the subpop size didn't match.\n"
-                    + "Had to resize and use newIndividual() instead of ReadIndividual().");
+                state.Output.WarnOnce("On reading subpopulation from text stream, the current subpopulation size didn't match the number of individuals in the file.  " +
+                                      "The size of the subpopulation will be revised accordingly.  There were " + numInds +
+                                      " individuals in the file and " + Individuals.Length + " individuals expected for the subopulation.");
 
                 Individuals = new Individual[numInds];
+
                 for (var i = 0; i < Individuals.Length; i++)
                 {
                     var j = Code.ReadIntWithPreamble(INDIVIDUAL_INDEX_PREAMBLE, state, reader);
+
                     // sanity check
                     if (j != i)
-                        state.Output.WarnOnce("On reading subpop from text stream, some individual indexes in the subpop did not match.");
+                        state.Output.WarnOnce("On reading subpopulation from text stream, some individual indexes in the subpopulation did not match.  " 
+                            + "The first was individual " + i + ", which is listed in the file as " + j);
+
                     Individuals[i] = Species.NewIndividual(state, reader);
                 }
             }
@@ -319,13 +410,14 @@ namespace BraneCloud.Evolution.EC
                     var j = Code.ReadIntWithPreamble(INDIVIDUAL_INDEX_PREAMBLE, state, reader);
                     // sanity check
                     if (j != i)
-                        state.Output.WarnOnce("On reading subpop from text stream, some individual indexes in the subpop did not match.");
+                        state.Output.WarnOnce("On reading subpopulation from text stream, some individual indexes in the subpopulation did not match.  " 
+                            + "The first was individual " + i + ", which is listed in the file as " + j);
                     if (Individuals[i] != null)
                         Individuals[i].ReadIndividual(state, reader);
                     else
                     {
-                        state.Output.WarnOnce("On reading subpop from text stream, some of the preexisting subpop's slots were null.\n"
-                            + "Had to use newIndividual() instead of ReadIndividual().");
+                        state.Output.WarnOnce("On reading subpopulation from text stream, some of the preexisting subpopulation's slots were null.  " 
+                            + "If you're starting an evolutionary run by reading an existing population from a file, this is expected -- ignore this message.");
                         Individuals[i] = Species.NewIndividual(state, reader);
                     }
                 }

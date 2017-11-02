@@ -30,23 +30,21 @@ namespace BraneCloud.Evolution.EC
     /// and assigned a fitness which determines its likelihood of selection.
     /// Individuals are created most commonly by the NewIndividual(...) method
     /// of the ec.Species class.
-    /// 
-    /// <p/>In general Individuals are immutable.  That is, once they are created
+    /// <p />In general Individuals are immutable.  That is, once they are created
     /// their genetic material should not be modified.  This protocol helps insure that they are
     /// safe to read under multithreaded conditions.  You can violate this protocol,
     /// but try to do so when you know you have only have a single thread.
-    /// 
-    /// <p/>In addition to serialization for checkpointing, Individuals may read and write themselves to streams in three ways.
-    /// 
+    /// <p />In addition to serialization for checkpointing, Individuals may read and write themselves to streams in three ways.
     /// <ul>
-    /// <li/><b>WriteIndividual(...,BinaryWriter) / ReadIndividual(...,BinaryReader)</b>&nbsp;&nbsp;&nbsp;
+    /// 
+    /// <li /><b>WriteIndividual(...,BinaryWriter) / ReadIndividual(...,BinaryReader)</b>&nbsp;&nbsp;&nbsp;
     /// This method transmits or receives an individual in binary.  It is the most efficient approach to sending
     /// individuals over networks, etc.  These methods write the evaluated flag and the fitness, then
     /// call <b>ReadGenotype/WriteGenotype</b>, which you must implement to write those parts of your 
     /// Individual special to your functions-- the default versions of ReadGenotype/WriteGenotype throw errors.
     /// You don't need to implement them if you don't plan on using Read/WriteIndividual.
     /// 
-    /// <li/><b>PrintIndividual(...,StreamWriter)/ReadIndividual(...,StreamReader)</b>&nbsp;&nbsp;&nbsp;
+    /// <li /><b>PrintIndividual(...,StreamWriter)/ReadIndividual(...,StreamReader)</b>&nbsp;&nbsp;&nbsp;
     /// This approach transmits or receives an indivdual in text encoded such that the individual is largely readable
     /// by humans but can be read back in 100% by ECJ as well.  To do this, these methods will encode numbers
     /// using the <tt>ec.util.Code</tt> class.  These methods are mostly used to write out populations to
@@ -60,7 +58,7 @@ namespace BraneCloud.Evolution.EC
     /// form of <b>ParseGenotype</b> throws an error.  You are not required to implement these methods, but without
     /// them you will not be able to write individuals to files in a simultaneously computer- and human-readable fashion.
     /// 
-    /// <li/><b>PrintIndividualForHumans(...,PrintWriter)</b>&nbsp;&nbsp;&nbsp;
+    /// <li /><b>PrintIndividualForHumans(...,PrintWriter)</b>&#160;&#160;&#160; 
     /// This approach prints an individual in a fashion intended for human consumption only.
     /// <b>PrintIndividualForHumans</b> writes out the fitness and evaluation flag, then calls <b>GenotypeToStringForHumans</b> 
     /// and <i>PrintLn</i>s the resultant string. You are responsible for implementing the GenotypeToStringForHumans method.
@@ -69,7 +67,7 @@ namespace BraneCloud.Evolution.EC
     /// to ensure individuals can be printed by ECJ.
     /// </ul>
     /// 
-    /// <p/>Since individuals should be largely immutable, why is there a <b>ReadIndividual</b> method?
+    /// <p />Since individuals should be largely immutable, why is there a <b>ReadIndividual</b> method?
     /// after all this method doesn't create a <i>new</i> individual -- it just erases the existing one.  This is
     /// largely historical; but the method is used underneath by the various <b>NewIndividual</b> methods in Species,
     /// which <i>do</i> create new individuals read from files.  If you're trying to create a brand new individual
@@ -185,14 +183,14 @@ namespace BraneCloud.Evolution.EC
         /// Returns a hashcode for the individual, such that individuals which
         /// are Equals(...) each other always return the same hash code. 
         /// </summary>
-        abstract public override int GetHashCode();
+        public abstract override int GetHashCode();
 
         /// <summary>
         /// Returns true if I am genetically "equal" to ind.  This should
         /// mostly be interpreted as saying that we are of the same class
         /// and that we hold the same data. It should NOT be a pointer comparison. 
         /// </summary>
-        abstract public override bool Equals(object other);
+        public abstract override bool Equals(object other);
 
         /// <summary>
         /// Returns the metric distance to another individual, if such a thing can be measured.
@@ -219,6 +217,7 @@ namespace BraneCloud.Evolution.EC
         #endregion // Comparison
         #region Cloning
 
+        /// <inheritdoc />
         /// <summary>
         /// This is a memberwise clone implementation.
         /// </summary>
@@ -226,7 +225,7 @@ namespace BraneCloud.Evolution.EC
         {
             try
             {
-                var myobj = (Individual) (MemberwiseClone());
+                var myobj = (Individual) MemberwiseClone();
                 if (myobj.Fitness != null)
                     myobj.Fitness = (IFitness) (Fitness.Clone());
                 return myobj;

@@ -1,4 +1,3 @@
-using System;
 using BraneCloud.Evolution.EC.GP;
 
 namespace BraneCloud.Evolution.EC.Problems.Regression.Func
@@ -20,9 +19,9 @@ namespace BraneCloud.Evolution.EC.Problems.Regression.Func
     /// </summary>
     public class Inv : GPNode
     {
-        public override String ToString() { return "1/"; }
+        public override string ToString() { return "1/"; }
 
-        public override int ExpectedChildren { get { return 1; } }
+        public override int ExpectedChildren => 1;
 
         public override void Eval(IEvolutionState state,
             int thread,

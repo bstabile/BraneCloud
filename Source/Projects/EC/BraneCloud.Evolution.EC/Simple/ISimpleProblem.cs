@@ -20,14 +20,15 @@ using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Simple
 {
+    /// <inheritdoc />
     /// <summary> 
-    /// SimpleProblemForm is an interface which defines methods
+    /// ISimpleProblem is an interface which defines methods
     /// for Problems to implement simple, single-individual (non-coevolutionary)
     /// evaluation.
     /// </summary>
 
     [ECConfiguration("ec.simple.ISimpleProblem")]
-    public interface ISimpleProblem
+    public interface ISimpleProblem : IProblem
     {
         /// <summary>
         /// Evaluates the individual in ind, if necessary (perhaps
@@ -36,13 +37,5 @@ namespace BraneCloud.Evolution.EC.Simple
         /// </summary>		
         void  Evaluate(IEvolutionState state, Individual ind, int subpop, int threadnum);
         
-        /// <summary>
-        /// "Reevaluates" an individual,
-        /// for the purpose of printing out
-        /// interesting facts about the individual in the context of the
-        /// Problem, and logs the results.  This might be called to print out 
-        /// facts about the best individual in the population, for example. 
-        /// </summary>
-        void Describe(IEvolutionState state, Individual ind, int subpop, int threadnum, int log);
     }
 }

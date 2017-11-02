@@ -41,8 +41,11 @@ namespace BraneCloud.Evolution.EC.Runtime
     /// 
     /// <p/><b>Parameters</b><br/>
     /// <table>
-    /// <tr><td valign="top"><i>base</i>.<tt>restart-type</tt><br/>
-    /// <font size="-1">random or fixed</font></td>
+    /// <tr><td valign="top">< i > base </i>.<tt> start </tt><br/>
+    /// <font size="-1">int &gt;= 0 (default = 1)</font></td>
+    /// <td valign="top"> The first generation where the clock may be started.</td></tr>
+    /// <tr><td valign="top"><i> base </i>.<tt> restart - type </tt><br/>
+    /// <font size="-1">random (default) or fixed</font></td>
     /// <td valign="top">Either initiates clock at a random value or a fixed one.</td></tr>
     /// <tr><td valign="top"><i>base</i>.<tt>restart-upper-bound</tt><br/>
     /// <font size="-1">1 &lt; int &lt; \inf</font></td>
@@ -73,9 +76,12 @@ namespace BraneCloud.Evolution.EC.Runtime
         /// </summary>
         public const string P_RESTART_UPPERBOUND = "restart-upper-bound";
 
+        public const string P_START = "start";
+
         #endregion // Constants
         #region Fields
 
+        /// <summary>
         /// Are we doing random or fixed?
         /// </summary>
         string _restartType;
@@ -93,6 +99,8 @@ namespace BraneCloud.Evolution.EC.Runtime
         /// </summary>
         public int Upperbound { get; set; }
 
+        public int Start { get; set; }
+
         #endregion // Properties
         #region Setup
 
@@ -104,7 +112,19 @@ namespace BraneCloud.Evolution.EC.Runtime
             base.Setup(state, paramBase);
 
             _restartType = state.Parameters.GetString(paramBase.Push(P_RESTART_TYPE), null);
+
+            if (_restartType == null)
+                _restartType = "random";
+
             Upperbound = state.Parameters.GetInt(paramBase.Push(P_RESTART_UPPERBOUND), null, 1);
+
+            if (state.Parameters.ParameterExists(paramBase.Push(P_START), null))
+            {
+                Start = state.Parameters.GetInt(paramBase.Push(P_START), null, 0);
+                if (Start < 0)
+                    state.Output.Fatal("Start value must be >= 0", paramBase.Push(P_START));
+            }
+            else Start = 1;
 
             if (Upperbound < 1)
                 state.Output.Fatal("Parameter either not found or invalid (<1).", paramBase.Push(P_RESTART_UPPERBOUND));
@@ -126,28 +146,24 @@ namespace BraneCloud.Evolution.EC.Runtime
         public override void PreEvaluationStatistics(IEvolutionState state)
         {
             base.PreEvaluationStatistics(state);
-            PossiblyRestart(state);
-        }
-
-        public override void GenerationBoundaryStatistics(IEvolutionState state)
-        {
-            base.GenerationBoundaryStatistics(state);
-            PossiblyRestart(state);
+            if (state.Generation == Start) ResetClock(state); // first time only
+            if (state.Generation >= Start) PossiblyRestart(state);
         }
 
         void PossiblyRestart(IEvolutionState state)
         {
+            Countdown--;
+            Subpopulation currentSubp = null;
 
-            Subpopulation currentSubp;
             // time to restart!
             if (Countdown == 0)
             {
-                Console.WriteLine("Restarting the population!");
+                state.Output.Message("Restarting the population prior to evaluating generation " + state.Generation);
                 // for each subpopulation
                 foreach (var t in state.Population.Subpops)
                 {
                     currentSubp = t;
-                    var temp = currentSubp.LoadInds;
+                    bool temp = currentSubp.LoadInds;
                     // disable LoadInds so we generate candidates randomly
                     currentSubp.LoadInds = false;
                     currentSubp.Populate(state, 0);
@@ -155,8 +171,6 @@ namespace BraneCloud.Evolution.EC.Runtime
                 }
                 ResetClock(state);
             }
-            else
-                Countdown--;
         }
 
         void ResetClock(IEvolutionState state)
@@ -165,7 +179,7 @@ namespace BraneCloud.Evolution.EC.Runtime
                 Countdown = Upperbound;
             else
                 // might need to fix random index to support multithreading
-                Countdown = state.Random[0].NextInt(Upperbound + 1);
+                Countdown = state.Random[0].NextInt(Upperbound) + 1;
         }
 
         #endregion // Operations

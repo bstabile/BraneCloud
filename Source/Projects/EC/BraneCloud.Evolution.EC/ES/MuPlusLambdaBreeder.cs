@@ -33,6 +33,12 @@ namespace BraneCloud.Evolution.EC.ES
     [ECConfiguration("ec.es.MuPlusLambdaBreeder")]
     public class MuPlusLambdaBreeder : MuCommaLambdaBreeder
     {
+        public MuPlusLambdaBreeder()
+        {
+            // The base class sets this to 2
+            MaximumMuLambdaDivisor = 1;
+        }
+
         #region Operations
 
         /// <summary>

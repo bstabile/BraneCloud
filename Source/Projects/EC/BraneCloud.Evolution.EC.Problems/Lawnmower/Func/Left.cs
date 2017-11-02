@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.Problems.Lawnmower.Func
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         public override void Eval(IEvolutionState state,
             int thread,
@@ -48,22 +48,22 @@ namespace BraneCloud.Evolution.EC.Problems.Lawnmower.Func
             GPIndividual individual,
             IProblem problem)
         {
-            var p = (LawnmowerProblem)problem;
+            var p = (Lawnmower)problem;
             var d = (LawnmowerData)input;
 
             switch (p.Orientation)
             {
-                case LawnmowerProblem.O_UP:
-                    p.Orientation = LawnmowerProblem.O_LEFT;
+                case Lawnmower.O_UP:
+                    p.Orientation = Lawnmower.O_LEFT;
                     break;
-                case LawnmowerProblem.O_LEFT:
-                    p.Orientation = LawnmowerProblem.O_DOWN;
+                case Lawnmower.O_LEFT:
+                    p.Orientation = Lawnmower.O_DOWN;
                     break;
-                case LawnmowerProblem.O_DOWN:
-                    p.Orientation = LawnmowerProblem.O_RIGHT;
+                case Lawnmower.O_DOWN:
+                    p.Orientation = Lawnmower.O_RIGHT;
                     break;
-                case LawnmowerProblem.O_RIGHT:
-                    p.Orientation = LawnmowerProblem.O_UP;
+                case Lawnmower.O_RIGHT:
+                    p.Orientation = Lawnmower.O_UP;
                     break;
                 default:  // whoa!
                     state.Output.Fatal("Whoa, somehow I got a bad orientation! (" + p.Orientation + ")");

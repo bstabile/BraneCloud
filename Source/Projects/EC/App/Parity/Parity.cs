@@ -55,6 +55,8 @@ namespace BraneCloud.Evolution.EC.App.Parity
     [ECConfiguration("ec.app.parity.Parity")]
     public class Parity : GPProblem, ISimpleProblem
     {
+        private const long SerialVersionUID = 1;
+
         public const string P_NUMBITS = "bits";
         public const string P_EVEN = "even";
 
@@ -64,13 +66,10 @@ namespace BraneCloud.Evolution.EC.App.Parity
 
         public int bits;  // data bits
 
-        // we'll need to deep clone this one though.
-        public ParityData input;
-
         public override object Clone()
         {
             var myobj = (Parity)base.Clone();
-            myobj.input = (ParityData)input.Clone();
+            myobj.Input = (ParityData)Input.Clone();
             return myobj;
         }
 
@@ -94,8 +93,8 @@ namespace BraneCloud.Evolution.EC.App.Parity
             doEven = state.Parameters.GetBoolean(paramBase.Push(P_EVEN), null, true);
 
             // set up our input
-            input = (ParityData)state.Parameters.GetInstanceForParameterEq(paramBase.Push(P_DATA), null, typeof(ParityData));
-            input.Setup(state, paramBase.Push(P_DATA));
+            Input = (ParityData)state.Parameters.GetInstanceForParameterEq(paramBase.Push(P_DATA), null, typeof(ParityData));
+            Input.Setup(state, paramBase.Push(P_DATA));
         }
 
         public void Evaluate(IEvolutionState state, Individual ind, int subpop, int threadnum)
@@ -112,15 +111,15 @@ namespace BraneCloud.Evolution.EC.App.Parity
                         tb += (bits >> b) & 1;
                     tb &= 1;  // now tb is 1 if we're odd, 0 if we're even
 
-                    ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, input, Stack, (GPIndividual)ind, this);
+                    ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, Input, Stack, (GPIndividual)ind, this);
 
-                    if ((doEven && ((input.x & 1) != tb)) ||
-                        ((!doEven) && ((input.x & 1) == tb)))
+                    if (doEven && (((ParityData)Input).x & 1) != tb ||
+                        (!doEven && (((ParityData)Input).x & 1) == tb))
                         sum++;
                 }
 
                 // the fitness better be KozaFitness!
-                var f = ((KozaFitness)ind.Fitness);
+                var f = (KozaFitness)ind.Fitness;
                 f.SetStandardizedFitness(state, totalSize - sum);
                 f.Hits = sum;
                 ind.Evaluated = true;

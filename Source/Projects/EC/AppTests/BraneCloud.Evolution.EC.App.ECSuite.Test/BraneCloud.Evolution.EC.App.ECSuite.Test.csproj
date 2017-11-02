@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -11,9 +11,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BraneCloud.Evolution.EC.App.ECSuite.Test</RootNamespace>
     <AssemblyName>BraneCloud.Evolution.EC.App.ECSuite.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -76,13 +79,18 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Params\App\ECSuite\de2.params" />
-    <None Include="Params\ec.params" />
+    <None Include="Params\App\ECSuite\base.params" />
+    <None Include="Params\App\ECSuite\de.params" />
     <None Include="Params\App\ECSuite\ecsuite.params" />
-    <None Include="Params\ES\es.params" />
-    <None Include="Params\App\ECSuite\es2.params" />
-    <None Include="Params\Simple\simple.params" />
+    <None Include="Params\App\ECSuite\es.params" />
+    <None Include="Params\App\ECSuite\meta.params" />
+    <None Include="Params\App\ECSuite\pso.params" />
     <None Include="Params\App\ECSuite\steady.params" />
+    <None Include="Params\DE\de.params" />
+    <None Include="Params\ec.params" />
+    <None Include="Params\ES\es.params" />
+    <None Include="Params\PSO\pso.params" />
+    <None Include="Params\Simple\simple.params" />
     <None Include="Params\SteadyState\steadystate.params" />
   </ItemGroup>
   <ItemGroup />

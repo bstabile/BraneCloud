@@ -17,10 +17,7 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using BraneCloud.Evolution.EC;
 using BraneCloud.Evolution.EC.App.MultiplexerSlow;
 using BraneCloud.Evolution.EC.Configuration;
@@ -40,7 +37,7 @@ namespace MultiplexerSlow
                                                     Assembly.GetAssembly(typeof(Multiplexer))
                                                 });
 
-            Evolve.Run(new[] { "-file", @"Params\App\Multiplexer\3.params" });
+            Evolve.Run(new[] { "-file", @"Params\App\Multiplexer\11.params" });
             Console.WriteLine("\nDone!");
             Console.ReadLine();
         }

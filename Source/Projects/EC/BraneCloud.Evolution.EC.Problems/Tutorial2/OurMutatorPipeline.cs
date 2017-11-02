@@ -104,7 +104,7 @@ namespace BraneCloud.Evolution.EC.Problems.Tutorial2
             {
                 var i = (IntegerVectorIndividual)inds[q];
                 for (var x = 0; x < i.genome.Length; x++)
-                    if (state.Random[thread].NextBoolean(species.MutationProbability))
+                    if (state.Random[thread].NextBoolean(species.MutationProbability[x]))
                         i.genome[x] = -i.genome[x];
                 // it's a "new" individual, so it's no longer been evaluated
                 i.Evaluated = false;

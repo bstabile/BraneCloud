@@ -24,7 +24,7 @@ namespace BraneCloud.Evolution.EC.Randomization
 {
     public interface IMersenneTwister : ICloneable, ISerializable
     {
-        bool StateEquals(object o);
+        bool StateEquals(IMersenneTwister o);
         void ReadState(BinaryReader reader);
         void WriteState(BinaryWriter writer);
         void SetSeed(long seed);
@@ -51,5 +51,7 @@ namespace BraneCloud.Evolution.EC.Randomization
         short NextShort();
         sbyte NextByte();
         double NextGaussian();
+
+        void ClearGaussian();
     }
 }

@@ -29,7 +29,7 @@ namespace BraneCloud.Evolution.EC.Problems.Regression.Func
           individualBase);
           }
         */
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         public override void Eval(IEvolutionState state,
             int thread,
@@ -39,9 +39,9 @@ namespace BraneCloud.Evolution.EC.Problems.Regression.Func
             IProblem problem)
         {
             var rd = ((RegressionData)(input));
-            double[] c = ((BenchmarksProblem)problem).currentValue;
+            double[] c = ((Benchmarks)problem).currentValue;
             if (c.Length >= 1)
-                rd.x = ((BenchmarksProblem)problem).currentValue[0];
+                rd.x = ((Benchmarks)problem).currentValue[0];
             else rd.x = 0;
         }
     }

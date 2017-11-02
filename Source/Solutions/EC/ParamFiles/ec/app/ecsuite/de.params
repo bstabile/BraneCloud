@@ -4,3 +4,6 @@
 
 parent.0 =				../../de/de.params
 parent.1 =				ecsuite.params
+
+# How often we should attempt to create something within valid bounds
+breed.out-of-bounds-retries = 10

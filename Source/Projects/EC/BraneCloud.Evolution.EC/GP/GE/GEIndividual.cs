@@ -56,10 +56,8 @@ namespace BraneCloud.Evolution.EC.GP.GE
 
             // print out ERC mapping
             state.Output.Print(ERC_PREAMBLE, log);
-            var iter = (ERCmap.Keys).GetEnumerator();
-            while (iter.MoveNext())
+            foreach (var key in ERCmap.Keys)
             {
-                var key = iter.Current;
                 var val = ERCmap[key];
                 state.Output.Print("    " + key + " -> " + val.ToStringForHumans(), log);
             }

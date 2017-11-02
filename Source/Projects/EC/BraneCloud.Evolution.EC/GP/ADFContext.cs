@@ -17,9 +17,6 @@
  */
 
 using System;
-using BraneCloud.Evolution.EC.GP.GE;
-using BraneCloud.Evolution.EC.Util;
-using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.GP
@@ -41,19 +38,6 @@ namespace BraneCloud.Evolution.EC.GP
     /// <p/>To evaluate an argument number from an ADFContext, call evaluate(...),
     /// and the results are evaluated and copied into input.
     /// 
-    /// <p/><b>Parameters</b><br/>
-    /// <table>
-    /// <tr><td valign="top"><i>base</i><tt>.Data</tt><br/>
-    /// <font size="-1">classname, inherits and != ec.GPData</font></td>
-    /// <td valign="top">(the class for the ADFContext's basic GPData type -- typically this is the same as GPProblem's GPData type)</td></tr>
-    /// </table>
-    /// <p/><b>Default Base</b><br/>
-    /// gp.adf-context
-    /// <p/><b>Parameter bases</b><br/>
-    /// <table>
-    /// <tr><td valign="top"/><i>base</i><tt>.Data</tt><br/>
-    /// <td valign="top"/>(the ADFContext's basic GPData type)</tr> 
-    /// </table>
     /// </summary>    
     [Serializable]
     [ECConfiguration("ec.gp.ADFContext")]
@@ -61,17 +45,13 @@ namespace BraneCloud.Evolution.EC.GP
     {
         #region Constants
 
-        public const string P_DATA = "data";
-        public const string P_ADFCONTEXT = "adf-context";        
-        public const int INITIAL_ARGUMENT_SIZE = 2; // seems reasonable
+        /// <deprecated></deprecated>
+        public const string P_ADFCONTEXT = "adf-context";    
 
         #endregion // Constants
         #region Properties
 
-        public virtual IParameter DefaultBase
-        {
-            get { return GPDefaults.ParamBase.Push(P_ADFCONTEXT); }
-        }
+        public virtual IParameter DefaultBase => GPDefaults.ParamBase.Push(P_ADFCONTEXT);
 
         /// <summary>
         /// The ADF/ADM node proper 
@@ -79,72 +59,23 @@ namespace BraneCloud.Evolution.EC.GP
         public ADF Adf { get; set; }
 
         /// <summary>
-        /// A prototypical GPData node. 
-        /// </summary>
-        public GPData ArgProto { get; set; }
-
-        /// <summary>
         /// An array of GPData nodes (none of the null, when it's used) 
         /// holding an ADF's Arguments' return results 
         /// </summary>
-        public GPData[] Arguments { get; set; }
+        public GPData[] Arguments { get; set; } = new GPData[0];
 
         #endregion // Properties
         #region Setup
 
-        public ADFContext()
-        {
-            Arguments = new GPData[INITIAL_ARGUMENT_SIZE];
-        }
-
         public virtual void Setup(IEvolutionState state, IParameter paramBase)
         {
-            // load the prototype
-            var p = paramBase.Push(P_DATA);
-            var def = DefaultBase;
-            var d = def.Push(P_DATA);
-
-            if (state.Parameters.ParameterExists(p, d))
-            {
-                //Arg_Proto = (GPData) (state.Parameters.GetInstanceForParameter(p, d, typeof(GPData)));
-                //Arg_Proto.Setup(state, p);
-                state.Output.Warning("ADF Data is deprecated -- this parameter is no longer used.  Instead, we directly use the GPData.", p, d);
-            }
-            //else
-            //{
-            // snarf it from eval.problem.Data, hacked up from the Problem's data type,
-            // 'cause I'm not sure if Problem's been set up yet
-
-            // BRS : This has been circumvented by setting up the GPData before the ADFStack in GPProblem's setup()
-            //var pp = new Parameter(EvolutionState.P_EVALUATOR).Push(Evaluator.P_PROBLEM).Push(GPProblem.P_DATA);
-            //var dd = GPDefaults.ParamBase.Push(GPProblem.P_GPPROBLEM).Push(GPProblem.P_DATA);
-
-            ////state.Output.Warning("No ADF GPData specified; using (and setting up) from\n " + pp + "\nor default base " + dd, p, d);
-            //ArgProto = (GPData)(state.Parameters.GetInstanceForParameter(pp, dd, typeof(GPData)));
-            //ArgProto.Setup(state, pp); // note setting up from Problem's base!
-            // END BRS comment
-
-            //}
-
-            // BRS : TODO : Determine if this is a reasonable way to do this!
-            // Currently, only GEProblem implements IGPProblemParent. 
-            // But for all I know, there could be other uses for this kind of "aggregate problem".
-            // Could the parentage ever likely be more than one level deep? If so this would have to be recursive.
-            if (state.Evaluator.p_problem is IGPProblemParent)
-                ArgProto = (GPData)((IGPProblemParent) state.Evaluator.p_problem).Problem.Data.Clone();
-            else
-                ArgProto = (GPData)((IGPProblem)state.Evaluator.p_problem).Data.Clone();
-
-            // clone off the prototype
-            for (var x = 0; x < INITIAL_ARGUMENT_SIZE; x++)
-                Arguments[x] = (GPData)(ArgProto.Clone());
         }
 
         /// <summary>
         /// Increases Arguments to accommodate space if necessary. Sets adf to a.
         /// You need to then fill out the Arguments yourself. 
         /// </summary>
-        public void PrepareADF(ADF a)
+        public void PrepareADF(ADF a, GPProblem problem)
         {
             // set to the length requested or longer
             if (a.Children.Length > Arguments.Length)
@@ -153,7 +84,7 @@ namespace BraneCloud.Evolution.EC.GP
                 Array.Copy(Arguments, 0, newArguments, 0, Arguments.Length);
                 // fill gap -- ugh, luckily this doesn't happen but a few times
                 for (var x = Arguments.Length; x < newArguments.Length; x++)
-                    newArguments[x] = (GPData)(ArgProto.Clone());
+                    newArguments[x] = (GPData)problem.Input.Clone();
                 Arguments = newArguments;
             }
             Adf = a;
@@ -177,7 +108,7 @@ namespace BraneCloud.Evolution.EC.GP
             GPIndividual individual, IProblem problem, int argument)
         {
             // do I have that many Arguments?
-            if (argument >= Adf.Children.Length || argument < 0)
+            if ((argument >= Adf.Children.Length) || argument < 0)
             // uh oh 
             {
                 individual.PrintIndividual(state, 0);
@@ -215,13 +146,10 @@ namespace BraneCloud.Evolution.EC.GP
             {
                 var myobj = (ADFContext) MemberwiseClone();
                 
-                // deep-clone the context proto
-                myobj.ArgProto = (GPData) (ArgProto.Clone());
-                
                 // deep-clone the contexts
                 myobj.Arguments = new GPData[Arguments.Length];
                 for (var x = 0; x < myobj.Arguments.Length; x++)
-                    myobj.Arguments[x] = (GPData) (Arguments[x].Clone());
+                    myobj.Arguments[x] = (GPData) Arguments[x].Clone();
                 
                 return myobj;
             }

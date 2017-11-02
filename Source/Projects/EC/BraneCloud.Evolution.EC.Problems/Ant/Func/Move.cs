@@ -21,7 +21,7 @@ using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 using BraneCloud.Evolution.EC.Problems.Ant;
 
-namespace BraneCloud.Evolution.EC.Problems.AntApp
+namespace BraneCloud.Evolution.EC.Problems.Ant.Func
 {
     [ECConfiguration("ec.problems.ant.func.Move")]
     public class Move : GPNode, IEvalPrint
@@ -41,7 +41,7 @@ namespace BraneCloud.Evolution.EC.Problems.AntApp
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         public override void Eval(
             IEvolutionState state, 
@@ -51,22 +51,22 @@ namespace BraneCloud.Evolution.EC.Problems.AntApp
             GPIndividual individual, 
             IProblem problem)
         {
-            var p = (AntProblem)problem;
+            var p = (Ant)problem;
             switch (p.Orientation)
             {
-                case AntProblem.O_UP:
+                case Ant.O_UP:
                     p.PosY--;
                     if (p.PosY < 0) p.PosY = p.MaxY - 1;
                     break;
-                case AntProblem.O_LEFT:
+                case Ant.O_LEFT:
                     p.PosX--;
                     if (p.PosX < 0) p.PosX = p.MaxX - 1;
                     break;
-                case AntProblem.O_DOWN:
+                case Ant.O_DOWN:
                     p.PosY++;
                     if (p.PosY >= p.MaxY) p.PosY = 0;
                     break;
-                case AntProblem.O_RIGHT:
+                case Ant.O_RIGHT:
                     p.PosX++;
                     if (p.PosX >= p.MaxX) p.PosX = 0;
                     break;
@@ -76,10 +76,10 @@ namespace BraneCloud.Evolution.EC.Problems.AntApp
             }
 
             p.Moves++;
-            if (p.Map[p.PosX][p.PosY] == AntProblem.FOOD && p.Moves < p.MaxMoves)
+            if (p.Map[p.PosX][p.PosY] == Ant.FOOD && p.Moves < p.MaxMoves)
             {
                 p.Sum++;
-                p.Map[p.PosX][p.PosY] = AntProblem.ATE;
+                p.Map[p.PosX][p.PosY] = Ant.ATE;
             }
         }
 
@@ -88,22 +88,22 @@ namespace BraneCloud.Evolution.EC.Problems.AntApp
         /// </summary>
         public void EvalPrint(IEvolutionState state, int thread, GPData input, ADFStack stack, GPIndividual individual, IProblem problem, int[][] map2)
         {
-            var p = (AntProblem)problem;
+            var p = (Ant)problem;
             switch (p.Orientation)
             {
-                case AntProblem.O_UP:
+                case Ant.O_UP:
                     p.PosY--;
                     if (p.PosY < 0) p.PosY = p.MaxY - 1;
                     break;
-                case AntProblem.O_LEFT:
+                case Ant.O_LEFT:
                     p.PosX--;
                     if (p.PosX < 0) p.PosX = p.MaxX - 1;
                     break;
-                case AntProblem.O_DOWN:
+                case Ant.O_DOWN:
                     p.PosY++;
                     if (p.PosY >= p.MaxY) p.PosY = 0;
                     break;
-                case AntProblem.O_RIGHT:
+                case Ant.O_RIGHT:
                     p.PosX++;
                     if (p.PosX >= p.MaxX) p.PosX = 0;
                     break;
@@ -113,10 +113,10 @@ namespace BraneCloud.Evolution.EC.Problems.AntApp
             }
 
             p.Moves++;
-            if (p.Map[p.PosX][p.PosY] == AntProblem.FOOD && p.Moves < p.MaxMoves)
+            if (p.Map[p.PosX][p.PosY] == Ant.FOOD && p.Moves < p.MaxMoves)
             {
                 p.Sum++;
-                p.Map[p.PosX][p.PosY] = AntProblem.ATE;
+                p.Map[p.PosX][p.PosY] = Ant.ATE;
             }
 
             if (p.Moves < p.MaxMoves)

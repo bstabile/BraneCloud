@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.Problems.MultiplexerSlow.Func
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         public override void Eval(IEvolutionState state,
             int thread,
@@ -49,7 +49,7 @@ namespace BraneCloud.Evolution.EC.Problems.MultiplexerSlow.Func
             IProblem problem)
         {
             ((MultiplexerData)input).x =
-                ((((MultiplexerProblem)problem).dataPart >> 6) & 1);
+                ((((Multiplexer)problem).dataPart >> 6) & 1);
         }
     }
 }

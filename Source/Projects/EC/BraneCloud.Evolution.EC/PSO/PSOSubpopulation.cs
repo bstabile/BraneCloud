@@ -162,10 +162,10 @@ namespace BraneCloud.Evolution.EC.PSO
                     for (var j = 0; j < prevInd.GenomeLength; j++)
                     {
                         var val = prevInd.genome[j];
-                        var range = fvSpecies.MaxGene(j) - fvSpecies.MinGene(j);
+                        var range = fvSpecies.GetMaxGene(j) - fvSpecies.GetMinGene(j);
                         do
                             prevInd.genome[j] = val + (range * InitialVelocityScale) * (state.Random[thread].NextDouble() * 2.0 - 1.0);
-                        while (prevInd.genome[j] < fvSpecies.MinGene(j) || prevInd.genome[j] > fvSpecies.MaxGene(j));
+                        while (prevInd.genome[j] < fvSpecies.GetMinGene(j) || prevInd.genome[j] > fvSpecies.GetMaxGene(j));
                     }
                     PreviousIndividuals[i] = prevInd;
                 }

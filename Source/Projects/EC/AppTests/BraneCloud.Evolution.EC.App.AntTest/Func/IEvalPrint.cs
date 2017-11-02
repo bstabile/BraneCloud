@@ -19,7 +19,7 @@
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 
-namespace BraneCloud.Evolution.EC.App.AntTest
+namespace BraneCloud.Evolution.EC.App.AntTest.Func
 {
     [ECConfiguration("ec.app.ant.IEvalPrint")]
     public interface IEvalPrint

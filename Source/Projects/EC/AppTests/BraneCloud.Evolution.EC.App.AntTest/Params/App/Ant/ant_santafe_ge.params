@@ -7,7 +7,9 @@ parent.1 = ant_santafe.params
 
 ge.species.file.0 = ../../../grammar/ant.grammar
 eval.problem.problem = ec.app.ant.Ant
-eval.problem.problem.data = ec.app.ant.AntData
+# Because our GPData is completely empty, we can just use
+# GPData directly
+eval.problem.data = ec.gp.GPData
 eval.problem.problem.moves = 400
 eval.problem.problem.file = ../../../trails/santafe.trl
 

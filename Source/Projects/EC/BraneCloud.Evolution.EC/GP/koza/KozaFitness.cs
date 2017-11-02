@@ -122,10 +122,10 @@ namespace BraneCloud.Evolution.EC.GP.Koza
             else _standardizedFitness = f;
         }
 
-        public override bool IsIdeal
-        {
-            get { return _standardizedFitness == 0.0f; }
-        }
+        /// <summary>
+        /// should always be == 0.0f, less than 0.0f is illegal, but just in case...
+        /// </summary>
+        public override bool IsIdeal => _standardizedFitness <= 0.0f;
 
         // BRS: See the Value property
         ///// <summary>

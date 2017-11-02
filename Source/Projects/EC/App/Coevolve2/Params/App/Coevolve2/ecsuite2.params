@@ -7,16 +7,26 @@ parent.0 = ../ecsuite/ecsuite.params
 eval.problem = ec.app.coevolve2.CoevolutionaryECSuite
 eval.problem.type = rosenbrock
 
+# Four threads
+evalthreads = 				4
+breedthreads = 				4
+
+# Four seeds! Need Max(evalthreads, breedthreads)
+seed.0 =				time
+seed.1 =				time
+seed.2 =				time
+seed.3 =				time
+
 eval =                                  ec.coevolve.MultiPopCoevolutionaryEvaluator
 
-eval.num-shuffled =			1
-eval.num-current =                      0
+eval.num-shuffled=			1
+eval.num-current=                       0
 eval.num-elites =                       0
 eval.num-prev =                         0
 eval.select-current =                   ec.select.RandomSelection
 eval.select-prev =                      ec.select.RandomSelection
 
-generations =                           1000
+generations=                            1000
 select.tournament.size =                2
 pop.subpops =                           2
 
@@ -27,7 +37,9 @@ pop.subpop.0.species =                  ec.vector.FloatVectorSpecies
 pop.subpop.0.species.crossover-type =   one
 pop.subpop.0.species.genome-size =      50
 
-pop.subpop.0.species.fitness =           ec.coevolve.ICCEAFitness
+# Can't find the ICCEAFitness so we'll just SimpleFitness
+#pop.subpop.0.species.fitness =          ec.coevolve.ICCEAFitness
+pop.subpop.0.species.fitness =		ec.simple.SimpleFitness
 
 pop.subpop.0.species.ind =              ec.vector.DoubleVectorIndividual
 pop.subpop.0.species.min-gene =         -5.12
@@ -41,6 +53,7 @@ pop.subpop.0.species.pipe.source.0 =    ec.vector.breed.VectorCrossoverPipeline
 pop.subpop.0.species.pipe.source.0.source.0 = ec.select.TournamentSelection
 pop.subpop.0.species.pipe.source.0.source.1 = same
 
+
 pop.subpop.1 =                          ec.Subpopulation
 pop.subpop.1.duplicate-retries =        2
 pop.subpop.1.size =                     500
@@ -48,7 +61,9 @@ pop.subpop.1.species =                  ec.vector.FloatVectorSpecies
 pop.subpop.1.species.crossover-type =   one
 pop.subpop.1.species.genome-size =      50
 
-pop.subpop.1.species.fitness =          ec.coevolve.ICCEAFitness
+# Can't find the ICCEAFitness so we'll just SimpleFitness
+#pop.subpop.1.species.fitness =          ec.coevolve.ICCEAFitness
+pop.subpop.1.species.fitness =		ec.simple.SimpleFitness
 
 pop.subpop.1.species.ind =              ec.vector.DoubleVectorIndividual
 pop.subpop.1.species.min-gene =         -5.12
@@ -61,4 +76,6 @@ pop.subpop.1.species.mutation-bounded = true
 pop.subpop.1.species.pipe.source.0 =    ec.vector.breed.VectorCrossoverPipeline
 pop.subpop.1.species.pipe.source.0.source.0 = ec.select.TournamentSelection
 pop.subpop.1.species.pipe.source.0.source.1 = same
+
+stat.file				$out.stat
 

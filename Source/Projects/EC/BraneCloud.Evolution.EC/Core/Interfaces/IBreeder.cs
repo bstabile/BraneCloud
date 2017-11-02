@@ -31,5 +31,12 @@ namespace BraneCloud.Evolution.EC
         /// In general, state.Population should not be modified. 
         /// </summary>
         Population BreedPopulation(IEvolutionState state);
+
+        void BreedPopChunk(
+            Population newpop, 
+            IEvolutionState state, 
+            int[] numinds, 
+            int[] from, 
+            int threadnum);
     }
 }

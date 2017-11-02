@@ -181,7 +181,6 @@ namespace BraneCloud.Evolution.EC
         /// </summary>
         public virtual void Describe(IEvolutionState state, Individual ind, int subpop, int threadnum, int log)
         {
-            return;
         }
 
         #endregion IO
