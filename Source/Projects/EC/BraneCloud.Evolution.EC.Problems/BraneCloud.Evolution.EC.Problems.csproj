@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BraneCloud.Evolution.EC.Problems</RootNamespace>
     <AssemblyName>BraneCloud.Evolution.EC.Problems</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,10 +31,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,8 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ant\AntProblem.cs" />
-    <Compile Include="Ant\AntData.cs" />
+    <Compile Include="Ant\Ant.cs" />
     <Compile Include="Ant\Func\IEvalPrint.cs" />
     <Compile Include="Ant\Func\IfFoodAhead.cs" />
     <Compile Include="Ant\Func\Left.cs" />
@@ -50,11 +53,11 @@
     <Compile Include="Ant\Func\Progn3.cs" />
     <Compile Include="Ant\Func\Progn4.cs" />
     <Compile Include="Ant\Func\Right.cs" />
-    <Compile Include="Bbob\BBOBenchmarksProblem.cs" />
-    <Compile Include="Coevolve1\CompetitiveMaxOnesProblem.cs" />
-    <Compile Include="Coevolve2\CoevolutionaryECSuiteProblemProblem.cs" />
-    <Compile Include="ECSuite\ECSuiteProblem.cs" />
-    <Compile Include="Edge\EdgeProblem.cs" />
+    <Compile Include="Bbob\BBOBenchmarks.cs" />
+    <Compile Include="Coevolve1\CompetitiveMaxOnes.cs" />
+    <Compile Include="Coevolve2\CoevolutionaryECSuite.cs" />
+    <Compile Include="ECSuite\ECSuite.cs" />
+    <Compile Include="Edge\Edge.cs" />
     <Compile Include="Edge\EdgeData.cs" />
     <Compile Include="Edge\Func\Accept.cs" />
     <Compile Include="Edge\Func\BAccept.cs" />
@@ -70,19 +73,90 @@
     <Compile Include="Edge\Func\Split.cs" />
     <Compile Include="Edge\Func\Start.cs" />
     <Compile Include="Edge\Func\Zero.cs" />
+    <Compile Include="GPSemantics\Func\SemanticExtra.cs" />
+    <Compile Include="GPSemantics\Func\SemanticJ.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN0.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN1.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN10.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN11.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN12.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN13.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN14.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN15.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN16.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN2.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN3.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN4.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN5.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN6.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN7.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN8.cs" />
+    <Compile Include="GPSemantics\Func\SemanticN9.cs" />
+    <Compile Include="GPSemantics\Func\SemanticNode.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX0.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX1.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX10.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX11.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX12.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX13.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX14.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX15.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX16.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX2.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX3.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX4.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX5.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX6.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX7.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX8.cs" />
+    <Compile Include="GPSemantics\Func\SemanticX9.cs" />
+    <Compile Include="GPSemantics\Semantic.cs" />
     <Compile Include="Gui\SimpleBarChartStatistics.cs" />
     <Compile Include="Gui\SimpleXYSeriesChartStatistics.cs" />
-    <Compile Include="Hiff\HIFFProblem.cs" />
+    <Compile Include="Hiff\HIFF.cs" />
     <Compile Include="Hiff\HiffNew.cs" />
+    <Compile Include="KLandscapes\Func\KLandscapeTree.cs" />
+    <Compile Include="KLandscapes\Func\KLandscapeTreeA.cs" />
+    <Compile Include="KLandscapes\Func\KLandscapeTreeB.cs" />
+    <Compile Include="KLandscapes\Func\KLandscapeTreeW.cs" />
+    <Compile Include="KLandscapes\Func\KLandscapeTreeX.cs" />
+    <Compile Include="KLandscapes\Func\KLandscapeTreeY.cs" />
+    <Compile Include="KLandscapes\Func\KLandscapeTreeZ.cs" />
+    <Compile Include="KLandscapes\KLandscapes.cs" />
     <Compile Include="Lawnmower\Func\Frog.cs" />
     <Compile Include="Lawnmower\Func\LawnERC.cs" />
     <Compile Include="Lawnmower\Func\Left.cs" />
     <Compile Include="Lawnmower\Func\Mow.cs" />
     <Compile Include="Lawnmower\Func\Progn2.cs" />
     <Compile Include="Lawnmower\Func\V8a.cs" />
-    <Compile Include="Lawnmower\LawnmowerProblem.cs" />
+    <Compile Include="Lawnmower\Lawnmower.cs" />
     <Compile Include="Lawnmower\LawnmowerData.cs" />
-    <Compile Include="MooSuite\MooSuiteProblem.cs" />
+    <Compile Include="Lid\Func\LidJ.cs" />
+    <Compile Include="Lid\Func\LidX.cs" />
+    <Compile Include="Lid\Lid.cs" />
+    <Compile Include="Majority\CA.cs" />
+    <Compile Include="Majority\Func\And.cs" />
+    <Compile Include="Majority\Func\E.cs" />
+    <Compile Include="Majority\Func\EE.cs" />
+    <Compile Include="Majority\Func\EEE.cs" />
+    <Compile Include="Majority\Func\If.cs" />
+    <Compile Include="Majority\Func\Nand.cs" />
+    <Compile Include="Majority\Func\Nor.cs" />
+    <Compile Include="Majority\Func\Not.cs" />
+    <Compile Include="Majority\Func\Or.cs" />
+    <Compile Include="Majority\Func\W.cs" />
+    <Compile Include="Majority\Func\WW.cs" />
+    <Compile Include="Majority\Func\WWW.cs" />
+    <Compile Include="Majority\Func\X.cs" />
+    <Compile Include="Majority\Func\Xor.cs" />
+    <Compile Include="Majority\MajorityData.cs" />
+    <Compile Include="Majority\MajorityGA.cs" />
+    <Compile Include="Majority\MajorityGP.cs" />
+    <Compile Include="Mona\Mona.cs" />
+    <Compile Include="Mona\MonaStatistics.cs" />
+    <Compile Include="Mona\MonaVectorIndividual.cs" />
+    <Compile Include="Mona\Picture.cs" />
+    <Compile Include="MooSuite\MooSuite.cs" />
     <Compile Include="MultiplexerSlow\Func\A0.cs" />
     <Compile Include="MultiplexerSlow\Func\A1.cs" />
     <Compile Include="MultiplexerSlow\Func\A2 .cs" />
@@ -98,7 +172,7 @@
     <Compile Include="MultiplexerSlow\Func\If.cs" />
     <Compile Include="MultiplexerSlow\Func\Not.cs" />
     <Compile Include="MultiplexerSlow\Func\Or.cs" />
-    <Compile Include="MultiplexerSlow\MultiplexerProblem.cs" />
+    <Compile Include="MultiplexerSlow\Multiplexer.cs" />
     <Compile Include="MultiplexerSlow\MultiplexerData.cs" />
     <Compile Include="Multiplexer\Fast.cs" />
     <Compile Include="Multiplexer\Func\A0.cs" />
@@ -116,9 +190,11 @@
     <Compile Include="Multiplexer\Func\If.cs" />
     <Compile Include="Multiplexer\Func\Not.cs" />
     <Compile Include="Multiplexer\Func\Or.cs" />
-    <Compile Include="Multiplexer\MultiplexerProblem.cs" />
+    <Compile Include="Multiplexer\Multiplexer.cs" />
     <Compile Include="Multiplexer\MultiplexerData.cs" />
-    <Compile Include="NK\NKProblem.cs" />
+    <Compile Include="NK\NK.cs" />
+    <Compile Include="OrderTree\Funcs.cs" />
+    <Compile Include="OrderTree\OrderTree.cs" />
     <Compile Include="Parity\Func\And.cs" />
     <Compile Include="Parity\Func\D0.cs" />
     <Compile Include="Parity\Func\D1.cs" />
@@ -155,10 +231,13 @@
     <Compile Include="Parity\Func\Nand.cs" />
     <Compile Include="Parity\Func\Nor.cs" />
     <Compile Include="Parity\Func\Or.cs" />
-    <Compile Include="Parity\ParityProblem.cs" />
+    <Compile Include="Parity\Parity.cs" />
     <Compile Include="Parity\ParityData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Regression\BenchmarksProblem.cs" />
+    <Compile Include="Push\Atan.cs" />
+    <Compile Include="Push\Print.cs" />
+    <Compile Include="Push\Regression.cs" />
+    <Compile Include="Regression\Benchmarks.cs" />
     <Compile Include="Regression\Func\Add.cs" />
     <Compile Include="Regression\Func\Cos.cs" />
     <Compile Include="Regression\Func\Cube.cs" />
@@ -187,25 +266,25 @@
     <Compile Include="Regression\Func\X3.cs" />
     <Compile Include="Regression\Func\X4.cs" />
     <Compile Include="Regression\Func\X5.cs" />
-    <Compile Include="Regression\QuinticRegressionProblem.cs" />
-    <Compile Include="Regression\RegressionProblem.cs" />
+    <Compile Include="Regression\Quintic.cs" />
+    <Compile Include="Regression\Regression.cs" />
     <Compile Include="Regression\RegressionData.cs" />
-    <Compile Include="Regression\SexticRegressionProblem.cs" />
-    <Compile Include="Sat\SATProblem.cs" />
-    <Compile Include="Spacial\ECSuiteSpacialProblem.cs" />
-    <Compile Include="Sum\SumProblem.cs" />
-    <Compile Include="Tutorial1\MaxOnesProblem.cs" />
+    <Compile Include="Regression\Sextic.cs" />
+    <Compile Include="Sat\SAT.cs" />
+    <Compile Include="Spatial\ECSuite.cs" />
+    <Compile Include="Sum\Sum.cs" />
+    <Compile Include="Tutorial1\MaxOnes.cs" />
     <Compile Include="Tutorial1\MyEvolve.cs" />
-    <Compile Include="Tutorial2\AddSubtractProblem.cs" />
+    <Compile Include="Tutorial2\AddSubtract.cs" />
     <Compile Include="Tutorial2\OurMutatorPipeline.cs" />
     <Compile Include="Tutorial3\MyStatistics.cs" />
-    <Compile Include="Tutorial3\OddRosenbrockProblem.cs" />
+    <Compile Include="Tutorial3\OddRosenbrock.cs" />
     <Compile Include="Tutorial3\OurSelection.cs" />
     <Compile Include="Tutorial4\DoubleData.cs" />
     <Compile Include="Tutorial4\Func\Add.cs" />
     <Compile Include="Tutorial4\Func\Mul.cs" />
     <Compile Include="Tutorial4\Func\Sub.cs" />
-    <Compile Include="Tutorial4\MultiValuedRegressionProblem.cs" />
+    <Compile Include="Tutorial4\MultiValuedRegression.cs" />
     <Compile Include="Tutorial4\Func\X.cs" />
     <Compile Include="Tutorial4\Func\Y.cs" />
     <Compile Include="TwoBox\Func\Add.cs" />
@@ -218,12 +297,11 @@
     <Compile Include="TwoBox\Func\Sub.cs" />
     <Compile Include="TwoBox\Func\W0.cs" />
     <Compile Include="TwoBox\Func\W1.cs" />
-    <Compile Include="TwoBox\TwoBoxProblem.cs" />
+    <Compile Include="TwoBox\TwoBox.cs" />
     <Compile Include="TwoBox\TwoBoxData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Async\" />
-    <Folder Include="Star\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Projects\EC\BraneCloud.Evolution.EC.Configuration\BraneCloud.Evolution.EC.Configuration.csproj">
@@ -250,6 +328,20 @@
       <Project>{A8AB0B32-952F-4FBA-8C34-C22CCB897977}</Project>
       <Name>BraneCloud.Evolution.EC.Evaluation</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BraneCloud.Evolution.EC.Psh\BraneCloud.Evolution.EC.Psh.csproj">
+      <Project>{cfdb1e93-1a72-496d-89ef-ede6695b70af}</Project>
+      <Name>BraneCloud.Evolution.EC.Psh</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="MultiplexerSlow\README.txt" />
+    <Content Include="OrderTree\README.txt" />
+    <Content Include="Regression\README.txt" />
+    <Content Include="Star\README.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Parity\params-README" />
+    <None Include="Regression\convertToMathematica.lisp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

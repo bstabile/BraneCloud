@@ -22,11 +22,14 @@ using System.IO;
 using System.Text;
 using System.Collections;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Linq;
 using BraneCloud.Evolution.EC.Support;
 
 namespace BraneCloud.Evolution.EC.Configuration
-{		
+{	
+    // BRS: Most of the methods in ParameterDatabase are synchronized using _syncLock.
+
     /// <summary> 
     /// This extension of the Properties class allows you to set, get, and delete
     /// Parameters in a hierarchical tree-like database. The database consists of a
@@ -113,6 +116,18 @@ namespace BraneCloud.Evolution.EC.Configuration
     [Serializable]
     public partial class ParameterDatabase : PropertiesClass, IParameterDatabase
     {
+        /// <inheritdoc />
+        public IParameterDatabase DeepClone()
+        {
+            var bs = new BinaryFormatter();
+            using (var ms = new MemoryStream())
+            {
+                bs.Serialize(ms, this);
+                ms.Position = 0;
+                return (ParameterDatabase)bs.Deserialize(ms);
+            }
+        }
+
         #region Constants           **************************************************************************
 
         public const string C_HERE = "$";
@@ -151,6 +166,13 @@ namespace BraneCloud.Evolution.EC.Configuration
             : this()
         {
             Label = "Dictionary: " + map.GetHashCode();
+
+            // TODO: Use foreach here?
+            //foreach (DictionaryEntry de in map)
+            //{
+            //    SetParameter(new Parameter("" + de.Key), "" + de.Value);
+            //}
+
             var keys = map.Keys.GetEnumerator();
             while (keys.MoveNext())
             {
@@ -395,7 +417,9 @@ namespace BraneCloud.Evolution.EC.Configuration
                 else if (s.StartsWith(C_CLASS))
                 {
                     var i = IndexOfFirstWhitespace(s);
-                    if (i == -1) throw new FileNotFoundException("Could not parse file into filename and classname:\n\tparent." + x + " = " + s);
+                    if (i == -1)
+                        throw new FileNotFoundException("Could not parse file into filename and classname:\n\tparent." +
+                                                        x + " = " + s);
                     var classname = s.Substring(0, i);
                     var fname = s.Substring(i).Trim();
                     try
@@ -404,11 +428,14 @@ namespace BraneCloud.Evolution.EC.Configuration
                     }
                     catch (TypeLoadException ex)
                     {
-                        throw new FileNotFoundException("Could not parse file into filename and classname:\n\tparent." + x + " = " + s);
+                        throw new FileNotFoundException("Could not parse file into filename and classname:\n\tparent." +
+                                                        x + " = " + s);
                     }
-                }                // it's relative to my path
+                } // it's relative to my path
                 else
+                {
                     Parents.Add(new ParameterDatabase(new FileInfo(Path.Combine(fileInfo.DirectoryName, s))));
+                }
             }
         }
 
@@ -1636,6 +1663,11 @@ namespace BraneCloud.Evolution.EC.Configuration
                         return null;
                     if (p.StartsWith(C_HERE))
                         return new FileStream(GetFile(parameter).FullName, FileMode.Open);
+
+                    // BRS: I think what below is trying to do is retrieve a resource from
+                    //      an assembly. So we would have to determine which assembly using
+                    //      Assembly.GetAssembly(typeof(T)) and then get the resource stream.
+
                     //if (p.StartsWith(C_CLASS))
                     //{
                     //    var i = IndexOfFirstWhitespace(p);
@@ -1645,15 +1677,19 @@ namespace BraneCloud.Evolution.EC.Configuration
                     //    var filename = p.Substring(i).Trim();
                     //    return Type.GetType(classname).getResourceAsStream(filename);
                     //}
+
                     var f = new FileInfo(p);
                     if (Path.IsPathRooted(f.FullName))
                         return new FileStream(f.FullName, FileMode.Open);
+
+                    // BRS: Not sure what this is all about!
                     //Type c = GetLocation(parameter.Param).relativeClass;
                     //String rp = GetLocation(parameter.Param).relativePath;
                     //if (c != null)
                     //{
                     //    return c.GetResourceAsStream(new File(new File(rp).GetParent(), p).GetPath());
                     //}
+
                     return new FileStream(DirectoryFor(parameter).FullName, FileMode.Open);
                 }
                 return null;
@@ -1677,31 +1713,6 @@ namespace BraneCloud.Evolution.EC.Configuration
             var loc = _getLocation(parameter);
             Uncheck();
             return loc;
-        }
-
-        /** Private helper function */
-        private IParameterDatabase _getLocation(string parameter)
-        {
-            if (parameter == null)
-                return null;
-            if (CheckState)
-                return null; // we already searched this path
-            CheckState = true;
-            var result = GetProperty(parameter);
-            if (result == null)
-            {
-                var size = Parents.Count;
-                for (var x = 0; x < size; x++)
-                {
-                    var loc = ((ParameterDatabase) (Parents[x]))._getLocation(parameter);
-                    if (loc != null)
-                    {
-                        return loc;
-                    }
-                }
-                return null;
-            }
-            return this;
         }
 
         /// <summary>

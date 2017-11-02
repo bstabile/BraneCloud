@@ -124,10 +124,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
         /// (2) an individual has returned from the system.  If you're not doing steady state evolution,
         /// you should not call this method.  
         /// </summary>
-        public virtual bool EvaluatedIndividualAvailable
-        {
-            get { return Monitor.EvaluatedIndividualAvailable; }
-        }
+        public virtual bool EvaluatedIndividualAvailable => Monitor.EvaluatedIndividualAvailable;
 
         #endregion // Properties
         #region Setup

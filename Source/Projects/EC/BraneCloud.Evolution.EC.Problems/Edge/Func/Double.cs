@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.Problems.Edge.Func
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 2; } }
+        public override int ExpectedChildren => 2;
 
         public override void Eval(IEvolutionState state,
             int thread,
@@ -49,7 +49,7 @@ namespace BraneCloud.Evolution.EC.Problems.Edge.Func
             IProblem problem)
         {
             var edge = ((EdgeData)(input)).edge;
-            var prob = (EdgeProblem)problem;
+            var prob = (Edge)problem;
 
             if (prob.From.Length == prob.NumEdges)  // we're full, need to expand
             {

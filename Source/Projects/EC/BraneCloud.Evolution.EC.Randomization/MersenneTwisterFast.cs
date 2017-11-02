@@ -192,7 +192,7 @@ namespace BraneCloud.Evolution.EC.Randomization
         #region Constants
 
         // Serialization
-        private const long serialVersionUID = - 8219700664442619525L; // locked as of Version 15
+        private const long SerialVersionUID = - 8219700664442619525L; // locked as of Version 15
         
         // Period parameters
         private const int N = 624;
@@ -1066,6 +1066,13 @@ namespace BraneCloud.Evolution.EC.Randomization
             return v1 * multiplier;
         }
 
+        /** 
+            Clears the internal gaussian variable from the RNG.  You only need to do this
+            in the rare case that you need to guarantee that two RNGs have identical internal
+            state.  Otherwise, disregard this method.  See stateEquals(other).
+        */
+        public void ClearGaussian() { __haveNextNextGaussian = false; }
+
         #endregion // Floating Point
         #region Char
 
@@ -1615,7 +1622,7 @@ namespace BraneCloud.Evolution.EC.Randomization
         #endregion // Test
         #region Serialization (Not Currently Used)
 
-        public virtual bool StateEquals(object o)
+        public virtual bool StateEquals(IMersenneTwister o)
         {
             if (o == this)
                 return true;

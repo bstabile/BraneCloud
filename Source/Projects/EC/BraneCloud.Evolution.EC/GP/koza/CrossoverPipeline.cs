@@ -103,6 +103,8 @@ namespace BraneCloud.Evolution.EC.GP.Koza
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_NUM_TRIES = "tries";
         public const string P_MAXDEPTH = "maxdepth";
         public const string P_MAXSIZE = "maxsize";
@@ -287,14 +289,14 @@ namespace BraneCloud.Evolution.EC.GP.Koza
             if (MaxSize != NO_SIZE_LIMIT)
             {
                 // first easy check
-                var inner1size = inner1.NumNodes(GPNode.NODESEARCH_ALL);
-                var inner2size = inner2.NumNodes(GPNode.NODESEARCH_ALL);
-                if (inner1size > inner2size)  // need to test further
+                var inner1Size = inner1.NumNodes(GPNode.NODESEARCH_ALL);
+                var inner2Size = inner2.NumNodes(GPNode.NODESEARCH_ALL);
+                if (inner1Size > inner2Size)  // need to test further
                 {
                     // let's keep on going for the more complex test
                     var root2 = ((GPTree)(inner2.RootParent())).Child;
-                    var root2size = root2.NumNodes(GPNode.NODESEARCH_ALL);
-                    if (root2size - inner2size + inner1size > MaxSize)  // take root2, remove inner2 and swap in inner1.  Is it still small enough?
+                    var root2Size = root2.NumNodes(GPNode.NODESEARCH_ALL);
+                    if (root2Size - inner2Size + inner1Size > MaxSize)  // take root2, remove inner2 and swap in inner1.  Is it still small enough?
                         return false;
                 }
             }

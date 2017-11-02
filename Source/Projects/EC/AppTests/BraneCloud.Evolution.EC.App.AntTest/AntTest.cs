@@ -16,11 +16,7 @@
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
 
-using System;
 using System.Reflection;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
 using BraneCloud.Evolution.EC.Runtime;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using BraneCloud.Evolution.EC.Configuration;

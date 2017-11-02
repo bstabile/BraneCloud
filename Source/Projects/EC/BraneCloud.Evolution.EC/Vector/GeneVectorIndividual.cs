@@ -28,7 +28,7 @@ using BraneCloud.Evolution.EC.Configuration;
 namespace BraneCloud.Evolution.EC.Vector
 {
     /// <summary> 
-    /// GeneVectorIndividual is a VectorIndividual whose genome is an array of VectorGenes.
+    /// GeneVectorIndividual is a VectorIndividual whose genome is an array of Genes.
     /// The default mutation method calls the mutate() method on each gene independently
     /// with <tt>species.MutationProbability</tt>.  Initialization calls Reset(), which
     /// should call Reset() on each gene.  Do not expect that the genes will actually
@@ -86,42 +86,30 @@ namespace BraneCloud.Evolution.EC.Vector
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return VectorDefaults.ParamBase.Push(P_GENEVECTORINDIVIDUAL); }
-        }
+        public override IParameter DefaultBase => VectorDefaults.ParamBase.Push(P_GENEVECTORINDIVIDUAL);
 
         public override object Genome
         {
-            get
-            {
-                return genome;
-            }
+            get => genome;
 
-            set
-            {
-                genome = (VectorGene[])value;
-            }
-
+            set => genome = (Gene[])value;
         }
         public override int GenomeLength
         {
-            get { return genome.Length; }
+            get => genome.Length;
             set
             {
                 var s = (GeneVectorSpecies)Species;
-                var newGenome = new VectorGene[value];
+                var newGenome = new Gene[value];
                 Array.Copy(genome, 0, newGenome, 0, genome.Length < newGenome.Length ? genome.Length : newGenome.Length);
                 for (var x = genome.Length; x < newGenome.Length; x++)
-                    newGenome[x] = (VectorGene)(s.GenePrototype.Clone());  // not reset
+                    newGenome[x] = (Gene)s.GenePrototype.Clone();  // not reset
                 genome = newGenome;
             }
         }
-        public override long Length
-        {
-            get { return genome.Length; }
-        }
-        public VectorGene[] genome { get; set; }
+        public override long Length => genome.Length;
+
+        public Gene[] genome { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -142,7 +130,7 @@ namespace BraneCloud.Evolution.EC.Vector
 
             // note that genome isn't initialized with any genes yet -- they're all null.
             // Reset() needs
-            genome = new VectorGene[s.GenomeSize];
+            genome = new Gene[s.GenomeSize];
             Reset(state, 0);
         }
 
@@ -161,7 +149,7 @@ namespace BraneCloud.Evolution.EC.Vector
             var point1 = points[0];
             for (var x = 0; x < pieces.Length; x++)
             {
-                pieces[x] = new VectorGene[point1 - point0];
+                pieces[x] = new Gene[point1 - point0];
                 Array.Copy(genome, point0, (Array)pieces[x], 0, point1 - point0);
                 point0 = point1;
                 point1 = x >= pieces.Length - 2
@@ -175,14 +163,14 @@ namespace BraneCloud.Evolution.EC.Vector
         /// </summary>
         public override void Join(object[] pieces)
         {
-            var sum = pieces.Sum(t => ((VectorGene[])t).Length);
+            var sum = pieces.Sum(t => ((Gene[])t).Length);
 
             var runningsum = 0;
-            var newgenome = new VectorGene[sum];
+            var newgenome = new Gene[sum];
             foreach (var t in pieces)
             {
-                Array.Copy((Array)t, 0, newgenome, runningsum, ((VectorGene[])t).Length);
-                runningsum += ((VectorGene[])t).Length;
+                Array.Copy((Array)t, 0, newgenome, runningsum, ((Gene[])t).Length);
+                runningsum += ((Gene[])t).Length;
             }
             // set genome
             genome = newgenome;
@@ -199,7 +187,7 @@ namespace BraneCloud.Evolution.EC.Vector
             {
                 // first create the gene if it doesn't exist
                 if (genome[x] == null)
-                    genome[x] = (VectorGene)s.GenePrototype.Clone();
+                    genome[x] = (Gene)s.GenePrototype.Clone();
                 // now reset it
                 genome[x].Reset(state, thread);
             }
@@ -212,7 +200,7 @@ namespace BraneCloud.Evolution.EC.Vector
         {
             var s = (GeneVectorSpecies)Species;
             var i = (GeneVectorIndividual)ind;
-            VectorGene tmp;
+            Gene tmp;
             int point;
 
             if (genome.Length != i.genome.Length)
@@ -267,11 +255,27 @@ namespace BraneCloud.Evolution.EC.Vector
         public override void DefaultMutate(IEvolutionState state, int thread)
         {
             var s = (GeneVectorSpecies)Species;
-            if (s.MutationProbability > 0.0)
-                foreach (var t in genome.Where(t => state.Random[thread].NextBoolean(s.MutationProbability)))
+            for (var x = 0; x < genome.Length; x++)
+            {
+                if (state.Random[thread].NextBoolean(s.MutationProbability[x]))
                 {
-                    t.Mutate(state, thread);
+                    if (s.GetDuplicateRetries(x) <= 0)  // a little optimization
+                    {
+                        genome[x].Mutate(state, thread);
+                    }
+                    else    // argh
+                    {
+                        Gene old = (Gene)genome[x].Clone();
+                        for (int retries = 0; retries < s.GetDuplicateRetries(x) + 1; retries++)
+                        {
+                            genome[x].Mutate(state, thread);
+                            if (!genome[x].Equals(old)) break;
+                            else genome[x] = old;  // try again.  Note that we're copying back just in case.
+                        }
+
+                    }
                 }
+            }
         }
 
         #endregion // Breeding
@@ -289,12 +293,13 @@ namespace BraneCloud.Evolution.EC.Vector
 
         public override bool Equals(object ind)
         {
-            if (!(GetType().Equals(ind.GetType())))
+            if (ind == null) return false;
+            if (!GetType().Equals(ind.GetType()))
                 return false;
             var i = (GeneVectorIndividual)ind;
             if (genome.Length != i.genome.Length)
                 return false;
-            return !genome.Where((t, j) => !(t.Equals(i.genome[j]))).Any();
+            return !genome.Where((t, j) => !t.Equals(i.genome[j])).Any();
         }
 
         #endregion // Comparison
@@ -305,9 +310,9 @@ namespace BraneCloud.Evolution.EC.Vector
             var myobj = (GeneVectorIndividual)base.Clone();
 
             // must clone the genome
-            myobj.genome = (VectorGene[])genome.Clone();
+            myobj.genome = (Gene[])genome.Clone();
             for (var x = 0; x < genome.Length; x++)
-                myobj.genome[x] = (VectorGene)genome[x].Clone();
+                myobj.genome[x] = (Gene)genome[x].Clone();
 
             return myobj;
         }
@@ -317,10 +322,10 @@ namespace BraneCloud.Evolution.EC.Vector
         /// </summary>
         public override void CloneGenes(Object piece)
         {
-            var genes = (VectorGene[])piece;
+            var genes = (Gene[])piece;
             for (var i = 0; i < genes.Length; i++)
             {
-                if (genes[i] != null) genes[i] = (VectorGene)genes[i].Clone();
+                if (genes[i] != null) genes[i] = (Gene)genes[i].Clone();
             }
         }
 
@@ -330,11 +335,8 @@ namespace BraneCloud.Evolution.EC.Vector
         public override string GenotypeToStringForHumans()
         {
             var s = new StringBuilder();
-            foreach (var t in genome)
-            {
-                s.Append(" ");
-                s.Append(t.PrintGeneToStringForHumans());
-            }
+            for (var i = 0; i < genome.Length; i++)
+            { if (i > 0) s.Append(" "); s.Append(genome[i].PrintGeneToStringForHumans()); }
             return s.ToString();
         }
 
@@ -343,7 +345,8 @@ namespace BraneCloud.Evolution.EC.Vector
             var s = new StringBuilder();
             foreach (var t in genome)
             {
-                s.Append(" "); s.Append(t.PrintGeneToString());
+                s.Append(" ");
+                s.Append(t.PrintGeneToString());
             }
             return s.ToString();
         }
@@ -357,14 +360,16 @@ namespace BraneCloud.Evolution.EC.Vector
             var s = reader.ReadLine();
             var d = new DecodeReturn(s);
             Code.Decode(d);
-            var lll = (int)(d.L);
+            if (d.Type != DecodeReturn.T_INTEGER)  // uh oh
+                state.Output.Fatal("Individual with genome:\n" + s + "\n... does not have an integer at the beginning indicating the genome count.");
+            var lll = (int)d.L;
 
-            genome = new VectorGene[lll];
+            genome = new Gene[lll];
 
             var species = (GeneVectorSpecies)Species;
             for (var i = 0; i < genome.Length; i++)
             {
-                genome[i] = (VectorGene)species.GenePrototype.Clone();
+                genome[i] = (Gene)species.GenePrototype.Clone();
                 genome[i].ReadGene(state, reader);
             }
         }
@@ -380,12 +385,12 @@ namespace BraneCloud.Evolution.EC.Vector
         {
             var len = reader.ReadInt32();
             if (genome == null || genome.Length != len)
-                genome = new VectorGene[len];
+                genome = new Gene[len];
             var species = (GeneVectorSpecies)Species;
 
             for (var x = 0; x < genome.Length; x++)
             {
-                genome[x] = (VectorGene)species.GenePrototype.Clone();
+                genome[x] = (Gene)species.GenePrototype.Clone();
                 genome[x].ReadGene(state, reader);
             }
         }

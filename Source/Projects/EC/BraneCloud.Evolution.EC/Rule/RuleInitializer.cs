@@ -45,6 +45,8 @@ namespace BraneCloud.Evolution.EC.Rule
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         // BRS : TODO : Change all the sbytes to bytes (conversion was easier with sbyte)
         // used just here, so far as I know :-)
         public const int SIZE_OF_BYTE = 256;
@@ -151,10 +153,8 @@ namespace BraneCloud.Evolution.EC.Rule
                 c.Setup(state, paramBase.Push("" + y));
             }
             // set our constraints array up
-            IEnumerator e = RuleSetConstraintRepository.GetEnumerator();
-            while (e.MoveNext())
+            foreach (RuleSetConstraints c in RuleSetConstraintRepository)
             {
-                var c = (RuleSetConstraints)(e.Current);
                 c.ConstraintCount = NumRuleSetConstraints;
                 RuleSetConstraints[NumRuleSetConstraints] = c;
                 NumRuleSetConstraints++;

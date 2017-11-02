@@ -78,6 +78,8 @@ namespace BraneCloud.Evolution.EC.GP
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_ADFSTACK = "adf-stack";
         public const string P_ADF = "adf";
         public const string P_CONTEXT = "context";

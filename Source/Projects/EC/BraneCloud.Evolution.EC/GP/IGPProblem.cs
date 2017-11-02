@@ -17,7 +17,7 @@ namespace BraneCloud.Evolution.EC.GP
         /// <summary>
         /// The GPProblems' GPData 
         /// </summary>
-        GPData Data { get; set; }
+        GPData Input { get; set; }
 
         /// <summary>
         /// Asynchronous Steady-State EC only: Returns true if the problem is ready to evaluate.  

@@ -256,6 +256,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         //// Client information
 
         /// <summary>
@@ -494,15 +496,15 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
             ParamBase = paramBase;
 
             // get the port of the server
-            var p = ParamBase.Push(P_SERVER_PORT);
+            var p = paramBase.Push(P_SERVER_PORT);
             ServerPort = state.Parameters.GetInt(p, null, 1);
             if (ServerPort == 0)
                 state.Output.Fatal("Could not get the port of the server, or it is invalid.", p);
 
-            Chatty = state.Parameters.GetBoolean(ParamBase.Push(P_CHATTY), null, true);
+            Chatty = state.Parameters.GetBoolean(paramBase.Push(P_CHATTY), null, true);
 
             // by default, communication is not compressed
-            CompressedCommunication = state.Parameters.GetBoolean(ParamBase.Push(P_COMPRESSED_COMMUNICATION), null, false);
+            CompressedCommunication = state.Parameters.GetBoolean(paramBase.Push(P_COMPRESSED_COMMUNICATION), null, false);
             if (CompressedCommunication)
             {
                 //            state.Output.Fatal("JDK 1.5 has broken compression.  For now, you must set " + base.Push(P_COMPRESSED_COMMUNICATION) + "=false");
@@ -510,7 +512,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
             }
 
             // check whether it has to launch the main server for coordination
-            p = ParamBase.Push(P_IS_SERVER);
+            p = paramBase.Push(P_IS_SERVER);
             AmServer = state.Parameters.GetBoolean(p, null, false);
 
             // Am I ONLY the server or not?
@@ -528,33 +530,33 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
             else
             {
                 // Setup the selection method
-                p = ParamBase.Push(P_SELECT_METHOD);
+                p = paramBase.Push(P_SELECT_METHOD);
                 ImmigrantsSelectionMethod = (SelectionMethod)state.Parameters.GetInstanceForParameter(p, null, typeof(SelectionMethod));
-                ImmigrantsSelectionMethod.Setup(state, ParamBase);
+                ImmigrantsSelectionMethod.Setup(state, paramBase);
 
                 // Setup the selection method
-                p = ParamBase.Push(P_SELECT_TO_DIE_METHOD);
+                p = paramBase.Push(P_SELECT_TO_DIE_METHOD);
                 if (state.Parameters.ParameterExists(p, null))
                     IndsToDieSelectionMethod = (SelectionMethod)state.Parameters.GetInstanceForParameter(p, null, typeof(SelectionMethod));
                 // use RandomSelection
                 else
                     IndsToDieSelectionMethod = new RandomSelection();
-                IndsToDieSelectionMethod.Setup(state, ParamBase);
+                IndsToDieSelectionMethod.Setup(state, paramBase);
 
                 // get the address of the server
-                p = ParamBase.Push(P_SERVER_ADDRESS);
+                p = paramBase.Push(P_SERVER_ADDRESS);
                 ServerAddress = state.Parameters.GetStringWithDefault(p, null, "");
                 if (String.IsNullOrEmpty(ServerAddress))
                     state.Output.Fatal("Could not get the address of the server.", p);
 
                 // get the port of the client Mailbox
-                p = ParamBase.Push(P_CLIENT_PORT);
+                p = paramBase.Push(P_CLIENT_PORT);
                 ClientPort = state.Parameters.GetInt(p, null, 1);
                 if (ClientPort == 0)
                     state.Output.Fatal("Could not get the port of the client, or it is invalid.", p);
 
                 // get the id of the island
-                p = ParamBase.Push(P_OWN_ID);
+                p = paramBase.Push(P_OWN_ID);
                 OwnId = state.Parameters.GetStringWithDefault(p, null, "");
                 if (String.IsNullOrEmpty(OwnId))
                     state.Output.Fatal("Could not get the Id of the island.", p);

@@ -50,17 +50,11 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
         ///</summary>
         public TestContext TestContext
         {
-            get
-            {
-                return testContextInstance;
-            }
-            set
-            {
-                testContextInstance = value;
-            }
+            get => testContextInstance;
+            set => testContextInstance = value;
         }
 
-        private TestContext context { get { return testContextInstance; } }
+        private TestContext context => testContextInstance;
 
         #region Additional test attributes
         //
@@ -88,13 +82,18 @@ namespace BraneCloud.Evolution.EC.App.ECSuite.Test
 
         [TestMethod]
         [Description("ECSuite Basic Test.")]
-        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\App\ECSuite\de2.params", "App/ECSuite/Params/App/ECSuite")]
-        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\ec.params", "App/ECSuite/Params")]
+        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\App\ECSuite\base.params", "App/ECSuite/Params/App/ECSuite")]
+        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\App\ECSuite\de.params", "App/ECSuite/Params/App/ECSuite")]
         [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\App\ECSuite\ecsuite.params", "App/ECSuite/Params/App/ECSuite")]
-        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\ES\es.params", "App/ECSuite/Params/ES")]
-        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\App\ECSuite\es2.params", "App/ECSuite/Params/App/ECSuite")]
-        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\Simple\simple.params", "App/ECSuite/Params/Simple")]
+        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\App\ECSuite\es.params", "App/ECSuite/Params/App/ECSuite")]
+        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\App\ECSuite\meta.params", "App/ECSuite/Params/App/ECSuite")]
+        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\App\ECSuite\pso.params", "App/ECSuite/Params/App/ECSuite")]
         [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\App\ECSuite\steady.params", "App/ECSuite/Params/App/ECSuite")]
+        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\ec.params", "App/ECSuite/Params")]
+        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\DE\de.params", "App/ECSuite/Params/DE")]
+        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\ES\es.params", "App/ECSuite/Params/ES")]
+        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\PSO\pso.params", "App/ECSuite/Params/PSO")]
+        [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\Simple\simple.params", "App/ECSuite/Params/Simple")]
         [DeploymentItem(@"..\..\Projects\EC\Tests\App\BraneCloud.Evolution.EC.App.ECSuite.Test\Params\SteadyState\steadystate.params", "App/ECSuite/Params/SteadyState")]
         public void ECSuiteBasic()
         {

@@ -1,4 +1,3 @@
-using System;
 using BraneCloud.Evolution.EC.GP;
 
 namespace BraneCloud.Evolution.EC.App.Regression.Func
@@ -15,23 +14,26 @@ namespace BraneCloud.Evolution.EC.App.Regression.Func
     /// <p/>This function appears in the Korns function set, and is just x * x * x
     /// <p/>M. F. Korns. Accuracy in Symbolic Regression. In <i>Proc. GPTP.</i> 2011. 
     /// </summary>
-public class Cube : GPNode
+    public class Cube : GPNode
     {
-    public override String ToString() { return "cube"; }
-
-    public override int ExpectedChildren { get { return 1; } }
-
-    public override void Eval(IEvolutionState state,
-        int thread,
-        GPData input,
-        ADFStack stack,
-        GPIndividual individual,
-        IProblem problem)
+        public override string ToString()
         {
-        var rd = ((RegressionData)(input));
+            return "cube";
+        }
 
-        Children[0].Eval(state,thread,input,stack,individual,problem);
-        rd.x = rd.x * rd.x * rd.x;
+        public override int ExpectedChildren => 1;
+
+        public override void Eval(IEvolutionState state,
+            int thread,
+            GPData input,
+            ADFStack stack,
+            GPIndividual individual,
+            IProblem problem)
+        {
+            var rd = ((RegressionData) (input));
+
+            Children[0].Eval(state, thread, input, stack, individual, problem);
+            rd.x = rd.x * rd.x * rd.x;
         }
     }
 

@@ -78,11 +78,6 @@ namespace BraneCloud.Evolution.EC.Parsimony
         public const string P_SIZE = "size";
         public const string P_SIZE2 = "size2";
         
-        /// <summary>
-        /// Default size
-        /// </summary>
-        public const int DEFAULT_SIZE = 7;
-
         #endregion // Constants
         #region Properties
 

@@ -91,6 +91,8 @@ namespace BraneCloud.Evolution.EC.GP
     {
         #region Constants   ***************************************************************************
 
+        private const long SerialVersionUID = 1;
+
         public const string P_NUMTREES = "numtrees";
         public const string P_TREE = "tree";
 
@@ -200,7 +202,8 @@ namespace BraneCloud.Evolution.EC.GP
 
         public override bool Equals(object ind)
         {
-            if (!(GetType().Equals(ind.GetType())))
+            if (ind == null) return false;
+            if (!(GetType() == ind.GetType()))
                 return false; // GPIndividuals are special.
             var i = (GPIndividual) ind;
             if (Trees.Length != i.Trees.Length)

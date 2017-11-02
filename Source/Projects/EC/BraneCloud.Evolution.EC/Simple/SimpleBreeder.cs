@@ -17,8 +17,10 @@
  */
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
-
+using System.Threading.Tasks.Dataflow;
+using BraneCloud.Evolution.EC.Breed;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Configuration;
@@ -84,9 +86,12 @@ namespace BraneCloud.Evolution.EC.Simple
         #region Constants
 
         public const string P_ELITE = "elite";
+        public const string P_ELITE_FRAC = "elite-fraction";
         public const string P_REEVALUATE_ELITES = "reevaluate-elites";
         public const string P_SEQUENTIAL_BREEDING = "sequential";
         public const string P_CLONE_PIPELINE_AND_POPULATION = "clone-pipeline-and-population";
+
+        public const int NOT_SET = -1;
 
         #endregion // Constants
         #region Properties
@@ -95,6 +100,10 @@ namespace BraneCloud.Evolution.EC.Simple
         /// An array[subpop] of the number of elites to keep for that subpop 
         /// </summary>
         public int[] Elite { get; set; }
+
+        public double[] EliteFrac { get; set; }
+
+
 
         public bool[] ReevaluateElites { get; set; }
 
@@ -115,34 +124,65 @@ namespace BraneCloud.Evolution.EC.Simple
             var size = state.Parameters.GetInt(p, null, 1);
 
             Elite = new int[size];
+            EliteFrac = new double[size];
+            for (var i = 0; i < size; i++)
+                EliteFrac[i] = Elite[i] = NOT_SET;
             ReevaluateElites = new bool[size];
 
             SequentialBreeding = state.Parameters.GetBoolean(paramBase.Push(P_SEQUENTIAL_BREEDING), null, false);
-            if (SequentialBreeding && (size == 1)) // uh oh, this can't be right
-                state.Output.Fatal("The Breeder is breeding sequentially, but you have only one population.", paramBase.Push(P_SEQUENTIAL_BREEDING));
+            if (SequentialBreeding && size == 1) // uh oh, this can't be right
+                state.Output.Fatal("The Breeder is breeding sequentially, but you have only one population.", 
+                    paramBase.Push(P_SEQUENTIAL_BREEDING));
 
             ClonePipelineAndPopulation = state.Parameters.GetBoolean(paramBase.Push(P_CLONE_PIPELINE_AND_POPULATION), null, true);
             if (!ClonePipelineAndPopulation && (state.BreedThreads > 1)) // uh oh, this can't be right
-                state.Output.Fatal("The Breeder is not cloning its pipeline and population, but you have more than one thread.", paramBase.Push(P_CLONE_PIPELINE_AND_POPULATION));
+                state.Output.Fatal("The Breeder is not cloning its pipeline and population, but you have more than one thread.", 
+                    paramBase.Push(P_CLONE_PIPELINE_AND_POPULATION));
 
             var defaultSubpop = state.Parameters.GetInt(new Parameter(Initializer.P_POP).Push(Population.P_DEFAULT_SUBPOP), null, 0);
             for (var x = 0; x < size; x++)
             {
                 // get elites
-                if (defaultSubpop >= 0 && !state.Parameters.ParameterExists(paramBase.Push(P_ELITE).Push("" + x), null))
+                if (state.Parameters.ParameterExists(paramBase.Push(P_ELITE).Push("" + x), null))
                 {
-                    Elite[x] = state.Parameters.GetIntWithDefault(paramBase.Push(P_ELITE).Push("" + defaultSubpop), null, 0);
-                    if (Elite[x] > 0)
-                        state.Output.Warning("Elites not specified for subpopulation " + x
-                            + ".  Using values for default subpopulation " + defaultSubpop + ": " + Elite[x]);
+                    if (state.Parameters.ParameterExists(paramBase.Push(P_ELITE_FRAC).Push("" + x), null))
+                        state.Output.Error("Both elite and elite-frac specified for subpouplation " + x + ".", paramBase.Push(P_ELITE_FRAC).Push("" + x), paramBase.Push(P_ELITE_FRAC).Push("" + x));
+                    else
+                    {
+                        Elite[x] = state.Parameters.GetIntWithDefault(paramBase.Push(P_ELITE).Push("" + x), null, 0);
+                        if (Elite[x] < 0)
+                            state.Output.Error("Elites for subpopulation " + x + " must be an integer >= 0", paramBase.Push(P_ELITE).Push("" + x));
+                    }
                 }
-                else
+                else if (state.Parameters.ParameterExists(paramBase.Push(P_ELITE_FRAC).Push("" + x), null))
                 {
-                    Elite[x] = state.Parameters.GetIntWithDefault(paramBase.Push(P_ELITE).Push("" + x), null, 0);
+                    EliteFrac[x] = state.Parameters.GetDoubleWithMax(paramBase.Push(P_ELITE_FRAC).Push("" + x), null, 0.0, 1.0);
+                    if (EliteFrac[x] < 0.0)
+                        state.Output.Error("Elite Fraction of subpopulation " + x + " must be a real value between 0.0 and 1.0 inclusive", paramBase.Push(P_ELITE_FRAC).Push("" + x));
                 }
-                if (Elite[x] < 0) state.Output.Error("The number of elites for subpopulation " + x
-                    + " must be >= 0", paramBase.Push(P_ELITE).Push("" + x));
-
+                else if (defaultSubpop >= 0)
+                {
+                    if (state.Parameters.ParameterExists(paramBase.Push(P_ELITE).Push("" + defaultSubpop), null))
+                    {
+                        Elite[x] = state.Parameters.GetIntWithDefault(paramBase.Push(P_ELITE).Push("" + defaultSubpop), null, 0);
+                        if (Elite[x] < 0)
+                            state.Output.Warning("Invalid default subpopulation elite value.");  // we'll fail later
+                    }
+                    else if (state.Parameters.ParameterExists(paramBase.Push(P_ELITE_FRAC).Push("" + defaultSubpop), null))
+                    {
+                        EliteFrac[x] = state.Parameters.GetDoubleWithMax(paramBase.Push(P_ELITE_FRAC).Push("" + defaultSubpop), null, 0.0, 1.0);
+                        if (EliteFrac[x] < 0.0)
+                            state.Output.Warning("Invalid default subpopulation elite-frac value.");  // we'll fail later
+                    }
+                    else  // elitism is 0
+                    {
+                        Elite[x] = 0;
+                    }
+                }
+                else // elitism is 0
+                {
+                    Elite[x] = 0;
+                }
 
                 // get reevaluation
                 if (defaultSubpop >= 0 && !state.Parameters.ParameterExists(paramBase.Push(P_REEVALUATE_ELITES).Push("" + x), null))
@@ -166,13 +206,37 @@ namespace BraneCloud.Evolution.EC.Simple
 
         #region Elites
 
+        public bool UsingElitism(int subpopulation)
+        {
+            return Elite[subpopulation] != NOT_SET 
+                || !EliteFrac[subpopulation].Equals(NOT_SET); // Floating point comparison!
+        }
+
+        public int NumElites(IEvolutionState state, int subpopulation)
+        {
+            if (Elite[subpopulation] != NOT_SET)
+            {
+                return Elite[subpopulation];
+            }
+            if (!EliteFrac[subpopulation].Equals(0)) // Floating point comparison!
+            {
+                return 0; // no elites
+            }
+            if (!EliteFrac[subpopulation].Equals(NOT_SET)) // Floating point comparison!
+            {
+                return (int)Math.Max(Math.Floor(state.Population.Subpops[subpopulation].Individuals.Length * EliteFrac[subpopulation]), 1.0);  // AT LEAST 1 ELITE
+            }
+            state.Output.WarnOnce("Elitism error (SimpleBreeder).  This shouldn't be able to happen.  Please report.");
+            return 0;  // this shouldn't happen
+        }
+
         protected void UnmarkElitesEvaluated(IEvolutionState state, Population newpop)
         {
             for (var sub = 0; sub < newpop.Subpops.Length; sub++)
             {
                 if (!ShouldBreedSubpop(state, sub, 0))
                     continue;
-                for (var e = 0; e < Elite[sub]; e++)
+                for (var e = 0; e < NumElites(state, sub); e++)
                 {
                     var len = newpop.Subpops[sub].Individuals.Length;
                     if (ReevaluateElites[sub])
@@ -186,11 +250,16 @@ namespace BraneCloud.Evolution.EC.Simple
         /// </summary>		
         protected virtual void LoadElites(IEvolutionState state, Population newpop)
         {
-            // are our Elites small enough?
-            for (var x = 0; x < state.Population.Subpops.Length; x++)
-                if (Elite[x] > state.Population.Subpops[x].Individuals.Length)
-                    state.Output.Error("The number of Elites for subpop " + x + " exceeds the actual size of the subpop",
-                                                        new Parameter(EvolutionState.P_BREEDER).Push(P_ELITE).Push("" + x));
+            // are our elites small enough?
+            for (int x = 0; x < state.Population.Subpops.Length; x++)
+            {
+                if (NumElites(state, x) > state.Population.Subpops[x].Individuals.Length)
+                    state.Output.Error("The number of elites for subpopulation " + x + " exceeds the actual size of the subpopulation",
+                        new Parameter(EvolutionState.P_BREEDER).Push(P_ELITE).Push("" + x));
+                if (NumElites(state, x) == state.Population.Subpops[x].Individuals.Length)
+                    state.Output.Warning("The number of elites for subpopulation " + x + " is the actual size of the subpopulation",
+                        new Parameter(EvolutionState.P_BREEDER).Push(P_ELITE).Push("" + x));
+            }
 
             state.Output.ExitIfErrors();
 
@@ -204,7 +273,7 @@ namespace BraneCloud.Evolution.EC.Simple
                 }
 
                 // if the number of Elites is 1, then we handle this by just finding the best one.
-                if (Elite[sub] == 1)
+                if (NumElites(state, sub) == 1)
                 {
                     var best = 0;
                     var oldinds = state.Population.Subpops[sub].Individuals;
@@ -216,7 +285,7 @@ namespace BraneCloud.Evolution.EC.Simple
                     var inds = newpop.Subpops[sub].Individuals;
                     inds[inds.Length - 1] = (Individual)oldinds[best].Clone();
                 }
-                else if (Elite[sub] > 0) // we'll need to sort
+                else if (NumElites(state, sub) > 0) // we'll need to sort
                 {
                     var orderedPop = new int[state.Population.Subpops[sub].Individuals.Length];
                     for (var x = 0; x < state.Population.Subpops[sub].Individuals.Length; x++)
@@ -228,7 +297,7 @@ namespace BraneCloud.Evolution.EC.Simple
 
                     var inds = newpop.Subpops[sub].Individuals;
                     var oldinds = state.Population.Subpops[sub].Individuals;
-                    for (var x = inds.Length - Elite[sub]; x < inds.Length; x++)
+                    for (var x = inds.Length - NumElites(state, sub); x < inds.Length; x++)
                         inds[x] = (Individual)(oldinds[orderedPop[x]].Clone());
                 }
                 // optionally force reevaluation
@@ -247,7 +316,7 @@ namespace BraneCloud.Evolution.EC.Simple
         {
             if (!ShouldBreedSubpop(state, subpop, threadnum))
                 return newpop.Subpops[subpop].Individuals.Length;  // we're not breeding the population, just copy over the whole thing
-            return newpop.Subpops[subpop].Individuals.Length - Elite[subpop];	// we're breeding population, so elitism may have happened 
+            return newpop.Subpops[subpop].Individuals.Length - NumElites(state, subpop);	// we're breeding population, so elitism may have happened 
         }
 
         /// <summary>
@@ -257,17 +326,6 @@ namespace BraneCloud.Evolution.EC.Simple
         /// </summary>
         public override Population BreedPopulation(IEvolutionState state)
         {
-            var numinds = new int[state.BreedThreads][];
-            for (var i = 0; i < state.BreedThreads; i++)
-            {
-                numinds[i] = new int[state.Population.Subpops.Length];
-            }
-            var from = new int[state.BreedThreads][];
-            for (var i2 = 0; i2 < state.BreedThreads; i2++)
-            {
-                from[i2] = new int[state.Population.Subpops.Length];
-            }
-
             Population newpop;
             if (ClonePipelineAndPopulation)
                 newpop = (Population)state.Population.EmptyClone();
@@ -283,64 +341,94 @@ namespace BraneCloud.Evolution.EC.Simple
             // load Elites into top of newpop
             LoadElites(state, newpop);
 
-            for (var y = 0; y < state.BreedThreads; y++)
-                for (var x = 0; x < state.Population.Subpops.Length; x++)
+            // how many threads do we really need?  No more than the maximum number of individuals in any subpopulation
+            int numThreads = 0;
+            for (int x = 0; x < state.Population.Subpops.Length; x++)
+                numThreads = Math.Max(numThreads, state.Population.Subpops[x].Individuals.Length);
+            numThreads = Math.Min(numThreads, state.BreedThreads);
+            if (numThreads < state.BreedThreads)
+                state.Output.WarnOnce("Largest subpopulation size (" + numThreads + ") is smaller than number of breedthreads (" + state.BreedThreads +
+                                      "), so fewer breedthreads will be created.");
+
+            var numinds = new int[state.BreedThreads][];
+            for (var i = 0; i < state.BreedThreads; i++)
+            {
+                numinds[i] = new int[state.Population.Subpops.Length];
+            }
+            var from = new int[state.BreedThreads][];
+            for (var i2 = 0; i2 < state.BreedThreads; i2++)
+            {
+                from[i2] = new int[state.Population.Subpops.Length];
+            }
+
+            for (int x = 0; x < state.Population.Subpops.Length; x++)
+            {
+                int length = ComputeSubpopulationLength(state, newpop, x, 0);
+
+                // we will have some extra individuals.  We distribute these among the early subpopulations
+                int individualsPerThread = length / numThreads;  // integer division
+                int slop = length - numThreads * individualsPerThread;
+                int currentFrom = 0;
+
+                for (int y = 0; y < numThreads; y++)
                 {
-                    // the number of individuals we need to breed
-                    var length = ComputeSubpopulationLength(state, newpop, x, 0);
-                    // the size of each breeding chunk except the last one
-                    var firstBreedChunkSizes = length / state.BreedThreads;
-                    // the size of the last breeding chunk
-                    var lastBreedChunkSize = firstBreedChunkSizes + length - firstBreedChunkSizes * (state.BreedThreads);
-
-                    // figure numinds
-                    if (y < state.BreedThreads - 1)
-                        // not the last one
-                        numinds[y][x] = firstBreedChunkSizes;
-                    // the last one
+                    if (slop > 0)
+                    {
+                        numinds[y][x] = individualsPerThread + 1;
+                        slop--;
+                    }
                     else
-                        numinds[y][x] = lastBreedChunkSize;
+                        numinds[y][x] = individualsPerThread;
 
-                    // figure from
-                    from[y][x] = (firstBreedChunkSizes * y);
+                    if (numinds[y][x] == 0)
+                    {
+                        state.Output.WarnOnce("More threads exist than can be used to breed some subpopulations (first example: subpopulation " + x + ")");
+                    }
+
+                    from[y][x] = currentFrom;
+                    currentFrom += numinds[y][x];
                 }
+            }
 
-            if (state.BreedThreads == 1)
+
+            if (numThreads == 1)
             {
                 BreedPopChunk(newpop, state, numinds[0], from[0], 0);
             }
             else
             {
-                var t = new ThreadClass[state.BreedThreads];
-
-                // start up the threads
-                for (var y = 0; y < state.BreedThreads; y++)
-                {
-                    var r = new SimpleBreederThread
-                    {
-                        ThreadNum = y,
-                        NewPop = newpop,
-                        NumInds = numinds[y],
-                        From = from[y],
-                        Me = this,
-                        State = state
-                    };
-                    t[y] = new ThreadClass(new ThreadStart(r.Run));
-                    t[y].Start();
-                }
-
-                // gather the threads
-                for (var y = 0; y < state.BreedThreads; y++)
-                    try
-                    {
-                        t[y].Join();
-                    }
-                    catch (ThreadInterruptedException)
-                    {
-                        state.Output.Fatal("Whoa! The main breeding thread got interrupted!  Dying...");
-                    }
+                ParallelBreeding(state, newpop, from, numinds, this);
             }
+
             return newpop;
+        }
+
+        void ParallelBreeding(IEvolutionState state, Population newpop, int[][] origin, int[][] numinds, SimpleBreeder breeder)
+        {
+            // BRS: TPL DataFlow is cleaner and safer than using raw threads.
+
+            // Limit the concurrency in case the user has gone overboard!
+            var maxDegree = Math.Min(Environment.ProcessorCount, state.BreedThreads);
+            var options = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = maxDegree };
+
+            Action<BreederThread> act = t => t.Run();
+            var actionBlock = new ActionBlock<BreederThread>(act, options);
+
+            for (var i = 0; i < state.BreedThreads; i++)
+            {
+                var runnable = new BreederThread
+                {
+                    ThreadNum = i,
+                    State = state,
+                    NewPop = newpop,
+                    NumInds = numinds[i],
+                    From = origin[i],
+                    Breeder = breeder,
+                };
+                actionBlock.Post(runnable);
+            }
+            actionBlock.Complete();
+            actionBlock.Completion.Wait();
         }
 
         /// <summary>
@@ -348,7 +436,8 @@ namespace BraneCloud.Evolution.EC.Simple
         /// </summary>
         public bool ShouldBreedSubpop(IEvolutionState state, int subpop, int threadnum)
         {
-            return (!SequentialBreeding || (state.Generation % state.Population.Subpops.Length) == subpop);
+            return !SequentialBreeding 
+                || state.Generation % state.Population.Subpops.Length == subpop;
         }
 
         /// <summary>
@@ -358,7 +447,7 @@ namespace BraneCloud.Evolution.EC.Simple
         /// public (for the benefit of a private helper class in this file),
         /// you should not call it. 
         /// </summary>
-        protected internal virtual void BreedPopChunk(Population newpop, IEvolutionState state, int[] numinds, int[] from, int threadnum)
+        public override void BreedPopChunk(Population newpop, IEvolutionState state, int[] numinds, int[] from, int threadnum)
         {
             for (var subpop = 0; subpop < newpop.Subpops.Length; subpop++)
             {
@@ -374,7 +463,12 @@ namespace BraneCloud.Evolution.EC.Simple
                 else
                 {
                     // do regular breeding of this subpopulation
-                    var bp = (BreedingPipeline)newpop.Subpops[subpop].Species.Pipe_Prototype.Clone();
+                    BreedingPipeline bp = null;
+                    if (ClonePipelineAndPopulation)
+                        bp = (BreedingPipeline)newpop.Subpops[subpop].Species.Pipe_Prototype.Clone();
+                    else
+                        bp = newpop.Subpops[subpop].Species.Pipe_Prototype;
+
 
                     // check to make sure that the breeding pipeline produces
                     // the right kind of individuals.  Don't want a mistake there! :-)
@@ -404,22 +498,5 @@ namespace BraneCloud.Evolution.EC.Simple
         }
 
         #endregion // Operations
-    }
-        
-    /// <summary>
-    /// A private helper class for implementing multithreaded breeding 
-    /// </summary>
-    class SimpleBreederThread : IThreadRunnable
-    {
-        internal Population NewPop;
-        public int[] NumInds;
-        public int[] From;
-        public SimpleBreeder Me;
-        public IEvolutionState State;
-        public int ThreadNum;
-        public virtual void  Run()
-        {
-            Me.BreedPopChunk(NewPop, State, NumInds, From, ThreadNum);
-        }
     }
 }

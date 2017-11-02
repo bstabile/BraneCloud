@@ -41,7 +41,7 @@ namespace BraneCloud.Evolution.EC.App.Multiplexer.Func
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         public override void Eval(IEvolutionState state,
             int thread,

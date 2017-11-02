@@ -36,7 +36,7 @@ namespace BraneCloud.Evolution.EC.App.Edge
                                                 });
 
             // We can run in a loop using each numbered param file. But here we are just running one individually to examine the output.
-            Evolve.Run(new[] { "-file", @"Params\App\Edge\1.params" });
+            Evolve.Run(new[] { "-file", @"Params\App\Edge\7.params" });
             Console.WriteLine("\nDone!");
             Console.ReadLine();
         }

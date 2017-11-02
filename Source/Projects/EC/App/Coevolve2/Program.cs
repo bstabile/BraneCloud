@@ -17,11 +17,9 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Runtime;
 
 namespace BraneCloud.Evolution.EC.App.Coevolve2
 {
@@ -34,16 +32,17 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
             // so that we can have the library param file in the same directory.
 
             // This primes the activator so it knows where to look for types that will be created from parameters.
-            //ECActivator.AddSourceAssemblies(new[] 
-            // { 
-            //   Assembly.GetAssembly(typeof(IEvolutionState)), 
-            //   Assembly.GetAssembly(typeof(Evaluator)), 
-            //   Assembly.GetAssembly(typeof(CoevolutionaryECSuite)) 
-            // });
+            ECActivator.AddSourceAssemblies(new[]
+             {
+               Assembly.GetAssembly(typeof(IEvolutionState)),
+               Assembly.GetAssembly(typeof(Evaluator)),
+               Assembly.GetAssembly(typeof(CoevolutionaryECSuite))
+             });
 
-            //Evolve.Run(new[] { "-file", @"Params/App/Coevolve2/ecsuite.params" });
-            //Console.WriteLine("\nDone!");
-            //Console.ReadLine();
+            Evolve.Run(new[] { "-file", @"Params/App/Coevolve2/ecsuite2.params" });
+            Console.WriteLine("\nDone!");
+            Console.ReadLine();
         }
     }
 }
+

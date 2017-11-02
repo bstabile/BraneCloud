@@ -1,7 +1,5 @@
 
 using System;
-using BraneCloud.Evolution.EC;
-using BraneCloud.Evolution.EC.Problems.Regression.Func;
 
 namespace BraneCloud.Evolution.EC.Problems.Regression.Func
 {
@@ -15,13 +13,16 @@ namespace BraneCloud.Evolution.EC.Problems.Regression.Func
     /// Created: Wed Nov  3 18:26:37 1999
     /// By: Sean Luke
     ///
-    /// <p/>This ERC appears in the Korns function set.  It is defined as a random finite 65-bit IEEE double.  We achieve this by drawing a random long, then converting it to a double, then rejecting results which are either NaN or infinite.
+    /// <p/>This ERC appears in the Korns function set.  
+    /// It is defined as a random finite 65-bit IEEE double.  
+    /// We achieve this by drawing a random long, then converting it to a double, 
+    /// then rejecting results which are either NaN or infinite.
     /// 
     /// <p/>M. F. Korns. Accuracy in Symbolic Regression. In <i>Proc. GPTP.</i> 2011.
     /// </summary>
     public class KornsERC : RegERC
     {
-        public override string Name { get { return "KornsERC"; } }
+        public override string Name => "KornsERC";
 
         public override void ResetNode(IEvolutionState state, int thread)
         {

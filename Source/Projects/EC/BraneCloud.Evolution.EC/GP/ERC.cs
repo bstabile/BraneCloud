@@ -130,7 +130,7 @@ namespace BraneCloud.Evolution.EC.GP
         /// Usually ERCs don't have children, and this default implementation makes certain of it. 
         /// But if you want to override this, you're welcome to.
         /// </summary>
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         #endregion // Properties
         #region Setup

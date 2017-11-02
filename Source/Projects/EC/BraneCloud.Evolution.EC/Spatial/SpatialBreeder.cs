@@ -44,7 +44,7 @@ namespace BraneCloud.Evolution.EC.Spatial
 
             // check for elitism and warn about it
             for (var i = 0; i < Elite.Length; i++)
-                if (Elite[i] > 0)
+                if (UsingElitism(i))
                 {
                     state.Output.Warning("You're using elitism with SpatialBreeder.  This is unwise as elitism is done by moving individuals around in the population, thus messing up the spatial nature of breeding.",
                         paramBase.Push(P_ELITE).Push("" + i));
@@ -52,7 +52,7 @@ namespace BraneCloud.Evolution.EC.Spatial
                 }
 
             if (SequentialBreeding) // uh oh, untested
-                state.Output.Warning("SpationBreeder hasn't been well tested with sequential evaluation, though it should probably work fine.  You're on your own.",
+                state.Output.Warning("SpatialBreeder hasn't been well tested with sequential evaluation, though it should probably work fine.  You're on your own.",
                     paramBase.Push(P_SEQUENTIAL_BREEDING));
 
             if (!ClonePipelineAndPopulation)
@@ -62,7 +62,7 @@ namespace BraneCloud.Evolution.EC.Spatial
         #endregion // Setup
         #region Operations
 
-        protected internal override void BreedPopChunk(Population newpop, IEvolutionState state, int[] numinds, int[] from, int threadnum)
+        public override void BreedPopChunk(Population newpop, IEvolutionState state, int[] numinds, int[] from, int threadnum)
         {
             for (var subpop = 0; subpop < newpop.Subpops.Length; subpop++)
             {
@@ -72,7 +72,7 @@ namespace BraneCloud.Evolution.EC.Spatial
                     // instead of breeding, we should just copy forward this subpopulation.  We'll copy the part we're assigned
                     for (var ind = from[subpop]; ind < numinds[subpop] - from[subpop]; ind++)
                         newpop.Subpops[subpop].Individuals[ind] =
-                            (Individual)(state.Population.Subpops[subpop].Individuals[ind].Clone());
+                            (Individual)state.Population.Subpops[subpop].Individuals[ind].Clone();
                 }
                 else
                 {

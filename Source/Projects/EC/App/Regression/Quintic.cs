@@ -29,7 +29,7 @@ namespace BraneCloud.Evolution.EC.App.Regression
     [ECConfiguration("ec.app.regression.Quintic")]
     public class Quintic : Regression
     {
-        public double func(double x)
+        public override double Func(double x)
         { return x * x * x * x * x - 2.0 * x * x * x + x; }
     }
 }

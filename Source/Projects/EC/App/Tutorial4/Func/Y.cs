@@ -21,7 +21,7 @@ using BraneCloud.Evolution.EC.GP;
 
 namespace BraneCloud.Evolution.EC.App.Tutorial4
 {
-    [ECConfiguration("ec.app.tutorial4.Y")]
+    [ECConfiguration("ec.app.tutorial4.func.Y")]
     public class Y : GPNode
     {
         public override string ToString() { return "y"; }
@@ -38,7 +38,7 @@ namespace BraneCloud.Evolution.EC.App.Tutorial4
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         public override void Eval(IEvolutionState state,
             int thread,
@@ -47,7 +47,7 @@ namespace BraneCloud.Evolution.EC.App.Tutorial4
             GPIndividual individual,
             IProblem problem)
         {
-            var rd = ((DoubleData)(input));
+            var rd = (DoubleData)input;
             rd.x = ((MultiValuedRegression)problem).currentY;
         }
     }

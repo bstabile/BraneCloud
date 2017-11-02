@@ -62,10 +62,13 @@ namespace BraneCloud.Evolution.EC.DE
             var inds = state.Population.Subpops[subpop].Individuals;
 
             var v = (DoubleVectorIndividual)
-                (state.Population.Subpops[subpop].Species.NewIndividual(state, thread));
+                state.Population.Subpops[subpop].Species.NewIndividual(state, thread);
 
+            var retry = -1;
             do
             {
+                retry++;
+
                 // select three indexes different from each other and from that of the current parent
                 int r0, r1, r2;
                 // do
@@ -76,26 +79,31 @@ namespace BraneCloud.Evolution.EC.DE
                 do
                 {
                     r1 = state.Random[thread].NextInt(inds.Length);
-                }
-                while (r1 == r0 || r1 == index);
+                } while (r1 == r0 || r1 == index);
                 do
                 {
                     r2 = state.Random[thread].NextInt(inds.Length);
-                }
-                while (r2 == r1 || r2 == r0 || r2 == index);
+                } while (r2 == r1 || r2 == r0 || r2 == index);
 
-                var g0 = (DoubleVectorIndividual)(inds[r0]);
-                var g1 = (DoubleVectorIndividual)(inds[r1]);
-                var g2 = (DoubleVectorIndividual)(inds[r2]);
+                var g0 = (DoubleVectorIndividual) (inds[r0]);
+                var g1 = (DoubleVectorIndividual) (inds[r1]);
+                var g2 = (DoubleVectorIndividual) (inds[r2]);
 
                 for (var i = 0; i < v.genome.Length; i++)
                     v.genome[i] = g0.genome[i] +
-                        (F + state.Random[thread].NextDouble() * F_NOISE - (F_NOISE / 2.0)) *
-                        (g1.genome[i] - g2.genome[i]);
+                                  (F + state.Random[thread].NextDouble() * F_NOISE - (F_NOISE / 2.0)) *
+                                  (g1.genome[i] - g2.genome[i]);
             }
-            while (!Valid(v));
+            while (!Valid(v) && retry < Retries);
 
-            return Crossover(state, (DoubleVectorIndividual)(inds[index]), v, thread);
+            if (retry >= Retries && !Valid(v))  // we reached our maximum
+            {
+                // completely reset and be done with it
+                v.Reset(state, thread);
+            }
+
+
+            return Crossover(state, (DoubleVectorIndividual)inds[index], v, thread);
         }
 
         #endregion // Operations

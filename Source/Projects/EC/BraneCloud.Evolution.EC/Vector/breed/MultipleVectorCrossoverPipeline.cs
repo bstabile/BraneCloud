@@ -496,7 +496,7 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
                     for (var j = _parents.Length - 1; j > 0; j--)
                     {
                         var swapIndex = state.Random[thread].NextInt(j); // not inclusive; don't want to swap with self                     
-                        var temp = ((GeneVectorIndividual)_parents[j]).genome[i]; // modifying genomes directly. it's okay since they're clones
+                        Gene temp = ((GeneVectorIndividual)_parents[j]).genome[i]; // modifying genomes directly. it's okay since they're clones
                         ((GeneVectorIndividual)_parents[j]).genome[i] = ((GeneVectorIndividual)_parents[swapIndex]).genome[i];
                         ((GeneVectorIndividual)_parents[swapIndex]).genome[i] = temp;
                     }

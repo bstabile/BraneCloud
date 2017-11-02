@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.Problems.Lawnmower.Func
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 1; } }
+        public override int ExpectedChildren => 1;
 
         public override void Eval(IEvolutionState state,
             int thread,
@@ -48,7 +48,7 @@ namespace BraneCloud.Evolution.EC.Problems.Lawnmower.Func
             GPIndividual individual,
             IProblem problem)
         {
-            var p = (LawnmowerProblem)problem;
+            var p = (Lawnmower)problem;
             var d = (LawnmowerData)input;
 
             Children[0].Eval(state, thread, input, stack, individual, problem);
@@ -62,22 +62,22 @@ namespace BraneCloud.Evolution.EC.Problems.Lawnmower.Func
 
             switch (p.Orientation)
             {
-                case LawnmowerProblem.O_UP:
+                case Lawnmower.O_UP:
                     // counter-clockwise rotation
                     p.PosX -= d.y;
                     p.PosY += d.x;
                     break;
-                case LawnmowerProblem.O_LEFT:
+                case Lawnmower.O_LEFT:
                     // flipped orientation
                     p.PosX -= d.x;
                     p.PosY -= d.y;
                     break;
-                case LawnmowerProblem.O_DOWN:
+                case Lawnmower.O_DOWN:
                     // clockwise rotation
                     p.PosX += d.y;
                     p.PosY -= d.x;
                     break;
-                case LawnmowerProblem.O_RIGHT:
+                case Lawnmower.O_RIGHT:
                     // proper orientation
                     p.PosX += d.x;
                     p.PosY += d.y;
@@ -95,7 +95,7 @@ namespace BraneCloud.Evolution.EC.Problems.Lawnmower.Func
             p.PosY = ((p.PosY % p.MaxY) + p.MaxY) % p.MaxY;
 
             p.Moves++;
-            if (p.Map[p.PosX][p.PosY] == LawnmowerProblem.UNMOWED)
+            if (p.Map[p.PosX][p.PosY] == Lawnmower.UNMOWED)
             {
                 p.Sum++;
                 p.Map[p.PosX][p.PosY] = p.Moves;

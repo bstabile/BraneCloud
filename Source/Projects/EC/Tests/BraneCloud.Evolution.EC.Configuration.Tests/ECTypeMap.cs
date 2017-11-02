@@ -72,6 +72,7 @@ namespace BraneCloud.Evolution.EC.Configuration.Tests
                 { "ec.Subpopulation", typeof(BraneCloud.Evolution.EC.Subpopulation) },
                 #endregion // (root)
                 #region Breed
+                { "ec.gp.breed.BreederThread", typeof(BraneCloud.Evolution.EC.Breed.BreederThread) },
                 { "ec.breed.BreedDefaults", typeof(BraneCloud.Evolution.EC.Breed.BreedDefaults) },
                 { "ec.breed.BufferedBreedingPipeline", typeof(BraneCloud.Evolution.EC.Breed.BufferedBreedingPipeline) },
                 { "ec.breed.ForceBreedingPipeline", typeof(BraneCloud.Evolution.EC.Breed.ForceBreedingPipeline) },
@@ -104,7 +105,6 @@ namespace BraneCloud.Evolution.EC.Configuration.Tests
                 { "ec.es.ESDefaults", typeof(BraneCloud.Evolution.EC.ES.ESDefaults) },
                 { "ec.es.ESSelection", typeof(BraneCloud.Evolution.EC.ES.ESSelection) },
                 { "ec.es.MuCommaLambdaBreeder", typeof(BraneCloud.Evolution.EC.ES.MuCommaLambdaBreeder) },
-                { "ec.es.MuLambdaBreederThread", typeof(BraneCloud.Evolution.EC.ES.MuLambdaBreederThread) },
                 { "ec.es.MuPlusLambdaBreeder", typeof(BraneCloud.Evolution.EC.ES.MuPlusLambdaBreeder) },
                 #endregion // ES
                 #region Eval
@@ -257,10 +257,9 @@ namespace BraneCloud.Evolution.EC.Configuration.Tests
                 #endregion // Select
                 #region Simple
                 { "ec.simple.SimpleBreeder", typeof(BraneCloud.Evolution.EC.Simple.SimpleBreeder) },
-                { "ec.simple.SimpleBreederThread", typeof(BraneCloud.Evolution.EC.Simple.SimpleBreederThread) },
                 { "ec.simple.SimpleDefaults", typeof(BraneCloud.Evolution.EC.Simple.SimpleDefaults) },
                 { "ec.simple.SimpleEvaluator", typeof(BraneCloud.Evolution.EC.Simple.SimpleEvaluator) },
-                { "ec.simple.SimpleEvaluatorThread", typeof(BraneCloud.Evolution.EC.Simple.SimpleEvaluatorThread) },
+                { "ec.simple.SimpleEvaluator.SimpleEvaluatorThread", typeof(BraneCloud.Evolution.EC.Simple.SimpleEvaluator.SimpleEvaluatorThread) },
                 { "ec.simple.SimpleEvolutionState", typeof(BraneCloud.Evolution.EC.Simple.SimpleEvolutionState) },
                 { "ec.simple.SimpleExchanger", typeof(BraneCloud.Evolution.EC.Simple.SimpleExchanger) },
                 { "ec.simple.SimpleFinisher", typeof(BraneCloud.Evolution.EC.Simple.SimpleFinisher) },
@@ -311,6 +310,7 @@ namespace BraneCloud.Evolution.EC.Configuration.Tests
                 { "ec.vector.DoubleVectorIndividual", typeof(BraneCloud.Evolution.EC.Vector.DoubleVectorIndividual) },
                 { "ec.vector.FloatVectorIndividual", typeof(BraneCloud.Evolution.EC.Vector.FloatVectorIndividual) },
                 { "ec.vector.FloatVectorSpecies", typeof(BraneCloud.Evolution.EC.Vector.FloatVectorSpecies) },
+                { "ec.vector.Gene", typeof(BraneCloud.Evolution.EC.Vector.Gene) },
                 { "ec.vector.GeneVectorIndividual", typeof(BraneCloud.Evolution.EC.Vector.GeneVectorIndividual) },
                 { "ec.vector.GeneVectorSpecies", typeof(BraneCloud.Evolution.EC.Vector.GeneVectorSpecies) },
                 { "ec.vector.IntegerVectorIndividual", typeof(BraneCloud.Evolution.EC.Vector.IntegerVectorIndividual) },
@@ -318,7 +318,6 @@ namespace BraneCloud.Evolution.EC.Configuration.Tests
                 { "ec.vector.LongVectorIndividual", typeof(BraneCloud.Evolution.EC.Vector.LongVectorIndividual) },
                 { "ec.vector.ShortVectorIndividual", typeof(BraneCloud.Evolution.EC.Vector.ShortVectorIndividual) },
                 { "ec.vector.VectorDefaults", typeof(BraneCloud.Evolution.EC.Vector.VectorDefaults) },
-                { "ec.vector.VectorGene", typeof(BraneCloud.Evolution.EC.Vector.VectorGene) },
                 { "ec.vector.VectorIndividual", typeof(BraneCloud.Evolution.EC.Vector.VectorIndividual) },
                 { "ec.vector.VectorSpecies", typeof(BraneCloud.Evolution.EC.Vector.VectorSpecies) },
                 #endregion // Vector
@@ -332,14 +331,10 @@ namespace BraneCloud.Evolution.EC.Configuration.Tests
             };
         #endregion // Map
 
-        public static Dictionary<string, Type>.KeyCollection Keys
-        {
-            get { return _map.Keys; }
-        }
-        public static Dictionary<string, Type>.ValueCollection Values
-        {
-            get { return _map.Values; }
-        }
+        public static Dictionary<string, Type>.KeyCollection Keys => _map.Keys;
+
+        public static Dictionary<string, Type>.ValueCollection Values => _map.Values;
+
         public static bool TryGetType(string configTypeName, out Type type)
         {
             return _map.TryGetValue(configTypeName, out type);

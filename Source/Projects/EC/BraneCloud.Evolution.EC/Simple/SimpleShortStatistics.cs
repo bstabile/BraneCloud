@@ -21,6 +21,7 @@ using System.Diagnostics;
 
 using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Configuration;
+using SharpenMinimal;
 
 namespace BraneCloud.Evolution.EC.Simple
 {
@@ -103,17 +104,19 @@ namespace BraneCloud.Evolution.EC.Simple
         public const string P_DO_TIME = "do-time";
         public const string P_DO_SUBPOPS = "do-subpops";
         public const string P_STATISTICS_FILE = "file";
+        public const string P_MUZZLE = "muzzle";
 
         #endregion // Constants
         #region Public Properties
 
-        public bool DoFull { get; set; }
+        //public bool DoFull { get; set; }
 
         public int StatisticsLog { get; set; }
         public int Modulus { get; set; }
         public bool DoSize { get; set; }
         public bool DoTime { get; set; }
         public bool DoSubpops { get; set; }
+        public bool Muzzle { get; set; }
 
         public Individual[] BestSoFar { get; set; }
         public long[] TotalSizeSoFar { get; set; }
@@ -133,19 +136,19 @@ namespace BraneCloud.Evolution.EC.Simple
         #endregion // Public Properties
         #region Setup
 
-        public SimpleShortStatistics()
-        {
-            StatisticsLog = 0; /* stdout */
-        }
-
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
             base.Setup(state, paramBase);
             var statisticsFile = state.Parameters.GetFile(paramBase.Push(P_STATISTICS_FILE), null);
 
             Modulus = state.Parameters.GetIntWithDefault(paramBase.Push(P_STATISTICS_MODULUS), null, 1);
+            Muzzle = state.Parameters.GetBoolean(paramBase.Push(P_MUZZLE), null, false);
 
-            if (statisticsFile != null)
+            if (Muzzle)
+            {
+                StatisticsLog = Output.NO_LOGS;
+            }
+            else if (statisticsFile != null)
             {
                 try
                 {
@@ -157,6 +160,16 @@ namespace BraneCloud.Evolution.EC.Simple
                 {
                     state.Output.Fatal("An IOException occurred while trying to create the log " + statisticsFile + ":\n" + i);
                 }
+                DoSize = state.Parameters.GetBoolean(paramBase.Push(P_DO_SIZE), null, false);
+                DoTime = state.Parameters.GetBoolean(paramBase.Push(P_DO_TIME), null, false);
+                if (state.Parameters.ParameterExists(paramBase.Push(P_FULL), null))
+                {
+                    state.Output.Warning(P_FULL + " is deprecated.  Use " + P_DO_SIZE + " and " + P_DO_TIME + " instead.  Also be warned that the table columns have been reorganized. ", paramBase.Push(P_FULL), null);
+                    bool gather = state.Parameters.GetBoolean(paramBase.Push(P_FULL), null, false);
+                    DoSize = DoSize || gather;
+                    DoTime = DoTime || gather;
+                }
+                DoSubpops = state.Parameters.GetBoolean(paramBase.Push(P_DO_SUBPOPS), null, false);
             }
 
             DoSize = state.Parameters.GetBoolean(paramBase.Push(P_DO_SIZE), null, false);
@@ -184,10 +197,11 @@ namespace BraneCloud.Evolution.EC.Simple
         {
             base.PreInitializationStatistics(state);
 
-            var output = (state.Generation % Modulus == 0);
+            var output = state.Generation % Modulus == 0;
 
             if (output && DoTime)
             {
+                // ECJ: lastTime = System.currentTimeMillis();
                 LastTime = (DateTime.Now.Ticks - 621355968000000000) / 10000;
             }
         }
@@ -196,14 +210,17 @@ namespace BraneCloud.Evolution.EC.Simple
         {
             base.PostInitializationStatistics(state);
 
-            bool output = (state.Generation % Modulus == 0);
+            bool output = state.Generation % Modulus == 0;
 
             // set up our BestSoFar array -- can't do this in Setup, because
             // we don't know if the number of subpops has been determined yet
             BestSoFar = new Individual[state.Population.Subpops.Length];
 
             // print out our generation number
-            if (output) state.Output.Print("0 ", StatisticsLog);
+            if (output)
+            {
+                state.Output.Print("0 ", StatisticsLog);
+            }
 
             // gather timings       
             TotalSizeSoFar = new long[state.Population.Subpops.Length];
@@ -211,6 +228,7 @@ namespace BraneCloud.Evolution.EC.Simple
 
             if (output && DoTime)
             {
+                // ECJ: state.output.print("" + (System.currentTimeMillis() - lastTime) + " ", statisticslog);
                 state.Output.Print("" + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - LastTime) + " ", StatisticsLog);
             }
         }
@@ -221,9 +239,10 @@ namespace BraneCloud.Evolution.EC.Simple
         public override void PreBreedingStatistics(IEvolutionState state)
         {
             base.PreBreedingStatistics(state);
-            bool output = (state.Generation % Modulus == Modulus - 1);
+            bool output = state.Generation % Modulus == Modulus - 1;
             if (output && DoTime)
             {
+                // ECJ: lastTime = System.currentTimeMillis();
                 LastTime = (DateTime.Now.Ticks - 621355968000000000) / 10000;
             }
         }
@@ -237,6 +256,7 @@ namespace BraneCloud.Evolution.EC.Simple
             // gather timings
             if (output && DoTime)
             {
+                // ECJ: state.output.print("" + (System.currentTimeMillis() - lastTime) + " ", statisticslog);
                 state.Output.Print("" + (((DateTime.Now.Ticks - 621355968000000000) / 10000) - LastTime) + " ", StatisticsLog);
             }
         }
@@ -251,17 +271,21 @@ namespace BraneCloud.Evolution.EC.Simple
 
             if (output && DoTime)
             {
+                // ECJ: lastTime = System.currentTimeMillis();
                 LastTime = (DateTime.Now.Ticks - 621355968000000000) / 10000;
             }
         }
 
         public override void PostEvaluationStatistics(IEvolutionState state)
         {
-            bool output = (state.Generation % Modulus == 0);
+            base.PostEvaluationStatistics(state);
+
+            bool output = state.Generation % Modulus == 0;
 
             // gather timings
             if (output && DoTime)
             {
+                // ECJ: state.output.print("" + (System.currentTimeMillis() - lastTime) + " ", statisticslog);
                 state.Output.Print("" + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - LastTime) + " ", StatisticsLog);
             }
 
@@ -296,7 +320,7 @@ namespace BraneCloud.Evolution.EC.Simple
                         {
                             BestOfGeneration[x] = state.Population.Subpops[x].Individuals[y];
                             if (BestSoFar[x] == null || BestOfGeneration[x].Fitness.BetterThan(BestSoFar[x].Fitness))
-                                BestSoFar[x] = (Individual)(BestOfGeneration[x].Clone());
+                                BestSoFar[x] = (Individual)BestOfGeneration[x].Clone();
                         }
 
                         // sum up mean fitness for population
@@ -307,7 +331,7 @@ namespace BraneCloud.Evolution.EC.Simple
                     }
                 }
                 // compute mean fitness stats
-                meanFitnessThisGen[x] = (TotalIndsThisGen[x] > 0 ? TotalFitnessThisGen[x] / TotalIndsThisGen[x] : 0);
+                meanFitnessThisGen[x] = TotalIndsThisGen[x] > 0 ? TotalFitnessThisGen[x] / TotalIndsThisGen[x] : 0;
 
                 // hook for KozaShortStatistics etc.
                 if (output && DoSubpops) PrintExtraSubpopStatisticsBefore(state, x);
@@ -315,10 +339,10 @@ namespace BraneCloud.Evolution.EC.Simple
                 // print out optional average size information
                 if (output && DoSize && DoSubpops)
                 {
-                    state.Output.Print("" + (TotalIndsThisGen[x] > 0 ? ((double)TotalSizeThisGen[x]) / TotalIndsThisGen[x] : 0) + " ", StatisticsLog);
-                    state.Output.Print("" + (TotalIndsSoFar[x] > 0 ? ((double)TotalSizeSoFar[x]) / TotalIndsSoFar[x] : 0) + " ", StatisticsLog);
-                    state.Output.Print("" + (double)(BestOfGeneration[x].Size) + " ", StatisticsLog);
-                    state.Output.Print("" + (double)(BestSoFar[x].Size) + " ", StatisticsLog);
+                    state.Output.Print("" + (TotalIndsThisGen[x] > 0 ? (double)TotalSizeThisGen[x] / TotalIndsThisGen[x] : 0) + " ", StatisticsLog);
+                    state.Output.Print("" + (TotalIndsSoFar[x] > 0 ? (double)TotalSizeSoFar[x] / TotalIndsSoFar[x] : 0) + " ", StatisticsLog);
+                    state.Output.Print("" + (double)BestOfGeneration[x].Size + " ", StatisticsLog);
+                    state.Output.Print("" + (double)BestSoFar[x].Size + " ", StatisticsLog);
                 }
 
                 // print out fitness information
@@ -361,7 +385,7 @@ namespace BraneCloud.Evolution.EC.Simple
             }
 
             // build mean
-            popMeanFitness = (popTotalInds > 0 ? popTotalFitness / popTotalInds : 0);		// average out
+            popMeanFitness = popTotalInds > 0 ? popTotalFitness / popTotalInds : 0;		// average out
 
             // hook for KozaShortStatistics etc.
             if (output) PrintExtraPopStatisticsBefore(state);
@@ -371,16 +395,16 @@ namespace BraneCloud.Evolution.EC.Simple
             {
                 state.Output.Print("" + (popTotalInds > 0 ? popTotalSize / popTotalInds : 0) + " ", StatisticsLog);						// mean size of pop this gen
                 state.Output.Print("" + (popTotalIndsSoFar > 0 ? popTotalSizeSoFar / popTotalIndsSoFar : 0) + " ", StatisticsLog);				// mean size of pop so far
-                state.Output.Print("" + (double)(popBestOfGeneration.Size) + " ", StatisticsLog);					// size of best ind of pop this gen
-                state.Output.Print("" + (double)(popBestSoFar.Size) + " ", StatisticsLog);				// size of best ind of pop so far
+                state.Output.Print("" + (double)popBestOfGeneration.Size + " ", StatisticsLog);					// size of best ind of pop this gen
+                state.Output.Print("" + (double)popBestSoFar.Size + " ", StatisticsLog);				// size of best ind of pop so far
             }
 
             // print out fitness info
             if (output)
             {
                 state.Output.Print("" + popMeanFitness + " ", StatisticsLog);											// mean fitness of pop this gen
-                state.Output.Print("" + (double)(popBestOfGeneration.Fitness.Value) + " ", StatisticsLog);			// best fitness of pop this gen
-                state.Output.Print("" + (double)(popBestSoFar.Fitness.Value) + " ", StatisticsLog);		// best fitness of pop so far
+                state.Output.Print("" + (double)popBestOfGeneration.Fitness.Value + " ", StatisticsLog);			// best fitness of pop this gen
+                state.Output.Print("" + (double)popBestSoFar.Fitness.Value + " ", StatisticsLog);		// best fitness of pop so far
             }
 
             // hook for KozaShortStatistics etc.
@@ -391,14 +415,15 @@ namespace BraneCloud.Evolution.EC.Simple
         }
 
         #endregion // On Evaluation
-        #region Extra Subpop
+
+        #region Extra Subpop (Used by KozaShortStatistics)
 
         protected void GatherExtraSubpopStatistics(IEvolutionState state, int subpop, int individual) { }
         protected void PrintExtraSubpopStatisticsBefore(IEvolutionState state, int subpop) { }
         protected void PrintExtraSubpopStatisticsAfter(IEvolutionState state, int subpop) { }
 
         #endregion // Extra Subpop
-        #region Extra Pop
+        #region Extra Pop  (Used by KozaShortStatistics)
 
         protected void GatherExtraPopStatistics(IEvolutionState state, int subpop) { }
         protected void PrintExtraPopStatisticsBefore(IEvolutionState state) { }

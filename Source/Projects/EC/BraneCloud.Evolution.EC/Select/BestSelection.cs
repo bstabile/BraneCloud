@@ -24,35 +24,48 @@ using BraneCloud.Evolution.EC.Randomization;
 
 namespace BraneCloud.Evolution.EC.Select
 {
-    /// <summary> 
-    /// Picks among the best <i>n</i> individuals in a population in 
-    /// direct proportion to their absolute
-    /// fitnesses as returned by their fitness() methods relative to the
-    /// fitnesses of the other "best" individuals in that <i>n</i>.  This is expensive to
-    /// set up and bring down, so it's not appropriate for steady-state evolution.
-    /// If you're not familiar with the relative advantages of 
-    /// selection methods and just want a good one,
-    /// use TournamentSelection instead.   Not appropriate for
-    /// multiobjective fitnesses.
-    /// 
-    /// <p/><b><font color="red">
-    /// Note: Fitnesses must be non-negative.  0 is assumed to be the worst fitness.
-    /// </font></b>
-    /// 
-    /// <p/><b>Typical Number of Individuals Produced Per <tt>produce(...)</tt> call</b><br/>
-    /// Always 1.
-    /// <p/><b>Parameters</b><br/>
-    /// <table>
-    /// <tr><td valign="top"><i>base.</i><tt>pick-worst</tt><br/>
-    /// <font size="-1"> bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
-    /// <td valign="top">(should we pick from among the <i>worst n</i> individuals in the tournament instead of the <i>best n</i>?)</td></tr>
-    /// <tr><td valign="top"><i>base.</i><tt>n</tt><br/>
-    /// <font size="-1"> int > 0 (default is 1)</font></td>
-    /// <td valign="top">(the number of best-individuals to select from)</td></tr>
-    /// </table>
-    /// <p/><b>Default Base</b><br/>
-    /// select.best
-    /// </summary>	
+    /**
+     * Performs a tournament selection restricted to only the best, or worst, <i>n</i>
+     * indivdiuals in the population.  If the best individuals, then tournament selection
+     * will prefer the better among them; if the worst individuals, then tournament selection
+     * will prefer the worse among them.  The procedure for performing restriction is expensive to
+     * set up and bring down, so it's not appropriate for steady-state evolution.  Like
+     * TournamentSelection, the size of the tournament can be any 
+     * If you're not familiar with the relative advantages of 
+     * selection methods and just want a good one,
+     * use TournamentSelection instead.   Not appropriate for
+     * multiobjective fitnesses.
+     *
+     * <p>The tournament <i>size</i> can be any floating point value >= 1.0.  If it is a non-
+     * integer value <i>x</i> then either a tournament of size ceil(x) is used
+     * (with probability x - floor(x)), else a tournament of size floor(x) is used.
+     *
+     <p><b>Typical Number of Individuals Produced Per <tt>produce(...)</tt> call</b><br>
+     Always 1.
+
+     <p><b>Parameters</b><br>
+     <table>
+     <tr><td valign=top><i>base.</i><tt>pick-worst</tt><br>
+     <font size=-1> bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
+     <td valign=top>(should we pick from among the <i>worst n</i> individuals in the tournament instead of the <i>best n</i>?)</td></tr>
+     <tr><td valign=top><i>base.</i><tt>size</tt><br>
+     <font size=-1>float &gt;= 1</font></td>
+     <td valign=top>(the tournament size)</td></tr>
+     <tr><td valign=top><i>base.</i><tt>n</tt><br>
+     <font size=-1> int > 0 </font></td>
+     <td valign=top>(the number of best-individuals to select from)</td></tr>
+     <tr><td valign=top><i>base.</i><tt>n-fraction</tt><br>
+     <font size=-1> 0.0 <= float < 1.0 (default is 1)</font></td>
+     <td valign=top>(the number of best-individuals to select from, as a fraction of the total population)</td></tr>
+     </table>
+
+     <p><b>Default Base</b><br>
+     select.best
+
+     * @author Sean Luke
+     * @version 1.0 
+     */
+
     [Serializable]
     [ECConfiguration("ec.select.BestSelection")]
     public class BestSelection : SelectionMethod
@@ -64,7 +77,11 @@ namespace BraneCloud.Evolution.EC.Select
         /// </summary>
         public const string P_BEST = "best";
         public const string P_N = "n";
+        public const String P_N_FRACTION = "n-fraction";
         public const string P_PICKWORST = "pick-worst";
+        public const String P_SIZE = "size";
+
+        public const int NOT_SET = -1;
 
         #endregion // Constants
         #region Properties
@@ -74,12 +91,20 @@ namespace BraneCloud.Evolution.EC.Select
             get { return SelectDefaults.ParamBase.Push(P_BEST); }
         }
 
+        /** Base size of the tournament; this may change.  */
+        public int Size { get; set; }
+
+        /** Probablity of picking the size plus one. */
+        public double ProbabilityOfPickingSizePlusOne { get; set; }
+
         /// <summary>
         /// Do we pick the worst instead of the best? 
         /// </summary>
         public bool PickWorst { get; set; }
 
-        public int BestN { get; set; }
+        public int BestN { get; set; } = NOT_SET;
+
+        public double BestNFrac = NOT_SET;
 
         /// <summary>
         /// Sorted, normalized, totalized fitnesses for the population. 
@@ -105,11 +130,39 @@ namespace BraneCloud.Evolution.EC.Select
 
             var def = DefaultBase;
 
-            BestN = state.Parameters.GetInt(paramBase.Push(P_N), def.Push(P_N), 1);
-            if (BestN == 0)
-                state.Output.Fatal("n must be an integer greater than 0", paramBase.Push(P_N), def.Push(P_N));
+            if (state.Parameters.ParameterExists(paramBase.Push(P_N), def.Push(P_N)))
+            {
+                BestN = state.Parameters.GetInt(paramBase.Push(P_N), def.Push(P_N), 1);
+                if (BestN == 0)
+                    state.Output.Fatal("n must be an integer greater than 0", paramBase.Push(P_N), def.Push(P_N));
+            }
+            else if (state.Parameters.ParameterExists(paramBase.Push(P_N_FRACTION), def.Push(P_N_FRACTION)))
+            {
+                if (state.Parameters.ParameterExists(paramBase.Push(P_N), def.Push(P_N)))
+                    state.Output.Fatal("Both n and n-fraction specified for BestSelection.", paramBase.Push(P_N), def.Push(P_N));
+                BestNFrac =
+                    state.Parameters.GetDoubleWithMax(paramBase.Push(P_N_FRACTION), def.Push(P_N_FRACTION), 0.0, 1.0);
+                if (BestNFrac <= 0.0)
+                    state.Output.Fatal("n-fraction must be a floating-point value greater than 0.0 and <= 1.0", paramBase.Push(P_N_FRACTION), def.Push(P_N_FRACTION));
+            }
+            else state.Output.Fatal("Either n or n-fraction must be defined for BestSelection.", paramBase.Push(P_N), def.Push(P_N));
+
 
             PickWorst = state.Parameters.GetBoolean(paramBase.Push(P_PICKWORST), def.Push(P_PICKWORST), false);
+
+            double val = state.Parameters.GetDouble(paramBase.Push(P_SIZE), def.Push(P_SIZE), 1.0);
+            if (val < 1.0)
+                state.Output.Fatal("Tournament size must be >= 1.", paramBase.Push(P_SIZE), def.Push(P_SIZE));
+            else if (val == (int)val)  // easy, it's just an integer
+            {
+                Size = (int)val;
+                ProbabilityOfPickingSizePlusOne = 0.0;
+            }
+            else
+            {
+                Size = (int)Math.Floor(val);
+                ProbabilityOfPickingSizePlusOne = val - Size;  // for example, if we have 5.4, then the probability of picking *6* is 0.4
+            }
         }
 
         #endregion // Setup
@@ -127,41 +180,59 @@ namespace BraneCloud.Evolution.EC.Select
             // sort SortedPop in increasing fitness order
             QuickSort.QSort(SortedPop, new AnonymousClassSortComparatorL(i));
 
-            // load SortedFit
-            SortedFit = new float[Math.Min(SortedPop.Length, BestN)];
-            if (PickWorst)
-                for (var x = 0; x < SortedFit.Length; x++)
-                    SortedFit[x] = i[SortedPop[x]].Fitness.Value;
-            else
-                for (var x = 0; x < SortedFit.Length; x++)
-                    SortedFit[x] = i[SortedPop[SortedPop.Length - x - 1]].Fitness.Value;
+            if (!PickWorst)  // gotta reverse it
+                for (int x = 0; x < SortedPop.Length / 2; x++)
+                {
+                    int p = SortedPop[x];
+                    SortedPop[x] = SortedPop[SortedPop.Length - x - 1];
+                    SortedPop[SortedPop.Length - x - 1] = p;
+                }
 
-            foreach (var t in SortedFit)
+            // figure out bestn
+            if (!BestNFrac.Equals(NOT_SET))
             {
-                if (t < 0)
-                    // uh oh
-                    s.Output.Fatal("Discovered a negative fitness value."
-                                   + "  BestSelection requires that all fitness values be non-negative(offending subpop #" + subpop + ")");
+                BestN = (int)Math.Max(Math.Floor(s.Population.Subpops[subpop].Individuals.Length * BestNFrac), 1);
             }
+        }
 
-            // organize the distributions.  All zeros in fitness is fine
-            RandomChoice.OrganizeDistribution(SortedFit, true);
+        /** Returns a tournament size to use, at random, based on base size and probability of picking the size plus one. */
+        int GetTournamentSizeToUse(IMersenneTwister random)
+        {
+            double p = ProbabilityOfPickingSizePlusOne;   // pulls us to under 35 bytes
+            if (p == 0.0) return Size;
+            return Size + (random.NextBoolean(p) ? 1 : 0);
         }
 
         public override int Produce(int subpop, IEvolutionState state, int thread)
         {
-            // Pick and return an individual from the population
-            if (PickWorst)
-                return SortedPop[RandomChoice.PickFromDistribution(SortedFit, state.Random[thread].NextFloat())];
+            // pick size random individuals, then pick the best.
+            Individual[] oldinds = state.Population.Subpops[subpop].Individuals;
+            int best = state.Random[thread].NextInt(BestN);  // only among the first N
 
-            return SortedPop[SortedPop.Length - RandomChoice.PickFromDistribution(SortedFit, state.Random[thread].NextFloat()) - 1];
+            int s = GetTournamentSizeToUse(state.Random[thread]);
+
+            if (PickWorst)
+                for (int x = 1; x < s; x++)
+                {
+                    int j = state.Random[thread].NextInt(BestN);  // only among the first N
+                    if (!(oldinds[SortedPop[j]].Fitness.BetterThan(oldinds[SortedPop[best]].Fitness)))  // j isn't better than best
+                        best = j;
+                }
+            else
+                for (int x = 1; x < s; x++)
+                {
+                    int j = state.Random[thread].NextInt(BestN);  // only among the first N
+                    if (oldinds[SortedPop[j]].Fitness.BetterThan(oldinds[SortedPop[best]].Fitness))  // j is better than best
+                        best = j;
+                }
+
+            return SortedPop[best];
         }
 
         public override void FinishProducing(IEvolutionState s, int subpop, int thread)
         {
             // release the distributions so we can quickly 
             // garbage-collect them if necessary
-            SortedFit = null;
             SortedPop = null;
         }
 

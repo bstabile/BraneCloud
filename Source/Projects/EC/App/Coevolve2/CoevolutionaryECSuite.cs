@@ -61,7 +61,7 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
                 if (prepareForAssessment[i])
                 {
                     foreach (var t in pop.Subpops[i].Individuals)
-                        ((SimpleFitness)(t.Fitness)).Trials = new List<double>();
+                        ((SimpleFitness)t.Fitness).Trials = new List<double>();
                 }
             }
         }
@@ -70,21 +70,20 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
         {
             for (var i = 0; i < pop.Subpops.Length; i++)
             {
-                if (assessFitness[i])
+                if (!assessFitness[i]) continue;
+
+                foreach (var ind in pop.Subpops[i].Individuals)
                 {
-                    foreach (var t in pop.Subpops[i].Individuals)
-                    {
-                        var fit = ((SimpleFitness)(t.Fitness));
+                    var fit = (SimpleFitness)ind.Fitness;
 
-                        // we take the max over the trials
-                        var max = Double.NegativeInfinity;
-                        var len = fit.Trials.Count;
-                        for (var l = 0; l < len; l++)
-                            max = Math.Max((Double)fit.Trials[l], max); // it'll be the first one, but whatever
+                    // we take the max over the trials
+                    var max = Double.NegativeInfinity;
+                    var len = fit.Trials.Count;
+                    for (var l = 0; l < len; l++)
+                        max = Math.Max(fit.Trials[l], max); // it'll be the first one, but whatever
 
-                        fit.SetFitness(state, (float)(max), IsOptimal(ProblemType, (float)max));
-                        t.Evaluated = true;
-                    }
+                    fit.SetFitness(state, (float)max, IsOptimal(ProblemType, (float)max));
+                    ind.Evaluated = true;
                 }
             }
         }
@@ -108,7 +107,7 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
                     state.Output.Error("Individual " + i + "in coevolution is not a DoubleVectorIndividual.");
                 else
                 {
-                    var coind = (DoubleVectorIndividual)(ind[i]);
+                    var coind = (DoubleVectorIndividual)ind[i];
                     size += coind.genome.Length;
                 }
             }
@@ -119,17 +118,17 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
             var pos = 0;
             foreach (var t in ind)
             {
-                var coind = (DoubleVectorIndividual)(t);
+                var coind = (DoubleVectorIndividual)t;
                 Array.Copy(coind.genome, 0, vals, pos, coind.genome.Length);
                 pos += coind.genome.Length;
             }
 
-            var trial = (Function(state, ProblemType, vals, threadnum));
+            var trial = Function(state, ProblemType, vals, threadnum);
 
             // update individuals to reflect the trial
             for (var i = 0; i < ind.Length; i++)
             {
-                var coind = (DoubleVectorIndividual)(ind[i]);
+                var coind = (DoubleVectorIndividual)ind[i];
                 if (updateFitness[i])
                 {
                     // Update the context if this is the best trial.  We're going to assume that the best
@@ -141,11 +140,16 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
                         if (_shouldSetContext) coind.Fitness.SetContext(ind, i);
                         coind.Fitness.Trials.Add(trial);
                     }
-                    else if (((Double)coind.Fitness.Trials[0]) < trial)  // best trial is presently #0
+                    else if (coind.Fitness.Trials[0] < trial)  // best trial is presently #0
+                    {
+                        if (_shouldSetContext) coind.Fitness.SetContext(ind, i);
+                        coind.Fitness.Trials.Add(trial);
+                    }
+                    else if (coind.Fitness.Trials[0] < trial)  // best trial is presently #0
                     {
                         if (_shouldSetContext) coind.Fitness.SetContext(ind, i);
                         // put me at position 0
-                        var t = (Double)coind.Fitness.Trials[0];
+                        Double t = coind.Fitness.Trials[0];
                         coind.Fitness.Trials[0] = trial;  // put me at 0
                         coind.Fitness.Trials.Add(t);  // move him to the end
                     }

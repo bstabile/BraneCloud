@@ -31,7 +31,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
     /// fitnesses need to be updated during the evaluation process.
     /// </summary>
     [ECConfiguration("ec.coevolve.IGroupedProblem")]
-    public interface IGroupedProblem
+    public interface IGroupedProblem : IProblem
     {
         /// <summary>
         /// Set up the population <tt>pop</tt> (such as fitness information) prior to evaluation.

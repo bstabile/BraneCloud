@@ -45,7 +45,7 @@ namespace BraneCloud.Evolution.EC
     /// </summary>	
     [Serializable]
     [ECConfiguration("ec.Breeder")]
-    public abstract class Breeder : ISingleton
+    public abstract class Breeder : IBreeder, ISingleton
     {
         public abstract void Setup(IEvolutionState param1, IParameter param2);
 
@@ -54,5 +54,13 @@ namespace BraneCloud.Evolution.EC
         /// In general, state.Population should not be modified. 
         /// </summary>		
         public abstract Population BreedPopulation(IEvolutionState state);
+
+        public virtual void BreedPopChunk(
+            Population newpop, 
+            IEvolutionState state, 
+            int[] numinds, 
+            int[] from,
+            int threadnum)
+        { /* Does nothing by default */ }
     }
 }

@@ -22,7 +22,7 @@ using BraneCloud.Evolution.EC.GP;
 
 namespace BraneCloud.Evolution.EC.App.Tutorial4
 {
-    [ECConfiguration("ec.app.tutorial4.Sub")]
+    [ECConfiguration("ec.app.tutorial4.func.Sub")]
     public class Sub : GPNode
     {
         public override string ToString() { return "-"; }
@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.App.Tutorial4
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 2; } }
+        public override int ExpectedChildren => 2;
 
         public override void Eval(IEvolutionState state,
             int thread,
@@ -48,7 +48,7 @@ namespace BraneCloud.Evolution.EC.App.Tutorial4
             GPIndividual individual,
             IProblem problem)
         {
-            var rd = ((DoubleData)(input));
+            var rd = (DoubleData)input;
 
             Children[0].Eval(state, thread, input, stack, individual, problem);
             var result = rd.x;

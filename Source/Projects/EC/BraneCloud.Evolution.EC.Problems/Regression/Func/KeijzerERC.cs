@@ -20,7 +20,7 @@ namespace BraneCloud.Evolution.EC.Problems.Regression.Func
         public static double MEAN = 0.0;
         public static double STANDARD_DEVIATION = 5.0;
 
-        public override string Name { get { return "KeijzerERC"; } }
+        public override string Name => "KeijzerERC";
 
         public override void ResetNode(IEvolutionState state, int thread)
         {

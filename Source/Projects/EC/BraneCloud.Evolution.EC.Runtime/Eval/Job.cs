@@ -48,14 +48,10 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
 
         public bool Sent { get; set; }
 
-        /// <summary>
-        /// Original individuals.
-        /// </summary>
+        /// <inheritdoc />
         public Individual[] Inds { get; set; }
 
-        /// <summary>
-        /// Individuals that were returned -- may be different individuals!
-        /// </summary>
+        /// <inheritdoc />
         public Individual[] NewInds { get; set; }
 
         public int[] Subpops { get; set; }
@@ -68,7 +64,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                 NewInds = new Individual[Inds.Length];
             for (var i = 0; i < Inds.Length; i++)
             {
-                NewInds[i] = (Individual) (Inds[i].Clone());
+                NewInds[i] = (Individual) Inds[i].Clone();
                 // delete the trials since they'll get remerged
                 NewInds[i].Fitness.Trials = null;
                 // delete the context, since it'll get remerged

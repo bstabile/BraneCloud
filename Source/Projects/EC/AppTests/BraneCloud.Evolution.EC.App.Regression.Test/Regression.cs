@@ -64,7 +64,7 @@ namespace BraneCloud.Evolution.EC.App.Regression.Test
         /// <summary>
         /// we'll need to deep clone this one though.
         /// </summary>
-        public RegressionData Input;
+        public new RegressionData Input;
 
         public virtual double Func(double x)
         {

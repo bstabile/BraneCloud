@@ -46,18 +46,17 @@ namespace BraneCloud.Evolution.EC.App.Multiplexer
     [ECConfiguration("ec.app.multiplexer.Multiplexer")]
     public class Multiplexer : GPProblem, ISimpleProblem
     {
+        private const long SerialVersionUID = 1;
+
         public const int NUMINPUTS = 20;
         public const string P_NUMBITS = "bits";
 
         public int bits;  // number of bits in the data
 
-        // we'll need to deep clone this one though.
-        public MultiplexerData input;
-
         public override object Clone()
         {
-            var myobj = (Multiplexer)(base.Clone());
-            myobj.input = (MultiplexerData)(input.Clone());
+            var myobj = (Multiplexer)base.Clone();
+            myobj.Input = (MultiplexerData)Input.Clone();
             return myobj;
         }
 
@@ -68,32 +67,32 @@ namespace BraneCloud.Evolution.EC.App.Multiplexer
 
             // not using any default base -- it's not safe
 
+            // verify our input is the right class (or subclasses from it)
+            if (!(Input is MultiplexerData))
+            state.Output.Fatal("GPData class must subclass from " + typeof(MultiplexerData).Name,
+            paramBase.Push(P_DATA), null);
+
             // I figure 3 bits is plenty -- otherwise we'd be dealing with
             // REALLY big arrays!
             bits = state.Parameters.GetIntWithMax(paramBase.Push(P_NUMBITS), null, 1, 3);
             if (bits < 1)
                 state.Output.Fatal("The number of bits for Multiplexer must be between 1 and 3 inclusive");
-
-            // set up our input
-            input = (MultiplexerData)state.Parameters.GetInstanceForParameterEq(
-                paramBase.Push(P_DATA), null, typeof(MultiplexerData));
-            input.Setup(state, paramBase.Push(P_DATA));
         }
 
 
         public void Evaluate(IEvolutionState state, Individual ind, int subpop, int threadnum)
         {
-            input.Status = (byte)bits;
+            ((MultiplexerData)Input).Status = (byte)bits;
 
             if (!ind.Evaluated)  // don't bother reevaluating
             {
                 int sum = 0;
 
-                ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, input, Stack, ((GPIndividual)ind), this);
+                ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, Input, Stack, (GPIndividual)ind, this);
 
                 if (bits == 1)
                 {
-                    byte item1 = input.Dat3;
+                    byte item1 = ((MultiplexerData) Input).Dat3;
                     byte item2 = Fast.M_3[Fast.M_3_OUTPUT];
                     for (var y = 0; y < MultiplexerData.MULTI_3_BITLENGTH; y++)
                     {
@@ -109,7 +108,7 @@ namespace BraneCloud.Evolution.EC.App.Multiplexer
                 }
                 else if (bits == 2)
                 {
-                    long item1 = input.Dat6;
+                    long item1 = ((MultiplexerData)Input).Dat6;
                     long item2 = Fast.M_6[Fast.M_6_OUTPUT];
                     for (int y = 0; y < MultiplexerData.MULTI_6_BITLENGTH; y++)
                     {
@@ -125,7 +124,7 @@ namespace BraneCloud.Evolution.EC.App.Multiplexer
                     long item1, item2;
                     for (var y = 0; y < MultiplexerData.MULTI_11_NUM_BITSTRINGS; y++)
                     {
-                        item1 = input.Dat11[y];
+                        item1 = ((MultiplexerData)Input).Dat11[y];
                         item2 = Fast.M_11[Fast.M_11_OUTPUT][y];
                         //System.out.PrintLn("" + y + " ### " + item1 + " " + item2);
                         for (var z = 0; z < MultiplexerData.MULTI_11_BITLENGTH; z++)

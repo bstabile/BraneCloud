@@ -20,7 +20,7 @@ using System;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 
-namespace BraneCloud.Evolution.EC.App.TwoBox.Func
+namespace BraneCloud.Evolution.EC.Problems.TwoBox.Func
 {
     [ECConfiguration("ec.problems.twobox.func.Div")]
     public class Div : GPNode
@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.App.TwoBox.Func
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 2; } }
+        public override int ExpectedChildren => 2;
 
         public override void Eval(IEvolutionState state,
             int thread,

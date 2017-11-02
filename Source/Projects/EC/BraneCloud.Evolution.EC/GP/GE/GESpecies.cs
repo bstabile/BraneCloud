@@ -114,6 +114,8 @@ namespace BraneCloud.Evolution.EC.GP.GE
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_GESPECIES = "species";
         public const string P_FILE = "file";
         public const string P_GPSPECIES = "gp-species";
@@ -187,7 +189,8 @@ namespace BraneCloud.Evolution.EC.GP.GE
                 def = DefaultBase;
 
                 //var grammarFile = state.Parameters.GetFile(p, def.Push(P_FILE).Push("" + i));
-                var grammarFile = state.Parameters.GetResource(p, def.Push(P_FILE).Push("" + i));
+                Stream grammarFile = state.Parameters.GetResource(p, def.Push(P_FILE).Push("" + i));
+
                 if (grammarFile == null)
                 {
                     state.Output.Fatal("Error retrieving grammar file(s): " + def + "." + P_FILE + "." + i + " is undefined.");
@@ -217,8 +220,9 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// <param name="ind">ind the GEIndividual</param>
         /// <param name="trees">array of trees for the individual</param>
         /// <param name="threadnum">thread number</param>
+        /// <param name="ercMappings"></param>
         /// <returns>Number of chromosomes consumed</returns>
-        public int MakeTrees(IEvolutionState state, GEIndividual ind, GPTree[] trees, int threadnum, IDictionary<int, GPNode> ERCmappings)
+        public int MakeTrees(IEvolutionState state, GEIndividual ind, GPTree[] trees, int threadnum, IDictionary<int, GPNode> ercMappings)
         {
             var position = 0;
 
@@ -228,7 +232,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
                 if (position < 0)
                     return BIG_TREE_ERROR;
 
-                position = MakeTree(state, ind, trees[i], position, i, threadnum, ERCmappings);
+                position = MakeTree(state, ind, trees[i], position, i, threadnum, ercMappings);
             }
 
             return position;
@@ -238,7 +242,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// MakeTree, edits the tree that its given by adding a root (and all subtrees attached)
         /// </summary>
         /// <returns>The number of chromosomes used, or an BIG_TREE_ERROR sentinel value.</returns>
-        public int MakeTree(IEvolutionState state, GEIndividual ind, GPTree tree, int position, int treeNum, int threadnum, IDictionary<int, GPNode> ERCmappings)
+        public int MakeTree(IEvolutionState state, GEIndividual ind, GPTree tree, int position, int treeNum, int threadnum, IDictionary<int, GPNode> ercMappings)
         {
             int[] countNumberOfChromosomesUsed = { position };  // hack, use an array to pass an extra value
             var genome = ind.genome;
@@ -247,7 +251,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
 
             try // get the tree, or return an error.
             {
-                root = MakeSubtree(countNumberOfChromosomesUsed, genome, state, gpfs, Grammar[treeNum], treeNum, threadnum, ERCmappings);
+                root = MakeSubtree(countNumberOfChromosomesUsed, genome, state, gpfs, Grammar[treeNum], treeNum, threadnum, ercMappings);
             }
             catch (BigTreeException)
             {
@@ -269,7 +273,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// </summary>
         class BigTreeException : Exception { /* ECJ has: static long serialVersionUID = 1L; */ }
 
-        GPNode MakeSubtree(IList<int> index, IList<sbyte> genome, IEvolutionState es, GPFunctionSet gpfs, GrammarRuleNode rule, int treeNum, int threadnum, IDictionary<int, GPNode> ERCmappings)
+        GPNode MakeSubtree(IList<int> index, IList<byte> genome, IEvolutionState es, GPFunctionSet gpfs, GrammarRuleNode rule, int treeNum, int threadnum, IDictionary<int, GPNode> ercMappings)
         {
             //have we exceeded the length of the genome?  No point in going further.
             if (index[0] >= genome.Count)
@@ -290,7 +294,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
             if (rule.GetNumChoices() > 1)
             {
                 //casting to an int should be ok since the biggest these genes can be is a byte
-                i = ((genome[index[0]]) - ((int)(MinGene(index[0])))) % rule.GetNumChoices();
+                i = (genome[index[0]] - (int)GetMinGene(index[0])) % rule.GetNumChoices();
                 index[0]++;
             }
             //only 1 rule to consider
@@ -305,7 +309,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
             if (choice is GrammarRuleNode)
             {
                 var nextrule = (GrammarRuleNode)choice;
-                return MakeSubtree(index, genome, es, gpfs, nextrule, treeNum, threadnum, ERCmappings);
+                return MakeSubtree(index, genome, es, gpfs, nextrule, treeNum, threadnum, ercMappings);
             }
             else //handle functions
             {
@@ -334,11 +338,11 @@ namespace BraneCloud.Evolution.EC.GP.GE
                     }
 
                     // key for ERC hashtable look ups is the current index within the genome.  Consume it.
-                    var key = ((genome[index[0]]) - ((int)(MinGene(index[0]))));
+                    var key = genome[index[0]] - (int)GetMinGene(index[0]);
                     int originalVal = genome[index[0]];
                     index[0]++;
 
-                    validNode = ObtainERC(es, key, originalVal, threadnum, validNode, ERCmappings);
+                    validNode = ObtainERC(es, key, originalVal, threadnum, validNode, ercMappings);
                 }
                 //non ERC node
                 else
@@ -351,7 +355,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
                 {
                     //get and link children to the current GPNode
                     validNode.Children[childNumber] = MakeSubtree(index, genome, es, gpfs,
-                        (GrammarRuleNode)funcgrammarnode.GetArgument(j), treeNum, threadnum, ERCmappings);
+                        (GrammarRuleNode)funcgrammarnode.GetArgument(j), treeNum, threadnum, ercMappings);
 
                     if (validNode.Children[childNumber] == null)
                     {
@@ -368,7 +372,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// If there is no such ERC, then one is created and randomized, then added to the bank.
         /// The point of this mechanism is to enable ERCs to appear in multiple places in a GPTree. 
         /// </summary>
-        public GPNode ObtainERC(IEvolutionState state, int key, int genomeVal, int threadnum, GPNode node, IDictionary<int, GPNode> ERCmappings)
+        public GPNode ObtainERC(IEvolutionState state, int key, int genomeVal, int threadnum, GPNode node, IDictionary<int, GPNode> ercMappings)
         {
             var ercList = (List<GPNode>)(ERCBank[key]);
 
@@ -388,7 +392,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
                 // ERC was found inside the list
                 if (dummy.NodeEquivalentTo(node))
                 {
-                    if (ERCmappings != null) ERCmappings[genomeVal] = dummy;
+                    if (ercMappings != null) ercMappings[genomeVal] = dummy;
                     return dummy.LightClone();
                 }
             }
@@ -397,7 +401,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
             node = node.LightClone();
             node.ResetNode(state, threadnum);
             ercList.Add(node);
-
+            if (ercMappings != null) ercMappings[genomeVal] = node;
             return node;
         }
 
@@ -430,7 +434,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// over the elements of the given GEIndividual.  Null is returned if an error occurs,
         /// specifically, if all elements were consumed and the tree had still not been completed.
         /// </summary>
-        public GPIndividual Map(IEvolutionState state, GEIndividual ind, int threadnum, IDictionary<int, GPNode> ERCmappings)
+        public GPIndividual Map(IEvolutionState state, GEIndividual ind, int threadnum, IDictionary<int, GPNode> ercMappings)
         {
             // create a dummy individual
             var newind = ((GPIndividual) GPSpecies.I_Prototype).LightClone();
@@ -445,7 +449,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
             newind.Species = GPSpecies;
 
             // do the mapping
-            if (MakeTrees(state, ind, newind.Trees, threadnum, ERCmappings) < 0)  // error
+            if (MakeTrees(state, ind, newind.Trees, threadnum, ercMappings) < 0)  // error
                 return null;
 
             return newind;

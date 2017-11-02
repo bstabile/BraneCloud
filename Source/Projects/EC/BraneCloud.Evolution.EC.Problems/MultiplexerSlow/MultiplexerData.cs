@@ -21,7 +21,7 @@ using BraneCloud.Evolution.EC.GP;
 
 namespace BraneCloud.Evolution.EC.Problems.MultiplexerSlow
 {
-    [ECConfiguration("ec.problems.multiplexerslow.MultiplexerData")]
+    [ECConfiguration("ec.app.multiplexerslow.MultiplexerData")]
     public class MultiplexerData : GPData
     {
         // return value -- should ALWAYS be either 1 or 0

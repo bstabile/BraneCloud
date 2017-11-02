@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.Problems.Parity.Func
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         public override void Eval(IEvolutionState state,
             int thread,
@@ -49,7 +49,7 @@ namespace BraneCloud.Evolution.EC.Problems.Parity.Func
             IProblem problem)
         {
             ((ParityData)input).x =
-                ((((ParityProblem)problem).bits >> 12) & 1);
+                ((((Parity)problem).bits >> 12) & 1);
         }
     }
 }

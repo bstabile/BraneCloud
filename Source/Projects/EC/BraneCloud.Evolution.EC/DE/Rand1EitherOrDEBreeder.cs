@@ -89,8 +89,11 @@ namespace BraneCloud.Evolution.EC.DE
             var v = (DoubleVectorIndividual)
                 (state.Population.Subpops[subpop].Species.NewIndividual(state, thread));
 
+            var retry = -1;
             do
             {
+                retry++;
+
                 // select three indexes different from each other and from that of the current parent
                 int r0, r1, r2;
                 do
@@ -119,7 +122,12 @@ namespace BraneCloud.Evolution.EC.DE
                     else
                         v.genome[i] = g0.genome[i] + 0.5 * (F + 1) * (g1.genome[i] + g2.genome[i] - 2 * g0.genome[i]);
             }
-            while (!Valid(v));
+            while (!Valid(v) && retry < Retries);
+            if (retry >= Retries && !Valid(v))  // we reached our maximum
+            {
+                // completely reset and be done with it
+                v.Reset(state, thread);
+            }
 
             return v;       // no crossover is performed
         }

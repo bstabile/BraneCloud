@@ -22,100 +22,76 @@ using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Vector
 {
-    /// <summary> 
-    /// IntegerVectorSpecies is a subclass of VectorSpecies with special constraints
-    /// for integral vectors, namely ByteVectorIndividual, ShortVectorIndividual,
-    /// IntegerVectorIndividual, and LongVectorIndividual.
-    /// </summary>
-    /// <summary> <p/>IntegerVectorSpecies can specify min/max numeric constraints on gene values
-    /// in three different ways.
-    /// 
-    /// <ol>
-    /// <li/> You may provide a default min and max value.
-    /// This is done by specifying:
-    /// <p/><i>base.n</i>.<tt>min-gene</tt>
-    /// <br/><i>base.n</i>.<tt>max-gene</tt>
-    /// <p/><i>Note:</i> you <b>must</b> provide these values even if you don't use them,
-    /// as they're used as defaults by #2 and #3 below.
-    /// <p/>
-    /// <li/> You may provide min and max values for genes in segments (regions) along
-    /// the genome.  This is done by specifying:
-    /// <p/><i>base</i>.<tt>num-segments</tt>
-    /// The segments may be defined by either start or end indices of genes. 
-    /// This is controlled by specifying the value of:
-    /// <p/><i>base</i>.<tt>segment-type</tt>
-    /// which can assume the value of start or end, with start being the default.
-    /// The indices are defined using Java array style, i.e. the first gene has the index of 0, 
-    /// and the last gene has the index of genome-size - 1.
-    /// <p/>Using this method, each segment is specified by<i>j</i>...
-    /// <p/><i>base</i>.<tt>segment.</tt><i>j</i><tt>.start</tt>
-    /// <br/><i>base</i>.<tt>segment.</tt><i>j</i><tt>.min-gene</tt>
-    /// <br/><i>base</i>.<tt>segment.</tt><i>j</i><tt>.max-gene</tt>
-    /// if segment-type value was chosen as start or by:
-    /// <p/><i>base</i>.<tt>segment.</tt><i>j</i><tt>.end</tt>
-    /// <br/><i>base</i>.<tt>segment.</tt><i>j</i><tt>.min-gene</tt>
-    /// <br/><i>base</i>.<tt>segment.</tt><i>j</i><tt>.max-gene</tt>
-    /// if segment-type value is equal to end.
-    /// <p/>
-    /// <li/> You may provide min and max values for each separate gene.
-    /// This is done by specifying (for each gene location <i>i</i> you wish to specify).  
-    /// <p/><i>base.n</i>.<tt>min-gene</tt>.<i>i</i>
-    /// <br/><i>base.n</i>.<tt>max-gene</tt>.<i>i</i>
-    /// </ol>
-    /// 
-    /// <p/>Any settings for #3 override #2, and both override #1. 
-    /// 
-    /// <p/><b>Parameters</b><br/>
-    /// <table>
-    /// <tr><td valign="top"><i>base.n</i>.<tt>min-gene</tt><br/>
-    /// <font size="-1">long (default=0)</font></td>
-    /// <td valign="top">(the minimum gene value)</td></tr>
-    /// 
-    /// <tr><td valign="top"><i>base.n</i>.<tt>max-gene</tt><br/>
-    /// <font size="-1">long &gt;= <i>base.n</i>.min-gene</font></td>
-    /// <td valign="top">(the maximum gene value)</td></tr>
-    /// 
-    /// <tr><td valign="top"><i>base.n</i>.<tt>min-gene</tt>.<i>i</i><br/>
-    /// <font size="-1">long (default=<i>base.n</i>.<tt>min-gene</tt>)</font></td>
-    /// <td valign="top">(the minimum gene value for gene <i>i</i>)</td></tr>
-    /// 
-    /// <tr><td valign="top"><i>base.n</i>.<tt>max-gene</tt>.<i>i</i><br/>
-    /// <font size="-1">long &gt;= <i>base.n</i>.min-gene.<i>i</i> (default=<i>base.n</i>.<tt>max-gene</tt>)</font></td>
-    /// <td valign="top">(the maximum gene value for gene <i>i</i>)</td></tr>
-    /// 
-    /// <tr><td valign="top"><i>base.</i>.<tt>num-segments</tt><br/>
-    /// <font size="-1">int &gt;= 1 (default=no segments used)</font></td>
-    /// <td valign="top">(the number of gene segments defined)</td>
-    /// </tr>
-    /// 
-    /// <tr><td valign="top"><i>base.</i>.<tt>segment-type</tt><br/>
-    /// <font size="-1">int &gt;= 1 (default=start)</font></td>
-    /// <td valign="top">(defines the way in which segments are defined: either by providing start indices (segment-type=start) or by providing end indices (segment-type=end)</td>
-    /// </tr>
-    /// 
-    /// <tr><td valign="top"><i>base.</i>.<tt>segment</tt>.<i>j</i>.<tt>start</tt><br/>
-    /// <font size="-1">0 &lt;= int &lt; genome length</font></td>
-    /// <td valign="top">(the start index of gene segment <i>j</i> -- the end of a segment is before the start of the next segment)</td>
-    /// <td valign="top">(used when the value of segment-type parameter is equal to start)</td>
-    /// </tr>
-    /// 
-    /// <tr><td valign="top"><i>base.</i>.<tt>segment</tt>.<i>j</i>.<tt>end</tt><br/>
-    /// <font size="-1">0 &lt;= int &lt; genome length</font></td>
-    /// <td valign="top">(the end of gene segment <i>j</i> -- the start of a segment is after the end of the previous segment)</td>
-    /// <td valign="top">(used when the value of segment-type parameter is equal to end)</td>
-    /// </tr>
-    /// 
-    /// <tr><td valign="top"><i>base.</i>.<tt>segment</tt>.<i>j</i>.<tt>min-gene</tt><br/>
-    /// <font size="-1">double (default=0.0)</font></td>
-    /// <td valign="top">(the minimum gene value for segment <i>j</i>)</td>
-    /// </tr>
-    /// 
-    /// <tr><td valign="top"><i>base.</i>.<tt>segment</tt>.<i>j</i>.<tt>max-gene</tt><br/>
-    /// <font size="-1"/>double &gt;= <i>base.</i>.<tt>segment</tt>.<i>j</i>.<tt>min-gene</tt></td>
-    /// <td valign="top">(the maximum gene value for segment <i>j</i>)</td>
-    /// </tr>
-    /// </table>
-    /// </summary>
+    /**
+     * IntegerVectorSpecies is a subclass of VectorSpecies with special constraints
+     * for integral vectors, namely ByteVectorIndividual, ShortVectorIndividual,
+     * IntegerVectorIndividual, and LongVectorIndividual.
+     *
+     * <p>IntegerVectorSpecies can specify a number of parameters globally, per-segment, and per-gene.
+     * See <a href="VectorSpecies.html">VectorSpecies</a> for information on how to this works.
+     *
+     * <p>IntegerVectorSpecies defines a minimum and maximum gene value.  These values
+     * are used during initialization and, depending on whether <tt>mutation-bounded</tt>
+     * is true, also during various mutation algorithms to guarantee that the gene value
+     * will not exceed these minimum and maximum bounds.
+     *
+     * <p>
+     * IntegerVectorSpecies provides support for two ways of mutating a gene.
+     * <ul>
+     * <li><b>reset</b> Replacing the gene's value with a value uniformly drawn from the gene's
+     * range (the default behavior).</li>
+     * <li><b>random-walk</b>Replacing the gene's value by performing a random walk starting at the gene
+     * value.  The random walk either adds 1 or subtracts 1 (chosen at random), then does a coin-flip
+     * to see whether to continue the random walk.  When the coin-flip finally comes up false, the gene value
+     * is set to the current random walk position.
+     * </ul>
+     *
+     * <p>IntegerVectorSpecies performs gene initialization by resetting the gene.
+     *
+     *
+     * <p><b>Parameters</b><br>
+     * <table>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>min-gene</tt>&nbsp;&nbsp;&nbsp;<i>or</i><br>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>segment</tt>.<i>segment-number</i>.<tt>min-gene</tt>&nbsp;&nbsp;&nbsp;<i>or</i><br>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>min-gene</tt>.<i>gene-number</i><br>
+     * <font size=-1>long (default=0)</font></td>
+     * <td valign=top>(the minimum gene value)</td></tr>
+     *
+     <tr><td>&nbsp;
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>max-gene</tt>&nbsp;&nbsp;&nbsp;<i>or</i><br>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>segment</tt>.<i>segment-number</i>.<tt>max-gene</tt>&nbsp;&nbsp;&nbsp;<i>or</i><br>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>max-gene</tt>.<i>gene-number</i><br>
+     * <font size=-1>long &gt;= <i>base</i>.min-gene</font></td>
+     * <td valign=top>(the maximum gene value)</td></tr>
+     *
+     <tr><td>&nbsp;
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>mutation-type</tt>&nbsp;&nbsp;&nbsp;<i>or</i><br>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>segment</tt>.<i>segment-number</i>.<tt>mutation-type</tt>&nbsp;&nbsp;&nbsp;<i>or</i><br>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>mutation-prob</tt>.<i>gene-number</i><br>
+     * <font size=-1><tt>reset</tt> or <tt>random-walk</tt> (default=<tt>reset</tt>)</font></td>
+     * <td valign=top>(the mutation type)</td>
+     * </tr>
+     *
+     <tr><td>&nbsp;
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>random-walk-probability</tt>&nbsp;&nbsp;&nbsp;<i>or</i><br>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>segment</tt>.<i>segment-number</i>.<tt>random-walk-probability</tt>&nbsp;&nbsp;&nbsp;<i>or</i><br>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>random-walk-probability</tt>.<i>gene-number</i><br>
+     <font size=-1>0.0 &lt;= float &lt;= 1.0 </font></td>
+     *  <td valign=top>(the probability that a random walk will continue.  Random walks go up or down by 1.0 until the coin flip comes up false.)</td>
+     * </tr>
+     * 
+     <tr><td>&nbsp;
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>mutation-bounded</tt>&nbsp;&nbsp;&nbsp;<i>or</i><br>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>segment</tt>.<i>segment-number</i>.<tt>mutation-bounded</tt>&nbsp;&nbsp;&nbsp;<i>or</i><br>
+     <tr><td valign=top style="white-space: nowrap"><i>base</i>.<tt>mutation-bounded</tt>.<i>gene-number</i><br>
+     *  <font size=-1>boolean (default=true)</font></td>
+     *  <td valign=top>(whether mutation is restricted to only being within the min/max gene values.  Does not apply to SimulatedBinaryCrossover (which is always bounded))</td>
+     * </tr>
+     * </table>
+     * @author Sean Luke, Rafal Kicinger
+     * @version 1.0 
+     */
+
     [Serializable]
     [ECConfiguration("ec.vector.IntegerVectorSpecies")]
     public class IntegerVectorSpecies : VectorSpecies
@@ -125,133 +101,113 @@ namespace BraneCloud.Evolution.EC.Vector
         public const string P_MINGENE = "min-gene";
         public const string P_MAXGENE = "max-gene";
         
-        public const string P_NUM_SEGMENTS = "num-segments";        
-        public const string P_SEGMENT_TYPE = "segment-type";       
-        public const string P_SEGMENT_START = "start";        
-        public const string P_SEGMENT_END = "end";        
-        public const string P_SEGMENT = "segment";
+        // DEFINED ON VECTOR SPECIES
+        //public const string P_NUM_SEGMENTS = "num-segments";        
+        //public const string P_SEGMENT_TYPE = "segment-type";       
+        //public const string P_SEGMENT_START = "start";        
+        //public const string P_SEGMENT_END = "end";        
+        //public const string P_SEGMENT = "segment";
+
+        public const string P_MUTATIONTYPE = "mutation-type";
+        public const string P_RANDOM_WALK_PROBABILITY = "random-walk-probability";
+        public const string P_MUTATION_BOUNDED = "mutation-bounded";
+        public const string V_RESET_MUTATION = "reset";
+        public const string V_RANDOM_WALK_MUTATION = "random-walk";
+        public const int C_RESET_MUTATION = 0;
+        public const int C_RANDOM_WALK_MUTATION = 1;
 
         #endregion // Constants
         #region Properties
 
-        public long[] MinGenes;
-        public long[] MaxGenes;
+        protected long[] MinGenes;
+        protected long[] MaxGenes;
+
+        /** Mutation type, per gene.
+           This array is one longer than the standard genome length.
+           The top element in the array represents the parameters for genes in
+           genomes which have extended beyond the genome length.  */
+        protected int[] MutationType { get; set; }
+
+        /** The continuation probability for Integer Random Walk Mutation, per gene.
+            This array is one longer than the standard genome length.
+            The top element in the array represents the parameters for genes in
+            genomes which have extended beyond the genome length.  */
+        protected double[] RandomWalkProbability { get; set; }
+
+        /** Whether mutation is bounded to the min- and max-gene values, per gene.
+            This array is one longer than the standard genome length.
+            The top element in the array represents the parameters for genes in
+            genomes which have extended beyond the genome length.  */
+        protected bool[] MutationIsBounded { get; set; }
+
+        /** Whether the mutationIsBounded value was defined, per gene.
+            Used internally only.
+            This array is one longer than the standard genome length.
+            The top element in the array represents the parameters for genes in
+            genomes which have extended beyond the genome length.  */
+        bool _mutationIsBoundedDefined;
 
         #endregion // Properties
         #region Setup
 
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
-            // keep in mind that the *species* variable has not been set yet.
-            base.Setup(state, paramBase);
+            IParameter def = DefaultBase;
 
-            var def = DefaultBase;
-
+            SetupGenome(state, paramBase);
 
             // create the arrays
-            MinGenes = new long[GenomeSize];
-            MaxGenes = new long[GenomeSize];
+            MinGenes = new long[GenomeSize + 1];
+            MaxGenes = new long[GenomeSize + 1];
+            MutationType = Fill(new int[GenomeSize + 1], -1);
+            MutationIsBounded = new bool[GenomeSize + 1];
+            RandomWalkProbability = new double[GenomeSize + 1];
+
 
             // LOADING GLOBAL MIN/MAX GENES
-            var minGene = state.Parameters.GetLongWithDefault(paramBase.Push(P_MINGENE), def.Push(P_MINGENE), 0);
-            var maxGene = state.Parameters.GetLong(paramBase.Push(P_MAXGENE), def.Push(P_MAXGENE), minGene);
+            long minGene = state.Parameters.GetLongWithDefault(paramBase.Push(P_MINGENE), def.Push(P_MINGENE), 0);
+            long maxGene = state.Parameters.GetLong(paramBase.Push(P_MAXGENE), def.Push(P_MAXGENE), minGene);
             if (maxGene < minGene)
                 state.Output.Fatal("IntegerVectorSpecies must have a default min-gene which is <= the default max-gene",
-                                                                        paramBase.Push(P_MAXGENE), def.Push(P_MAXGENE));
+                    paramBase.Push(P_MAXGENE), def.Push(P_MAXGENE));
+            Fill(MinGenes, minGene);
+            Fill(MaxGenes, maxGene);
 
-            for (var x = 0; x < GenomeSize; x++)
+
+            /// MUTATION
+
+
+            String mtype = state.Parameters.GetStringWithDefault(paramBase.Push(P_MUTATIONTYPE), def.Push(P_MUTATIONTYPE), null);
+            int mutType = C_RESET_MUTATION;
+            if (mtype == null)
+                state.Output.Warning("No global mutation type given for IntegerVectorSpecies, assuming 'reset' mutation",
+                    paramBase.Push(P_MUTATIONTYPE), def.Push(P_MUTATIONTYPE));
+            else if (mtype.Equals(V_RESET_MUTATION, StringComparison.InvariantCultureIgnoreCase))
+                mutType = C_RESET_MUTATION; // redundant
+            else if (mtype.Equals(V_RANDOM_WALK_MUTATION, StringComparison.InvariantCultureIgnoreCase))
+                mutType = C_RANDOM_WALK_MUTATION;
+            else
+                state.Output.Fatal("IntegerVectorSpecies given a bad mutation type: "
+                    + mtype, paramBase.Push(P_MUTATIONTYPE), def.Push(P_MUTATIONTYPE));
+            Fill(MutationType, mutType);
+
+            if (mutType == C_RANDOM_WALK_MUTATION)
             {
-                MinGenes[x] = minGene;
-                MaxGenes[x] = maxGene;
+                double randWalkProb = state.Parameters.GetDoubleWithMax(paramBase.Push(P_RANDOM_WALK_PROBABILITY), def.Push(P_RANDOM_WALK_PROBABILITY), 0.0, 1.0);
+                if (randWalkProb <= 0)
+                    state.Output.Fatal("If it's going to use random walk mutation as its global mutation type, IntegerVectorSpecies must a random walk mutation probability between 0.0 and 1.0.",
+                        paramBase.Push(P_RANDOM_WALK_PROBABILITY), def.Push(P_RANDOM_WALK_PROBABILITY));
+                Fill(RandomWalkProbability, randWalkProb);
+
+                if (!state.Parameters.ParameterExists(paramBase.Push(P_MUTATION_BOUNDED), def.Push(P_MUTATION_BOUNDED)))
+                    state.Output.Warning("IntegerVectorSpecies is using gaussian, polynomial, or integer randomwalk mutation as its global mutation type, but " + P_MUTATION_BOUNDED + " is not defined.  Assuming 'true'");
+                bool mutIsBounded = state.Parameters.GetBoolean(paramBase.Push(P_MUTATION_BOUNDED), def.Push(P_MUTATION_BOUNDED), true);
+                Fill(MutationIsBounded, mutIsBounded);
+                _mutationIsBoundedDefined = true;
             }
 
-            // LOADING SEGMENTS
 
-            // Now check to see if segments of genes (genes having the same min and max values) exist
-            if (state.Parameters.ParameterExists(paramBase.Push(P_NUM_SEGMENTS), def.Push(P_NUM_SEGMENTS)))
-            {
-                if (DynamicInitialSize)
-                    state.Output.WarnOnce("Using dynamic initial sizing, but per-segment min/max gene declarations.  This is probably wrong.  You probably want to use global min/max declarations.",
-                        paramBase.Push(P_NUM_SEGMENTS), def.Push(P_NUM_SEGMENTS));
-
-                var numSegments = state.Parameters.GetIntWithDefault(paramBase.Push(P_NUM_SEGMENTS), def.Push(P_NUM_SEGMENTS), 0);
-
-                if (numSegments == 0)
-                    state.Output.Warning("The number of genome segments has been defined to be equal to 0.\n"
-                        + "Hence, no genome segments will be defined.", paramBase.Push(P_NUM_SEGMENTS),
-                                                                              def.Push(P_NUM_SEGMENTS));
-                else if (numSegments < 0)
-                    state.Output.Fatal("Invalid number of genome segments: "
-                        + numSegments + "\nIt must be a nonnegative value.",
-                        paramBase.Push(P_NUM_SEGMENTS),
-                              def.Push(P_NUM_SEGMENTS));
-
-                //read the type of segment definition using the default start value
-                var segmentType = state.Parameters.GetStringWithDefault(paramBase.Push(P_SEGMENT_TYPE),
-                                                                def.Push(P_SEGMENT_TYPE), P_SEGMENT_START);
-
-                if (segmentType.ToUpper().Equals(P_SEGMENT_START.ToUpper()))
-                    InitializeGenomeSegmentsByStartIndices(state, paramBase, def, numSegments, minGene, maxGene);
-                else if (segmentType.ToUpper().Equals(P_SEGMENT_END.ToUpper()))
-                    InitializeGenomeSegmentsByEndIndices(state, paramBase, def, numSegments, minGene, maxGene);
-                else
-                    state.Output.Fatal("Invalid specification of genome segment type: " + segmentType
-                        + "\nThe " + P_SEGMENT_TYPE + " parameter must have the value of "
-                                   + P_SEGMENT_START + " or " + P_SEGMENT_END, paramBase.Push(P_SEGMENT_TYPE),
-                                                                                     def.Push(P_SEGMENT_TYPE));
-            }
-
-            // LOADING PER-GENE VALUES
-
-            var foundStuff = false;
-            var warnedMin = false;
-            var warnedMax = false;
-            for (var x = 0; x < GenomeSize; x++)
-            {
-                if (!state.Parameters.ParameterExists(paramBase.Push(P_MINGENE).Push("" + x), paramBase.Push(P_MINGENE).Push("" + x)))
-                {
-                    if (foundStuff && !warnedMin)
-                    {
-                        state.Output.Warning("IntegerVectorSpecies has missing min-gene values for some genes.\n"
-                            + "The first one is gene #" + x + ".", paramBase.Push(P_MINGENE).Push("" + x),
-                                                                   paramBase.Push(P_MINGENE).Push("" + x));
-
-                        warnedMin = true;
-                    }
-                }
-                else
-                {
-                    if (DynamicInitialSize)
-                        state.Output.WarnOnce("Using dynamic initial sizing, but per-gene min/max gene declarations.  This is probably wrong.  You probably want to use global min/max declarations.",
-                            paramBase.Push(P_MINGENE).Push("" + x), paramBase.Push(P_MINGENE).Push("" + x));
-
-                    MinGenes[x] = state.Parameters.GetLongWithDefault(paramBase.Push(P_MINGENE).Push("" + x),
-                                                                      paramBase.Push(P_MINGENE).Push("" + x), minGene);
-                    foundStuff = true;
-                }
-
-                if (!state.Parameters.ParameterExists(paramBase.Push(P_MAXGENE).Push("" + x),
-                                             paramBase.Push(P_MAXGENE).Push("" + x)))
-                {
-                    if (foundStuff && !warnedMax)
-                    {
-                        state.Output.Warning("IntegerVectorSpecies has missing max-gene values for some genes.\n"
-                            + "The first one is gene #" + x + ".", paramBase.Push(P_MAXGENE).Push("" + x),
-                                                                   paramBase.Push(P_MAXGENE).Push("" + x));
-                        warnedMax = true;
-                    }
-                }
-                else
-                {
-                    if (DynamicInitialSize)
-                        state.Output.WarnOnce("Using dynamic initial sizing, but per-gene min/max gene declarations.  This is probably wrong.  You probably want to use global min/max declarations.",
-                            paramBase.Push(P_MINGENE).Push("" + x), paramBase.Push(P_MINGENE).Push("" + x));
-
-                    MaxGenes[x] = state.Parameters.GetLongWithDefault(paramBase.Push(P_MAXGENE).Push("" + x),
-                                                                      paramBase.Push(P_MAXGENE).Push("" + x), maxGene);
-                    foundStuff = true;
-                }
-            }
+            base.Setup(state, paramBase);
 
             // VERIFY
             for (var x = 0; x < GenomeSize; x++)
@@ -262,13 +218,13 @@ namespace BraneCloud.Evolution.EC.Vector
                 // check to see if these longs are within the data type of the particular individual
                 if (!InNumericalTypeRange(MinGenes[x]))
                     state.Output.Fatal("This IntegerVectorSpecies has a prototype of the kind: "
-                        + I_Prototype.GetType().FullName + ", but doesn't have a min-gene[" + x
-                        + "] value within the range of this prototype's genome's data types");
+                                       + I_Prototype.GetType().FullName + ", but doesn't have a min-gene[" + x
+                                       + "] value within the range of this prototype's genome's data types");
 
                 if (!InNumericalTypeRange(MaxGenes[x]))
                     state.Output.Fatal("This IntegerVectorSpecies has a prototype of the kind: "
-                        + I_Prototype.GetType().FullName + ", but doesn't have a max-gene[" + x
-                        + "] value within the range of this prototype's genome's data types");
+                                       + I_Prototype.GetType().FullName + ", but doesn't have a max-gene[" + x
+                                       + "] value within the range of this prototype's genome's data types");
             }
             /*
             //Debugging
@@ -277,43 +233,159 @@ namespace BraneCloud.Evolution.EC.Vector
             */
         }
 
+        protected override void LoadParametersForGene(IEvolutionState state, int index, IParameter paramBase, IParameter def, String postfix)
+        {
+            base.LoadParametersForGene(state, index, paramBase, def, postfix);
+
+            bool minValExists = state.Parameters.ParameterExists(paramBase.Push(P_MINGENE).Push(postfix), def.Push(P_MINGENE).Push(postfix));
+            bool maxValExists = state.Parameters.ParameterExists(paramBase.Push(P_MAXGENE).Push(postfix), def.Push(P_MAXGENE).Push(postfix));
+
+            if ((maxValExists && !minValExists))
+                state.Output.Warning("Max Gene specified but not Min Gene", paramBase.Push(P_MINGENE).Push(postfix), def.Push(P_MINGENE).Push(postfix));
+
+            if (minValExists && !maxValExists)
+                state.Output.Warning("Min Gene specified but not Max Gene", paramBase.Push(P_MAXGENE).Push(postfix), def.Push(P_MINGENE).Push(postfix));
+
+            if (minValExists)
+            {
+                long minVal = state.Parameters.GetLongWithDefault(paramBase.Push(P_MINGENE).Push(postfix), def.Push(P_MINGENE).Push(postfix), 0);
+
+                //check if the value is in range
+                if (!InNumericalTypeRange(minVal))
+                    state.Output.Error("Min Gene Value out of range for data type " + I_Prototype.GetType().Name,
+                        paramBase.Push(P_MINGENE).Push(postfix),
+                        paramBase.Push(P_MINGENE).Push(postfix));
+                else MinGenes[index] = minVal;
+
+                if (DynamicInitialSize)
+                    state.Output.WarnOnce("Using dynamic initial sizing, but per-gene or per-segment min-gene declarations.  This is probably wrong.  You probably want to use global min/max declarations.",
+                        paramBase.Push(P_MINGENE).Push(postfix),
+                        paramBase.Push(P_MINGENE).Push(postfix));
+            }
+
+            if (minValExists)
+            {
+                long maxVal = state.Parameters.GetLongWithDefault(paramBase.Push(P_MAXGENE).Push(postfix), def.Push(P_MAXGENE).Push(postfix), 0);
+
+                //check if the value is in range
+                if (!InNumericalTypeRange(maxVal))
+                    state.Output.Error("Max Gene Value out of range for data type " + I_Prototype.GetType().Name,
+                        paramBase.Push(P_MAXGENE).Push(postfix),
+                        paramBase.Push(P_MAXGENE).Push(postfix));
+                else MaxGenes[index] = maxVal;
+
+                if (DynamicInitialSize)
+                    state.Output.WarnOnce("Using dynamic initial sizing, but per-gene or per-segment max-gene declarations.  This is probably wrong.  You probably want to use global min/max declarations.",
+                        paramBase.Push(P_MAXGENE).Push(postfix),
+                        paramBase.Push(P_MAXGENE).Push(postfix));
+            }
+
+            // MUTATION
+
+            String mtype = state.Parameters.GetStringWithDefault(paramBase.Push(P_MUTATIONTYPE).Push(postfix), def.Push(P_MUTATIONTYPE).Push(postfix), null);
+            int mutType = -1;
+            if (mtype == null) { }  // we're cool
+            else if (mtype.Equals(V_RESET_MUTATION, StringComparison.InvariantCultureIgnoreCase))
+                mutType = MutationType[index] = C_RESET_MUTATION;
+            else if (mtype.Equals(V_RANDOM_WALK_MUTATION, StringComparison.InvariantCultureIgnoreCase))
+            {
+                mutType = MutationType[index] = C_RANDOM_WALK_MUTATION;
+                state.Output.WarnOnce("Integer Random Walk Mutation used in IntegerVectorSpecies.  Be advised that during initialization these genes will only be set to integer values.");
+            }
+            else
+                state.Output.Error("IntegerVectorSpecies given a bad mutation type: " + mtype,
+                    paramBase.Push(P_MUTATIONTYPE).Push(postfix), def.Push(P_MUTATIONTYPE).Push(postfix));
+
+
+            if (mutType == C_RANDOM_WALK_MUTATION)
+            {
+                if (state.Parameters.ParameterExists(paramBase.Push(P_RANDOM_WALK_PROBABILITY).Push(postfix), def.Push(P_RANDOM_WALK_PROBABILITY).Push(postfix)))
+                {
+                    RandomWalkProbability[index] = state.Parameters.GetDoubleWithMax(paramBase.Push(P_RANDOM_WALK_PROBABILITY).Push(postfix), def.Push(P_RANDOM_WALK_PROBABILITY).Push(postfix), 0.0, 1.0);
+                    if (RandomWalkProbability[index] <= 0)
+                        state.Output.Error("If it's going to use random walk mutation as a per-gene or per-segment type, IntegerVectorSpecies must a random walk mutation probability between 0.0 and 1.0.",
+                            paramBase.Push(P_RANDOM_WALK_PROBABILITY).Push(postfix), def.Push(P_RANDOM_WALK_PROBABILITY).Push(postfix));
+                }
+                else
+                    state.Output.Error("If IntegerVectorSpecies is going to use polynomial mutation as a per-gene or per-segment type, either the global or per-gene/per-segment random walk mutation probability must be defined.",
+                        paramBase.Push(P_RANDOM_WALK_PROBABILITY).Push(postfix), def.Push(P_RANDOM_WALK_PROBABILITY).Push(postfix));
+
+                if (state.Parameters.ParameterExists(paramBase.Push(P_MUTATION_BOUNDED).Push(postfix), def.Push(P_MUTATION_BOUNDED).Push(postfix)))
+                {
+                    MutationIsBounded[index] = state.Parameters.GetBoolean(paramBase.Push(P_MUTATION_BOUNDED).Push(postfix), def.Push(P_MUTATION_BOUNDED).Push(postfix), true);
+                }
+                else if (!_mutationIsBoundedDefined)
+                    state.Output.Fatal("If IntegerVectorSpecies is going to use gaussian, polynomial, or integer random walk mutation as a per-gene or per-segment type, the mutation bounding must be defined.",
+                        paramBase.Push(P_MUTATION_BOUNDED).Push(postfix), def.Push(P_MUTATION_BOUNDED).Push(postfix));
+
+            }
+        }
         #endregion // Setup
         #region Operations
 
-        public virtual long MaxGene(int gene)
+        public virtual long GetMaxGene(int gene)
         {
-            var m = MaxGenes;
+            long[] m = MaxGenes;
             if (m.Length <= gene)
-            {
-                if (!DynamicInitialSize && !Warned) WarnAboutGene(gene);
                 gene = m.Length - 1;
-            }
             return m[gene];
         }
-        
-        public virtual long MinGene(int gene)
+
+        public virtual long GetMinGene(int gene)
         {
-            var m = MinGenes;
+            long[] m = MinGenes;
             if (m.Length <= gene)
-            {
-                if (!DynamicInitialSize && !Warned) WarnAboutGene(gene);
                 gene = m.Length - 1;
-            }
             return m[gene];
         }
-        
-        public virtual bool InNumericalTypeRange(long geneVal)
+
+        public int GetMutationType(int gene)
+        {
+            int[] m = MutationType;
+            if (m.Length <= gene)
+                gene = m.Length - 1;
+            return m[gene];
+        }
+
+        public double GetRandomWalkProbability(int gene)
+        {
+            double[] m = RandomWalkProbability;
+            if (m.Length <= gene)
+                gene = m.Length - 1;
+            return m[gene];
+        }
+
+        public bool GetMutationIsBounded(int gene)
+        {
+            bool[] m = MutationIsBounded;
+            if (m.Length <= gene)
+                gene = m.Length - 1;
+            return m[gene];
+        }
+
+        public bool InNumericalTypeRange(double geneVal)
         {
             if (I_Prototype is ByteVectorIndividual)
-                return (geneVal <= SByte.MaxValue && geneVal >= SByte.MinValue);
+            return (geneVal <= Byte.MaxValue && geneVal >= Byte.MinValue);
             if (I_Prototype is ShortVectorIndividual)
                 return (geneVal <= Int16.MaxValue && geneVal >= Int16.MinValue);
             if (I_Prototype is IntegerVectorIndividual)
-                return (geneVal <= int.MaxValue && geneVal >= int.MinValue);
+                return (geneVal <= Int32.MaxValue && geneVal >= Int32.MinValue);
             if (I_Prototype is LongVectorIndividual)
-                return true;
+                return true;  // geneVal is valid for all longs
+            return false;  // dunno what the individual is...
+        }
 
-            // geneVal is valid for all longs
+        public virtual bool InNumericalTypeRange(long geneVal)
+        {
+            if (I_Prototype is ByteVectorIndividual)
+                return (geneVal <= Byte.MaxValue && geneVal >= Byte.MinValue);
+            if (I_Prototype is ShortVectorIndividual)
+                return (geneVal <= Int16.MaxValue && geneVal >= Int16.MinValue);
+            if (I_Prototype is IntegerVectorIndividual)
+                return (geneVal <= Int32.MaxValue && geneVal >= Int32.MinValue);
+            if (I_Prototype is LongVectorIndividual)
+                return true; // geneVal is valid for all longs
             return false; // dunno what the individual is...
         }
 

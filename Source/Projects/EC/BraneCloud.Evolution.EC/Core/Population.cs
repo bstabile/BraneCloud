@@ -68,6 +68,8 @@ namespace BraneCloud.Evolution.EC
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_SIZE = "subpops";
         public const string P_SUBPOP = "subpop";
         public const string P_DEFAULT_SUBPOP = "default-subpop";
@@ -121,14 +123,19 @@ namespace BraneCloud.Evolution.EC
                 }
                 Subpops[x] = (Subpopulation)(state.Parameters.GetInstanceForParameterEq(p, null, typeof(Subpopulation))); // Subpopulation.class is fine
                 Subpops[x].Setup(state, p);
+
+                // test for loadinds
+                if (LoadInds && Subpops[x].LoadInds)  // uh oh
+                    state.Output.Fatal("Both a subpopulation and its parent population have been told to load from files.  This can't happen.  It's got to be one or the other.",
+                        paramBase.Push(P_FILE), null);
             }
         }
 
         /* Sets all Individuals in the Population to null, preparing it to be reused. */
         public void Clear()
         {
-            for (var i = 0; i < Subpops.Length; i++)
-                Subpops[i].Clear();
+            foreach (Subpopulation t in Subpops)
+                t.Clear();
         }
 
         #endregion // Setup
@@ -156,8 +163,8 @@ namespace BraneCloud.Evolution.EC
             else
             {
                 // let's populate!
-                for (var x = 0; x < Subpops.Length; x++)
-                    Subpops[x].Populate(state, thread);
+                foreach (Subpopulation t in Subpops)
+                    t.Populate(state, thread);
             }
         }
 

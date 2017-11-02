@@ -106,11 +106,6 @@ namespace BraneCloud.Evolution.EC.Parsimony
         public const string P_SIZE = "size";
 
         /// <summary>
-        /// Default size 
-        /// </summary>
-        public const int DEFAULT_SIZE = 7;
-
-        /// <summary>
         /// The number of buckets 
         /// </summary>
         public const string P_BUCKETS = "num-buckets";

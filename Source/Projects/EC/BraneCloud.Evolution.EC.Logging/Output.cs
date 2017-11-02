@@ -19,9 +19,12 @@
 using System;
 using System.IO;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
-
+using System.Text;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Configuration;
 
@@ -77,17 +80,154 @@ namespace BraneCloud.Evolution.EC.Logging
     {
         #region Constants
 
-        public const int ALL_LOGS = -1;
+        private const long SerialVersionUID = 1;
+
+        public const int ALL_MESSAGE_LOGS = -1;
+
+        /// <summary>
+        /// When passed to print functions, doesn't do any printing
+        /// </summary>
+        public const int NO_LOGS = -2;
+
+        // VERBOSITY NO LONGER HAS ANY EFFECT!
+        ///** Total verbosity */
+        //public const int V_VERBOSE = 0;
+        ///** Don't print messages */
+        //public const int V_NO_MESSAGES = 1000;
+        ///** Don't print warnings or messages */
+        //public const int V_NO_WARNINGS = 2000;
+        ///** The standard verbosity to use if you don't want common reporting (like statistics) */
+        //public const int V_NO_GENERAL = 3000;
+        ///** Don't print warnings, messages, or simple errors  */
+        //public const int V_NO_ERRORS = 4000;
+        ///** No verbosity at all, not even system messages or fatal errors*/
+        //public const int V_TOTALLY_SILENT = 5000;
 
         #endregion // Constants
         #region Private Fields
 
         private bool _errors;
-        private readonly ArrayList _logs = ArrayList.Synchronized(new ArrayList(10));
         private ArrayList _announcements = ArrayList.Synchronized(new ArrayList(10));
         private readonly HashSetSupport _oneTimeWarnings = new HashSetSupport();
 
+        /// <summary>
+        /// TODO: This should NOT be an ArrayList. 
+        /// It is said that the ArrayList.Synchronized wrapper is NOT actually threadsafe.
+        /// Instead a ConcurrentDictionary of ILog instances should be used with the
+        /// key being the log number passed back to callers of AddLog. 
+        /// 
+        /// Also, Imagine what would happen when someone somewhere calls RemoveLog? 
+        /// Some of the clients may end up holding a log id that is completely invalidated! 
+        /// Instead, every AddLog call should increment a private field used when adding 
+        /// to the Dictionary and pass that key back as the LogId.
+        /// </summary>
+        private readonly ArrayList _logs = ArrayList.Synchronized(new ArrayList(10));
+
         #endregion // Private Fields
+        #region Public Properties
+
+        /// <summary>
+        /// The <i>FilePrefix</i> property is guaranteed to always return a non-null value,
+        /// either the string that has been previously set by a client, or an empty string.
+        /// </summary>
+        /// <remarks>
+        /// This guarantee would not normally be required. But in <i>ECJ</i> it is at least
+        /// implied, because the value is set at construction time to an empty string.
+        /// Here we are formalizing that in case legacy code has come to rely on it
+        /// for whatever reason.
+        /// </remarks>
+        public virtual string FilePrefix
+        {
+            get
+            {
+                return String.IsNullOrEmpty(_filePrefix) ? "" : _filePrefix;
+            }
+            set
+            {
+                _filePrefix = String.IsNullOrEmpty(value) ? "" : value;
+            }
+        }
+        private string _filePrefix = "";
+
+        /// <summary>
+        /// Gets or Sets whether the Output flushes its announcements.
+        /// </summary>
+        public virtual bool AutoFlush
+        {
+            get
+            {
+                lock (this)
+                {
+                    return _autoFlush;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    _autoFlush = value;
+                }
+            }
+        }
+        private bool _autoFlush = true;
+
+        /// <summary>
+        /// Sets whether the Output stores its announcements.
+        /// </summary>
+        public virtual bool StoreAnnouncements
+        {
+            // Returns the Output's storing behavior.
+            get
+            {
+                lock (this) { return _storeAnnouncements; }
+            }
+            set
+            {
+                lock (this) { _storeAnnouncements = value; }
+            }
+        }
+        private bool _storeAnnouncements;
+
+        public virtual int NumAnnouncements
+        {
+            get
+            {
+                lock (this)
+                {
+                    return _announcements != null ? _announcements.Count : 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the number of logs currently posted. 
+        /// </summary>
+        public virtual int NumLogs
+        {
+            get
+            {
+                lock (this)
+                {
+                    return _logs.Count;
+                }
+            }
+        }
+
+        // BRS: ECJ has this as a private field with accessor methods. I didn't see the point.
+        public bool ThrowsErrors { get; set; }
+
+        public bool HasErrors
+        {
+            get
+            {
+                lock (this)
+                {
+                    return _errors;
+                }
+            }
+        }
+
+        #endregion // Public Properties
         #region Constructors and Restart
 
         /// <summary>
@@ -163,6 +303,20 @@ namespace BraneCloud.Evolution.EC.Logging
             Environment.Exit(1);
         }
 
+        private static void ExitWithError(Output output, String message, bool throwException)
+        {
+            // flush logs first
+            output?.Close(); // This flushes
+            Console.Out.Flush();
+            Console.Error.Flush();
+            Trace.Flush();
+
+            // exit
+            if (throwException)
+                throw new OutputExitException(message);
+            Environment.Exit(1);
+        }
+
         /// <summary>
         /// Exits with a fatal error if the error flag has been raised. 
         /// </summary>
@@ -171,7 +325,7 @@ namespace BraneCloud.Evolution.EC.Logging
             lock (this)
             {
                 if (!_errors) return;
-                PrintLn("SYSTEM EXITING FROM ERRORS\n", ALL_LOGS, true);
+                PrintLn("SYSTEM EXITING FROM ERRORS\n", ALL_MESSAGE_LOGS, true);
                 ExitWithError();
             }
         }
@@ -199,7 +353,7 @@ namespace BraneCloud.Evolution.EC.Logging
             // All in all, the Flush(), Close(), Dispose(), Finalize semantics of all of this needs to be cleaned up considerably!
             lock (this)
             {
-                foreach (var log in _logs.Cast<Log>().Where(log => log != null && log.Writer != null))
+                foreach (var log in _logs.Cast<Log>().Where(log => log?.Writer != null))
                 {
                     try
                     {
@@ -207,7 +361,7 @@ namespace BraneCloud.Evolution.EC.Logging
                     }
                     catch (IOException ex)
                     {
-                        throw new ApplicationException(String.Format("Error while trying to flush log [{0}]", log), ex);
+                        throw new ApplicationException($"Error while trying to flush log [{log}]", ex);
                     }
                 }
                 try
@@ -251,154 +405,36 @@ namespace BraneCloud.Evolution.EC.Logging
         #region Compression
 
         /// <summary>
-        /// Returns a compressing input stream using JZLib (http://www.jcraft.com/jzlib/).  
-        /// If JZLib is not available on your system, this method will return null. 
+        /// This method uses the .NET DeflateStream found in System.IO.Compression.
+        /// DeflateStream uses ZLib algorithms under the covers.
         /// </summary>
+        /// <remarks>
+        /// Because it is so easy to forget to close or dispose of a resource,
+        /// it might be wiser to create it in a using() statement where it will be used:
+        /// <code>using (DeflateStream decompressionStream = new DeflateStream(input, CompressionMode.Decompress){...}</code>
+        /// </remarks>
         public static Stream MakeCompressingInputStream(Stream input)
         {
-            // to do this, we're going to use reflection.  But here's the equivalent code:
-            /* return new com.jcraft.jzlib.ZInputStream(in); */
-            try
-            {
-                return (Stream)(Type.GetType("com.jcraft.jzlib.ZInputStream").GetConstructor(new Type[] { typeof(Stream) }).Invoke(new object[] { input }));
-            }
-            catch (Exception)
-            {
-                return null;
-            } // failed, probably doesn't have JZLib on the system
+            DeflateStream decompressionStream = new DeflateStream(input, CompressionMode.Decompress);
+            return decompressionStream;
         }
 
         /// <summary>
-        /// Returns a compressing output stream using JZLib (http://www.jcraft.com/jzlib/).  
-        /// If JZLib is not available on your system, this method will return null. 
+        /// This method uses the .NET DeflateStream found in System.IO.Compression.
+        /// DeflateStream uses ZLib algorithms under the covers.
         /// </summary>
+        /// <remarks>
+        /// Because it is so easy to forget to close or dispose of a resource,
+        /// it might be wiser to create it in a using() statement where it will be used:
+        /// <code>using (DeflateStream compressingStream = new DeflateStream(output, CompressionLevel.Optimal){...}</code>
+        /// </remarks>
         public static Stream MakeCompressingOutputStream(Stream output)
         {
-            // to do this, we're going to use reflection.  But here's the equivalent code:
-            /*
-            com.jcraft.jzlib.ZOutputStream stream = new com.jcraft.jzlib.ZOutputStream(out, com.jcraft.jzlib.JZlib.Z_BEST_SPEED);
-            stream.setFlushMode(com.jcraft.jzlib.JZlib.Z_SYNC_FLUSH);
-            return stream;
-            */
-            try
-            {
-                var outz = Type.GetType("com.jcraft.jzlib.JZlib");
-                var Z_BEST_SPEED = (int)outz.GetField("Z_BEST_SPEED", BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static).GetValue(null);
-                var Z_SYNC_FLUSH = (int)outz.GetField("Z_SYNC_FLUSH", BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static).GetValue(null);
-
-                var outc = Type.GetType("com.jcraft.jzlib.ZOutputStream");
-                var outi = outc.GetConstructor(new[] { typeof(Stream), Type.GetType("int") }).Invoke(new object[] { output, (int)Z_BEST_SPEED });
-                outc.GetMethod("setFlushMode", (new[] { Type.GetType("int") } == null) ? new Type[0] : new[] { Type.GetType("int") }).Invoke(outi, new object[] { (int)Z_SYNC_FLUSH });
-                return (Stream)outi;
-            }
-            catch (Exception)
-            {
-                return null;
-            } // failed, probably doesn't have JZLib on the system
+            DeflateStream compressingOutputStream = new DeflateStream(output, CompressionLevel.Optimal);
+            return compressingOutputStream;
         }
 
         #endregion // Compression
-        #region Public Properties
-
-        /// <summary>
-        /// The <i>FilePrefix</i> property is guaranteed to always return a non-null value,
-        /// either the string that has been previously set by a client, or an empty string.
-        /// </summary>
-        /// <remarks>
-        /// This guarantee would not normally be required. But in <i>ECJ</i> it is at least
-        /// implied, because the value is set at construction time to an empty string.
-        /// Here we are formalizing that in case legacy code has come to rely on it
-        /// for whatever reason.
-        /// </remarks>
-        public virtual string FilePrefix
-        {
-            get
-            {
-                return String.IsNullOrEmpty(_filePrefix) ? "" : _filePrefix;
-            }
-            set
-            {
-                _filePrefix = String.IsNullOrEmpty(value) ? "" : value;
-            }
-        }
-        private string _filePrefix = "";
-
-        /// <summary>
-        /// Gets or Sets whether the Output flushes its announcements.
-        /// </summary>
-        public virtual bool AutoFlush
-        {
-            get
-            {
-                lock (this)
-                {
-                    return _autoFlush;
-                }
-            }            
-            set
-            {
-                lock (this)
-                {
-                    _autoFlush = value;
-                }
-            }           
-        }
-        private bool _autoFlush = true;
-
-        /// <summary>
-        /// Sets whether the Output stores its announcements.
-        /// </summary>
-        public virtual bool StoreAnnouncements
-        {
-            // Returns the Output's storing behavior.
-            get
-            {
-                lock (this) { return _storeAnnouncements; }
-            }
-            set
-            {
-                lock (this) { _storeAnnouncements = value; }
-            }
-        }
-        private bool _storeAnnouncements;
-
-        public virtual int NumAnnouncements
-        {
-            get
-            {
-                lock (this)
-                {
-                    return _announcements != null ? _announcements.Count : 0;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns the number of logs currently posted. 
-        /// </summary>
-        public virtual int NumLogs
-        {
-            get
-            {
-                lock (this)
-                {
-                    return _logs.Count;
-                }
-            }
-        }
-
-        public bool HasErrors
-        {
-            get
-            {
-                lock (this)
-                {
-                    return _errors;
-                }
-            }
-        }
-
-        #endregion // Public Properties
         #region AddLog and RemoveLog and Reopen
 
         /// <summary>
@@ -657,6 +693,24 @@ namespace BraneCloud.Evolution.EC.Logging
         // This is where all the various writing operations are defined.
         #region Messages
 
+        /// <summary>
+        /// This StringBuilder works in conjunction with a method that
+        /// builds up an error message in case the user wants to throw
+        /// an exception rather than quit.
+        /// </summary>
+        private readonly StringBuilder _error = new StringBuilder();
+        /// <summary>
+        /// This method is called in the Fatal and Error method groups.
+        /// </summary>
+        /// <param name="str">A partial message that is appended to the "_error" StringBuilder.</param>
+        /// <returns>The original string argument that is passed in.</returns>
+        private String _a(String str)
+        {
+            _error.Append(str);
+            _error.Append("\n");
+            return str;
+        }
+
         #region Message
 
         /// <summary>
@@ -676,7 +730,7 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn(s, ALL_LOGS, true);
+                PrintLn(s, ALL_MESSAGE_LOGS, true);
             }
         }
 
@@ -687,7 +741,7 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn(s, ALL_LOGS, true);
+                PrintLn(s, ALL_MESSAGE_LOGS, true);
             }
         }
 
@@ -701,22 +755,8 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn("FATAL ERROR:\n" + s, ALL_LOGS, true);
-                ExitWithError();
-            }
-        }
-
-        /// <summary>
-        /// Posts a fatal error.
-        /// Optionally terminate immediately as specified by the <i>exit</i> argument.
-        /// </summary>
-        public virtual void Fatal(string s, bool exit)
-        {
-            lock (this)
-            {
-                PrintLn("FATAL ERROR:\n" + s, ALL_LOGS, true);
-                if (exit)
-                    ExitWithError();
+                PrintLn(_a("FATAL ERROR:\n" + s), ALL_MESSAGE_LOGS, true);
+                ExitWithError(this, _error.ToString(), ThrowsErrors);
             }
         }
 
@@ -727,30 +767,12 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn("FATAL ERROR:\n" + s, ALL_LOGS, true);
+                PrintLn(_a("FATAL ERROR:\n" + s), ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
                 {
-                    PrintLn("PARAMETER: " + p1, ALL_LOGS, true);
+                    PrintLn(_a("PARAMETER: " + p1), ALL_MESSAGE_LOGS, true);
                 }
-                ExitWithError();
-            }
-        }
-
-        /// <summary>
-        /// Posts a fatal error.
-        /// Optionally terminate immediately as specified by the <i>exit</i> argument.
-        /// </summary>
-        public virtual void Fatal(string s, IParameter p1, bool exit)
-        {
-            lock (this)
-            {
-                PrintLn("FATAL ERROR:\n" + s, ALL_LOGS, true);
-                if (p1 != null)
-                {
-                    PrintLn("PARAMETER: " + p1, ALL_LOGS, true);
-                }
-                if (exit)
-                    ExitWithError();
+                ExitWithError(this, _error.ToString(), ThrowsErrors);
             }
         }
 
@@ -761,46 +783,20 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn("FATAL ERROR:\n" + s, ALL_LOGS, true);
+                PrintLn("FATAL ERROR:\n" + s, ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
                 {
-                    PrintLn("PARAMETER: " + p1, ALL_LOGS, true);
+                    PrintLn("PARAMETER: " + p1, ALL_MESSAGE_LOGS, true);
                 }
                 if (p2 != null && p1 != null)
                 {
-                    PrintLn("     ALSO: " + p2, ALL_LOGS, true);
+                    PrintLn("     ALSO: " + p2, ALL_MESSAGE_LOGS, true);
                 }
                 else
                 {
-                    PrintLn("PARAMETER: " + p2, ALL_LOGS, true);
+                    PrintLn("PARAMETER: " + p2, ALL_MESSAGE_LOGS, true);
                 }
                 ExitWithError();
-            }
-        }
-
-        /// <summary>
-        /// Posts a fatal error. 
-        /// Optionally terminate immediately as specified by the <i>exit</i> argument.
-        /// </summary>
-        public virtual void Fatal(string s, IParameter p1, IParameter p2, bool exit)
-        {
-            lock (this)
-            {
-                PrintLn("FATAL ERROR:\n" + s, ALL_LOGS, true);
-                if (p1 != null)
-                {
-                    PrintLn("PARAMETER: " + p1, ALL_LOGS, true);
-                }
-                if (p2 != null && p1 != null)
-                {
-                    PrintLn("     ALSO: " + p2, ALL_LOGS, true);
-                }
-                else
-                {
-                    PrintLn("PARAMETER: " + p2, ALL_LOGS, true);
-                }
-                if (exit)
-                    ExitWithError();
             }
         }
 
@@ -819,12 +815,11 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </remarks>
         public static void InitialError(string s)
         {
-            Console.Error.WriteLine("STARTUP ERROR:\n" + s);
+            var er = "STARTUP ERROR:\n" + s;
+            Console.Error.WriteLine(er);
 
-            // just in case...
-            Console.Out.Flush();
-            Console.Error.Flush();
-            Environment.Exit(1);
+            //System.exit(1);
+            ExitWithError(null, er, false);
         }
 
         /// <summary>
@@ -857,16 +852,16 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </remarks>
         public static void InitialError(string s, IParameter p1)
         {
-            Console.Error.WriteLine("STARTUP ERROR:\n" + s);
+            var er = "STARTUP ERROR:\n" + s;
+            Console.Error.WriteLine(er);
             if (p1 != null)
             {
+                er += "PARAMETER: " + p1;
                 Console.Error.WriteLine("PARAMETER: " + p1);
             }
 
-            // just in case...
-            Console.Out.Flush();
-            Console.Error.Flush();
-            Environment.Exit(1);
+            //System.exit(1);
+            ExitWithError(null, er, false);
         }
 
         /// <summary>
@@ -904,20 +899,21 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </remarks>
         public static void InitialError(string s, IParameter p1, IParameter p2)
         {
-            Console.Error.WriteLine("STARTUP ERROR:\n" + s);
+            var er = "STARTUP ERROR:\n" + s;
+            Console.Error.WriteLine(er);
             if (p1 != null)
             {
+                er += "PARAMETER: " + p1;
                 Console.Error.WriteLine("PARAMETER: " + p1);
             }
             if (p2 != null && p1 != null)
             {
+                er += "     ALSO: " + p2;
                 Console.Error.WriteLine("     ALSO: " + p2);
             }
 
-            // just in case...
-            Console.Out.Flush();
-            Console.Error.Flush();
-            Environment.Exit(1);
+            //System.exit(1);
+            ExitWithError(null, er, false);
         }
 
         /// <summary>
@@ -931,7 +927,8 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </remarks>
         public static void InitialError(string s, IParameter p1, IParameter p2, bool exit)
         {
-            Console.Error.WriteLine("STARTUP ERROR:\n" + s);
+            var msg = "STARTUP ERROR:\n" + s;
+            Console.Error.WriteLine(msg);
             if (p1 != null)
             {
                 Console.Error.WriteLine("PARAMETER: " + p1);
@@ -941,11 +938,8 @@ namespace BraneCloud.Evolution.EC.Logging
                 Console.Error.WriteLine("     ALSO: " + p2);
             }
 
-            // just in case...
-            Console.Out.Flush();
-            Console.Error.Flush();
-            if (exit)
-                Environment.Exit(1);
+            //System.exit(1);
+            ExitWithError(null, msg, false);
         }
 
         #endregion // InitialError
@@ -957,7 +951,7 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn("ERROR:\n" + s, ALL_LOGS, true);
+                PrintLn(_a("ERROR:\n" + s), ALL_MESSAGE_LOGS, true);
                 _errors = true;
             }
         }
@@ -969,10 +963,10 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn("ERROR:\n" + s, ALL_LOGS, true);
+                PrintLn(_a("ERROR:\n" + s), ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
                 {
-                    PrintLn("PARAMETER: " + p1, ALL_LOGS, true);
+                    PrintLn(_a("PARAMETER: " + p1), ALL_MESSAGE_LOGS, true);
                 }
                 _errors = true;
             }
@@ -985,18 +979,18 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn("ERROR:\n" + s, ALL_LOGS, true);
+                PrintLn(_a("ERROR:\n" + s), ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
                 {
-                    PrintLn("PARAMETER: " + p1, ALL_LOGS, true);
+                    PrintLn(_a("PARAMETER: " + p1), ALL_MESSAGE_LOGS, true);
                 }
                 if (p2 != null && p1 != null)
                 {
-                    PrintLn("     ALSO: " + p2, ALL_LOGS, true);
+                    PrintLn(_a("     ALSO: " + p2), ALL_MESSAGE_LOGS, true);
                 }
                 else
                 {
-                    PrintLn("PARAMETER: " + p2, ALL_LOGS, true);
+                    PrintLn(_a("PARAMETER: " + p2), ALL_MESSAGE_LOGS, true);
                 }
                 _errors = true;
             }
@@ -1012,7 +1006,7 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn("WARNING:\n" + s, ALL_LOGS, true);
+                PrintLn("WARNING:\n" + s, ALL_MESSAGE_LOGS, true);
             }
         }
 
@@ -1023,10 +1017,10 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn("WARNING:\n" + s, ALL_LOGS, true);
+                PrintLn("WARNING:\n" + s, ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
                 {
-                    PrintLn("PARAMETER: " + p1, ALL_LOGS, true);
+                    PrintLn("PARAMETER: " + p1, ALL_MESSAGE_LOGS, true);
                 }
             }
         }
@@ -1038,18 +1032,18 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             lock (this)
             {
-                PrintLn("WARNING:\n" + s, ALL_LOGS, true);
+                PrintLn("WARNING:\n" + s, ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
                 {
-                    PrintLn("PARAMETER: " + p1, ALL_LOGS, true);
+                    PrintLn("PARAMETER: " + p1, ALL_MESSAGE_LOGS, true);
                 }
                 if (p2 != null && p1 != null)
                 {
-                    PrintLn("     ALSO: " + p2, ALL_LOGS, true);
+                    PrintLn("     ALSO: " + p2, ALL_MESSAGE_LOGS, true);
                 }
                 else
                 {
-                    PrintLn("PARAMETER: " + p2, ALL_LOGS, true);
+                    PrintLn("PARAMETER: " + p2, ALL_MESSAGE_LOGS, true);
                 }
             }
         }
@@ -1066,7 +1060,7 @@ namespace BraneCloud.Evolution.EC.Logging
             {
                 if (_oneTimeWarnings.Contains(s)) return;
                 _oneTimeWarnings.Add(s);
-                PrintLn("ONCE-ONLY WARNING:\n" + s, ALL_LOGS, true);
+                PrintLn("ONCE-ONLY WARNING:\n" + s, ALL_MESSAGE_LOGS, true);
             }
         }
 
@@ -1076,10 +1070,10 @@ namespace BraneCloud.Evolution.EC.Logging
             {
                 if (_oneTimeWarnings.Contains(s)) return;
                 _oneTimeWarnings.Add(s);
-                PrintLn("ONCE-ONLY WARNING:\n" + s, ALL_LOGS, true);
+                PrintLn("ONCE-ONLY WARNING:\n" + s, ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
                 {
-                    PrintLn("PARAMETER: " + p1, ALL_LOGS, true);
+                    PrintLn("PARAMETER: " + p1, ALL_MESSAGE_LOGS, true);
                 }
             }
         }
@@ -1090,18 +1084,18 @@ namespace BraneCloud.Evolution.EC.Logging
             {
                 if (_oneTimeWarnings.Contains(s)) return;
                 _oneTimeWarnings.Add(s);
-                PrintLn("ONCE-ONLY WARNING:\n" + s, ALL_LOGS, true);
+                PrintLn("ONCE-ONLY WARNING:\n" + s, ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
                 {
-                    PrintLn("PARAMETER: " + p1, ALL_LOGS, true);
+                    PrintLn("PARAMETER: " + p1, ALL_MESSAGE_LOGS, true);
                 }
                 if (p2 != null && p1 != null)
                 {
-                    PrintLn("     ALSO: " + p2, ALL_LOGS, true);
+                    PrintLn("     ALSO: " + p2, ALL_MESSAGE_LOGS, true);
                 }
                 else
                 {
-                    PrintLn("PARAMETER: " + p2, ALL_LOGS, true);
+                    PrintLn("PARAMETER: " + p2, ALL_MESSAGE_LOGS, true);
                 }
             }
         }
@@ -1137,13 +1131,15 @@ namespace BraneCloud.Evolution.EC.Logging
 
         /// <summary>
         /// Prints a message to a given log.
-        /// If log==ALL_LOGS, posted to all logs which accept announcements. 
+        /// If log==ALL_MESSAGE_LOGS, posted to all logs which accept announcements. 
+        /// If the log is NO_LOGS, nothing is printed.
         /// </summary>
         public void PrintLn(string s, int log, bool announcement)
         {
+            if (log == NO_LOGS) return;
             lock (this)
             {
-                if (log == ALL_LOGS)
+                if (log == ALL_MESSAGE_LOGS)
                     for (var x = 0; x < _logs.Count; x++)
                     {
                         var l = (Log) _logs[x];
@@ -1172,13 +1168,13 @@ namespace BraneCloud.Evolution.EC.Logging
 
         /// <summary>
         /// Prints a non-announcement message to a given log.
-        /// If log==ALL_LOGS, posted to all logs which accept announcements. No '\n' is printed.
+        /// If log==ALL_MESSAGE_LOGS, posted to all logs which accept announcements. No '\n' is printed.
         /// </summary>
         public void Print(String s, int log)
         {
             lock (this)
             {
-                if (log == ALL_LOGS)
+                if (log == ALL_MESSAGE_LOGS)
                     for (var x = 0; x < _logs.Count; x++)
                     {
                         var l = (Log) _logs[x];
@@ -1196,15 +1192,18 @@ namespace BraneCloud.Evolution.EC.Logging
 
         /// <summary>
         /// Prints a non-announcement message to a given log. No '\n' is printed.  
+        /// If the log is null, nothing is printed.
         /// </summary>
         public void Print(string s, Log log)
         {
+            if (log == null) return;
             lock (this)
             {
                 if (log.Writer == null)
                 {
                     throw new OutputException("Log with a null writer: " + log);
                 }
+                if (log.Muzzle) return;  // don't write it
                 // now write it
                 log.Writer.Write(s);
             }

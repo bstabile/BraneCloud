@@ -26,12 +26,19 @@ namespace BraneCloud.Evolution.EC.GP
     /// GPData is the parent class of data transferred between GPNodes.
     /// If performed correctly, there need be only one GPData instance 
     /// ever created in the evaluation of many individuals. 
+    ///
+    /// <p/>You can use GPData as-is if you have absolutely no data to
+    /// transfer between individuals.Otherwise, you need to subclas
+    /// GPData, add your own instance variables, and then override
+    /// the copyTo(...) method and, depending on whether the data has
+    /// pointers in it(like arrays), the clone() method as well.
+    ///
     /// <p/><b>Default Base</b><br/>
     /// gp.Data
     /// </summary>	
     [Serializable]
     [ECConfiguration("ec.gp.GPData")]
-    public abstract class GPData : IPrototype
+    public class GPData : IPrototype
     {
         #region Constants
 
@@ -40,10 +47,8 @@ namespace BraneCloud.Evolution.EC.GP
         #endregion // Constants
         #region Properties
 
-        public virtual IParameter DefaultBase
-        {
-            get { return GPDefaults.ParamBase.Push(P_GPDATA); }
-        }
+        public virtual IParameter DefaultBase => GPDefaults.ParamBase.Push(P_GPDATA); 
+        
 
         #endregion // Properties
         #region Setup
@@ -58,8 +63,10 @@ namespace BraneCloud.Evolution.EC.GP
         /// <summary>
         /// Modifies gpd so that gpd is equivalent to us. You may
         /// safely assume that gpd is of the same class as we are. 
+        /// Do not share references with the other object, except to
+        /// read-only data: instead, copy any read-write data as necessary.
         /// </summary>
-        public abstract void CopyTo(GPData gpd);
+        public virtual void CopyTo(GPData gpd) { }
 
         public virtual object Clone()
         {

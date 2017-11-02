@@ -21,7 +21,7 @@ using BraneCloud.Evolution.EC.GP;
 
 namespace BraneCloud.Evolution.EC.Problems.Tutorial4
 {
-    [ECConfiguration("ec.problems.tutorial4.Add")]
+    [ECConfiguration("ec.problems.tutorial4.func.Add")]
     public class Add : GPNode
     {
         public override string ToString() { return "+"; }
@@ -38,7 +38,7 @@ namespace BraneCloud.Evolution.EC.Problems.Tutorial4
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 2; } }
+        public override int ExpectedChildren => 2;
 
         public override void Eval(IEvolutionState state,
             int thread,

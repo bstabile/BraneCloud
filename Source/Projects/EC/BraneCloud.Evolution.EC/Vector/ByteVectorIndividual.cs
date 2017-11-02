@@ -24,12 +24,13 @@ using System.Text;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Randomization;
 
 namespace BraneCloud.Evolution.EC.Vector
 {
     /// <summary> 
     /// ByteVectorIndividual is a VectorIndividual whose genome is an array of bytes.
-    /// Gene values may range from species.MinGene(x) to species.MaxGene(x), inclusive.
+    /// Gene values may range from species.GetMinGene(x) to species.GetMaxGene(x), inclusive.
     /// The default mutation method randomizes genes to new values in this range,
     /// with <tt>species.MutationProbability</tt>.
     /// 
@@ -98,25 +99,22 @@ namespace BraneCloud.Evolution.EC.Vector
 
             set
             {
-                genome = (sbyte[])value;
+                genome = (byte[])value;
             }
 
         }
-        public sbyte[] genome { get; set; }
+        public byte[] genome { get; set; }
         public override int GenomeLength
         {
             get { return genome.Length; }
             set
             {
-                var newGenome = new sbyte[value];
+                var newGenome = new byte[value];
                 Array.Copy(genome, 0, newGenome, 0, genome.Length < newGenome.Length ? genome.Length : newGenome.Length);
                 genome = newGenome;
             }
         }
-        public override long Length
-        {
-            get { return genome.Length; }
-        }
+        public override long Length => genome.Length;
 
         /// <summary>
         /// Returns true if each gene value is within is specified [min,max] range.
@@ -127,8 +125,8 @@ namespace BraneCloud.Evolution.EC.Vector
             {
                 var species = (IntegerVectorSpecies)Species;
                 for (var i = 0; i < GenomeLength; i++)
-                    if (genome[i] < species.MinGene(i) ||
-                        genome[i] > species.MaxGene(i)) return false;
+                    if (genome[i] < species.GetMinGene(i) ||
+                        genome[i] > species.GetMaxGene(i)) return false;
                 return true;
             }
         }
@@ -150,7 +148,7 @@ namespace BraneCloud.Evolution.EC.Vector
                 state.Output.Fatal("ByteVectorIndividual requires an IntegerVectorSpecies", paramBase, def);
             var s = (IntegerVectorSpecies)Species;
 
-            genome = new sbyte[s.GenomeSize];
+            genome = new byte[s.GenomeSize];
         }
 
         #endregion // Setup
@@ -160,7 +158,7 @@ namespace BraneCloud.Evolution.EC.Vector
 
         public void SetGenomeLength(int len)
         {
-            var newGenome = new sbyte[len];
+            var newGenome = new byte[len];
             Array.Copy(genome, 0, newGenome, 0, genome.Length < newGenome.Length ? genome.Length : newGenome.Length);
             genome = newGenome;
         }
@@ -190,14 +188,31 @@ namespace BraneCloud.Evolution.EC.Vector
             var sum = pieces.Sum(t => ((sbyte[])t).Length);
 
             var runningsum = 0;
-            var newgenome = new sbyte[sum];
+            var newgenome = new byte[sum];
             foreach (var t in pieces)
             {
-                Array.Copy((Array)t, 0, newgenome, runningsum, ((sbyte[])t).Length);
-                runningsum += ((sbyte[])t).Length;
+                Array.Copy((Array)t, 0, newgenome, runningsum, ((byte[])t).Length);
+                runningsum += ((byte[])t).Length;
             }
             // set genome
             genome = newgenome;
+        }
+
+        /// <summary>
+        /// Returns a random value from between min and max inclusive.  This method handles
+        /// overflows that complicate this computation.  Does NOT check that
+        /// min is less than or equal to max.  You must check this yourself.
+        /// </summary>
+        public byte RandomValueFromClosedInterval(byte min, byte max, IMersenneTwister random)
+        {
+            if (max - min < 0) // we had an overflow
+            {
+                byte l = 0;
+                do l = (byte)random.NextInt();
+                while (l < min || l > max);
+                return l;
+            }
+            return (byte)(min + random.NextInt(max - min + 1));
         }
 
         /// <summary>
@@ -207,7 +222,7 @@ namespace BraneCloud.Evolution.EC.Vector
         {
             var s = (IntegerVectorSpecies)Species;
             for (var x = 0; x < genome.Length; x++)
-                genome[x] = (sbyte)((int)s.MinGene(x) + state.Random[thread].NextInt((int)s.MaxGene(x) - (int)s.MinGene(x) + 1));
+                genome[x] = (byte)RandomValueFromClosedInterval((byte)s.GetMinGene(x), (byte)s.GetMaxGene(x), state.Random[thread]);
         }
 
         /// <summary>
@@ -218,12 +233,12 @@ namespace BraneCloud.Evolution.EC.Vector
             var species = (IntegerVectorSpecies)Species;
             for (var i = 0; i < Length; i++)
             {
-                var minGene = (sbyte)species.MinGene(i);
+                var minGene = (byte)species.GetMinGene(i);
                 if (genome[i] < minGene)
                     genome[i] = minGene;
                 else
                 {
-                    var maxGene = (sbyte)species.MaxGene(i);
+                    var maxGene = (byte)species.GetMaxGene(i);
                     if (genome[i] > maxGene)
                         genome[i] = maxGene;
                 }
@@ -237,7 +252,7 @@ namespace BraneCloud.Evolution.EC.Vector
         {
             var s = (IntegerVectorSpecies)Species;
             var i = (ByteVectorIndividual)ind;
-            sbyte tmp;
+            byte tmp;
             int point;
 
             if (genome.Length != i.genome.Length)
@@ -288,14 +303,14 @@ namespace BraneCloud.Evolution.EC.Vector
                         var beta = state.Random[thread].NextDouble() * (1 + 2 * s.LineDistance) - s.LineDistance;
                         for (var x = 0; x < genome.Length; x++)
                         {
-                            var min = s.MinGene(x);
-                            var max = s.MaxGene(x);
+                            var min = s.GetMinGene(x);
+                            var max = s.GetMaxGene(x);
                             var t = (long)Math.Floor(alpha * genome[x] + (1 - alpha) * i.genome[x] + 0.5);
                             var u = (long)Math.Floor(beta * i.genome[x] + (1 - beta) * genome[x] + 0.5);
                             if (!(t < min || t > max || u < min || u > max))
                             {
-                                genome[x] = (sbyte)t;
-                                i.genome[x] = (sbyte)u;
+                                genome[x] = (byte)t;
+                                i.genome[x] = (byte)u;
                             }
                         }
                     }
@@ -312,13 +327,13 @@ namespace BraneCloud.Evolution.EC.Vector
                             {
                                 var alpha = state.Random[thread].NextDouble() * (1 + 2 * s.LineDistance) - s.LineDistance;
                                 var beta = state.Random[thread].NextDouble() * (1 + 2 * s.LineDistance) - s.LineDistance;
-                                min = s.MinGene(x);
-                                max = s.MaxGene(x);
+                                min = s.GetMinGene(x);
+                                max = s.GetMaxGene(x);
                                 t = (long)Math.Floor(alpha * genome[x] + (1 - alpha) * i.genome[x] + 0.5);
                                 u = (long)Math.Floor(beta * i.genome[x] + (1 - beta) * genome[x] + 0.5);
                             } while (t < min || t > max || u < min || u > max);
-                            genome[x] = (sbyte)t;
-                            i.genome[x] = (sbyte)u;
+                            genome[x] = (byte)t;
+                            i.genome[x] = (byte)u;
                         }
                     }
                     break;
@@ -332,10 +347,44 @@ namespace BraneCloud.Evolution.EC.Vector
         public override void DefaultMutate(IEvolutionState state, int thread)
         {
             var s = (IntegerVectorSpecies)Species;
-            if (s.MutationProbability > 0.0)
-                for (var x = 0; x < genome.Length; x++)
-                    if (state.Random[thread].NextBoolean(s.MutationProbability))
-                        genome[x] = (sbyte)((int)s.MinGene(x) + state.Random[thread].NextInt((int)s.MaxGene(x) - (int)s.MinGene(x) + 1));
+            for (int x = 0; x < genome.Length; x++)
+                if (state.Random[thread].NextBoolean(s.GetMutationProbability(x)))
+                {
+                    byte old = genome[x];
+                    for (int retries = 0; retries < s.GetDuplicateRetries(x) + 1; retries++)
+                    {
+                        switch (s.GetMutationType(x))
+                        {
+                            case IntegerVectorSpecies.C_RESET_MUTATION:
+                                genome[x] = (byte)RandomValueFromClosedInterval((byte)s.GetMinGene(x), (byte)s.GetMaxGene(x), state.Random[thread]);
+                                break;
+                            case IntegerVectorSpecies.C_RANDOM_WALK_MUTATION:
+                                int min = (int)s.GetMinGene(x);
+                                int max = (int)s.GetMaxGene(x);
+                                if (!s.GetMutationIsBounded(x))
+                                {
+                                    // okay, technically these are still bounds, but we can't go beyond this without weird things happening
+                                    max = Byte.MaxValue;
+                                    min = Byte.MinValue;
+                                }
+                                do
+                                {
+                                    int n = state.Random[thread].NextBoolean() ? 1 : -1;
+                                    int g = genome[x];
+                                    if ((n == 1 && g < max) ||
+                                        (n == -1 && g > min))
+                                        genome[x] = (byte)(g + n);
+                                    else if ((n == -1 && g < max) ||
+                                        (n == 1 && g > min))
+                                        genome[x] = (byte)(g - n);
+                                }
+                                while (state.Random[thread].NextBoolean(s.GetRandomWalkProbability(x)));
+                                break;
+                        }
+                        if (genome[x] != old) break;
+                        // else genome[x] = old;  // try again
+                    }
+                }
         }
 
         #endregion // Breeding
@@ -355,6 +404,7 @@ namespace BraneCloud.Evolution.EC.Vector
 
         public override bool Equals(object ind)
         {
+            if (ind == null) return false;
             if (!(GetType().Equals(ind.GetType())))
                 return false; // SimpleRuleIndividuals are special.
             var i = (ByteVectorIndividual)ind;
@@ -419,15 +469,17 @@ namespace BraneCloud.Evolution.EC.Vector
             var s = reader.ReadLine();
             var d = new DecodeReturn(s);
             Code.Decode(d);
-            var lll = (int)(d.L);
+            if (d.Type != DecodeReturn.T_INTEGER)  // uh oh
+                state.Output.Fatal("Individual with genome:\n" + s + "\n... does not have an integer at the beginning indicating the genome count.");
+            var lll = (int)d.L;
 
-            genome = new sbyte[lll];
+            genome = new byte[lll];
 
             // read in the genes
             for (var i = 0; i < genome.Length; i++)
             {
                 Code.Decode(d);
-                genome[i] = (sbyte)(d.L);
+                genome[i] = (byte)d.L;
             }
         }
 
@@ -442,9 +494,9 @@ namespace BraneCloud.Evolution.EC.Vector
         {
             var len = reader.ReadInt32();
             if (genome == null || genome.Length != len)
-                genome = new sbyte[len];
+                genome = new byte[len];
             for (var x = 0; x < genome.Length; x++)
-                genome[x] = (sbyte)reader.ReadByte();
+                genome[x] = (byte)reader.ReadByte();
         }
 
         #endregion // IO

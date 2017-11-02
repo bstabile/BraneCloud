@@ -72,6 +72,8 @@ namespace BraneCloud.Evolution.EC.GP.Breed
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_INTERNALCROSSOVER = "internal-xover";
         public const string P_NUM_TRIES = "tries";
         public const string P_MAXDEPTH = "maxdepth";
@@ -227,7 +229,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
             if (!state.Random[thread].NextBoolean(Likelihood))
                 return Reproduce(n, start, subpop, inds, state, thread, false);  // DON'T produce children from source -- we already did
 
-            var initializer = ((GPInitializer)state.Initializer);
+            var initializer = (GPInitializer)state.Initializer;
 
             for (var q = start; q < n + start; q++)
             {

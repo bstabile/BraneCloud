@@ -75,13 +75,19 @@ namespace BraneCloud.Evolution.EC
     /// <p/><b>Parameters</b><br/>
     /// <table>
     /// <tr><td valign="top"><tt>generations</tt><br/>
-    /// <font size="-1">int &gt;= 1</font></td>
-    /// <td valign="top">(maximal number of generations to run.)</td></tr>
+    /// <font size="-1">int &gt;= 1</font> or undefined</td>
+    /// <td valign="top">(maximal number of generations to run. Either this or evaluations must be set, but not both.)</td></tr>
+    ///
+    /// <tr><td valign="top"><tt> evaluations </tt ><br/>
+    /// < font size="-1">int &gt;= 1</font> or undefined</td>
+    /// <td valign="top">(maximal number of evaluations to run (in subpopulation 0).    Either this or generations must be set, but not both.)</td></tr>
+
     /// <tr><td valign="top"><tt>Checkpoint-modulo</tt><br/>
     /// <font size="-1">int &gt;= 1</font></td>
     /// <td valign="top">(how many generations should pass before we do a Checkpoint?  
     /// The definition of "generations" depends on the particular EvolutionState 
     /// implementation you're using)</td></tr>
+    /// 
     /// <tr><td valign="top"><tt>Checkpoint</tt><br/>
     /// <font size="-1"/>bool = <tt>true</tt> or <tt>false</tt> (default)</td>
     /// <td valign="top">(should we Checkpoint?)</td></tr>
@@ -89,9 +95,11 @@ namespace BraneCloud.Evolution.EC
     /// <tr><td valign="top"><tt>prefix</tt><br/>
     /// <font size="-1">String</font></td>
     /// <td valign="top">(the prefix to prepend to Checkpoint files -- see ec.util.Checkpoint)</td></tr>
+    ///
     /// <tr><td valign="top"><tt>checkpoint-directory</tt><br/>
     /// <font size="-1"/>File (default is empty)</td>
     /// <td valign="top">(directory where the checkpoint files should be located)</td></tr> 
+    /// 
     /// <tr><td valign="top"><tt>quit-on-run-complete</tt><br/>
     /// <font size="-1"/>bool = <tt>true</tt> or <tt>false</tt> (default)</td>
     /// <td valign="top">(do we prematurely quit the run when we find a perfect individual?)</td></tr>
@@ -136,6 +144,10 @@ namespace BraneCloud.Evolution.EC
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
+        public const int UNDEFINED = 0;
+
         /// <summary>
         /// The population has started fresh (not from a Checkpoint). 
         /// </summary>
@@ -168,6 +180,7 @@ namespace BraneCloud.Evolution.EC
         public const string P_STATISTICS = "stat";
         public const string P_EXCHANGER = "exch";
         public const string P_GENERATIONS = "generations";
+        public const string P_EVALUATIONS = "evaluations";
         public const string P_QUITONRUNCOMPLETE = "quit-on-run-complete";
         public const string P_CHECKPOINTDIRECTORY = "checkpoint-directory";
         public const string P_CHECKPOINTPREFIX = "checkpoint-prefix";
@@ -291,10 +304,16 @@ namespace BraneCloud.Evolution.EC
 
         /// <summary>
         /// The number of generations the evolutionary computation system will run until it ends.  
+        /// If the user has specified a desired number of evaluations instead of generations, then
+        /// this value will not be valid until after the first generation has been created(but before
+        /// it has bene evaluated).
         /// If after the population has been evaluated the Evaluator returns true for RunComplete(...), 
         /// and quitOnRunComplete is true, then the system will quit.  You probably shouldn't modify this.  
         /// </summary>
         public int NumGenerations { get; set; }
+
+        /// How many evaluations should we run for?  If set to UNDEFINED (0), we run for the number of generations instead.
+        public long NumEvaluations { get; set; } = UNDEFINED;
 
         /// <summary>
         /// The current population.  This is <i>not</i> a singleton object, and may be replaced after every 
@@ -398,10 +417,31 @@ namespace BraneCloud.Evolution.EC
             }
             else CheckpointDirectory = null;
 
+            // load evaluations, or generations, or both
+            p = new Parameter(P_EVALUATIONS);
+            if (Parameters.ParameterExists(p, null))
+            {
+                NumEvaluations = Parameters.GetInt(p, null, 1);  // 0 would be UNDEFINED
+                if (NumEvaluations <= 0)
+                    Output.Fatal("If defined, the number of evaluations must be an integer >= 1", p, null);
+            }
+
             p = new Parameter(P_GENERATIONS);
-            NumGenerations = Parameters.GetInt(p, null, 1);
-            if (NumGenerations == 0)
-                Output.Fatal("The number of generations must be an integer >0.", p);
+            if (Parameters.ParameterExists(p, null))
+            {
+                NumGenerations = Parameters.GetInt(p, null, 1);  // 0 would be UDEFINED                 
+
+                if (NumGenerations <= 0)
+                    Output.Fatal("If defined, the number of generations must be an integer >= 1.", p, null);
+
+                if (NumEvaluations != UNDEFINED)  // both defined
+                {
+                    state.Output.Warning("Both generations and evaluations defined: generations will be ignored and computed from the evaluations.");
+                    NumGenerations = UNDEFINED;
+                }
+            }
+            else if (NumEvaluations == UNDEFINED)  // uh oh, something must be defined
+                Output.Fatal("Either evaluations or generations must be defined.", new Parameter(P_GENERATIONS), new Parameter(P_EVALUATIONS));
 
             p = new Parameter(P_QUITONRUNCOMPLETE);
             QuitOnRunComplete = Parameters.GetBoolean(p, null, false);

@@ -117,13 +117,22 @@ namespace BraneCloud.Evolution.EC
         /// In most cases, the default is true.  
         /// </summary>
         bool CanEvaluate { get; }
-        
+
         #endregion // Evalutation
         #region IO
 
         /// <summary>
-        /// Part of ISimpleProblem.  Included here so you don't have to write the default version, which usually does nothing.
+        ///// "Reevaluates" an individual,
+        ///// for the purpose of printing out
+        ///// interesting facts about the individual in the context of the
+        ///// Problem, and logs the results.  This might be called to print out 
+        ///// facts about the best individual in the population, for example. 
+        /// 
         /// </summary>
+        /// <remarks>
+        /// Part of ISimpleProblem. Included here so you don't have to write 
+        /// the default version, which usually does nothing.
+        /// </remarks>
         void Describe(IEvolutionState state, Individual ind, int subpop, int threadnum, int log);
 
         #endregion IO

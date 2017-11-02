@@ -1,11 +1,13 @@
 # BraneCloud
 ## Industrial-Strength Evolutionary Computation for .NET 4.x
 
+### Coming Soon: Conversion to ECJ v25+ (New 3-year academic grant for further development by Sean and his team at GMU)
+
 This is an independent port of Sean Luke's venerable ECJ project (GMU EC Lab) Version 20
 
 NOTE: This conversion to C# cannot and will not in any way be supported by Sean or any other member of his team at GMU. Please do not even ask! It is incredible that software of this caliber is made available in open-source form, and that is more than enough support! 
 
-It is hard to imagine how many hours Sean and his team have put into this over the course of 13 years. But suffice it to say: 
+It is hard to imagine how many hours Sean and his team have put into this over the course of the past 20 years. But suffice it to say: 
 ECJ is an 800 lb Gorilla in the realm of Evolutionary Computation and Stochastic Optimization. 
 
 MILD WARNING: ECJ is used for some very serious business (and this C# version has, or will shortly have, all of the same capabilities). But you don't need to get scared off by that. A comprehensive collection of samples is provided with ECJ, and the documentation that you can browse on Sean's site covers all of the basics and well beyond. I highly recommend that newbies work with ECJ in JAVA before you decide if this converted fork makes sense for you. The need for tight native .NET platform integration is potentially uncalled for, and you must ask yourself, "Do I really Need This?". Chances are, you don't. But I personally really DO need this, and I’m happy to spare others with similar requirements all of the heavy lifting required to get it this far. Trust me, it is a DAUNTING challenge to preserve delicate algorithms when there are so many moving parts. 

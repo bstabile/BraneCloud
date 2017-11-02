@@ -21,8 +21,8 @@ namespace BraneCloud.Evolution.EC.Problems.Regression.Func
     /// </summary>
     public class VladERCA : RegERC
     {
-        public override string Name { get { return "VladERCA"; } }
-        public override int ExpectedChildren { get { return 1; } }
+        public override string Name => "VladERCA";
+        public override int ExpectedChildren => 1;
 
         public override void ResetNode(IEvolutionState state, int thread)
         {

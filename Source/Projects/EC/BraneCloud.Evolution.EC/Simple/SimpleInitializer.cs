@@ -31,6 +31,14 @@ namespace BraneCloud.Evolution.EC.Simple
     [ECConfiguration("ec.simple.SimpleInitializer")]
     public class SimpleInitializer : Initializer
     {
+
+        #region Constants
+
+        private const long SerialVersionUID = 1;
+
+        #endregion
+
+
         #region Setup
 
         public override void Setup(IEvolutionState state, IParameter paramBase)

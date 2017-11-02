@@ -38,7 +38,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
         public int GetRandomIndividual(int number, int subpopulation, EvolutionState state, int thread)
         {
             var oldinds = state.Population.Subpops[subpopulation].Individuals;
-            var archiveSize = ((SimpleBreeder)(state.Breeder)).Elite[subpopulation];
+            var archiveSize = ((SimpleBreeder)state.Breeder).NumElites(state, subpopulation);
             var archiveStart = state.Population.Subpops[subpopulation].Individuals.Length - archiveSize;
 
             return archiveStart + state.Random[thread].NextInt(archiveSize);

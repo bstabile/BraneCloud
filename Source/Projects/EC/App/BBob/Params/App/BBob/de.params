@@ -2,6 +2,6 @@
 # Licensed under the Academic Free License version 3.0
 # See the file "LICENSE" for more information
 
-parent.0 =                              ../../de/de.params
-parent.1 =                              bbob.params
+parent.0	=	../../de/de.params
+parent.1	=	bbob.params
 

@@ -51,6 +51,8 @@ namespace BraneCloud.Evolution.EC.App.Regression
     [ECConfiguration("ec.app.regression.Regression")]
     public class Regression : GPProblem, ISimpleProblem
     {
+        private const long SerialVersionUID = 1;
+
         public const string P_SIZE = "size";
         public const string P_FILE = "file";
         public const string P_USE_FUNCTION = "use-function";
@@ -67,11 +69,6 @@ namespace BraneCloud.Evolution.EC.App.Regression
         public double[] Inputs;
         public double[] Outputs;
 
-        /// <summary>
-        /// we'll need to deep clone this one though.
-        /// </summary>
-        public RegressionData Input;
-
         public virtual double Func(double x)
         {
             return x * x * x * x + x * x * x + x * x + x;
@@ -82,9 +79,9 @@ namespace BraneCloud.Evolution.EC.App.Regression
             // don't bother copying the inputs and outputs; they're read-only :-)
             // don't bother copying the currentValue; it's transitory
             // but we need to copy our regression data
-            var myobj = (Regression)(base.Clone());
+            var myobj = (Regression)base.Clone();
 
-            myobj.Input = (RegressionData)(Input.Clone());
+            myobj.Input = (RegressionData)Input.Clone();
             return myobj;
         }
 
@@ -92,6 +89,11 @@ namespace BraneCloud.Evolution.EC.App.Regression
         {
             // very important, remember this
             base.Setup(state, paramBase);
+
+            // verify our input is the right class (or subclasses from it)
+            if (!(Input is RegressionData))
+            state.Output.Fatal("GPData class must subclass from " + typeof(RegressionData).Name,
+                paramBase.Push(P_DATA), null);
 
             TrainingSetSize = state.Parameters.GetInt(paramBase.Push(P_SIZE), null, 1);
             if (TrainingSetSize < 1) state.Output.Fatal("Training Set Size must be an integer greater than 0", paramBase.Push(P_SIZE));
@@ -116,14 +118,14 @@ namespace BraneCloud.Evolution.EC.App.Regression
                     var scan = new Scanner(inputfile);
                     for (var x = 0; x < TrainingSetSize; x++)
                     {
-                        if (scan.hasNextDouble())
-                            Inputs[x] = scan.nextDouble();
-                        else state.Output.Fatal("Not enough data points in file: expected " + (TrainingSetSize * (UseFunction ? 1 : 2)));
+                        if (scan.HasNextDouble())
+                            Inputs[x] = scan.NextDouble();
+                        else state.Output.Fatal("Not enough data points in file: expected " + TrainingSetSize * (UseFunction ? 1 : 2));
                         if (!UseFunction)
                         {
-                            if (scan.hasNextDouble())
-                                Outputs[x] = scan.nextDouble();
-                            else state.Output.Fatal("Not enough data points in file: expected " + (TrainingSetSize * (UseFunction ? 1 : 2)));
+                            if (scan.HasNextDouble())
+                                Outputs[x] = scan.NextDouble();
+                            else state.Output.Fatal("Not enough data points in file: expected " + TrainingSetSize * (UseFunction ? 1 : 2));
                         }
                     }
                 }
@@ -166,7 +168,7 @@ namespace BraneCloud.Evolution.EC.App.Regression
                 for (var y = 0; y < TrainingSetSize; y++)
                 {
                     CurrentValue = Inputs[y];
-                    ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, Input, Stack, ((GPIndividual)ind), this);
+                    ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, Input, Stack, (GPIndividual)ind, this);
 
                     // It's possible to get NaN because cos(infinity) and
                     // sin(infinity) are undefined (hence cos(exp(3000)) zings ya!)
@@ -179,7 +181,7 @@ namespace BraneCloud.Evolution.EC.App.Regression
                     const double PROBABLY_ZERO = 1.11E-15;
                     const double BIG_NUMBER = 1.0e15;
 
-                    var result = Math.Abs(Outputs[y] - Input.x);
+                    var result = Math.Abs(Outputs[y] - ((RegressionData)Input).x);
 
                     if (!(result < BIG_NUMBER))   // *NOT* (input.x >= BIG_NUMBER)
                         result = BIG_NUMBER;
@@ -197,7 +199,7 @@ namespace BraneCloud.Evolution.EC.App.Regression
                 }
 
                 // the fitness better be KozaFitness!
-                var f = ((KozaFitness)ind.Fitness);
+                var f = (KozaFitness)ind.Fitness;
                 f.SetStandardizedFitness(state, (float)sum);
                 f.Hits = hits;
                 ind.Evaluated = true;
@@ -207,25 +209,23 @@ namespace BraneCloud.Evolution.EC.App.Regression
 
     class Scanner : StreamReader
     {
-        string currentWord;
+        string _currentWord;
 
         public Scanner(Stream source)
             : base(source)
         {
-            readNextWord();
+            ReadNextWord();
         }
 
-        private void readNextWord()
+        private void ReadNextWord()
         {
             var sb = new StringBuilder();
-            char nextChar;
-            int next;
             do
             {
-                next = Read();
+                var next = Read();
                 if (next < 0)
                     break;
-                nextChar = (char)next;
+                var nextChar = (char)next;
                 if (char.IsWhiteSpace(nextChar))
                     break;
                 sb.Append(nextChar);
@@ -233,54 +233,54 @@ namespace BraneCloud.Evolution.EC.App.Regression
             while ((Peek() >= 0) && (char.IsWhiteSpace((char)Peek())))
                 Read();
             if (sb.Length > 0)
-                currentWord = sb.ToString();
+                _currentWord = sb.ToString();
             else
-                currentWord = null;
+                _currentWord = null;
         }
 
-        public bool hasNextInt()
+        public bool HasNextInt()
         {
-            if (currentWord == null)
+            if (_currentWord == null)
                 return false;
             int dummy;
-            return int.TryParse(currentWord, out dummy);
+            return int.TryParse(_currentWord, out dummy);
         }
 
-        public int nextInt()
+        public int NextInt()
         {
             try
             {
-                return int.Parse(currentWord);
+                return int.Parse(_currentWord);
             }
             finally
             {
-                readNextWord();
+                ReadNextWord();
             }
         }
 
-        public bool hasNextDouble()
+        public bool HasNextDouble()
         {
-            if (currentWord == null)
+            if (_currentWord == null)
                 return false;
             double dummy;
-            return double.TryParse(currentWord, out dummy);
+            return double.TryParse(_currentWord, out dummy);
         }
 
-        public double nextDouble()
+        public double NextDouble()
         {
             try
             {
-                return double.Parse(currentWord);
+                return double.Parse(_currentWord);
             }
             finally
             {
-                readNextWord();
+                ReadNextWord();
             }
         }
 
-        public bool hasNext()
+        public bool HasNext()
         {
-            return currentWord != null;
+            return _currentWord != null;
         }
     } 
 

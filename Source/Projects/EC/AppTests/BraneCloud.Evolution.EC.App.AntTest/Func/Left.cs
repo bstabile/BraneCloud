@@ -20,25 +20,27 @@ using System;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 
-namespace BraneCloud.Evolution.EC.App.AntTest
+namespace BraneCloud.Evolution.EC.App.AntTest.Func
 {
     [ECConfiguration("ec.app.ant.func.Left")]
     public class Left : GPNode, IEvalPrint
     {
         public override string ToString() { return "left"; }
 
-        public override void CheckConstraints(
-            IEvolutionState state, 
-            int tree, 
-            GPIndividual typicalIndividual, 
-            IParameter individualBase)
-        {
-            base.CheckConstraints(state, tree, typicalIndividual, individualBase);
-            if (Children.Length != 0)
-                state.Output.Error("Incorrect number of children for node " +
-                    ToStringForError() + " at " +
-                    individualBase);
-        }
+        /*        public override void CheckConstraints(
+                    IEvolutionState state, 
+                    int tree, 
+                    GPIndividual typicalIndividual, 
+                    IParameter individualBase)
+                {
+                    base.CheckConstraints(state, tree, typicalIndividual, individualBase);
+                    if (Children.Length != 0)
+                        state.Output.Error("Incorrect number of children for node " +
+                            ToStringForError() + " at " +
+                            individualBase);
+                }*/
+
+        public override int ExpectedChildren => 0;
 
         public override void Eval(
             IEvolutionState state, 

@@ -104,4 +104,6 @@ eval.problem.even = true
 # this value must always be set to *4* more than eval.problem.bits
 gp.fs.0.size = 16
 
-
+# Threads
+breedthreads = auto
+evalthreads  = auto

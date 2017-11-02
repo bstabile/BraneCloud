@@ -20,7 +20,7 @@ namespace BraneCloud.Evolution.EC.App.Regression.Func
     {
         public override string ToString() { return "tanh"; }
 
-        public override int ExpectedChildren { get { return 1; } }
+        public override int ExpectedChildren => 1;
 
         public override void Eval(IEvolutionState state,
             int thread,

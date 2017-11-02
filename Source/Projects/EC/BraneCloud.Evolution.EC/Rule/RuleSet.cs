@@ -257,7 +257,7 @@ namespace BraneCloud.Evolution.EC.Rule
             var myrule = _rules[index];
 
             if (index < NumRules - 1)   // if we've chosen to remove the last rule, leave it where it is
-                Array.Copy(_rules, index + 1, _rules, index, _ruleCount - index + 1);
+                Array.Copy(_rules, index + 1, _rules, index, _ruleCount - (index + 1));
 
             _ruleCount--;
             return myrule;
@@ -399,23 +399,24 @@ namespace BraneCloud.Evolution.EC.Rule
             return GetType().GetHashCode() + _rules.Where(t => t != null).Sum(t => t.GetHashCode());
         }
 
-        public override bool Equals(object otherObj)
+        public override bool Equals(object other)
         {
-            if (!GetType().Equals(otherObj.GetType()))
+            if (other == null) return false;
+            if (!GetType().Equals(other.GetType()))
                 // not the same class, I'm conservative that way
                 return false;
 
-            var other = (RuleSet)otherObj;
-            if (_ruleCount != other._ruleCount)
+            var otherRuleSet = (RuleSet)other;
+            if (_ruleCount != otherRuleSet._ruleCount)
                 return false; // quick and dirty
-            if (_ruleCount == 0 && other._ruleCount == 0)
+            if (_ruleCount == 0 && otherRuleSet._ruleCount == 0)
                 return true; // quick and dirty
 
             // we need to sort the rulesets.  First, let's clone
             // the rule arrays
 
             var srules = (Rule[])(_rules.Clone());
-            var orules = (Rule[])(other._rules.Clone());
+            var orules = (Rule[])(otherRuleSet._rules.Clone());
 
             Array.Sort(srules);
             Array.Sort(orules);

@@ -18,7 +18,7 @@ namespace BraneCloud.Evolution.EC.App.Regression.Func
     /// </summary>
     public class VladERCB : VladERCA
     {
-        public override string Name { get { return "VladERCB"; } }
+        public override string Name => "VladERCB";
 
         public override string ToStringForHumans()
         { return "n+" + (float)value; }
@@ -30,7 +30,7 @@ namespace BraneCloud.Evolution.EC.App.Regression.Func
             GPIndividual individual,
             IProblem problem)
         {
-            var rd = ((RegressionData)(input));
+            var rd = (RegressionData)input;
 
             Children[0].Eval(state, thread, input, stack, individual, problem);
             rd.x = rd.x + value;

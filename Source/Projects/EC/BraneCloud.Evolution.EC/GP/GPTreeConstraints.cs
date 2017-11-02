@@ -62,6 +62,8 @@ namespace BraneCloud.Evolution.EC.GP
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const int SIZE_OF_BYTE = 256;
         public const string P_NAME = "name";
         public const string P_SIZE = "size";

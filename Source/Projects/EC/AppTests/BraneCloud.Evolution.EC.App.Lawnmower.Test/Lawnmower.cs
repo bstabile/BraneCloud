@@ -67,7 +67,7 @@ namespace BraneCloud.Evolution.EC.App.Lawnmower.Test
         /// <summary>
         /// We'll deep clone this
         /// </summary>
-        public LawnmowerData Input;
+        public new LawnmowerData Input;
 
         /// <summary>
         /// Our map
@@ -104,11 +104,11 @@ namespace BraneCloud.Evolution.EC.App.Lawnmower.Test
 
         public override object Clone()
         {
-            var myobj = (Lawnmower)(base.Clone());
-            myobj.Input = (LawnmowerData)(Input.Clone());
+            var myobj = (Lawnmower)base.Clone();
+            myobj.Input = (LawnmowerData)Input.Clone();
             myobj.Map = new int[Map.Length][];
             for (var x = 0; x < Map.Length; x++)
-                myobj.Map[x] = (int[])(Map[x].Clone());
+                myobj.Map[x] = (int[])Map[x].Clone();
             return myobj;
         }
 
@@ -156,7 +156,7 @@ namespace BraneCloud.Evolution.EC.App.Lawnmower.Test
 
                 // evaluate the individual
                 ((GPIndividual)ind).Trees[0].Child.Eval(
-                    state, threadnum, Input, Stack, ((GPIndividual)ind), this);
+                    state, threadnum, Input, Stack, (GPIndividual)ind, this);
 
                 // clean up the map
                 for (var x = 0; x < MaxX; x++)
@@ -164,7 +164,7 @@ namespace BraneCloud.Evolution.EC.App.Lawnmower.Test
                         Map[x][y] = UNMOWED;
 
                 // the fitness better be KozaFitness!
-                var f = ((KozaFitness)ind.Fitness);
+                var f = (KozaFitness)ind.Fitness;
                 f.SetStandardizedFitness(state, (float)(MaxX * MaxY - Sum));
                 f.Hits = Sum;
                 ind.Evaluated = true;
@@ -183,7 +183,7 @@ namespace BraneCloud.Evolution.EC.App.Lawnmower.Test
 
             // evaluate the individual
             ((GPIndividual)ind).Trees[0].Child.Eval(
-                state, threadnum, Input, Stack, ((GPIndividual)ind), this);
+                state, threadnum, Input, Stack, (GPIndividual)ind, this);
 
             // print out the map
             state.Output.PrintLn(" Y ->", log);
@@ -206,7 +206,7 @@ namespace BraneCloud.Evolution.EC.App.Lawnmower.Test
                         state.Output.Print("    ", log);
                     else
                     {
-                        var s = "" + (Map[x][y]);
+                        var s = "" + Map[x][y];
                         while (s.Length < 4) s = " " + s;
                         state.Output.Print(s + "|", log);
                     }

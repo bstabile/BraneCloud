@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BraneCloud.Evolution.EC", "..\..\Projects\EC\BraneCloud.Evolution.EC\BraneCloud.Evolution.EC.csproj", "{197FC1BD-8578-4DE7-9AEA-D7098A3505EA}"
@@ -16,11 +18,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9ACF2140-2A12-47C7-B2E9-33558EDDC49A}"
 	ProjectSection(SolutionItems) = preProject
 		BraneCloud.Evolution.EC.vsmdi = BraneCloud.Evolution.EC.vsmdi
+		CHANGES.txt = CHANGES.txt
 		LocalTestSettings.testsettings = LocalTestSettings.testsettings
 		Readme.txt = Readme.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Projects\EC\App\README.txt = ..\..\Projects\EC\App\README.txt
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBob", "..\..\Projects\EC\App\BBob\BBob.csproj", "{D412EF97-9A4E-4DC7-B75B-5763024A0A28}"
 EndProject
@@ -161,10 +167,331 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BraneCloud.Evolution.EC.Pro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BraneCloud.Evolution.EC.Evaluation", "..\..\Projects\EC\BraneCloud.Evolution.EC.Evaluation\BraneCloud.Evolution.EC.Evaluation.csproj", "{A8AB0B32-952F-4FBA-8C34-C22CCB897977}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ParamFiles", "ParamFiles", "{3B9FA701-2E1A-4215-A134-FD46C69DC2A2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ec", "ec", "{FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\ec.params = ParamFiles\ec\ec.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app", "app", "{041344D3-C858-4F65-BA3B-A93DD2F0B3F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "de", "de", "{BAB9060C-5823-4067-9A7B-8D2646CA72C5}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\de\de.params = ParamFiles\ec\de\de.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "es", "es", "{66E36112-EF96-4F17-992E-F4DCFC6CC813}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\es\es.params = ParamFiles\ec\es\es.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eval", "eval", "{CEA746BE-294E-451F-9E20-F84695BA42BD}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\eval\master.params = ParamFiles\ec\eval\master.params
+		ParamFiles\ec\eval\meta.params = ParamFiles\ec\eval\meta.params
+		ParamFiles\ec\eval\slave.params = ParamFiles\ec\eval\slave.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "exchange", "exchange", "{3714E3DA-00C0-473A-B4E1-CEF3B714843A}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\exchange\inter.params = ParamFiles\ec\exchange\inter.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gp", "gp", "{82BC531B-0130-4CB7-8DFA-02C776C95A58}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\gp\gp.params = ParamFiles\ec\gp\gp.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "multiobjective", "multiobjective", "{C363D751-782A-4F64-B478-31C6F33F3FE9}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\multiobjective\multiobjective.params = ParamFiles\ec\multiobjective\multiobjective.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pso", "pso", "{9611787F-23DF-486F-9C6C-0F257BFF0267}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\pso\pso.params = ParamFiles\ec\pso\pso.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "simple", "simple", "{18CCF359-AEA3-4C1B-AC13-F13573D86EF2}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\simple\simple.params = ParamFiles\ec\simple\simple.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "steadystate", "steadystate", "{04095B7F-91C4-40E3-93A8-B52274589864}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\steadystate\steadystate.params = ParamFiles\ec\steadystate\steadystate.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ant", "ant", "{4B4A958E-3CC0-4E13-9793-00B6361D411C}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\ant\ant.params = ParamFiles\ec\app\ant\ant.params
+		ParamFiles\ec\app\ant\ge.params = ParamFiles\ec\app\ant\ge.params
+		ParamFiles\ec\app\ant\progn4.params = ParamFiles\ec\app\ant\progn4.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "async", "async", "{E1D6E633-2F7F-4102-95BB-73276823B836}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\async\asesum.params = ParamFiles\ec\app\async\asesum.params
+		ParamFiles\ec\app\async\sum.slave.params = ParamFiles\ec\app\async\sum.slave.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bbob", "bbob", "{C6D8BFBB-E3A9-4154-92C5-7A3EDCFA5F4D}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\bbob\bbob.params = ParamFiles\ec\app\bbob\bbob.params
+		ParamFiles\ec\app\bbob\de.params = ParamFiles\ec\app\bbob\de.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "coevolve1", "coevolve1", "{87C4501F-67F3-4175-8CBA-156530092D25}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\coevolve1\coevolve1.params = ParamFiles\ec\app\coevolve1\coevolve1.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "coevolve2", "coevolve2", "{3BF97623-CC47-4AEE-B481-D5115B28A66B}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\coevolve2\coevolve2.params = ParamFiles\ec\app\coevolve2\coevolve2.params
+		ParamFiles\ec\app\coevolve2\ecsuite.params = ParamFiles\ec\app\coevolve2\ecsuite.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ecsuite", "ecsuite", "{8CC4F2F0-7A97-4B3C-8815-84C3CD5DA757}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\ecsuite\de.params = ParamFiles\ec\app\ecsuite\de.params
+		ParamFiles\ec\app\ecsuite\ecsuite.params = ParamFiles\ec\app\ecsuite\ecsuite.params
+		ParamFiles\ec\app\ecsuite\es.params = ParamFiles\ec\app\ecsuite\es.params
+		ParamFiles\ec\app\ecsuite\steady.params = ParamFiles\ec\app\ecsuite\steady.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "edge", "edge", "{2C168F11-48EE-45ED-8F7D-DB44A6E8A8D2}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\edge\1.params = ParamFiles\ec\app\edge\1.params
+		ParamFiles\ec\app\edge\2.params = ParamFiles\ec\app\edge\2.params
+		ParamFiles\ec\app\edge\3.params = ParamFiles\ec\app\edge\3.params
+		ParamFiles\ec\app\edge\4.params = ParamFiles\ec\app\edge\4.params
+		ParamFiles\ec\app\edge\5.params = ParamFiles\ec\app\edge\5.params
+		ParamFiles\ec\app\edge\6.params = ParamFiles\ec\app\edge\6.params
+		ParamFiles\ec\app\edge\7.params = ParamFiles\ec\app\edge\7.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gui", "gui", "{883C8002-9343-4E13-BF3E-8EFC0D69FD9C}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\gui\ant.params = ParamFiles\ec\app\gui\ant.params
+		ParamFiles\ec\app\gui\coevolve2.params = ParamFiles\ec\app\gui\coevolve2.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hiff", "hiff", "{3ED88A06-D495-4197-9A34-D1A5B437AF2E}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\hiff\hiff.params = ParamFiles\ec\app\hiff\hiff.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lawnmower", "lawnmower", "{050BDA80-4B4E-4A60-9968-6F16DB997521}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\lawnmower\adf.params = ParamFiles\ec\app\lawnmower\adf.params
+		ParamFiles\ec\app\lawnmower\ge.params = ParamFiles\ec\app\lawnmower\ge.params
+		ParamFiles\ec\app\lawnmower\noadf.params = ParamFiles\ec\app\lawnmower\noadf.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "moosuite", "moosuite", "{87D10B0B-09F2-4852-AA56-01DB9D097AAF}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\moosuite\f2.params = ParamFiles\ec\app\moosuite\f2.params
+		ParamFiles\ec\app\moosuite\fon.params = ParamFiles\ec\app\moosuite\fon.params
+		ParamFiles\ec\app\moosuite\kur-nsga2.params = ParamFiles\ec\app\moosuite\kur-nsga2.params
+		ParamFiles\ec\app\moosuite\kur-spea2.params = ParamFiles\ec\app\moosuite\kur-spea2.params
+		ParamFiles\ec\app\moosuite\moosuite.params = ParamFiles\ec\app\moosuite\moosuite.params
+		ParamFiles\ec\app\moosuite\nsga2.params = ParamFiles\ec\app\moosuite\nsga2.params
+		ParamFiles\ec\app\moosuite\pol.params = ParamFiles\ec\app\moosuite\pol.params
+		ParamFiles\ec\app\moosuite\qv.params = ParamFiles\ec\app\moosuite\qv.params
+		ParamFiles\ec\app\moosuite\sch.params = ParamFiles\ec\app\moosuite\sch.params
+		ParamFiles\ec\app\moosuite\spea2.params = ParamFiles\ec\app\moosuite\spea2.params
+		ParamFiles\ec\app\moosuite\sphere.params = ParamFiles\ec\app\moosuite\sphere.params
+		ParamFiles\ec\app\moosuite\unconstrained-f3.params = ParamFiles\ec\app\moosuite\unconstrained-f3.params
+		ParamFiles\ec\app\moosuite\zdt1.params = ParamFiles\ec\app\moosuite\zdt1.params
+		ParamFiles\ec\app\moosuite\zdt2.params = ParamFiles\ec\app\moosuite\zdt2.params
+		ParamFiles\ec\app\moosuite\zdt3.params = ParamFiles\ec\app\moosuite\zdt3.params
+		ParamFiles\ec\app\moosuite\zdt4.params = ParamFiles\ec\app\moosuite\zdt4.params
+		ParamFiles\ec\app\moosuite\zdt6.params = ParamFiles\ec\app\moosuite\zdt6.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "multiplexer", "multiplexer", "{1D82733C-EC1D-49B9-96D5-F942B170AC61}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\multiplexer\11.params = ParamFiles\ec\app\multiplexer\11.params
+		ParamFiles\ec\app\multiplexer\3.params = ParamFiles\ec\app\multiplexer\3.params
+		ParamFiles\ec\app\multiplexer\6.params = ParamFiles\ec\app\multiplexer\6.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "multiplexerslow", "multiplexerslow", "{7D2BD4C4-76CC-4D85-B1E9-D58F987B81A3}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\multiplexerslow\11.params = ParamFiles\ec\app\multiplexerslow\11.params
+		ParamFiles\ec\app\multiplexerslow\3.params = ParamFiles\ec\app\multiplexerslow\3.params
+		ParamFiles\ec\app\multiplexerslow\6.params = ParamFiles\ec\app\multiplexerslow\6.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nk", "nk", "{232D63E3-E703-4CE1-AA91-99621DF62C9E}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\nk\nk.params = ParamFiles\ec\app\nk\nk.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "parity", "parity", "{339A4967-99D0-425B-8A12-9EAFA43F108C}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\parity\adf.params = ParamFiles\ec\app\parity\adf.params
+		ParamFiles\ec\app\parity\parity.params = ParamFiles\ec\app\parity\parity.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "regression", "regression", "{A0DF32FD-70AF-44BB-A611-AE65C62D61BB}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\regression\erc.params = ParamFiles\ec\app\regression\erc.params
+		ParamFiles\ec\app\regression\ge.params = ParamFiles\ec\app\regression\ge.params
+		ParamFiles\ec\app\regression\noerc.params = ParamFiles\ec\app\regression\noerc.params
+		ParamFiles\ec\app\regression\noerc2.params = ParamFiles\ec\app\regression\noerc2.params
+		ParamFiles\ec\app\regression\quinticerc.params = ParamFiles\ec\app\regression\quinticerc.params
+		ParamFiles\ec\app\regression\quinticnoerc.params = ParamFiles\ec\app\regression\quinticnoerc.params
+		ParamFiles\ec\app\regression\sexticerc.params = ParamFiles\ec\app\regression\sexticerc.params
+		ParamFiles\ec\app\regression\sexticnoerc.params = ParamFiles\ec\app\regression\sexticnoerc.params
+		ParamFiles\ec\app\regression\steadynoerc.params = ParamFiles\ec\app\regression\steadynoerc.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sat", "sat", "{361F36F4-7CFC-4ED0-BB17-93FE36E30B07}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\sat\sat.params = ParamFiles\ec\app\sat\sat.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "spatial", "spatial", "{D8E6F21C-EF67-4061-946D-CD81833FA051}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\spatial\spatial.params = ParamFiles\ec\app\spatial\spatial.params
+		ParamFiles\ec\app\spatial\spatialcoevolve.params = ParamFiles\ec\app\spatial\spatialcoevolve.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "star", "star", "{4D1A4596-F358-4FF8-9F50-499B0FCF3CF9}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\star\ant.master.params = ParamFiles\ec\app\star\ant.master.params
+		ParamFiles\ec\app\star\ant.slave.params = ParamFiles\ec\app\star\ant.slave.params
+		ParamFiles\ec\app\star\coevolve1.master.params = ParamFiles\ec\app\star\coevolve1.master.params
+		ParamFiles\ec\app\star\coevolve1.slave.params = ParamFiles\ec\app\star\coevolve1.slave.params
+		ParamFiles\ec\app\star\coevolve2.master.params = ParamFiles\ec\app\star\coevolve2.master.params
+		ParamFiles\ec\app\star\coevolve2.slave.params = ParamFiles\ec\app\star\coevolve2.slave.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sum", "sum", "{464671F6-3F12-4881-8FDD-3A8E2358F306}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\sum\steadysum.params = ParamFiles\ec\app\sum\steadysum.params
+		ParamFiles\ec\app\sum\sum.params = ParamFiles\ec\app\sum\sum.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tutorial1", "tutorial1", "{ED71843C-1553-4D2C-AA20-39B429595075}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\tutorial1\tutorial1.params = ParamFiles\ec\app\tutorial1\tutorial1.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tutorial2", "tutorial2", "{F68A1567-C6E7-43CB-8E75-15206EE0D3C0}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\tutorial2\tutorial2.params = ParamFiles\ec\app\tutorial2\tutorial2.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tutorial3", "tutorial3", "{E7496804-A031-428C-B8FF-5429D71092EC}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\tutorial3\tutorial3.params = ParamFiles\ec\app\tutorial3\tutorial3.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tutorial4", "tutorial4", "{66C888EA-41C9-409B-8E28-50110B1568F3}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\tutorial4\tutorial4.params = ParamFiles\ec\app\tutorial4\tutorial4.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "twobox", "twobox", "{20A5398B-4793-4119-926A-CD42C291D049}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\twobox\adf.params = ParamFiles\ec\app\twobox\adf.params
+		ParamFiles\ec\app\twobox\noadf.params = ParamFiles\ec\app\twobox\noadf.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2-Island-Server", "2-Island-Server", "{99A3D0C6-CF5B-4BC1-AADD-3F23BB805D5B}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\exchange\2-Island-Server\client.params = ParamFiles\ec\exchange\2-Island-Server\client.params
+		ParamFiles\ec\exchange\2-Island-Server\crete.params = ParamFiles\ec\exchange\2-Island-Server\crete.params
+		ParamFiles\ec\exchange\2-Island-Server\minoa.params = ParamFiles\ec\exchange\2-Island-Server\minoa.params
+		ParamFiles\ec\exchange\2-Island-Server\server.params = ParamFiles\ec\exchange\2-Island-Server\server.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3-Island", "3-Island", "{BCEC7CF2-0741-41F8-8879-7BDBE5724D88}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\exchange\3-Island\assateague.params = ParamFiles\ec\exchange\3-Island\assateague.params
+		ParamFiles\ec\exchange\3-Island\chincoteague.params = ParamFiles\ec\exchange\3-Island\chincoteague.params
+		ParamFiles\ec\exchange\3-Island\client.params = ParamFiles\ec\exchange\3-Island\client.params
+		ParamFiles\ec\exchange\3-Island\server.params = ParamFiles\ec\exchange\3-Island\server.params
+		ParamFiles\ec\exchange\3-Island\wallops.params = ParamFiles\ec\exchange\3-Island\wallops.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "8-Island", "8-Island", "{FDE61618-6E40-46C8-BCBF-B9A47C3FE9AF}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\exchange\8-Island\client.params = ParamFiles\ec\exchange\8-Island\client.params
+		ParamFiles\ec\exchange\8-Island\coney.params = ParamFiles\ec\exchange\8-Island\coney.params
+		ParamFiles\ec\exchange\8-Island\ellis.params = ParamFiles\ec\exchange\8-Island\ellis.params
+		ParamFiles\ec\exchange\8-Island\fantasy.params = ParamFiles\ec\exchange\8-Island\fantasy.params
+		ParamFiles\ec\exchange\8-Island\gilligans.params = ParamFiles\ec\exchange\8-Island\gilligans.params
+		ParamFiles\ec\exchange\8-Island\rhode.params = ParamFiles\ec\exchange\8-Island\rhode.params
+		ParamFiles\ec\exchange\8-Island\server.params = ParamFiles\ec\exchange\8-Island\server.params
+		ParamFiles\ec\exchange\8-Island\survivor.params = ParamFiles\ec\exchange\8-Island\survivor.params
+		ParamFiles\ec\exchange\8-Island\temptation.params = ParamFiles\ec\exchange\8-Island\temptation.params
+		ParamFiles\ec\exchange\8-Island\treasure.params = ParamFiles\ec\exchange\8-Island\treasure.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "breed", "breed", "{EA062CC0-8E60-4080-A6A4-F92CE2A64B6C}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\gp\breed\breed.params = ParamFiles\ec\gp\breed\breed.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ge", "ge", "{D949874B-0B04-4665-9C80-A65AD6B3C3FF}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\gp\ge\ge.params = ParamFiles\ec\gp\ge\ge.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "koza", "koza", "{8EE93CB3-3246-4917-9427-C6B7EFBE85B2}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\gp\koza\koza.params = ParamFiles\ec\gp\koza\koza.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nsga2", "nsga2", "{AAAF4685-5EEE-460B-BE34-9222A0731E9E}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\multiobjective\nsga2\nsga2.params = ParamFiles\ec\multiobjective\nsga2\nsga2.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "spea2", "spea2", "{9F8332A2-A77B-43F9-AA6F-0BEC96027605}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\multiobjective\spea2\spea2.params = ParamFiles\ec\multiobjective\spea2\spea2.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "old", "old", "{B6EA426D-633D-43DD-BA94-A86ED7CF2D57}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\app\star\old\ant.slave1.params = ParamFiles\ec\app\star\old\ant.slave1.params
+		ParamFiles\ec\app\star\old\ant.slave2.params = ParamFiles\ec\app\star\old\ant.slave2.params
+		ParamFiles\ec\app\star\old\ant.slave3.params = ParamFiles\ec\app\star\old\ant.slave3.params
+		ParamFiles\ec\app\star\old\coevolve1.slave1.params = ParamFiles\ec\app\star\old\coevolve1.slave1.params
+		ParamFiles\ec\app\star\old\coevolve1.slave2.params = ParamFiles\ec\app\star\old\coevolve1.slave2.params
+		ParamFiles\ec\app\star\old\coevolve1.slave3.params = ParamFiles\ec\app\star\old\coevolve1.slave3.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "push", "push", "{943C417E-56F5-4570-BBCA-0CEB6059807A}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\gp\push\push.params = ParamFiles\ec\gp\push\push.params
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BraneCloud.Evolution.EC.Psh", "..\..\Projects\EC\BraneCloud.Evolution.EC.Psh\BraneCloud.Evolution.EC.Psh.csproj", "{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPSemantics", "..\..\Projects\EC\App\GPSemantics\GPSemantics.csproj", "{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KLandscapes", "..\..\Projects\EC\App\KLandscapes\KLandscapes.csproj", "{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lid", "..\..\Projects\EC\App\Lid\Lid.csproj", "{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Majority", "..\..\Projects\EC\App\Majority\Majority.csproj", "{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mona", "..\..\Projects\EC\App\Mona\Mona.csproj", "{3B51666B-BD32-4F8C-B791-DA611B0A10C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderTree", "..\..\Projects\EC\App\OrderTree\OrderTree.csproj", "{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Push", "..\..\Projects\EC\App\Push\Push.csproj", "{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoyalTree", "..\..\Projects\EC\App\RoyalTree\RoyalTree.csproj", "{43872910-A4E1-422F-ABDC-9A7A66085DE1}"
+EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = BraneCloud.Evolution.EC.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -834,6 +1161,114 @@ Global
 		{A8AB0B32-952F-4FBA-8C34-C22CCB897977}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{A8AB0B32-952F-4FBA-8C34-C22CCB897977}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{A8AB0B32-952F-4FBA-8C34-C22CCB897977}.Release|x86.ActiveCfg = Release|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Debug|x86.Build.0 = Debug|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Release|x86.ActiveCfg = Release|Any CPU
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF}.Release|x86.Build.0 = Release|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Debug|x86.Build.0 = Debug|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Release|x86.ActiveCfg = Release|Any CPU
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6}.Release|x86.Build.0 = Release|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Debug|x86.Build.0 = Debug|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Release|x86.ActiveCfg = Release|Any CPU
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED}.Release|x86.Build.0 = Release|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Debug|x86.Build.0 = Debug|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Release|x86.ActiveCfg = Release|Any CPU
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759}.Release|x86.Build.0 = Release|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Debug|x86.Build.0 = Debug|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Release|x86.ActiveCfg = Release|Any CPU
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12}.Release|x86.Build.0 = Release|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Debug|x86.Build.0 = Debug|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Release|x86.ActiveCfg = Release|Any CPU
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9}.Release|x86.Build.0 = Release|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Debug|x86.Build.0 = Debug|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Release|x86.ActiveCfg = Release|Any CPU
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB}.Release|x86.Build.0 = Release|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Debug|x86.Build.0 = Debug|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Release|x86.ActiveCfg = Release|Any CPU
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A}.Release|x86.Build.0 = Release|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Debug|x86.Build.0 = Debug|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Release|x86.ActiveCfg = Release|Any CPU
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -844,10 +1279,6 @@ Global
 		{E5ECCEA3-0448-40CD-98B2-BC70578807B1} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
 		{5993FC6C-820B-482F-AB46-961F89FC8EA1} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
 		{1669FD6F-D6A2-4498-A62B-F5A831B56A83} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
-		{76E4D9AC-A6EE-4566-B0F1-B5A12DDDB8FA} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
-		{926F38F4-D132-458C-91DB-6314AE9F2FAD} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
-		{434C94BF-E6D0-465E-9A55-AB07E884F6CE} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
-		{A8AB0B32-952F-4FBA-8C34-C22CCB897977} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
 		{D412EF97-9A4E-4DC7-B75B-5763024A0A28} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
 		{A602473A-44B3-46DA-A945-E049B5F2711A} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
 		{A20D7CE4-0164-4F24-B571-603F24596C94} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
@@ -879,7 +1310,9 @@ Global
 		{C18EF1C7-7F80-42BC-9BFC-6CD7E684534A} = {EA4A3363-8AAA-49CC-AD98-5D005C0AEA07}
 		{CF4A7D05-15AF-4367-B1E9-02A6E74D218F} = {EA4A3363-8AAA-49CC-AD98-5D005C0AEA07}
 		{3970A38A-51ED-4460-818E-FB2FCD4A1318} = {CF4A7D05-15AF-4367-B1E9-02A6E74D218F}
+		{76E4D9AC-A6EE-4566-B0F1-B5A12DDDB8FA} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
 		{D645289E-65A2-46F6-89A3-F1671DE7F177} = {76E4D9AC-A6EE-4566-B0F1-B5A12DDDB8FA}
+		{A1318528-F26F-4F8A-AC4B-8AFD4BF41E7C} = {D645289E-65A2-46F6-89A3-F1671DE7F177}
 		{35F4781E-6D36-47E8-86A9-CED63C17E031} = {76E4D9AC-A6EE-4566-B0F1-B5A12DDDB8FA}
 		{65E9D39D-D267-4147-966B-A1581E0F8BBC} = {76E4D9AC-A6EE-4566-B0F1-B5A12DDDB8FA}
 		{CE5E73DA-0F1C-4DC0-A6D6-CD125A673A90} = {76E4D9AC-A6EE-4566-B0F1-B5A12DDDB8FA}
@@ -887,7 +1320,6 @@ Global
 		{AFB313F3-FB5F-47C9-896E-97DEE2432E4D} = {76E4D9AC-A6EE-4566-B0F1-B5A12DDDB8FA}
 		{7B5201EE-BA3D-4F7E-94F4-94DEDFD31F13} = {76E4D9AC-A6EE-4566-B0F1-B5A12DDDB8FA}
 		{6AA23A14-690E-4278-9B88-233F1E94A997} = {76E4D9AC-A6EE-4566-B0F1-B5A12DDDB8FA}
-		{A1318528-F26F-4F8A-AC4B-8AFD4BF41E7C} = {D645289E-65A2-46F6-89A3-F1671DE7F177}
 		{045D8D76-AEE0-4A05-931E-564AE965FAD4} = {C57A539C-8B23-4D0C-9AEF-C4243DAD04F4}
 		{AF1C929F-17B2-4CB1-9938-9DA6759413CB} = {C57A539C-8B23-4D0C-9AEF-C4243DAD04F4}
 		{48B33610-B87A-4ADE-AF9D-F34B856A2C9F} = {C57A539C-8B23-4D0C-9AEF-C4243DAD04F4}
@@ -909,5 +1341,69 @@ Global
 		{10FEB0A7-99FE-44D6-8D5B-18964F976AB5} = {C57A539C-8B23-4D0C-9AEF-C4243DAD04F4}
 		{C2100A31-84E3-4903-AAC3-254782DF0869} = {C57A539C-8B23-4D0C-9AEF-C4243DAD04F4}
 		{EC7A2A4D-33C6-478D-86A1-C32E7D4A60E5} = {C57A539C-8B23-4D0C-9AEF-C4243DAD04F4}
+		{926F38F4-D132-458C-91DB-6314AE9F2FAD} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
+		{434C94BF-E6D0-465E-9A55-AB07E884F6CE} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
+		{A8AB0B32-952F-4FBA-8C34-C22CCB897977} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
+		{FEEBC06D-DDCF-4BFB-B642-F49D595AD10E} = {3B9FA701-2E1A-4215-A134-FD46C69DC2A2}
+		{041344D3-C858-4F65-BA3B-A93DD2F0B3F6} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{BAB9060C-5823-4067-9A7B-8D2646CA72C5} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{66E36112-EF96-4F17-992E-F4DCFC6CC813} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{CEA746BE-294E-451F-9E20-F84695BA42BD} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{3714E3DA-00C0-473A-B4E1-CEF3B714843A} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{82BC531B-0130-4CB7-8DFA-02C776C95A58} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{C363D751-782A-4F64-B478-31C6F33F3FE9} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{9611787F-23DF-486F-9C6C-0F257BFF0267} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{18CCF359-AEA3-4C1B-AC13-F13573D86EF2} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{04095B7F-91C4-40E3-93A8-B52274589864} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{4B4A958E-3CC0-4E13-9793-00B6361D411C} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{E1D6E633-2F7F-4102-95BB-73276823B836} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{C6D8BFBB-E3A9-4154-92C5-7A3EDCFA5F4D} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{87C4501F-67F3-4175-8CBA-156530092D25} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{3BF97623-CC47-4AEE-B481-D5115B28A66B} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{8CC4F2F0-7A97-4B3C-8815-84C3CD5DA757} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{2C168F11-48EE-45ED-8F7D-DB44A6E8A8D2} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{883C8002-9343-4E13-BF3E-8EFC0D69FD9C} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{3ED88A06-D495-4197-9A34-D1A5B437AF2E} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{050BDA80-4B4E-4A60-9968-6F16DB997521} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{87D10B0B-09F2-4852-AA56-01DB9D097AAF} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{1D82733C-EC1D-49B9-96D5-F942B170AC61} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{7D2BD4C4-76CC-4D85-B1E9-D58F987B81A3} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{232D63E3-E703-4CE1-AA91-99621DF62C9E} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{339A4967-99D0-425B-8A12-9EAFA43F108C} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{A0DF32FD-70AF-44BB-A611-AE65C62D61BB} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{361F36F4-7CFC-4ED0-BB17-93FE36E30B07} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{D8E6F21C-EF67-4061-946D-CD81833FA051} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{4D1A4596-F358-4FF8-9F50-499B0FCF3CF9} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{464671F6-3F12-4881-8FDD-3A8E2358F306} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{ED71843C-1553-4D2C-AA20-39B429595075} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{F68A1567-C6E7-43CB-8E75-15206EE0D3C0} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{E7496804-A031-428C-B8FF-5429D71092EC} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{66C888EA-41C9-409B-8E28-50110B1568F3} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{20A5398B-4793-4119-926A-CD42C291D049} = {041344D3-C858-4F65-BA3B-A93DD2F0B3F6}
+		{99A3D0C6-CF5B-4BC1-AADD-3F23BB805D5B} = {3714E3DA-00C0-473A-B4E1-CEF3B714843A}
+		{BCEC7CF2-0741-41F8-8879-7BDBE5724D88} = {3714E3DA-00C0-473A-B4E1-CEF3B714843A}
+		{FDE61618-6E40-46C8-BCBF-B9A47C3FE9AF} = {3714E3DA-00C0-473A-B4E1-CEF3B714843A}
+		{EA062CC0-8E60-4080-A6A4-F92CE2A64B6C} = {82BC531B-0130-4CB7-8DFA-02C776C95A58}
+		{D949874B-0B04-4665-9C80-A65AD6B3C3FF} = {82BC531B-0130-4CB7-8DFA-02C776C95A58}
+		{8EE93CB3-3246-4917-9427-C6B7EFBE85B2} = {82BC531B-0130-4CB7-8DFA-02C776C95A58}
+		{AAAF4685-5EEE-460B-BE34-9222A0731E9E} = {C363D751-782A-4F64-B478-31C6F33F3FE9}
+		{9F8332A2-A77B-43F9-AA6F-0BEC96027605} = {C363D751-782A-4F64-B478-31C6F33F3FE9}
+		{B6EA426D-633D-43DD-BA94-A86ED7CF2D57} = {4D1A4596-F358-4FF8-9F50-499B0FCF3CF9}
+		{943C417E-56F5-4570-BBCA-0CEB6059807A} = {82BC531B-0130-4CB7-8DFA-02C776C95A58}
+		{CFDB1E93-1A72-496D-89EF-EDE6695B70AF} = {CDDE5D9D-60BB-4CCB-BAE0-9525BAC6B11D}
+		{E03AF8EC-C439-45C2-9C36-AD50591EE5E6} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
+		{1E7EE31D-51C0-4706-A6A6-D2321BF4BAED} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
+		{E4E19074-6D20-4A8F-BFB5-23B67EFA5759} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
+		{24A2F9B2-1818-42DD-99B8-154F1ACEFF12} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
+		{3B51666B-BD32-4F8C-B791-DA611B0A10C9} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
+		{5793F15D-3E9D-49F8-8CE2-CF4414378ECB} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
+		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
+		{43872910-A4E1-422F-ABDC-9A7A66085DE1} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F3D450E4-EC34-460F-9537-F527E70EB099}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = BraneCloud.Evolution.EC.vsmdi
 	EndGlobalSection
 EndGlobal

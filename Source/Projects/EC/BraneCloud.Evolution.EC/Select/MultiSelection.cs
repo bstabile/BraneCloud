@@ -52,6 +52,8 @@ namespace BraneCloud.Evolution.EC.Select
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_NUMSELECTS = "num-selects";
         public const string P_SELECT = "select";
         public const string P_MULTISELECT = "multiselect";

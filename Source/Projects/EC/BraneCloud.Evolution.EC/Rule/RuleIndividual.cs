@@ -94,6 +94,8 @@ namespace BraneCloud.Evolution.EC.Rule
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_RULESET = "ruleset";
         public const string P_NUMRULESETS = "num-rulesets";
 
@@ -192,6 +194,7 @@ namespace BraneCloud.Evolution.EC.Rule
 
         public override bool Equals(object ind)
         {
+            if (ind == null) return false;
             // My loose definition: ind must be a 
             if (!GetType().Equals(ind.GetType()))
                 // not the same class, I'm conservative that way

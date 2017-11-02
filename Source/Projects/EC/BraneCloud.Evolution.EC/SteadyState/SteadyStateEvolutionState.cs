@@ -51,6 +51,10 @@ namespace BraneCloud.Evolution.EC.SteadyState
     /// <tr><td valign="top"><tt>evaluations</tt><br/>
     /// <font size="-1">int &gt;= 1</font></td>
     /// <td valign="top">(maximal number of evaluations to run.)</td></tr>
+    /// <tr><td valign="top"><tt>steady.replacement-probability</tt><br/>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0 (default is 1.0)</font></td>
+    /// <td valign="top"> (probability that an incoming individual will unilaterally replace the individual marked
+    /// for death, as opposed to replacing it only if the incoming individual is superior in fitness)</td></tr>
     /// </table>
     /// </summary>
     [Serializable]
@@ -59,25 +63,10 @@ namespace BraneCloud.Evolution.EC.SteadyState
     {
         #region Constants
 
-        /// <summary>
-        /// Base parameter for steady-state. 
-        /// </summary>
-        public const string P_NUMEVALUATIONS = "evaluations";
-
-        public static long UNDEFINED = 0;
-
+        public const string P_REPLACEMENT_PROBABILITY = "replacement-probability";
+        
         #endregion // Constants
-        #region Fields
-
-        private bool _justCalledPostEvaluationStatistics;
-
-        #endregion // Fields
         #region Properties
-
-        /// <summary>
-        /// First time calling evolve?
-        /// </summary>
-        public bool FirstTime { get; protected internal set; }
 
         /// <summary>
         /// Did we just start a new generation? 
@@ -90,32 +79,42 @@ namespace BraneCloud.Evolution.EC.SteadyState
         public int GenerationSize { get; set; }
 
         /// <summary>
-        /// How many Evaluations should we run for?  
-        /// If set to UNDEFINED (0), we run for the number of generations instead. 
+        /// When a new individual arrives, with what probability should it directly replace the existing
+        /// "marked for death" individual, as opposed to only replacing it if it's superior?
         /// </summary>
-        public long NumEvaluations { get; set; }
+        public double ReplacementProbability { get; set; }
 
         /// <summary>
         /// How many Evaluations have we run so far? 
         /// </summary>
         public long Evaluations { get; set; }
 
+        #endregion // Properties
+        #region Fields
+
+        /// <summary>
+        /// First time calling evolve?
+        /// </summary>
+        protected bool FirstTime;
+
         /// <summary>
         /// How many individuals have we added to the initial population? 
         /// </summary>
-        public int[] IndividualCount { get; set; }
+        private int[] IndividualCount;
 
         /// <summary>
         /// Hash table to check for duplicate individuals. 
         /// </summary>
-        public Hashtable[] IndividualHash { get; set; }
+        private Hashtable[] IndividualHash;
 
         /// <summary>
         /// Holds which subpop we are currently operating on. 
         /// </summary>
-        public int WhichSubpop { get; set; }
+        private int WhichSubpop;
 
-        #endregion // Properties
+        private bool _justCalledPostEvaluationStatistics;
+
+        #endregion
         #region Setup
 
         public override void Setup(IEvolutionState state, IParameter paramBase)
@@ -132,9 +131,18 @@ namespace BraneCloud.Evolution.EC.SteadyState
 
             CheckStatistics(state, Statistics, paramBase);
 
-            NumEvaluations = Parameters.GetLong(new Parameter(P_NUMEVALUATIONS), null, 1);
-            if (NumEvaluations == 0)
-                Output.Message("Number of Evaluations not defined; using number of generations");
+            if (Parameters.ParameterExists(SteadyStateDefaults.ParamBase.Push(P_REPLACEMENT_PROBABILITY), null))
+            {
+                ReplacementProbability = Parameters.GetDoubleWithMax(SteadyStateDefaults.ParamBase.Push(P_REPLACEMENT_PROBABILITY), null, 0.0, 1.0);
+                if (ReplacementProbability < 0.0) // uh oh
+                    state.Output.Error("Replacement probability must be between 0.0 and 1.0 inclusive.",
+                        SteadyStateDefaults.ParamBase.Push(P_REPLACEMENT_PROBABILITY), null);
+            }
+            else
+            {
+                ReplacementProbability = 1.0;  // always replace
+                state.Output.Message("Replacement probability not defined: using 1.0 (always replace)");
+            }
         }
 
         #endregion // Setup
@@ -162,9 +170,6 @@ namespace BraneCloud.Evolution.EC.SteadyState
             Statistics.PreInitializationStatistics(this);
             Population = Initializer.SetupPopulation(this, 0); // unthreaded
 
-            // INITIALIZE VARIABLES
-            if (NumEvaluations > 0 && NumEvaluations < Population.Subpops[0].Individuals.Length)
-                Output.Fatal("Number of Evaluations desired is smaller than the initial population of individuals");
             GenerationSize = 0;
             GenerationBoundary = false;
             FirstTime = true;
@@ -183,6 +188,9 @@ namespace BraneCloud.Evolution.EC.SteadyState
                 IndividualCount[sub] = 0;
                 GenerationSize += Population.Subpops[sub].Individuals.Length; // so our sum total 'GenerationSize' will be the initial total number of individuals
             }
+
+            if (NumEvaluations > UNDEFINED && NumEvaluations < GenerationSize)
+                Output.Fatal("Number of Evaluations desired is smaller than the initial population of individuals");
 
             // INITIALIZE CONTACTS -- done after initialization to allow
             // a hook for the user to do things in Initializer before
@@ -274,7 +282,11 @@ namespace BraneCloud.Evolution.EC.SteadyState
                     var deadInd = Population.Subpops[subpop].Individuals[deadIndex];
 
                     // replace dead individual with new individual 
-                    Population.Subpops[subpop].Individuals[deadIndex] = ind;
+                    if (ind.Fitness.BetterThan(deadInd.Fitness) || // it's better, we want it
+                        Random[0].NextDouble() < ReplacementProbability) // it's not better but maybe we replace it directly anyway
+                    {
+                        Population.Subpops[subpop].Individuals[deadIndex] = ind;
+                    }
 
                     // update duplicate hash table 
                     IndividualHash[subpop].Remove(deadInd);
@@ -302,8 +314,8 @@ namespace BraneCloud.Evolution.EC.SteadyState
                 return R_SUCCESS;
             }
 
-            if ((NumEvaluations > 0 && Evaluations >= NumEvaluations) ||  // using numEvaluations
-                (NumEvaluations <= 0 && GenerationBoundary && Generation == NumGenerations - 1))  // not using numEvaluations
+            if (NumEvaluations > UNDEFINED && Evaluations >= NumEvaluations ||  // using numEvaluations
+                NumEvaluations <= UNDEFINED && GenerationBoundary && Generation == NumGenerations - 1)  // not using numEvaluations
             {
                 return R_FAILURE;
             }
@@ -346,7 +358,8 @@ namespace BraneCloud.Evolution.EC.SteadyState
             /* finish up -- we completed. */
             ((SteadyStateBreeder)Breeder).FinishPipelines(this);
             if (!_justCalledPostEvaluationStatistics)
-                Statistics.PostEvaluationStatistics(this); Statistics.FinalStatistics(this, result);
+                Statistics.PostEvaluationStatistics(this);
+            Statistics.FinalStatistics(this, result);
             Finisher.FinishPopulation(this, result);
             Exchanger.CloseContacts(this, result);
             Evaluator.CloseContacts(this, result);

@@ -81,29 +81,19 @@ namespace BraneCloud.Evolution.EC.Vector
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return VectorDefaults.ParamBase.Push(P_BITVECTORINDIVIDUAL); }
-        }
+        public override IParameter DefaultBase => VectorDefaults.ParamBase.Push(P_BITVECTORINDIVIDUAL);
 
         public override object Genome
         {
-            get
-            {
-                return genome;
-            }
-            set
-            {
-                // possible InvalidCastException
-                genome = (bool[])value;
-            }
+            get => genome;
+            set => genome = (bool[])value; // Possible InvalidCastException
         }
 
         public bool[] genome { get; set; }
 
         public override int GenomeLength
         {
-            get { return genome.Length; }
+            get => genome.Length;
             set
             {
                 var newGenome = new bool[value];
@@ -119,7 +109,7 @@ namespace BraneCloud.Evolution.EC.Vector
         {
             base.Setup(state, paramBase); // actually unnecessary (Individual.Setup() is empty)
 
-            var s = (VectorSpecies)Species; // where my default info is stored
+            var s = (BitVectorSpecies)Species; // where my default info is stored
             genome = new bool[s.GenomeSize];
         }
 
@@ -130,7 +120,7 @@ namespace BraneCloud.Evolution.EC.Vector
 
         /// <summary>
         /// Splits the genome into n pieces, according to points, which *must* be sorted. 
-        /// pieces.length must be 1 + points.length 
+        /// pieces.Length must be 1 + points.Length 
         /// </summary>
         public override void Split(int[] points, object[] pieces)
         {
@@ -183,7 +173,7 @@ namespace BraneCloud.Evolution.EC.Vector
 
         public override void DefaultCrossover(IEvolutionState state, int thread, VectorIndividual ind)
         {
-            var s = (VectorSpecies)Species; // where my default info is stored
+            var s = (BitVectorSpecies)Species; // where my default info is stored
             var i = (BitVectorIndividual)ind;
             bool tmp;
             int point;
@@ -193,7 +183,7 @@ namespace BraneCloud.Evolution.EC.Vector
             switch (s.CrossoverType)
             {
 
-                case VectorSpecies.C_ONE_POINT:
+                case BitVectorSpecies.C_ONE_POINT:
                     point = state.Random[thread].NextInt((genome.Length / s.ChunkSize) + 1);
                     for (var x = 0; x < point * s.ChunkSize; x++)
                     {
@@ -203,7 +193,7 @@ namespace BraneCloud.Evolution.EC.Vector
                     }
                     break;
 
-                case VectorSpecies.C_TWO_POINT:
+                case BitVectorSpecies.C_TWO_POINT:
                     var point0 = state.Random[thread].NextInt((genome.Length / s.ChunkSize) + 1);
                     point = state.Random[thread].NextInt((genome.Length / s.ChunkSize) + 1);
                     if (point0 > point)
@@ -218,7 +208,7 @@ namespace BraneCloud.Evolution.EC.Vector
                     }
                     break;
 
-                case VectorSpecies.C_ANY_POINT:
+                case BitVectorSpecies.C_ANY_POINT:
                     for (var x = 0; x < genome.Length / s.ChunkSize; x++)
                         if (state.Random[thread].NextBoolean(s.CrossoverProbability))
                             for (var y = x * s.ChunkSize; y < (x + 1) * s.ChunkSize; y++)
@@ -237,11 +227,28 @@ namespace BraneCloud.Evolution.EC.Vector
         /// </summary>
         public override void DefaultMutate(IEvolutionState state, int thread)
         {
-            var s = (VectorSpecies)Species; // where my default info is stored
-            if (s.MutationProbability > 0.0)
-                for (var x = 0; x < genome.Length; x++)
-                    if (state.Random[thread].NextBoolean(s.MutationProbability))
-                        genome[x] = !genome[x];
+            var s = (BitVectorSpecies)Species; // where my default info is stored
+            for (int x = 0; x < genome.Length; x++)
+            {
+                if (state.Random[thread].NextBoolean(s.MutationProbability[x]))
+                {
+                    bool old = genome[x];
+                    for (int retries = 0; retries < s.GetDuplicateRetries(x) + 1; retries++)
+                    {
+                        switch (s.MutationType(x))
+                        {
+                            case BitVectorSpecies.C_FLIP_MUTATION:
+                                genome[x] = !genome[x];
+                                break;
+                            case BitVectorSpecies.C_RESET_MUTATION:
+                                genome[x] = state.Random[thread].NextBoolean();
+                                break;
+                        }
+                        if (genome[x] != old) break;
+                        // else genome[x] = old;  // try again
+                    }
+                }
+            }
         }
 
         #endregion // Breeding
@@ -310,15 +317,12 @@ namespace BraneCloud.Evolution.EC.Vector
 
         public override string GenotypeToStringForHumans()
         {
-            var s = "";
-            foreach (var t in genome)
+            StringBuilder s = new StringBuilder();
+            foreach (bool t in genome)
             {
-                if (t)
-                    s = s + " 1";
-                else
-                    s = s + " 0";
+                s.Append(t ? "1" : "0");
             }
-            return s;
+            return s.ToString();
         }
 
         public override string GenotypeToString()
@@ -339,6 +343,11 @@ namespace BraneCloud.Evolution.EC.Vector
             var s = reader.ReadLine();
             var d = new DecodeReturn(s);
             Code.Decode(d);
+
+            if (d.Type != DecodeReturn.T_INTEGER)  // uh oh
+                state.Output.Fatal("Individual with genome:\n" + s 
+                    + "\n... does not have an integer at the beginning indicating the genome count.");
+
             var lll = (int)(d.L);
 
             genome = new bool[lll];

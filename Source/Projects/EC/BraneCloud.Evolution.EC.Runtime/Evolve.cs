@@ -141,6 +141,11 @@ namespace BraneCloud.Evolution.EC.Runtime
         public const string A_AT = "-at";
 
         /// <summary>
+        /// The argument indicating a request to print out the help message.
+        /// </summary>
+        public const string A_HELP = "-help";
+
+        /// <summary>
         /// evalthreads parameter 
         /// </summary>
         public const string P_EVALTHREADS = "evalthreads";
@@ -175,6 +180,45 @@ namespace BraneCloud.Evolution.EC.Runtime
 
         #region Setup and Cleanup
 
+        /** Optionally prints the help message. */
+        public static void CheckForHelp(String[] args)
+        {
+            for (int x = 0; x < args.Length; x++)
+                if (args[x].Equals(A_HELP))
+                {
+                    Trace.WriteLine(ECVersion.Message());
+                    Trace.WriteLine(
+                        "Format:\n\n" +
+                        "    java ec.Evolve -file FILE [-p PARAM=VALUE] [-p PARAM=VALUE] ...\n" +
+                        "    java ec.Evolve -from FILE [-p PARAM=VALUE] [-p PARAM=VALUE] ...\n" +
+                        "    java ec.Evolve -from FILE -at CLASS [-p PARAM=VALUE] [-p PARAM=VALUE] ...\n" +
+                        "    java ec.Evolve -checkpoint CHECKPOINT\n" +
+                        "    java ec.Evolve -help\n\n" +
+                        "-help                   Shows this message and exits.\n\n" +
+                        "-file FILE              Launches ECJ using the provided parameter FILE.\n\n" +
+                        "-from FILE              Launches ECJ using the provided parameter FILE\n" +
+                        "                        which is defined relative to the directory\n" +
+                        "                        holding the classfile ec/Evolve.class  If this\n" +
+                        "                        class file is found inside a Jar file, then the\n" +
+                        "                        FILE will also be assumed to be in that Jar file,\n" +
+                        "                        at the proper relative location.\n\n" +
+                        "-from FILE -at CLASS    Launches ECJ using the provided parameter FILE\n" +
+                        "                        which is defined relative to the directory\n" +
+                        "                        holding the classfile CLASS (for example,\n" +
+                        "                        ec/ant/ant.class).  If this class file is found\n" +
+                        "                        inside a Jar file, then the FILE will also be\n" +
+                        "                        assumed to be in that Jar file, at the proper\n" +
+                        "                        relative location.\n\n" +
+                        "-p PARAM=VALUE          Overrides the parameter PARAM in the parameter\n" +
+                        "                        file, setting it to the value VALUE instead.  You\n" +
+                        "                        can override as many parameters as you like on\n" +
+                        "                        the command line.\n\n" +
+                        "-checkpoint CHECKPOINT  Launches ECJ from the provided CHECKPOINT file.\n"
+                        );
+                    Environment.Exit(1);
+                }
+        }
+
         /// <summary>
         /// Restores an EvolutionState from checkpoint if "-checkpoint FILENAME" is in the command-line arguments. 
         /// </summary>
@@ -190,7 +234,7 @@ namespace BraneCloud.Evolution.EC.Runtime
                     }
                     catch (Exception e)
                     {
-                        Output.InitialError("An exception was generated upon starting up from a checkpoint.\nHere it is:\n" + e, false);
+                        Output.InitialError("An exception was generated upon starting up from a checkpoint.\nFor help, try:  java ec.Evolve -help\n\n" + e, false);
                         Environment.Exit(1); // This was originally part of the InitialError call in ECJ. But we make Evolve responsible.
                     }
                 }
@@ -229,7 +273,7 @@ namespace BraneCloud.Evolution.EC.Runtime
                     try
                     {
                         if (parameters != null) // uh oh
-                            Output.InitialError("Both -file and -at arguments provided.  This is not permitted.");
+                            Output.InitialError("Both -file and -at arguments provided.  This is not permitted.\nFor help, try:  java ec.Evolve -help");
                         else
                             cls = Type.GetType(args[x + 1]);
                         break;
@@ -240,7 +284,7 @@ namespace BraneCloud.Evolution.EC.Runtime
                         Output.InitialError(
                             "An exception was generated upon extracting the class to load the parameter file relative to: " +
                             args[x + 1] +
-                            "\n Here it is:\n" + e);
+                            "\nFor help, try:  java ec.Evolve -help\n\n" + e);
                     }
 
             // search for a resource (we may or may not use this)
@@ -249,7 +293,7 @@ namespace BraneCloud.Evolution.EC.Runtime
                     try
                     {
                         if (parameters != null) // uh oh
-                            Output.InitialError("Both -file and -from arguments provided.  This is not permitted.");
+                            Output.InitialError("Both -file and -from arguments provided.  This is not permitted.\nFor help, try:  java ec.Evolve -help");
                         else
                         {
                             if (cls == null) // no -at
@@ -264,12 +308,12 @@ namespace BraneCloud.Evolution.EC.Runtime
                         Trace.WriteLine(e.Message);
                         Output.InitialError(
                             "The parameter file is missing at the resource location: " + args[x + 1] +
-                            " relative to the class: " + cls);
+                            " relative to the class: " + cls + "\n\nFor help, try:  java ec.Evolve -help");
                     }
 
             if (parameters == null)
             {
-                Output.InitialError("No parameter file was specified.", false);
+                Output.InitialError("No parameter or checkpoint file was specified.\nFor help, try:   java ec.Evolve -help", false);
                 Environment.Exit(1);
                 // This was originally part of the InitialError call in ECJ. But we make Evolve responsible.
             }
@@ -375,6 +419,7 @@ namespace BraneCloud.Evolution.EC.Runtime
         {
             var breedthreads = 1;
             var evalthreads = 1;
+
             //bool store;
             int x;
 
@@ -395,7 +440,7 @@ namespace BraneCloud.Evolution.EC.Runtime
             // 3. create the Mersenne Twister random number generators,
             // one per thread
 
-            var random = new MersenneTwisterFast[breedthreads > evalthreads ? breedthreads : evalthreads];
+            var random = new IMersenneTwister[breedthreads > evalthreads ? breedthreads : evalthreads];
             var seeds = new int[random.Length];
 
             var seedMessage = "Seed: ";
@@ -513,7 +558,8 @@ namespace BraneCloud.Evolution.EC.Runtime
         /// <returns></returns>
         public static MersenneTwisterFast PrimeGenerator(MersenneTwisterFast generator)
         {
-            for (var i = 0; i < 624 * 2; i++)
+            // 624 = MersenneTwisterFast.N  which is private duh
+            for (var i = 0; i < 624 * 2 + 1; i++)
                 generator.NextInt();
             return generator;
         }
@@ -532,7 +578,8 @@ namespace BraneCloud.Evolution.EC.Runtime
             {
                 output.Fatal("Seed must exist.", seedParameter, null);
             }
-            else if (V_SEED_TIME.ToUpper().Equals(tmp_s.ToUpper()) || (tmp_s == null && auto)) // BRS : What?
+            //else if (V_SEED_TIME.Equals(tmp_s, StringComparison.InvariantCultureIgnoreCase) || (tmp_s == null && auto))
+            else if (tmp_s == null && auto || V_SEED_TIME.Equals(tmp_s, StringComparison.InvariantCultureIgnoreCase)) // BRS : Just flipped
             {
                 if (tmp_s == null && auto)  // BRS : What?
                     output.WarnOnce("Using automatic determination number of threads, but not all seeds are defined."
@@ -567,6 +614,9 @@ namespace BraneCloud.Evolution.EC.Runtime
         /// </summary>        
         public static void Run(string[] args)
         {
+            // should we print the help message and quit?
+            CheckForHelp(args);
+
             // if we're loading from checkpoint, let's finish out the most recent job
             var state = PossiblyRestoreFromCheckpoint(args);
 

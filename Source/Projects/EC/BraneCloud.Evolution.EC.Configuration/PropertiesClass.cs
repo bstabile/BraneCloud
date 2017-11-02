@@ -354,8 +354,8 @@ namespace BraneCloud.Evolution.EC.Configuration
         public String GetProperty(String key)
         {
             var oval = this[key];
-            var sval = (oval is String) ? ((String)oval).Trim() : null;
-            return ((sval == null) && (Defaults != null)) ? Defaults.GetProperty(key).Trim() : sval;
+            var sval = oval is String ? ((String)oval).Trim() : null;
+            return sval == null && Defaults != null ? Defaults.GetProperty(key).Trim() : sval;
         }
 
         /// <summary>

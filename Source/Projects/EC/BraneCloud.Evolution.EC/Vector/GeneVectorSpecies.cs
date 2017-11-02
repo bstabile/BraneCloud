@@ -36,12 +36,14 @@ namespace BraneCloud.Evolution.EC.Vector
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_GENE = "gene";
 
         #endregion // Constants
         #region Properties
 
-        public VectorGene GenePrototype { get; set; }
+        public Gene GenePrototype { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -50,7 +52,7 @@ namespace BraneCloud.Evolution.EC.Vector
         {
             var def = DefaultBase;
 
-            GenePrototype = (VectorGene)(state.Parameters.GetInstanceForParameterEq(paramBase.Push(P_GENE), def.Push(P_GENE), typeof(VectorGene)));
+            GenePrototype = (Gene)state.Parameters.GetInstanceForParameterEq(paramBase.Push(P_GENE), def.Push(P_GENE), typeof(Gene));
             GenePrototype.Setup(state, paramBase.Push(P_GENE));
 
             // make sure that super.Setup is done AFTER we've loaded our gene prototype.

@@ -16,13 +16,12 @@
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
 
-using System;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 
 namespace BraneCloud.Evolution.EC.App.Tutorial4
 {
-    [ECConfiguration("ec.app.tutorial4.X")]
+    [ECConfiguration("ec.app.tutorial4.func.X")]
     public class X : GPNode
     {
         public override string ToString() { return "x"; }
@@ -39,7 +38,7 @@ namespace BraneCloud.Evolution.EC.App.Tutorial4
         //            individualBase);
         //}
 
-        public override int ExpectedChildren { get { return 0; } }
+        public override int ExpectedChildren => 0;
 
         public override void Eval(IEvolutionState state,
             int thread,
@@ -48,7 +47,7 @@ namespace BraneCloud.Evolution.EC.App.Tutorial4
             GPIndividual individual,
             IProblem problem)
         {
-            var rd = ((DoubleData)(input));
+            var rd = (DoubleData)input;
             rd.x = ((MultiValuedRegression)problem).currentX;
         }
     }

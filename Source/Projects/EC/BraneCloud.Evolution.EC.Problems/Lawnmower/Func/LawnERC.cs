@@ -19,7 +19,6 @@
 using System;
 using System.IO;
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.Evaluation;
 using BraneCloud.Evolution.EC.GP;
 using BraneCloud.Evolution.EC.Util;
 
@@ -44,14 +43,14 @@ namespace BraneCloud.Evolution.EC.Problems.Lawnmower.Func
             // obviously not using the default base for any of this stuff
 
             // load our map coordinates
-            maxx = state.Parameters.GetInt(newbase.Push(LawnmowerProblem.P_X), null, 1);
+            maxx = state.Parameters.GetInt(newbase.Push(Lawnmower.P_X), null, 1);
             if (maxx == 0)
                 state.Output.Error("The width (x dimension) of the lawn must be >0",
-                    newbase.Push(LawnmowerProblem.P_X));
-            maxy = state.Parameters.GetInt(newbase.Push(LawnmowerProblem.P_Y), null, 1);
+                    newbase.Push(Lawnmower.P_X));
+            maxy = state.Parameters.GetInt(newbase.Push(Lawnmower.P_Y), null, 1);
             if (maxy == 0)
                 state.Output.Error("The length (y dimension) of the lawn must be >0",
-                    newbase.Push(LawnmowerProblem.P_X));
+                    newbase.Push(Lawnmower.P_X));
             state.Output.ExitIfErrors();
         }
 

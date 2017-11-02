@@ -147,7 +147,7 @@ namespace BraneCloud.Evolution.EC
                     state.Output.Fatal("Breeding pipeline num-sources value must be > 0", paramBase.Push(P_NUMSOURCES), def.Push(P_NUMSOURCES));
             }
 
-            Sources = new BreedingSource[numsources];
+            Sources = new IBreedingSource[numsources];
 
             for (var x = 0; x < Sources.Length; x++)
             {
@@ -236,10 +236,7 @@ namespace BraneCloud.Evolution.EC
         /// children sources of the pipeline.  If you'd prefer something different,
         /// override this method. 
         /// </summary>
-        public override int TypicalIndsProduced
-        {
-            get { return MinChildProduction; }
-        }
+        public override int TypicalIndsProduced => MinChildProduction;
 
         /// <summary>
         /// Performs direct cloning of n individuals.  if produceChildrenFromSource is true, then...
@@ -289,7 +286,7 @@ namespace BraneCloud.Evolution.EC
         public virtual void IndividualReplaced(SteadyStateEvolutionState state, int subpop, int thread, int individual)
         {
             foreach (var t in Sources)
-                ((ISteadyStateBSource)(t)).IndividualReplaced(state, subpop, thread, individual);
+                ((ISteadyStateBSource)t).IndividualReplaced(state, subpop, thread, individual);
         }
 
         #endregion // Operations

@@ -18,8 +18,10 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks.Dataflow;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Simple;
 
 namespace BraneCloud.Evolution.EC.CoEvolve
 {
@@ -111,6 +113,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
             base.Setup(state, paramBase);
+
             var temp = state.Parameters.GetStringWithDefault(paramBase.Push(P_COMPETE_STYLE), null, "");
             if (temp.ToUpper().Equals("single-elim-tournament".ToUpper()))
             {
@@ -206,13 +209,12 @@ namespace BraneCloud.Evolution.EC.CoEvolve
 
             RandomizeOrder(state, state.Population.Subpops[0].Individuals);
 
-            var prob = (IGroupedProblem)(p_problem.Clone());
+            var prob = (IGroupedProblem)p_problem.Clone();
 
+            prob.PreprocessPopulation(state, state.Population, assessFitness, Style == STYLE_SINGLE_ELIMINATION);
 
-            prob.PreprocessPopulation(state, state.Population, assessFitness, false); // BRS : Should "CountVictoriesOnly" be true or false?
             switch (Style)
             {
-
                 case STYLE_SINGLE_ELIMINATION:
                     EvalSingleElimination(state, state.Population.Subpops[0].Individuals, 0, prob);
                     break;
@@ -225,6 +227,9 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 case STYLE_N_RANDOM_COMPETITORS_TWOWAY:
                     EvalNRandomTwoWay(state, fromThreads, numinds, state.Population.Subpops[0].Individuals, 0, prob);
                     break;
+                //default: // TODO: Is this the desired default? ECJ doesn't specify.
+                //    EvalSingleElimination(state, state.Population.Subpops[0].Individuals, 0, prob);
+                //    break;
             }
 
             prob.PostprocessPopulation(state, state.Population, assessFitness, Style == STYLE_SINGLE_ELIMINATION);
@@ -260,9 +265,9 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 {
                     // if the second individual is better, or coin flip if equal, than we switch them around
                     if (tourn[len - x - 1].Fitness.BetterThan(tourn[x].Fitness) 
-                        || (tourn[len - x - 1].Fitness.EquivalentTo(tourn[x].Fitness) && state.Random[0].NextBoolean()))
+                        || tourn[len - x - 1].Fitness.EquivalentTo(tourn[x].Fitness) && state.Random[0].NextBoolean())
                     {
-                        var temp = tourn[x];
+                        Individual temp = tourn[x];
                         tourn[x] = tourn[len - x - 1];
                         tourn[len - x - 1] = temp;
                     }
@@ -282,39 +287,46 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 EvalRoundRobinPopChunk(state, origins[0], numinds[0], 0, individuals, subpop, prob);
             else
             {
-                var t = new ThreadClass[state.EvalThreads];
-
-                // start up the threads
-                for (var y = 0; y < state.EvalThreads; y++)
-                {
-                    CompetitiveEvaluatorThread r = new RoundRobinCompetitiveEvaluatorThread
-                               {
-                                   ThreadNum = y,
-                                   NumInds = numinds[y],
-                                   From = origins[y],
-                                   Me = this,
-                                   Subpop = subpop,
-                                   State = state,
-                                   p = prob,
-                                   Inds = individuals
-                               };
-                    t[y] = new ThreadClass(new ThreadStart(r.Run));
-                    t[y].Start();
-                }
-
-                // gather the threads
-                for (var y = 0; y < state.EvalThreads; y++)
-                {
-                    try
-                    {
-                        t[y].Join();
-                    }
-                    catch (ThreadInterruptedException)
-                    {
-                        state.Output.Fatal("Whoa! The main evaluation thread got interrupted!  Dying...");
-                    }
-                }
+                ParallelEvaluation<RoundRobinCompetitiveEvaluatorThread>(
+                    state, origins, numinds, individuals, subpop, prob);
             }
+        }
+
+        void ParallelEvaluation<TEvalThread>(
+            IEvolutionState state, 
+            int[] origins, 
+            int[] numinds,
+            Individual[] individuals, 
+            int subpop, 
+            IGroupedProblem prob)
+            where TEvalThread: CompetitiveEvaluatorThread, new()
+        {
+            // BRS: TPL DataFlow is cleaner and safer than using raw threads.
+
+            // Limit the concurrency in case the user has gone overboard!
+            var maxDegree = Math.Min(Environment.ProcessorCount, state.BreedThreads);
+            var options = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = maxDegree };
+
+            Action<CompetitiveEvaluatorThread> act = t => t.Run();
+            var actionBlock = new ActionBlock<CompetitiveEvaluatorThread>(act, options);
+
+            for (var i = 0; i < state.EvalThreads; i++)
+            {
+                var runnable = new TEvalThread
+                {
+                    ThreadNum = i,
+                    State = state,
+                    Subpop = subpop,
+                    NumInds = numinds[i],
+                    From = origins[i],
+                    Problem = prob,
+                    Evaluator = this,
+                    Inds = individuals
+                };
+                actionBlock.Post(runnable);
+            }
+            actionBlock.Complete();
+            actionBlock.Completion.Wait();
         }
 
         /// <summary> 
@@ -353,38 +365,8 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 EvalNRandomOneWayPopChunk(state, origins[0], numinds[0], 0, individuals, subpop, prob);
             else
             {
-                var t = new ThreadClass[state.EvalThreads];
-
-                // start up the threads
-                for (var y = 0; y < state.EvalThreads; y++)
-                {
-                    CompetitiveEvaluatorThread r = new NRandomOneWayCompetitiveEvaluatorThread
-                                   {
-                                       ThreadNum = y,
-                                       NumInds = numinds[y],
-                                       From = origins[y],
-                                       Subpop = subpop,
-                                       Me = this,
-                                       State = state,
-                                       p = prob,
-                                       Inds = individuals
-                                   };
-                    t[y] = new ThreadClass(new ThreadStart(r.Run));
-                    t[y].Start();
-                }
-
-                // gather the threads
-                for (var y = 0; y < state.EvalThreads; y++)
-                {
-                    try
-                    {
-                        t[y].Join();
-                    }
-                    catch (ThreadInterruptedException)
-                    {
-                        state.Output.Fatal("Whoa! The main evaluation thread got interrupted!  Dying...");
-                    }
-                }
+                ParallelEvaluation<NRandomOneWayCompetitiveEvaluatorThread>(
+                    state, origins, numinds, individuals, subpop, prob);
             }
         }
 
@@ -429,38 +411,8 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 EvalNRandomTwoWayPopChunk(state, origins[0], numinds[0], 0, individuals, subpop, prob);
             else
             {
-                var t = new ThreadClass[state.EvalThreads];
-
-                // start up the threads
-                for (var y = 0; y < state.EvalThreads; y++)
-                {
-                    CompetitiveEvaluatorThread r = new NRandomTwoWayCompetitiveEvaluatorThread
-                               {
-                                   ThreadNum = y,
-                                   NumInds = numinds[y],
-                                   From = origins[y],
-                                   Me = this,
-                                   Subpop = subpop,
-                                   State = state,
-                                   p = prob,
-                                   Inds = individuals
-                               };
-                    t[y] = new ThreadClass(new ThreadStart(r.Run));
-                    t[y].Start();
-                }
-
-                // gather the threads
-                for (var y = 0; y < state.EvalThreads; y++)
-                {
-                    try
-                    {
-                        t[y].Join();
-                    }
-                    catch (ThreadInterruptedException)
-                    {
-                        state.Output.Fatal("Whoa! The main evaluation thread got interrupted!  Dying...");
-                    }
-                }
+                ParallelEvaluation<NRandomTwoWayCompetitiveEvaluatorThread>(
+                    state, origins, numinds, individuals, subpop, prob);
             }
         }
 
@@ -632,12 +584,14 @@ namespace BraneCloud.Evolution.EC.CoEvolve
 
     abstract class CompetitiveEvaluatorThread : IThreadRunnable
     {
+        protected object SyncLock = new object();
+
         public int NumInds;
         public int From;
-        public CompetitiveEvaluator Me;
+        public CompetitiveEvaluator Evaluator;
         public IEvolutionState State;
         public int ThreadNum;
-        public IGroupedProblem p;
+        public IGroupedProblem Problem;
         public int Subpop;
         public Individual[] Inds;
 
@@ -648,9 +602,9 @@ namespace BraneCloud.Evolution.EC.CoEvolve
     {
         public override void Run()
         {
-            lock (this)
+            lock (SyncLock)
             {
-                Me.EvalRoundRobinPopChunk(State, From, NumInds, ThreadNum, Inds, Subpop, p);
+                Evaluator.EvalRoundRobinPopChunk(State, From, NumInds, ThreadNum, Inds, Subpop, Problem);
             }
         }
     }
@@ -658,9 +612,9 @@ namespace BraneCloud.Evolution.EC.CoEvolve
     {
         public override void Run()
         {
-            lock (this)
+            lock (SyncLock)
             {
-                Me.EvalNRandomOneWayPopChunk(State, From, NumInds, ThreadNum, Inds, Subpop, p);
+                Evaluator.EvalNRandomOneWayPopChunk(State, From, NumInds, ThreadNum, Inds, Subpop, Problem);
             }
         }
     }
@@ -668,9 +622,9 @@ namespace BraneCloud.Evolution.EC.CoEvolve
     {
         public override void Run()
         {
-            lock (this)
+            lock (SyncLock)
             {
-                Me.EvalNRandomTwoWayPopChunk(State, From, NumInds, ThreadNum, Inds, Subpop, p);
+                Evaluator.EvalNRandomTwoWayPopChunk(State, From, NumInds, ThreadNum, Inds, Subpop, Problem);
             }
         }
     }

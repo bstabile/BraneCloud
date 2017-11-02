@@ -37,7 +37,7 @@ namespace BraneCloud.Evolution.EC.App.Lawnmower
                                                     Assembly.GetAssembly(typeof(Lawnmower))
                                                 });
 
-            Evolve.Run(new[] { "-file", @"Params\App\Lawnmower\ge.params" });
+            Evolve.Run(new[] { "-file", @"Params\App\Lawnmower\adf.params" });
             Console.WriteLine("\nDone!");
             Console.ReadLine();
         }

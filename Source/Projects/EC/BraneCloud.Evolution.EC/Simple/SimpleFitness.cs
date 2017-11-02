@@ -79,7 +79,7 @@ namespace BraneCloud.Evolution.EC.Simple
             _isIdeal = isIdeal;
         }
 
-        public void SetToMeanOf(IEvolutionState state, IFitness[] fitnesses)
+        public override void SetToMeanOf(IEvolutionState state, IFitness[] fitnesses)
         {
             // this is not numerically stable.  Perhaps we should have a numerically stable algorithm for sums
             // we're presuming it's not a very large number of elements, so it's probably not a big deal,
