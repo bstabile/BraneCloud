@@ -110,8 +110,9 @@ namespace BraneCloud.Evolution.EC.GP.Koza
 
             // pick a terminal when we're at max depth or if there are NO nonterminals
             if ((current + 1 >= max || WarnAboutNonterminal(nonterminals.Length == 0, type, false, state))
-                                                    && (triedTerminals = true) && terminals.Length != 0)
-            // AND if there are available terminals
+                                                    // this will freak out the static checkers
+                                                    && (triedTerminals = true) // [first set triedTerminals]
+                                                    && terminals.Length != 0)  // AND if there are available terminals
             {
                 var n = terminals[state.Random[thread].NextInt(terminals.Length)].LightClone();
                 n.ResetNode(state, thread); // give ERCs a chance to randomize
@@ -159,16 +160,18 @@ namespace BraneCloud.Evolution.EC.GP.Koza
             var triedTerminals = false;
 
             var t = type.Type;
-            var terminals = funcs.Terminals[t];
-            //var nonterminals = funcs.Nonterminals[t];
-            var nodes = funcs.Nodes[t];
+            GPNode[] terminals = funcs.Terminals[t];
+            //GPNode[] nonterminals = funcs.Nonterminals[t];
+            GPNode[] nodes = funcs.Nodes[t];
 
             if (nodes.Length == 0)
                 ErrorAboutNoNodeWithType(type, state); // total failure
 
             // pick a terminal when we're at max depth or if there are NO nonterminals
-            if ((current + 1 >= max) && (triedTerminals = true) && terminals.Length != 0)
-            // AND if there are available terminals
+            if (current + 1 >= max
+                // this will freak out the static checkers
+                && (triedTerminals = true) // [first set triedTerminals]
+                && terminals.Length != 0)  // AND if there are available terminals
             {
                 var n = terminals[state.Random[thread].NextInt(terminals.Length)].LightClone();
                 n.ResetNode(state, thread); // give ERCs a chance to randomize

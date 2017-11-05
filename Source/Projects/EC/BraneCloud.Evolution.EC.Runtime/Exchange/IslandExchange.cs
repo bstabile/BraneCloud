@@ -69,7 +69,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
     /// reports this to the server.  After everyone has hooked up, the server tells
     /// the clients to begin evolution, and they're off and Running.
     /// 
-    /// <p/>Islands send emigrants to other islands by copying good individuals
+    /// <p/>Islands send immigrants to other islands by copying good individuals
     /// (selected with a SelectionMethod) and sending the good individuals to
     /// the Mailboxes of receiving clients.  Once an individual has been received,
     /// it is considered to be unevaluated by the receiving island, even though 
@@ -86,10 +86,10 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
     /// which patiently sits waiting for more individuals.
     /// 
     /// <p/>Clients may also be given different start times and Modulos for 
-    /// migrating.  For example, client A might be told that he begins sending emigrants
-    /// only after generation 6, and then sends emigrants on every 4 generations beyond
+    /// migrating.  For example, client A might be told that he begins sending immigrants
+    /// only after generation 6, and then sends immigrants on every 4 generations beyond
     /// that.  The purpose for the start times and Modulos is so that not every client
-    /// sends emigrants at the same time; this also makes better use of network bandwidth.
+    /// sends immigrants at the same time; this also makes better use of network bandwidth.
     /// 
     /// <p/>When a client goes down, the other clients deal with it gracefully; they
     /// simply stop trying to send to it.  But if the server goes down, the clients
@@ -195,12 +195,12 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
     /// <tr><td valign="top"><tt><i>base</i>.start</tt><br/>
     /// <font size="-1">bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
     /// <td valign="top">
-    /// <i>server</i>: (Only if island model is Synchronous) The generation when islands begin sending emigrants.
+    /// <i>server</i>: (Only if island model is Synchronous) The generation when islands begin sending immigrants.
     /// </td></tr>
     /// <tr><td valign="top"><tt><i>base</i>.mod</tt><br/>
     /// <font size="-1">bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
     /// <td valign="top">
-    /// <i>server</i>: (Only if island model is Synchronous) The number of generations islands wait between sending emigrants.
+    /// <i>server</i>: (Only if island model is Synchronous) The number of generations islands wait between sending immigrants.
     /// </td></tr>
     /// <tr><td valign="top"><tt><i>base</i>.num-islands</tt><br/>
     /// <font size="-1">int >= 1</font></td>
@@ -215,27 +215,27 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
     /// <tr><td valign="top"><tt><i>base</i>.island.<i>n</i>.num-mig</tt><br/>
     /// <font size="-1">int >= 1</font></td>
     /// <td valign="top">
-    /// <i>server</i>: The number of islands that island #n sends emigrants to.
+    /// <i>server</i>: The number of islands that island #n sends immigrants to.
     /// </td></tr>
     /// <tr><td valign="top"><tt><i>base</i>.island.<i>n</i>.mig.</tt><i>m</i><br/>
     /// <font size="-1">int >= 1</font></td>
     /// <td valign="top">
-    /// <i>server</i>: The ID of island #m that island #n sends emigrants to.
+    /// <i>server</i>: The ID of island #m that island #n sends immigrants to.
     /// </td></tr>
     /// <tr><td valign="top"><tt><i>base</i>.island.<i>n</i>.size</tt><br/>
     /// <font size="-1">int >= 1</font></td>
     /// <td valign="top">
-    /// <i>server</i>: The number of emigrants (per subpop) that island #n sends to other islands.
+    /// <i>server</i>: The number of immigrants (per subpop) that island #n sends to other islands.
     /// </td></tr>
     /// <tr><td valign="top"><tt><i>base</i>.island.<i>n</i>.start</tt><br/>
     /// <font size="-1">int >= 0</font></td>
     /// <td valign="top">
-    /// <i>server</i>: The generation when island #n begins sending emigrants.
+    /// <i>server</i>: The generation when island #n begins sending immigrants.
     /// </td></tr>
     /// <tr><td valign="top"><tt><i>base</i>.island.<i>n</i>.mod</tt><br/>
     /// <font size="-1">int >= 1</font></td>
     /// <td valign="top">
-    /// <i>server</i>: The number of generations that island #n waits between sending emigrants.
+    /// <i>server</i>: The number of generations that island #n waits between sending immigrants.
     /// </td></tr>
     /// <tr><td valign="top"><tt><i>base</i>.island.<i>n</i>.Mailbox-capacity</tt><br/>
     /// <font size="-1">int >= 1</font></td>
@@ -395,7 +395,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         public bool CompressedCommunication { get; set; }
 
         /// <summary>
-        /// The selection method for emigrants 
+        /// The selection method for immigrants 
         /// </summary>
         /// <remarks>This needs to be serialized.</remarks>
         public SelectionMethod ImmigrantsSelectionMethod { get; set; }
@@ -806,7 +806,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
             // be a new population that I created fresh, or I could modify
             // the existing population and return that.
 
-            // else, check whether the emigrants need to be sent
+            // else, check whether the immigrants need to be sent
             if ((state.Generation >= Offset) && ((Modulo == 0) || (((state.Generation - Offset) % Modulo) == 0)))
             {
 
@@ -822,7 +822,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                         {
 
                             if (Chatty)
-                                state.Output.Message("Sending " + Size + " emigrants to island " + OutgoingIds[x]);
+                                state.Output.Message("Sending " + Size + " immigrants to island " + OutgoingIds[x]);
 
                             // for each of the subpops
                             for (var subpop = 0; subpop < state.Population.Subpops.Length; subpop++)
@@ -835,13 +835,14 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                                 // send different numbers of individuals
                                 OutWriters[x].Write(Size);
 
-                                // select "Size" individuals and send then to the destination as emigrants
+                                // select "Size" individuals and send then to the destination as immigrants
                                 ImmigrantsSelectionMethod.PrepareToProduce(state, subpop, 0);
                                 for (var y = 0; y < Size; y++)
                                 // send all necesary individuals
                                 {
                                     var index = ImmigrantsSelectionMethod.Produce(subpop, state, 0);
-                                    state.Population.Subpops[subpop].Individuals[index].WriteIndividual(state, OutWriters[x]);
+                                    Process(state, 0, OutgoingIds[x], subpop, state.Population.Subpops[subpop].Individuals[index]).WriteIndividual(state, OutWriters[x]);
+                                    // TODO -- should we move this to the end?
                                     OutWriters[x].Flush(); // just in case the individuals didn't do a PrintLn
                                 }
                                 ImmigrantsSelectionMethod.FinishProducing(state, subpop, 0); // end the selection step
@@ -935,7 +936,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                         IndsToDieSelectionMethod.FinishProducing(state, x, 0);
 
                         // there is no need to check for the differences in size: the Mailbox.immigrants,
-                        // state.Population.Subpops and the Mailbox.person2die should have the same size
+                        // state.Population.Subpops and the Mailbox.nextIndexPosition should have the same size
                         for (var y = 0; y < Mailbox.NumImmigrants[x]; y++)
                         {
 
@@ -985,8 +986,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                 // (this is the only message the server sends right now), and it should set the flag
                 // for exiting next time when in this procedure
                 var ww = FromServer.ReadString();
-                if (ww != null || AlreadyReadGoodBye)
-                // FOUND message sent from the server
+                if (AlreadyReadGoodBye) // FOUND message sent from the server
                 {
                     // we should exit because some other individual has
                     // found the perfect fit individual
@@ -1028,7 +1028,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
 
         /// <summary>
         /// Closes contacts with other processes, if that's what you're doing.  
-        /// Called at the end of an evolutionary run. result is either 
+        /// Called at the end of an evolutionary run. Result is either 
         /// ec.EvolutionState.R_SUCCESS or ec.EvolutionState.R_FAILURE, 
         /// indicating whether or not an ideal individual was found. 
         /// </summary>

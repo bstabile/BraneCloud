@@ -119,6 +119,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
         public const string P_EVALCOMPRESSION = "eval.compression";
         public const string P_RETURNINDIVIDUALS = "eval.return-inds";
 
+        public const string P_SILENT = "eval.slave.silent";
         public const string P_MUZZLE = "eval.slave.muzzle";
 
         public const byte V_NOTHING = 0;
@@ -152,6 +153,9 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
         /// </summary>
         public const int SLEEP_TIME = 100;
 
+        /** My unique slave number. At present this is just used to define a unique name. */
+        public static int SlaveNum = -1;
+
         #endregion // Constants
         #region Static
 
@@ -170,7 +174,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
         public static void EvaluateSimpleProblem(IEvolutionState state, bool returnIndividuals,
                                                      BinaryReader dataIn, BinaryWriter dataOut, string[] args)
         {
-            ParameterDatabase parameters = null;
+            IParameterDatabase parameters = null;
 
             // first load the individuals
             var numInds = 1;
@@ -228,8 +232,6 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
             var inds = new Individual[numInds];
             var indForThread = new int[numInds];
 
-           //int t = 0; // thread index
-
             try
             {
                 // BRS: TPL DataFlow BEGIN
@@ -268,31 +270,6 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                 }
                 // BRS: TPL DataFlow END
 
-                //    // start up all the threads
-                //    for (var i = 0; i < numInds; i++)
-                //    {
-                //        // may throw IOException here
-                //        inds[i] = state.Population.Subpops[subpops[i]].Species.NewIndividual(state, dataIn);
-                //        updateFitness[i] = dataIn.ReadBoolean();
-
-                //        // fire up evaluation thread on individual
-                //        if (t >= state.EvalThreads) t = 0;       // we can only be here if evalthreads > numInds
-                //        if (tasks[t] != null)
-                //        {
-                //            pool.joinAndReturn(threads[t]);  // ran out of threads, wait for new ones
-                //            returnIndividualsToMaster(state, inds, updateFitness, dataOut, returnIndividuals, indForThread[t]);  // return just that individual
-                //        }
-                //        if (problems[t] == null) problems[t] = ((SimpleProblemForm)(state.evaluator.p_problem.clone()));
-
-                //        final int j = i;
-                //        final int s = t;
-                //        indForThread[t] = i;
-                //        threads[t] = pool.startThread("Evaluation of individual " + i, new Runnable()
-                //        {
-                //            public void run() { problems[s].evaluate(state, inds[j], subpops[j], 0); }
-                //    });
-                //    t++;
-                //}
             }
             catch (IOException e)
             {
@@ -550,8 +527,15 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
 
             var returnIndividuals = parameters.GetBoolean(new Parameter(P_RETURNINDIVIDUALS), null, false);
 
-            // 5.5 should we muzzle?
-            bool muzzle = parameters.GetBoolean(new Parameter(P_MUZZLE), null, false);
+            // 5.5 should we silence the whole thing?
+
+            bool silent = parameters.GetBoolean(new Parameter(P_SILENT), null, false);
+
+            if (parameters.ParameterExists(new Parameter(P_MUZZLE), null))
+                Output.InitialWarning("" + new Parameter(P_MUZZLE) + " has been deprecated.  We suggest you use " +
+                                      new Parameter(P_SILENT) + " or similar newer options.");
+            silent = silent || parameters.GetBoolean(new Parameter(P_MUZZLE), null, false);
+
 
             // 6. Open a server socket and listen for requests
             var slaveName = parameters.GetString(new Parameter(P_EVALSLAVENAME), null);
@@ -581,7 +565,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     // This was originally part of the InitialError call in ECJ. But we make Slave responsible.
             }
 
-            if (!muzzle)
+            if (!silent)
             {
                 Output.InitialMessage("ECCS Slave");
                 if (RunEvolve)
@@ -600,7 +584,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                 try
                 {
                     long connectAttemptCount = 0;
-                    if (!muzzle)
+                    if (!silent)
                         Output.InitialMessage("Connecting to master at " + masterHost + ":" + masterPort);
 
                     while (true)
@@ -623,7 +607,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                             }
                         }
                     }
-                    if (!muzzle)
+                    if (!silent)
                         Output.InitialMessage("Connected to master after " + (connectAttemptCount*SLEEP_TIME) + " ms");
 
                     BinaryReader dataIn = null;
@@ -645,13 +629,11 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                             tmpOut = Output.MakeCompressingOutputStream(tmpOut);
                             if (tmpIn == null || tmpOut == null)
                             {
-                                if (!muzzle)
-                                    Output.InitialError(
-                                    "You do not appear to have JZLib installed on your system, and so must set eval.compression=false.  "
-                                    + "To get JZLib, download from the ECJ website or from http://www.jcraft.com/jzlib/",
-                                    false);
-                                Environment.Exit(1);
-                                    // This was originally part of the InitialError call in ECJ. But we make Slave responsible.
+                                var err = "You do not appear to have JZLib installed on your system, and so must set eval.compression=false.  "
+                                          + "To get JZLib, download from the ECJ website or from http://www.jcraft.com/jzlib/";
+                                if (!silent)
+                                    Output.InitialMessage(err);
+                                throw new OutputExitException(err);
                             }
                         }
 
@@ -660,10 +642,10 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     }
                     catch (IOException e)
                     {
-                        if (!muzzle)
-                            Output.InitialError("Unable to open input stream from socket:\n" + e, false);
-                        Environment.Exit(1);
-                            // This was originally part of the InitialError call in ECJ. But we make Slave responsible.
+                        var err = "Unable to open input stream from socket:\n" + e;
+                        if (!silent)
+                            Output.InitialMessage(err);
+                        throw new OutputExitException(err);
                     }
 
                     // specify the slaveName
@@ -671,7 +653,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     {
                         // BRS : TODO : Check equivalence of the address returned from .NET socket.Client.LocalEndPoint
                         slaveName = socket.Client.LocalEndPoint + "/" + (DateTime.Now.Ticks - 621355968000000000)/10000;
-                        if (!muzzle)
+                        if (!silent)
                             Output.InitialMessage("No slave name specified.  Using: " + slaveName);
                     }
 
@@ -694,13 +676,13 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     output.AddLog(Log.D_STDOUT, false);
                     output.AddLog(Log.D_STDERR, true);
 
-                    if (muzzle)
+                    if (silent)
                     {
-                        output.GetLog(0).Muzzle = true;
-                        output.GetLog(1).Muzzle = true;
+                        output.GetLog(0).Silent = true;
+                        output.GetLog(1).Silent = true;
                     }
 
-                    if (!muzzle) output.SystemMessage(ECVersion.Message());
+                    if (!silent) output.SystemMessage(ECVersion.Message());
 
 
                     // 2. set up thread values
@@ -806,7 +788,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     {
                         if (state != null)
                             state.Output.Fatal(e.Message);
-                        else if (!muzzle) Console.Error.WriteLine("FATAL ERROR (EvolutionState not created yet): " + e.Message);
+                        else if (!silent) Console.Error.WriteLine("FATAL ERROR (EvolutionState not created yet): " + e.Message);
                     }
                 }
                 catch (OutputExitException e)
@@ -837,7 +819,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     Console.Error.WriteLine(e);
                     if (OneShot) Environment.Exit(0);
                 }
-                if (!muzzle) Output.InitialMessage("\n\nResetting...");
+                if (!silent) Output.InitialMessage("\n\nResetting Slave");
             }
         }
 

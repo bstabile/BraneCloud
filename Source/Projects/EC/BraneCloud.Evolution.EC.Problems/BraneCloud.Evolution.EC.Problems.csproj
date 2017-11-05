@@ -271,7 +271,6 @@
     <Compile Include="Regression\RegressionData.cs" />
     <Compile Include="Regression\Sextic.cs" />
     <Compile Include="Sat\SAT.cs" />
-    <Compile Include="Spatial\ECSuite.cs" />
     <Compile Include="Sum\Sum.cs" />
     <Compile Include="Tutorial1\MaxOnes.cs" />
     <Compile Include="Tutorial1\MyEvolve.cs" />
@@ -302,6 +301,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Async\" />
+    <Folder Include="Spatial\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Projects\EC\BraneCloud.Evolution.EC.Configuration\BraneCloud.Evolution.EC.Configuration.csproj">

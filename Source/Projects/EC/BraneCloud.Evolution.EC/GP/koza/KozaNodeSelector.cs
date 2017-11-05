@@ -44,15 +44,15 @@ namespace BraneCloud.Evolution.EC.GP.Koza
     /// <p/><b>Parameters</b><br/>
     /// <table>
     /// <tr><td valign="top"><i>base</i>.<tt>terminals</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0,<br/>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0,<br/>
     /// nonterminals + terminals + root &lt;= 1.0</font></td>
     /// <td valign="top">(the probability we must pick a terminal)</td></tr>
     /// <tr><td valign="top"><i>base</i>.<tt>nonterminals</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0,<br/>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0,<br/>
     /// nonterminals + terminals + root &lt;= 1.0</font></td>
     /// <td valign="top">(the probability we must pick a nonterminal if possible)</td></tr>
     /// <tr><td valign="top"><i>base</i>.<tt>root</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0,<br/>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0,<br/>
     /// nonterminals + terminals + root &lt;= 1.0</font></td>
     /// <td valign="top">(the probability we must pick the root)</td></tr>
     /// </table>
@@ -73,25 +73,22 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         #endregion // Constants
         #region Properties
 
-        public virtual IParameter DefaultBase
-        {
-            get { return GPKozaDefaults.ParamBase.Push(P_NODESELECTOR); }
-        }
+        public virtual IParameter DefaultBase => GPKozaDefaults.ParamBase.Push(P_NODESELECTOR); 
 
         /// <summary>
         /// The probability the root must be chosen 
         /// </summary>
-        public float RootProbability { get; set; }
+        public double RootProbability { get; set; }
 
         /// <summary>
         /// The probability a terminal must be chosen 
         /// </summary>
-        public float TerminalProbability { get; set; }
+        public double TerminalProbability { get; set; }
 
         /// <summary>
         /// The probability a nonterminal must be chosen. 
         /// </summary>
-        public float NonterminalProbability { get; set; }
+        public double NonterminalProbability { get; set; }
 
         /// <summary>
         /// The number of nonterminals in the tree, -1 if unknown. 
@@ -119,7 +116,6 @@ namespace BraneCloud.Evolution.EC.GP.Koza
 
         public KozaNodeSelector()
         {
-            Gatherer = new GPNodeGatherer();
             Reset();
         }
 
@@ -127,28 +123,28 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         {
             var def = DefaultBase;
 
-            TerminalProbability = state.Parameters.GetFloatWithMax(
+            TerminalProbability = state.Parameters.GetDoubleWithMax(
                 paramBase.Push(P_TERMINAL_PROBABILITY), def.Push(P_TERMINAL_PROBABILITY), 0.0, 1.0);
 
-            if (TerminalProbability == -1.0)
+            if (TerminalProbability.Equals(-1.0))
                 state.Output.Fatal("Invalid terminal probability for KozaNodeSelector ",
                     paramBase.Push(P_TERMINAL_PROBABILITY), def.Push(P_TERMINAL_PROBABILITY));
 
-            NonterminalProbability = state.Parameters.GetFloatWithMax(
+            NonterminalProbability = state.Parameters.GetDoubleWithMax(
                 paramBase.Push(P_NONTERMINAL_PROBABILITY), def.Push(P_NONTERMINAL_PROBABILITY), 0.0, 1.0);
 
-            if (NonterminalProbability == -1.0)
+            if (NonterminalProbability.Equals(-1.0))
                 state.Output.Fatal("Invalid nonterminal probability for KozaNodeSelector ",
                     paramBase.Push(P_NONTERMINAL_PROBABILITY), def.Push(P_NONTERMINAL_PROBABILITY));
 
-            RootProbability = state.Parameters.GetFloatWithMax(
+            RootProbability = state.Parameters.GetDoubleWithMax(
                 paramBase.Push(P_ROOT_PROBABILITY), def.Push(P_ROOT_PROBABILITY), 0.0, 1.0);
 
-            if (RootProbability == -1.0)
+            if (RootProbability.Equals(-1.0))
                 state.Output.Fatal("Invalid root probability for KozaNodeSelector ",
                     paramBase.Push(P_ROOT_PROBABILITY), def.Push(P_ROOT_PROBABILITY));
 
-            if (RootProbability + TerminalProbability + NonterminalProbability > 1.0f)
+            if (RootProbability + TerminalProbability + NonterminalProbability > 1.0)
             {
                 state.Output.Fatal("The terminal, nonterminal, and root for KozaNodeSelector"
                     + paramBase + " may not sum to more than 1.0. (" + TerminalProbability + " "
@@ -168,7 +164,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
 
         public virtual GPNode PickNode(IEvolutionState s, int subpop, int thread, GPIndividual ind, GPTree tree)
         {
-            var rnd = s.Random[thread].NextFloat();
+            var rnd = s.Random[thread].NextDouble();
 
             if (rnd > NonterminalProbability + TerminalProbability + RootProbability)
             // pick anyone
@@ -176,8 +172,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
                 if (Nodes == -1)
                     Nodes = tree.Child.NumNodes(GPNode.NODESEARCH_ALL);
                 {
-                    tree.Child.NodeInPosition(s.Random[thread].NextInt(Nodes), Gatherer, GPNode.NODESEARCH_ALL);
-                    return Gatherer.Node;
+                    return tree.Child.NodeInPosition(s.Random[thread].NextInt(Nodes), GPNode.NODESEARCH_ALL);
                 }
             }
             if (rnd > NonterminalProbability + TerminalProbability)
@@ -191,8 +186,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
                 if (Terminals == -1)
                     Terminals = tree.Child.NumNodes(GPNode.NODESEARCH_TERMINALS);
 
-                tree.Child.NodeInPosition(s.Random[thread].NextInt(Terminals), Gatherer, GPNode.NODESEARCH_TERMINALS);
-                return Gatherer.Node;
+                return tree.Child.NodeInPosition(s.Random[thread].NextInt(Terminals), GPNode.NODESEARCH_TERMINALS);
             }
             // pick nonterminals if you can
 
@@ -201,8 +195,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
             if (Nonterminals > 0)
             // there are some nonterminals
             {
-                tree.Child.NodeInPosition(s.Random[thread].NextInt(Nonterminals), Gatherer, GPNode.NODESEARCH_NONTERMINALS);
-                return Gatherer.Node;
+                return tree.Child.NodeInPosition(s.Random[thread].NextInt(Nonterminals), GPNode.NODESEARCH_NONTERMINALS);
             }
             // there ARE no nonterminals!  It must be the root node
 
@@ -216,9 +209,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         {
             try
             {
-                var s = (KozaNodeSelector)MemberwiseClone();
-                // allocate a new gatherer, so we're always threadsafe
-                s.Gatherer = new GPNodeGatherer();
+                var s = (KozaNodeSelector) MemberwiseClone();
                 s.Reset();
                 return s;
             }

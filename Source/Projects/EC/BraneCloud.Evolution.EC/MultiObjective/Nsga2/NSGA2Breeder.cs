@@ -53,6 +53,10 @@ namespace BraneCloud.Evolution.EC.MultiObjective.NSGA2
                     state.Output.Warning("You're using elitism with NSGA2Breeder, which is not permitted and will be ignored.  However the reevaluate-elites parameter *will* bre recognized by NSGAEvaluator.",
                         paramBase.Push(P_ELITE).Push("" + i));
 
+            for (int i = 0; i < state.Population.Subpops.Length; i++)
+                if (ReduceBy[i] != 0)
+                    state.Output.Fatal("NSGA2Breeder does not support population reduction.", paramBase.Push(P_REDUCE_BY).Push("" + i), null);
+
 
             if (SequentialBreeding) // uh oh, haven't tested with this
                 state.Output.Fatal("NSGA2Breeder does not support sequential evaluation.",
@@ -88,8 +92,8 @@ namespace BraneCloud.Evolution.EC.MultiObjective.NSGA2
                 oldSubpop = oldPop.Subpops[i];
                 newSubpop = newPop.Subpops[i];
                 var combinedInds = new Individual[oldSubpop.Individuals.Length + newSubpop.Individuals.Length];
-                Array.Copy(newSubpop.Individuals, i, combinedInds, i, newSubpop.Individuals.Length);
-                Array.Copy(oldSubpop.Individuals, i, combinedInds, newSubpop.Individuals.Length, oldSubpop.Individuals.Length);
+                Array.Copy(newSubpop.Individuals, 0, combinedInds, 0, newSubpop.Individuals.Length);
+                Array.Copy(oldSubpop.Individuals, 0, combinedInds, newSubpop.Individuals.Length, oldSubpop.Individuals.Length);
                 newSubpop.Individuals = combinedInds;
             }
             return newPop;

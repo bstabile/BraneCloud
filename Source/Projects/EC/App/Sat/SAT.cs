@@ -38,6 +38,7 @@ namespace BraneCloud.Evolution.EC.App.Sat
     [ECConfiguration("ec.app.sat.SAT")]
     public class SAT : Problem, ISimpleProblem
     {
+        private const long SerialVersionUID = 1;
 
         public const string P_FILENAME = "sat-filename";
 
@@ -46,36 +47,42 @@ namespace BraneCloud.Evolution.EC.App.Sat
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
             base.Setup(state, paramBase);
-            var fileName = state.Parameters.GetString(paramBase.Push(P_FILENAME), null);
+            FileInfo fi = state.Parameters.GetFile(paramBase.Push(P_FILENAME), null);
+            if (fi == null)  // uh oh
+                state.Output.Fatal("Filename must be provided", paramBase.Push(P_FILENAME));
 
-            try
+            using (var stream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
+            using (var reader = new StreamReader(stream))
             {
-                var inFile = new StreamReader(fileName);
-                var line = "";
-                var cnt = 0;
-                var start = false;
-                while ((line = inFile.ReadLine()) != null)
+                try
                 {
-                    if (start)
-                    {
-                        _formula[cnt++] = new Clause(line);
-                        continue;
-                    }
 
-                    if (line.StartsWith("p"))
+                    var line = "";
+                    var cnt = 0;
+                    var start = false;
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        start = true;
-                        line = line.Trim();
-                        var index = line.LastIndexOf(" ");
-                        _formula = new Clause[Int32.Parse(line.Substring(index + 1))];
+                        if (start)
+                        {
+                            _formula[cnt++] = new Clause(line);
+                            continue;
+                        }
+
+                        if (line.StartsWith("p"))
+                        {
+                            start = true;
+                            line = line.Trim();
+                            var index = line.LastIndexOf(" ");
+                            _formula = new Clause[Int32.Parse(line.Substring(index + 1))];
+                        }
                     }
+                    reader.Close();
                 }
-                inFile.Close();
-            }
-            catch (IOException e)
-            {
-                state.Output.Fatal("Error in SAT Setup, while loading from file " + fileName +
-                    "\nFrom parameter " + paramBase.Push(P_FILENAME) + "\nError:\n" + e);
+                catch (IOException e)
+                {
+                    state.Output.Fatal("Error in SAT Setup, while loading from file " + fi.FullName +
+                                       "\nFrom parameter " + paramBase.Push(P_FILENAME) + "\nError:\n" + e);
+                }
             }
         }
 
@@ -94,7 +101,7 @@ namespace BraneCloud.Evolution.EC.App.Sat
             for (var i = 0; i < _formula.Length; i++)
                 fitness += _formula[i].Eval(ind2);
 
-            ((SimpleFitness)(ind2.Fitness)).SetFitness(state, (float)fitness, false);
+            ((SimpleFitness)ind2.Fitness).SetFitness(state, fitness, false);
             ind2.Evaluated = true;
         }
 
@@ -103,8 +110,11 @@ namespace BraneCloud.Evolution.EC.App.Sat
         /// Private helper class holding a single clause in the boolean formula. Each clause 
         /// is a disjunction of boolean variables (or their negation).
         /// </summary>
+        [Serializable]
         public class Clause
         {
+            private const long SerialVersionUID = 1;
+
             readonly int[] _variables;
             public Clause(String c)
             {
@@ -120,12 +130,10 @@ namespace BraneCloud.Evolution.EC.App.Sat
             /// Evaluates the individual with the clause.  Returns 1 is clase is satisfiabile, 0 otherwise.
             /// </summary>
             /// <param name="ind"></param>
-            /// <returns></returns>
             public int Eval(BitVectorIndividual ind)
             {
-                for (var i = 0; i < _variables.Length; i++)
+                foreach (var x in _variables)
                 {
-                    var x = _variables[i];
                     bool tmp;
                     if (x < 0)
                         tmp = !ind.genome[-x - 1];

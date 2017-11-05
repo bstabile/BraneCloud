@@ -257,7 +257,7 @@ namespace BraneCloud.Evolution.EC.GP
                 GPFunctionSet c;
                 // Figure the GPFunctionSet class
                 if (state.Parameters.ParameterExists(paramBase.Push("" + y), null))
-                    c = (GPFunctionSet) (state.Parameters.GetInstanceForParameterEq(paramBase.Push("" + y), null, typeof(GPFunctionSet)));
+                    c = (GPFunctionSet) state.Parameters.GetInstanceForParameterEq(paramBase.Push("" + y), null, typeof(GPFunctionSet));
                 else
                 {
                     state.Output.Message("No GPFunctionSet specified, assuming the default class: ec.gp.GPFunctionSet for " + paramBase.Push("" + y));

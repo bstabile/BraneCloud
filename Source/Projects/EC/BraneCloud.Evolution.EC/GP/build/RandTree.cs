@@ -35,7 +35,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
         #endregion // Constants
         #region Static
 
-        private class ArityObject
+        public class ArityObject
         {
             public readonly int Arity;
             public ArityObject(int a)
@@ -204,10 +204,8 @@ namespace BraneCloud.Evolution.EC.GP.Build
         #endregion // Static
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPBuildDefaults.ParamBase.Push(P_RANDOMBRANCH); }
-        }
+        public override IParameter DefaultBase => GPBuildDefaults.ParamBase.Push(P_RANDOMBRANCH); 
+        
 
         public int[] Arities { get; set; }
         public bool AritySetupDone { get; set; }

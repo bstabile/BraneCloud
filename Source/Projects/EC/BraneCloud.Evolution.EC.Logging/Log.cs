@@ -137,7 +137,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// <summary>
         /// Should we write to this log at all?
         /// </summary>
-        public bool Muzzle { get; set; }
+        public bool Silent { get; set; }
 
         /// <summary>The log's Writer </summary>
         public TextWriter Writer

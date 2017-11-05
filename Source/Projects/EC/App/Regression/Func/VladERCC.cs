@@ -12,14 +12,17 @@ namespace BraneCloud.Evolution.EC.App.Regression.Func
     /// Created: Wed Nov  3 18:26:37 1999
     /// By: Sean Luke
     /// 
-    /// <p/>This ERC appears all three the Vladislavleva function sets.  It is not a constant but rather a function of one parameter (n) with an internal constant (c) and returns n * c.  Note that the value of c is drawn from the fully-closed range [-5.0, 5.0]. 
+    /// <p/>This ERC appears all three the Vladislavleva function sets.  
+    /// It is not a constant but rather a function of one parameter (n) 
+    /// with an internal constant (c) and returns n * c.  
+    /// Note that the value of c is drawn from the fully-closed range [-5.0, 5.0]. 
     /// </summary>
     public class VladERCC : VladERCA
     {
         public override string Name => "VladERCC";
 
         public override string ToStringForHumans()
-        { return "n*" + (float)value; }
+        { return "n*" + value; }
 
         public override void Eval(IEvolutionState state,
             int thread,

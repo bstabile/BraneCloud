@@ -47,16 +47,16 @@ namespace BraneCloud.Evolution.EC
     /// <p/><b>Parameters</b><br/>
     /// <table>
     /// <tr><td valign="top"><i>base</i><tt>.prob</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0, or undefined</font></td>
+    /// <font size="-1">0.0 &lt;= doubke &lt;= 1.0, or undefined</font></td>
     /// <td valign="top">(probability this BreedingSource gets chosen.  
     /// Undefined is only valid if the caller of this BreedingSource doesn't need a Probability)</td></tr>
     /// </table>
     /// </summary>
     [ECConfiguration("ec.IBreedingSource")]
-    public interface IBreedingSource : IPrototype, IRandomChoiceChooser
+    public interface IBreedingSource : IPrototype, IRandomChoiceChooserD
     {
-        float Probability { get; set; }
-        int PickRandom(IBreedingSource[] sources, float prob);
+        double Probability { get; set; }
+        int PickRandom(IBreedingSource[] sources, double prob);
         void SetupProbabilities(IBreedingSource[] sources);
 
         int TypicalIndsProduced { get; }

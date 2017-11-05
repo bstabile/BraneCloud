@@ -227,9 +227,9 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 case STYLE_N_RANDOM_COMPETITORS_TWOWAY:
                     EvalNRandomTwoWay(state, fromThreads, numinds, state.Population.Subpops[0].Individuals, 0, prob);
                     break;
-                //default: // TODO: Is this the desired default? ECJ doesn't specify.
-                //    EvalSingleElimination(state, state.Population.Subpops[0].Individuals, 0, prob);
-                //    break;
+                default:
+                    state.Output.Fatal("Invalid competition style in CompetitiveEvaluator.evaluatePopulation()");
+                    break;
             }
 
             prob.PostprocessPopulation(state, state.Population, assessFitness, Style == STYLE_SINGLE_ELIMINATION);
@@ -553,19 +553,19 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         }
     }
 
-    /// <summary>
-    /// Used by the Single-Elimination-Tournament, (Double-Elimination-Tournament and World-Cup) evaluations
-    /// </summary>
-    class IndividualAndVictories
-    {
-        public Individual Ind;
-        public int Victories;
-        public IndividualAndVictories(Individual ind, int value)
-        {
-            Ind = ind;
-            Victories = value;
-        }
-    }
+    ///// <summary>
+    ///// Used by the Single-Elimination-Tournament, (Double-Elimination-Tournament and World-Cup) evaluations
+    ///// </summary>
+    //class IndividualAndVictories
+    //{
+    //    public Individual Ind;
+    //    public int Victories;
+    //    public IndividualAndVictories(Individual ind, int value)
+    //    {
+    //        Ind = ind;
+    //        Victories = value;
+    //    }
+    //}
 
     /// <summary>
     /// SortComparer for Inidividuals

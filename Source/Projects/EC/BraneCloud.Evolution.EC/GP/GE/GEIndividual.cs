@@ -31,7 +31,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
     /// </summary>
     [Serializable]
     [ECConfiguration("ec.gp.ge.GEIndividual")]
-    public class GEIndividual : ByteVectorIndividual
+    public class GEIndividual : IntegerVectorIndividual
     {
         #region Constants
 
@@ -46,19 +46,19 @@ namespace BraneCloud.Evolution.EC.GP.GE
         {
             base.PrintIndividualForHumans(state, log);
 
-            IDictionary<int, GPNode> ERCmap = new Dictionary<int, GPNode>();
+            IDictionary<int, GPNode> ERCmapsForFancyPrint = new Dictionary<int, GPNode>();
 
             // print out Trees
             state.Output.PrintLn(GP_PREAMBLE, log);
-            GPIndividual ind = (((GESpecies) Species).Map(state, this, 0, ERCmap));
+            GPIndividual ind = ((GESpecies) Species).Map(state, this, 0, ERCmapsForFancyPrint);
             if (ind == null) state.Output.PrintLn(BAD_TREE, log);
             else ind.PrintTrees(state, log);
 
             // print out ERC mapping
             state.Output.Print(ERC_PREAMBLE, log);
-            foreach (var key in ERCmap.Keys)
+            foreach (var key in ERCmapsForFancyPrint.Keys)
             {
-                var val = ERCmap[key];
+                var val = ERCmapsForFancyPrint[key];
                 state.Output.Print("    " + key + " -> " + val.ToStringForHumans(), log);
             }
             state.Output.PrintLn("", log);

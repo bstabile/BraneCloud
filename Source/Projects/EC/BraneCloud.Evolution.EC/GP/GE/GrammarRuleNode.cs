@@ -17,10 +17,6 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.GP.GE
@@ -61,7 +57,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// <summary>
         /// Returns a given choice.
         /// </summary>
-        public GrammarNode GetChoice(int index) { return (GrammarNode)(Children[index]); }
+        public GrammarNode GetChoice(int index) { return Children[index]; }
 
         /// <summary>
         /// Adds to this node all the choices of another node.
@@ -83,7 +79,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
             var first = true;
             while (i.MoveNext())
             {
-                ret = ret + (first ? "" : "| ") + ((GrammarNode)i.Current).Head;
+                ret = ret + (first ? "" : "| ") + i.Current.Head;
                 first = false;
             }
             return ret;

@@ -139,13 +139,13 @@ namespace BraneCloud.Evolution.EC.App.Multiplexer
                 }
 
                 // the fitness better be KozaFitness!
-                var f = ((KozaFitness)ind.Fitness);
+                var f = (KozaFitness)ind.Fitness;
                 if (bits == 1)
-                    f.SetStandardizedFitness(state, (Fast.M_3_SIZE - sum));
+                    f.SetStandardizedFitness(state, Fast.M_3_SIZE - sum);
                 else if (bits == 2)
-                    f.SetStandardizedFitness(state, (Fast.M_6_SIZE - sum));
+                    f.SetStandardizedFitness(state, Fast.M_6_SIZE - sum);
                 else // (bits == 3)
-                    f.SetStandardizedFitness(state, (Fast.M_11_SIZE - sum));
+                    f.SetStandardizedFitness(state, Fast.M_11_SIZE - sum);
                 f.Hits = sum;
                 ind.Evaluated = true;
             }

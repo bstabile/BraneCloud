@@ -568,8 +568,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
             LinkedList<NodeInfo> listOfNodes = (LinkedList<NodeInfo>) sizeToNodes[mateSublengthSelected];
             if (listOfNodes == null)
             {
-                Console.Error.WriteLine("Nodes for tree length " + mateSublengthSelected +
-                                   " is null, indicates some serious error");
+                state.Output.Fatal("In SizeFairCrossoverPipeline, nodes for tree length " + mateSublengthSelected + " is null, indicates some serious error");
             }
             // in size fair we choose the elements at random for given length
             int chosenNode = 0;

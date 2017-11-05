@@ -69,16 +69,16 @@ namespace BraneCloud.Evolution.EC.Rule
     /// <font size="-1">int >= 0</font> (default=unset)</td>
     /// <td valign="top">(for rule set constraint <i>n</i>, the number of sizes in the size distribution for initializtion, see discussion above)</td></tr>
     /// <tr><td valign="top"><i>base.n</i>.<tt>reset-size</tt>.<i>i</i><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0</font></td>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0</font></td>
     /// <td valign="top">(for rule set constraint <i>n</i>, the probability that <i>i</i> will be chosen as the number of rules upon initialization, see discussion above)</td></tr>
     /// <tr><td valign="top"><i>base.n</i>.<tt>p-add</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0</font></td>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0</font></td>
     /// <td valign="top">(the probability that a new rule will be added, see discussion)</td></tr>
     /// <tr><td valign="top"><i>base.n</i>.<tt>p-del</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0</font></td>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0</font></td>
     /// <td valign="top">(the probability that a rule will be deleted, see discussion)</td></tr>
     /// <tr><td valign="top"><i>base.n</i>.<tt>p-rand-order</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0</font></td>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0</font></td>
     /// <td valign="top">(the probability that the rules' order will be randomized, see discussion)</td></tr>
     /// </table>
     /// </summary>
@@ -142,22 +142,22 @@ namespace BraneCloud.Evolution.EC.Rule
         /// </summary>
         public int ResetMaxSize { get; set; }
 
-        public float[] SizeDistribution { get; set; }
+        public double[] SizeDistribution { get; set; }
 
         /// <summary>
         /// Probability of adding a random rule to the rule set
         /// </summary>
-        public float p_add { get; set; }
+        public double p_add { get; set; }
 
         /// <summary>
         /// Probability of removing a random rule from the rule set
         /// </summary>
-        public float p_del { get; set; }
+        public double p_del { get; set; }
 
         /// <summary>
         /// Probability of randomizing the rule order in the rule set
         /// </summary>
-        public float p_randorder { get; set; }
+        public double p_randorder { get; set; }
 
         /// <summary>
         /// The prototype of the Rule that will be used in the RuleSet
@@ -201,18 +201,18 @@ namespace BraneCloud.Evolution.EC.Rule
             RulePrototype = (Rule)(state.Parameters.GetInstanceForParameter(paramBase.Push(P_RULE), null, typeof(Rule)));
             RulePrototype.Setup(state, paramBase.Push(P_RULE));
 
-            p_add = state.Parameters.GetFloat(paramBase.Push(P_ADD_PROB), null, 0);
+            p_add = state.Parameters.GetDouble(paramBase.Push(P_ADD_PROB), null, 0);
             if (p_add < 0 || p_add > 1)
             {
                 state.Output.Fatal("Parameter not found, or its value is outside of allowed range [0..1].", paramBase.Push(P_ADD_PROB));
             }
-            p_del = state.Parameters.GetFloat(paramBase.Push(P_DEL_PROB), null, 0);
+            p_del = state.Parameters.GetDouble(paramBase.Push(P_DEL_PROB), null, 0);
             if (p_del < 0 || p_del > 1)
             {
                 state.Output.Fatal("Parameter not found, or its value is outside of allowed range [0..1].", paramBase.Push(P_DEL_PROB));
             }
 
-            p_randorder = state.Parameters.GetFloat(paramBase.Push(P_RAND_ORDER_PROB), null, 0);
+            p_randorder = state.Parameters.GetDouble(paramBase.Push(P_RAND_ORDER_PROB), null, 0);
             if (p_randorder < 0 || p_randorder > 1)
             {
                 state.Output.Fatal("Parameter not found, or its value is outside of allowed range [0..1].", paramBase.Push(P_RAND_ORDER_PROB));
@@ -249,12 +249,12 @@ namespace BraneCloud.Evolution.EC.Rule
                 var siz = state.Parameters.GetInt(paramBase.Push(P_NUMSIZES), null, 1);
                 if (siz == 0)
                     state.Output.Fatal("The number of sizes in the RuleSetConstraints's distribution must be >= 1. ");
-                SizeDistribution = new float[siz];
+                SizeDistribution = new double[siz];
 
-                var sum = 0.0f;
+                var sum = 0.0;
                 for (var x = 0; x < siz; x++)
                 {
-                    SizeDistribution[x] = state.Parameters.GetFloat(paramBase.Push(P_RESETSIZE).Push("" + x), null, 0.0f);
+                    SizeDistribution[x] = state.Parameters.GetDouble(paramBase.Push(P_RESETSIZE).Push("" + x), null, 0.0);
                     if (SizeDistribution[x] < 0.0)
                     {
                         state.Output.Warning("Distribution value #" + x + " negative or not defined, assumed to be 0.0",
@@ -315,7 +315,7 @@ namespace BraneCloud.Evolution.EC.Rule
         {
             if (SizeDistribution != null)
             // pick from distribution
-                return RandomChoice.PickFromDistribution(SizeDistribution, state.Random[thread].NextFloat());
+                return RandomChoice.PickFromDistribution(SizeDistribution, state.Random[thread].NextDouble());
 
             // pick from ResetMinSize...ResetMaxSize
             return state.Random[thread].NextInt(ResetMaxSize - ResetMinSize + 1) + ResetMinSize;

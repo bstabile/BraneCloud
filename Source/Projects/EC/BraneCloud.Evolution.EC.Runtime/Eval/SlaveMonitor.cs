@@ -27,6 +27,7 @@ using BraneCloud.Evolution.EC.Eval;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Randomization;
 using BraneCloud.Evolution.EC.SteadyState;
 
 namespace BraneCloud.Evolution.EC.Runtime.Eval
@@ -301,10 +302,10 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                 state.Output.Fatal("Unable to bind to port " + port + ": " + e);
             }
 
-            RandomSeed = (int)((DateTime.Now.Ticks - 621355968000000000) / 10000);
+            RandomSeed = (int)DateTimeHelper.CurrentTimeMilliseconds;
 
             // spawn the thread
-            Thread = new ThreadClass(new ThreadStart(new AnonymousClassRunnable(state, this, problemPrototype).Run));
+            Thread = new ThreadClass(new AnonymousClassRunnable(state, this, problemPrototype).Run);
             Thread.Start();
         }
 
@@ -334,6 +335,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
             {
             }
 
+            Debug("Main Monitor Thread Shut Down");
+
             // gather all the slaves
 
             lock (_allSlaves.SyncRoot)
@@ -342,10 +345,13 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                 {
                     var tempObject = _allSlaves[0];
                     _allSlaves.RemoveAt(0);
-                    ((SlaveConnection)(tempObject)).Shutdown(State);
+                    ((SlaveConnection)tempObject).Shutdown(State);
                 }
                 NotifyMonitor(_allSlaves);
             }
+            // BRS: What should we replace this with?
+            //pool.killAll();  // clean up the thread pool
+            Debug("Shut Down Completed");
         }
 
         public void Debug(string s)

@@ -28,7 +28,7 @@ namespace BraneCloud.Evolution.EC.Configuration
     {
         object GetInstanceForParameter(IParameter parameter, IParameter defaultParameter, Type mustCastToBaseType);
         object GetInstanceForParameterEq(IParameter parameter, IParameter defaultParameter, Type mustCastToBaseType);
-        object GetTypeForParameter(IParameter parameter, IParameter defaultParameter, Type mustCastToBaseType);
+        Type GetTypeForParameter(IParameter parameter, IParameter defaultParameter, Type mustCastToBaseType);
 
         bool GetBoolean(IParameter parameter, IParameter defaultParameter, bool defaultValue);
 

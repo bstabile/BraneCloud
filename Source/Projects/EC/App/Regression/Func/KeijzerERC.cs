@@ -17,8 +17,8 @@ namespace BraneCloud.Evolution.EC.App.Regression.Func
     /// </summary>
     public class KeijzerERC : RegERC
     {
-        public static double MEAN = 0.0;
-        public static double STANDARD_DEVIATION = 5.0;
+        public const double MEAN = 0.0;
+        public const double STANDARD_DEVIATION = 5.0;
 
         public override string Name => "KeijzerERC";
 

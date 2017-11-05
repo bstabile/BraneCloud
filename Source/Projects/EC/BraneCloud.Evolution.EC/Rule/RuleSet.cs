@@ -19,7 +19,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Configuration;
 
@@ -225,7 +224,7 @@ namespace BraneCloud.Evolution.EC.Rule
         /// </summary>
         public virtual void AddRule(Rule rule)
         {
-            if ((_rules == null && _ruleCount == 0) || (_ruleCount == _rules.Length))
+            if (_rules == null  || _ruleCount == _rules.Length)
             {
                 Rule[] tempRules;
                 if (_rules == null)
@@ -357,7 +356,7 @@ namespace BraneCloud.Evolution.EC.Rule
         /// land in the first set.  Sets must be already allocated.
         /// Comment: This function appends the splitted rulesets to the existing rulesets already in <i>sets</i>.
         /// </summary>
-        public virtual RuleSet[] SplitIntoTwo(IEvolutionState state, int thread, RuleSet[] sets, float prob)
+        public virtual RuleSet[] SplitIntoTwo(IEvolutionState state, int thread, RuleSet[] sets, double prob)
         {
             for (var i = 0; i < _ruleCount; i++)
                 if (state.Random[thread].NextBoolean(prob))

@@ -52,7 +52,7 @@ namespace BraneCloud.Evolution.EC.DE
         /// <summary>
         /// Scaling factor for mutation.
         /// </summary>
-        public double F { get { return _f; } set { _f = value; } }
+        public double F { get => _f; set => _f = value; }
         private double _f;
 
         /// <summary>
@@ -60,8 +60,8 @@ namespace BraneCloud.Evolution.EC.DE
         /// </summary>
         public double Cr
         {
-            get { return _cr; }
-            set { _cr = value; }
+            get => _cr;
+            set => _cr = value;
         }
         private double _cr = CR_UNSPECIFIED;
 
@@ -217,7 +217,7 @@ namespace BraneCloud.Evolution.EC.DE
         /// </summary>
         public DoubleVectorIndividual Crossover(IEvolutionState state, DoubleVectorIndividual target, DoubleVectorIndividual child, int thread)
         {
-            if (_cr == CR_UNSPECIFIED)
+            if (_cr.Equals(CR_UNSPECIFIED))
                 state.Output.WarnOnce("Differential Evolution Parameter cr unspecified.  Assuming cr = 0.5");
 
             // first, hold one value in abeyance

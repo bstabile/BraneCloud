@@ -45,17 +45,21 @@ namespace BraneCloud.Evolution.EC.Select
     /// 
     /// <p/><b>Typical Number of Individuals Produced Per <tt>produce(...)</tt> call</b><br/>
     /// Always 1.
+    /// 
     /// <p/><b>Parameters</b><br/>
     /// <table>
     /// <tr><td valign="top"><i>base.</i><tt>size</tt><br/>
-    /// <font size="-1">int &gt;= 1 <b>or</b> 1.0 &lt; float &lt; 2.0</font></td>
+    /// <font size="-1">double &gt;= 1</font></td>
     /// <td valign="top">(the tournament size)</td></tr>
+    /// 
     /// <tr><td valign="top"><i>base.</i><tt>pick-worst</tt><br/>
     /// <font size="-1"> bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
     /// <td valign="top">(should we pick the <i>worst</i> individual in the tournament instead of the <i>best</i>?)</td></tr>
     /// </table>
+    /// 
     /// <p/><b>Default Base</b><br/>
     /// select.tournament
+    /// 
     /// </summary>	
     [Serializable]
     [ECConfiguration("ec.select.TournamentSelection")]
@@ -78,10 +82,7 @@ namespace BraneCloud.Evolution.EC.Select
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_TOURNAMENT); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_TOURNAMENT); 
 
         /// <summary>
         /// Size of the tournament.

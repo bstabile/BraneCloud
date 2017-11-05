@@ -23,6 +23,7 @@ using System.Text;
 using System.Collections;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 using System.Xml.Linq;
 using BraneCloud.Evolution.EC.Support;
 
@@ -204,7 +205,7 @@ namespace BraneCloud.Evolution.EC.Configuration
         /// "hello/how/are/hey".  This is useful for making proper
         /// path names for jar files.
         /// </summary>
-        private static String SimplifyPath(String pathname)
+        private static string SimplifyPath(string pathname)
         {
             // TODO : Implement this!
             throw new NotImplementedException();
@@ -237,6 +238,14 @@ namespace BraneCloud.Evolution.EC.Configuration
             //{
             //    path = new FileInfo(path, (String) (b[i]));
             //}
+
+            //// Convert to "\" for windows
+            //String returnPath;
+            //if (File.separatorChar != '/')
+            //    returnPath = path.getPath().replace(File.separatorChar, '/');
+            //else
+            //    returnPath = path.getPath();
+
             //return path.FullName;
         }
 
@@ -246,20 +255,35 @@ namespace BraneCloud.Evolution.EC.Configuration
         /// database which contains the parameter entries stored in args, which
         /// points to a tree of databases constructed using
         /// ParameterDatabase(filename).
+        /// 
+        /// BRS: In other words, in .NET applications this will translate to...
+        /// Suppose our main application is built and started in "{somewhere}\bin\debug".
+        /// Suppose the class (Type) is "MyProblem" and that the system can find the
+        /// assembly that contains it because that has been referenced or loaded on startup.
+        /// <code>
+        ///     var assemblyLocation = Assembly.GetAssembly(type).Location;
+        ///     var paramsLocation = Path.Combine(assemblyLocation, pathNameRelativeToType);
+        /// </code>
+        /// and our pathNameRelativeToType = "Params\mytree.params"
+        /// and there are args such as "-p parent.0=.\gp\koza\koza.params" and "-p breedthreads=2" 
+        /// then the top-level database has 
         /// </summary>
-        public ParameterDatabase(string pathNameRelativeToClassFile, Type cls, IList<string> args) // throws FileNotFoundException, IOException 
+        public ParameterDatabase(string pathNameRelativeToType, Type cls, IList<string> args) // throws FileNotFoundException, IOException 
             : this()
         {
-            // TODO : TEST THIS!
-            Label = "" + cls + " : " + pathNameRelativeToClassFile;
+            //var assemblyLocation = Assembly.GetAssembly(cls).Location;
+            //var paramsLocation = Path.Combine(assemblyLocation, pathNameRelativeToType);
 
-            var files = new ParameterDatabase(pathNameRelativeToClassFile, cls);
+            // TODO : TEST THIS!
+            Label = "" + cls + " : " + pathNameRelativeToType;
+
+            var files = new ParameterDatabase(pathNameRelativeToType, cls);
 
             // Create the Parameter Database for the arguments
             var a = new ParameterDatabase
                         {
                             RelativeClass = cls,
-                            RelativePath = SimplifyPath(pathNameRelativeToClassFile)
+                            RelativePath = SimplifyPath(pathNameRelativeToType)
                         };
 
             a.Parents.Add(files);
@@ -284,7 +308,7 @@ namespace BraneCloud.Evolution.EC.Configuration
 
             // Set me up
             RelativeClass = cls;
-            RelativePath = SimplifyPath(pathNameRelativeToClassFile);
+            RelativePath = SimplifyPath(pathNameRelativeToType);
 
             Parents.Add(a);
         }
@@ -522,9 +546,10 @@ namespace BraneCloud.Evolution.EC.Configuration
         /// <summary>
         /// List of parameters which were requested and ones which furthermore were fulfilled.
         /// </summary>
-        public Dictionary<string, bool> Gotten { get { return _gotten; } }
-        public Dictionary<string, bool> Accessed { get { return _accessed; } }
-        public List<ParameterDatabaseListener> Listeners { get { return _listeners; } }
+        public Dictionary<string, bool> Gotten => _gotten;
+
+        public Dictionary<string, bool> Accessed => _accessed;
+        public List<ParameterDatabaseListener> Listeners => _listeners;
 
         #region List (Print) *********************************************************************************
 
@@ -838,7 +863,7 @@ namespace BraneCloud.Evolution.EC.Configuration
                                                                ? ""
                                                                : "\n     ALSO: " + defaultParameter));
                     }
-                    return Activator.CreateInstance(t);
+                    return Activator.CreateInstance(t, Thread.CurrentContext);
 
                 }
                     // BRS : 2009-03-15
@@ -928,7 +953,7 @@ namespace BraneCloud.Evolution.EC.Configuration
                                                                ? ""
                                                                : "\n     ALSO: " + defaultParameter));
                     }
-                    return Activator.CreateInstance(t);
+                    return Activator.CreateInstance(t, Thread.CurrentContext);
                 }
                     // BRS : 2009-03-15
                     // Calling Type.GetType(string s) throws TypeLoadException if the typeName (s) is invalid
@@ -982,7 +1007,7 @@ namespace BraneCloud.Evolution.EC.Configuration
         /// ParamClassLoadException if there is no such Class. If the parameter is
         /// not found, the defaultParameter is used. The parameter chosen is marked "used".
         /// </summary>
-        public virtual object GetTypeForParameter(IParameter parameter, IParameter defaultParameter, Type mustCastToBaseType)
+        public virtual Type GetTypeForParameter(IParameter parameter, IParameter defaultParameter, Type mustCastToBaseType)
         {
             lock (_syncLock)
             {
@@ -1585,7 +1610,7 @@ namespace BraneCloud.Evolution.EC.Configuration
         /// </summary>
         public string Label { get; set; }
 
-        public bool SourceExists { get { throw new NotImplementedException(); } }
+        public bool SourceExists => throw new NotImplementedException();
 
         #endregion // Public Properties
         #region File
@@ -1641,7 +1666,7 @@ namespace BraneCloud.Evolution.EC.Configuration
         }
 
         /** Private helper function */
-        private static int IndexOfFirstWhitespace(String s)
+        private static int IndexOfFirstWhitespace(string s)
         {
             var len = s.Length;
             for (var i = 0; i < len; i++)
@@ -1668,15 +1693,17 @@ namespace BraneCloud.Evolution.EC.Configuration
                     //      an assembly. So we would have to determine which assembly using
                     //      Assembly.GetAssembly(typeof(T)) and then get the resource stream.
 
-                    //if (p.StartsWith(C_CLASS))
-                    //{
-                    //    var i = IndexOfFirstWhitespace(p);
-                    //    if (i == -1)
-                    //        return null;
-                    //    var classname = p.Substring(0, i);
-                    //    var filename = p.Substring(i).Trim();
-                    //    return Type.GetType(classname).getResourceAsStream(filename);
-                    //}
+                    if (p.StartsWith(C_CLASS))
+                    {
+                        // TODO: Implement returning an embedded resource as a stream.
+                        throw new NotImplementedException("This may be trying to access an embedded resource (not currently supported).");
+                        //    var i = IndexOfFirstWhitespace(p);
+                        //    if (i == -1)
+                        //        return null;
+                        //    var classname = p.Substring(0, i);
+                        //    var filename = p.Substring(i).Trim();
+                        //    return Type.GetType(classname).getResourceAsStream(filename);
+                    }
 
                     var f = new FileInfo(p);
                     if (Path.IsPathRooted(f.FullName))
@@ -1718,14 +1745,9 @@ namespace BraneCloud.Evolution.EC.Configuration
         /// <summary>
         /// Returns a String describing the location of the ParameterDatabase holding this parameter, or "" if there is none.
         /// </summary>
-        public String GetLabel()
+        public string GetLabel()
         {
             return Label;
-            /*        File file = fileFor(parameter);
-                      if (file == null) return "";
-                      try { return file.getCanonicalPath(); }
-                      catch (IOException e) { return ""; }
-            */
         }
 
         #endregion // File

@@ -35,8 +35,10 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
        <tr><td valign=top><i>base</i>.<tt>type</tt><br>
        <font size=-1>String, one of: rosenbrock rastrigin sphere step noisy-quartic kdj-f1 kdj-f2 kdj-f3 kdj-f4 booth griewank median sum product schwefel min rotated-rastrigin rotated-schwefel rotated-griewank langerman lennard-jones lunacek</font></td>
        <td valign=top>(The vector problem to test against.  Some of the types are synonyms: kdj-f1 = sphere, kdj-f2 = rosenbrock, kdj-f3 = step, kdj-f4 = noisy-quartic.  "kdj" stands for "Ken DeJong", and the numbers are the problems in his test suite)</td></tr>
+       <tr><td valign=top><i>base</i>.<tt>seed</tt><br>
+       <font size=-1>int > 0</font></td>
+       <td valign=top>(Random number seed for rotated problems)</td></tr>
        </table>
-
 */
 
     [ECConfiguration("ec.app.ecsuite.ECSuite")]
@@ -44,6 +46,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
     {
         #region Constants
 
+        public const string P_SEED = "seed";
         public const string P_WHICH_PROBLEM = "type";
 
         public const string V_ROSENBROCK = "rosenbrock";
@@ -239,9 +242,15 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
         /// <summary>
         /// Build an NxN rotation matrix[row][column] with a given seed.
         /// </summary>
-        public static double[ /* row */ ][ /* column */] BuildRotationMatrix(double rotationSeed, int N)
+        public static double[ /* row */ ][ /* column */] BuildRotationMatrix(IEvolutionState state, long rotationSeed, int N)
         {
+            if (rotationSeed == ROTATION_SEED)
+                state.Output.WarnOnce("Default rotation seed being used (" + rotationSeed + ")");
+
             IMersenneTwister rand = new MersenneTwisterFast(ROTATION_SEED);
+            for (int i = 0; i < 624 * 4; i++) // prime the MT for 4 full sample iterations to get it warmed up
+                rand.NextInt();
+
             double[/* row */][/* column */] o = TensorFactory.Create<double>(N, N);
 
             // make random values
@@ -276,6 +285,11 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
         #region Fields
 
         bool _alreadyChecked;
+
+        /// <summary>
+        /// Rotation seed for rotation problems
+        /// </summary>
+        private long seed;
 
         #region Magic Arrays for the Langerman Problem
 
@@ -428,6 +442,10 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
                     "  " + V_LENNARDJONES + "\n" +
                     "  " + V_LUNACEK + "\n",
                     paramBase.Push(P_WHICH_PROBLEM));
+
+            seed = state.Parameters.GetLongWithDefault(paramBase.Push(P_SEED), null, ROTATION_SEED);
+            if (seed <= 0)
+                state.Output.Fatal("If a rotation seed is provided, it must be > 0", paramBase.Push(P_SEED), null);
         }
 
         #endregion // Setup
@@ -448,8 +466,8 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
                 var species = (FloatVectorSpecies)state.Population.Subpops[i].Species;
                 for (var k = 0; k < species.MinGenes.Length; k++)
                 {
-                    if (species.MinGenes[k] != MinRange[problem] ||
-                        species.MaxGenes[k] != MaxRange[problem])
+                    if (!species.MinGenes[k].Equals(MinRange[problem]) ||
+                        !species.MaxGenes[k].Equals(MaxRange[problem]))
                     {
                         state.Output.Warning("Gene range is nonstandard for problem " + ProblemName[problem]
                                              + ".\nFirst occurrence: Subpopulation " + i + " Gene " + k
@@ -488,7 +506,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
 
             var temp = (DoubleVectorIndividual)ind;
             double[] genome = temp.genome;
-            var len = genome.Length;
+            //var len = genome.Length;
 
             // this curious break-out makes it easy to use the isOptimal() and function() methods
             // for other purposes, such as coevolutionary versions of this class.
@@ -499,20 +517,23 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
             // compute if we're optimal on a per-function basis
             bool isOptimal = IsOptimal(ProblemType, fit);
 
+            // TODO: BRS: I don't think this works the same way in .NET as in Java! ;-)
             // set the fitness appropriately
-            if ((float)fit < (0.0f - float.MaxValue))  // uh oh -- can be caused by Product for example
+            //if (fit < (0.0 - double.MaxValue))  // uh oh -- can be caused by Product for example
+            if (double.IsNegativeInfinity(fit))  // uh oh -- can be caused by Product for example
             {
-                ((SimpleFitness)(ind.Fitness)).SetFitness(state, 0.0f - float.MaxValue, isOptimal);
+                ((SimpleFitness)ind.Fitness).SetFitness(state, double.MinValue, isOptimal);
                 state.Output.WarnOnce("'Product' type used: some fitnesses are negative infinity, setting to lowest legal negative number.");
             }
-            else if ((float)fit > float.MaxValue)  // uh oh -- can be caused by Product for example
+            //else if (fit > double.MaxValue)  // uh oh -- can be caused by Product for example
+            else if (double.IsPositiveInfinity(fit))  // uh oh -- can be caused by Product for example
             {
-                ((SimpleFitness)ind.Fitness).SetFitness(state, float.MaxValue, isOptimal);
-                state.Output.WarnOnce("'Product' type used: some fitnesses are negative infinity, setting to lowest legal negative number.");
+                ((SimpleFitness)ind.Fitness).SetFitness(state, double.MaxValue, isOptimal);
+                state.Output.WarnOnce("'Product' type used: some fitnesses are positive infinity, setting to highest legal number.");
             }
             else
             {
-                ((SimpleFitness)ind.Fitness).SetFitness(state, (float)fit, isOptimal);
+                ((SimpleFitness)ind.Fitness).SetFitness(state, fit, isOptimal);
             }
             ind.Evaluated = true;
         }
@@ -525,7 +546,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
                 case PROB_RASTRIGIN:
                 case PROB_SPHERE:
                 case PROB_STEP:
-                    return fitness == 0.0f;
+                    return fitness.Equals(0.0);
                 case PROB_NOISY_QUARTIC:
                 case PROB_BOOTH:
                 case PROB_GRIEWANK:
@@ -564,7 +585,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
 
 
                 case PROB_RASTRIGIN:
-                    var A = 10.0f;
+                    var A = 10.0;
                     value = len * A;
                     for (var i = 0; i < len; i++)
                     {
@@ -669,25 +690,25 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
                     return value; // note positive
 
                 case PROB_ROTATED_RASTRIGIN:
+                {
+                    lock (RotationMatrix.SyncRoot) // synchronizations are rare in ECJ.  :-(
                     {
-                        lock (RotationMatrix.SyncRoot) // synchronizations are rare in ECJ.  :-(
-                        {
-                            if (RotationMatrix[0] == null)
-                                RotationMatrix[0] = BuildRotationMatrix(ROTATION_SEED, (int)len);
-                        }
+                        if (RotationMatrix[0] == null)
+                            RotationMatrix[0] = BuildRotationMatrix(state, seed, (int) len);
+                    } // BRS: Why are we unlocking here?
 
-                        // now we know the matrix exists rotate the matrix and return its value
-                        var val = Mul(RotationMatrix[0], genome);
-                        return Function(state, PROB_RASTRIGIN, val, threadnum);
-                    }
+                    // now we know the matrix exists rotate the matrix and return its value
+                    double[] val = Mul(RotationMatrix[0], genome);
+                    return Function(state, PROB_RASTRIGIN, val, threadnum);
+                }
 
                 case PROB_ROTATED_SCHWEFEL:
                 {
                     lock (RotationMatrix.SyncRoot) // synchronizations are rare in ECJ.  :-(
                     {
                         if (RotationMatrix[0] == null)
-                            RotationMatrix[0] = BuildRotationMatrix(ROTATION_SEED, (int) len);
-                    }
+                            RotationMatrix[0] = BuildRotationMatrix(state, seed, (int) len);
+                    } // BRS: Why are we unlocking here?
 
                     // now we know the matrix exists rotate the matrix and return its value
                     double[] val = Mul(RotationMatrix[0], genome);
@@ -695,17 +716,17 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
                 }
 
                 case PROB_ROTATED_GRIEWANK:
-                    {
-                        lock(RotationMatrix.SyncRoot)            // synchronizations are rare in ECJ.  :-(
                 {
-                            if (RotationMatrix[0] == null)
-                                RotationMatrix[0] = BuildRotationMatrix(ROTATION_SEED, (int)len);
-                        }
+                    lock (RotationMatrix.SyncRoot) // synchronizations are rare in ECJ.  :-(
+                    {
+                        if (RotationMatrix[0] == null)
+                            RotationMatrix[0] = BuildRotationMatrix(state, seed, (int) len);
+                    } // BRS: Why are we unlocking here?
 
-                        // now we know the matrix exists rotate the matrix and return its value
-                        double[] val = Mul(RotationMatrix[0], genome);
-                        return Function(state, PROB_GRIEWANK, val, threadnum);
-                    }
+                    // now we know the matrix exists rotate the matrix and return its value
+                    double[] val = Mul(RotationMatrix[0], genome);
+                    return Function(state, PROB_GRIEWANK, val, threadnum);
+                }
 
                 case PROB_LANGERMAN:
                     {

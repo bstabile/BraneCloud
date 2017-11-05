@@ -53,7 +53,7 @@ namespace BraneCloud.Evolution.EC.GP
     /// <font size="-1">String</font></td>
     /// <td valign="top">(name of type for child argument <i>m</i> of node constraint <i>n</i>)</td></tr>
     /// <tr><td valign="top"><i>base</i>.<tt>prob</tt><br/>
-    /// <font size="-1">float &gt;= 0.0</font></td>
+    /// <font size="-1">double &gt;= 0.0</font></td>
     /// <td valign="top">(auxillary probability of selection -- used by ec.gp.build.PTC1 and ec.gp.build.PTC2)</td></tr>
     /// </table>
     /// </summary>
@@ -69,7 +69,7 @@ namespace BraneCloud.Evolution.EC.GP
         public const string P_CHILD = "child";
         public const string P_SIZE = "size";
         public const string P_PROBABILITY = "prob";
-        public const float DEFAULT_PROBABILITY = 1.0f;
+        public const double DEFAULT_PROBABILITY = 1.0;
 
         #endregion // Constants
         #region Static
@@ -92,7 +92,7 @@ namespace BraneCloud.Evolution.EC.GP
         /// <summary>
         /// Probability of selection -- an auxillary measure mostly used by PTC1/PTC2 right now 
         /// </summary>
-        public float ProbabilityOfSelection { get; set; }
+        public double ProbabilityOfSelection { get; set; }
 
         /// <summary>
         /// The index of the constraints
@@ -120,8 +120,8 @@ namespace BraneCloud.Evolution.EC.GP
         /// </summary>
         public GPNode[] ZeroChildren
         {
-            get { return _zeroChildren; }
-            set { _zeroChildren = value; }
+            get => _zeroChildren;
+            set => _zeroChildren = value;
         }
         private GPNode[] _zeroChildren = new GPNode[0];
 
@@ -155,7 +155,7 @@ namespace BraneCloud.Evolution.EC.GP
 
             if (state.Parameters.ParameterExists(paramBase.Push(P_PROBABILITY), null))
             {
-                var f = state.Parameters.GetFloat(paramBase.Push(P_PROBABILITY), null, 0);
+                var f = state.Parameters.GetDouble(paramBase.Push(P_PROBABILITY), null, 0);
                 if (f < 0)
                     state.Output.Fatal("The probability of selection is < 0, which is not valid.", paramBase.Push(P_PROBABILITY), null);
                 ProbabilityOfSelection = f;

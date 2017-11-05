@@ -17,12 +17,9 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Simple;
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
 {
@@ -41,6 +38,10 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
             base.Setup(state, paramBase);
+
+            for (int i = 0; i < state.Population.Subpops.Length; i++)
+                if (ReduceBy[i] != 0)
+                    state.Output.Fatal("SPEA2Breeder does not support population reduction.", paramBase.Push(P_REDUCE_BY).Push("" + i), null);
 
             if (SequentialBreeding) // uh oh, haven't tested with this
                 state.Output.Fatal("SPEA2Breeder does not support sequential evaluation.",
@@ -109,8 +110,8 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
 
             // step 3: if the archive is OVERFULL, iterate as follows:
             //              step 3a: remove the k-closest individual in the archive
-            var evaluator = ((ISPEA2Evaluator)(state.Evaluator));
-            var inds = archive.ToArray();
+            //var evaluator = ((ISPEA2Evaluator)(state.Evaluator));
+            //var inds = archive.ToArray();
 
             while (currentArchiveSize > archiveSize)
             {

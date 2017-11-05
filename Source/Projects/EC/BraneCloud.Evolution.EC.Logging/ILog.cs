@@ -26,6 +26,10 @@ namespace BraneCloud.Evolution.EC.Logging
         FileInfo FileInfo { get; set; }
         LogRestarter Restarter { get; set; }
 
+        /// <summary>
+        /// Should we write to this log at all?
+        /// </summary>
+        bool Silent { get; set; }
         bool PostAnnouncements { get; set; }
         bool RepostAnnouncementsOnRestart { get; set; }
         bool AppendOnRestart { get; set; }

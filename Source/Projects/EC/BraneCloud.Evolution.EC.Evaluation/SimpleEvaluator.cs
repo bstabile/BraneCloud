@@ -18,7 +18,6 @@
 
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks.Dataflow;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Support;
@@ -149,7 +148,7 @@ namespace BraneCloud.Evolution.EC.Simple
             }
 
             // swap
-            Population oldpop = state.Population;
+            oldpop = state.Population;
             state.Population = pop;
         }
 
@@ -261,10 +260,9 @@ namespace BraneCloud.Evolution.EC.Simple
         /// A private helper function for evaluatePopulation which evaluates a chunk
         /// of individuals in a subpop for a given thread.
         /// Although this method is declared
-        /// public (for the benefit of a private helper class in this file),
-        /// you should not call it. 
+        /// protected, you should not call it. 
         /// </summary>		
-        protected internal virtual void EvalPopChunk(IEvolutionState state, int[] numinds, int[] from, int threadnum, ISimpleProblem p)
+        protected virtual void EvalPopChunk(IEvolutionState state, int[] numinds, int[] from, int threadnum, ISimpleProblem p)
         {
             p.PrepareToEvaluate(state, threadnum);
 

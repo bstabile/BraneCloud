@@ -20,8 +20,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Vector;
 
@@ -71,7 +69,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
     /// in your grammar.
     /// 
     /// <p/>Once the gammar file has been created and Setup has been run trees can the be created using the genome (chromosome) of a GEIndividual.
-    /// A genome of an individual is an array of random integers each of which are one byte long.  These numbers are used when a decision point 
+    /// A genome of an individual is an array of random integers each of which are one int long.  These numbers are used when a decision point 
     /// (a rule having more that one choice) is reached within the grammar.  Once a particular gene (index) in the genome has been used it will 
     /// not be used again (this may change) when creating the tree.
     /// 
@@ -83,7 +81,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
     /// | (left) | (right) | (move)<br/>
     /// Since the rule &lt;op> has more than one choice that it can map to, we must consult the genome to decide which choice to take.  In this case
     /// the number of chromosomes used is 0 so genome[0] is used and number of chromosomes used is incremented.  Since values in the genome can
-    /// be negitive values they are offset by 128 (max negitive of a byte) giving us a value from 0-255.  A modulus is performed on this resulting 
+    /// be negitive values they are offset by 128 (max negitive of a int) giving us a value from 0-255.  A modulus is performed on this resulting 
     /// number by the number of choices present for the given rule.  In the above example since we are using genome[0] the resulting operation would 
     /// look like: 23+128=151, number of choices for &lt;op> = 6, 151%6=1 so we use choices[1] which is: (progn2 &lt;op> &lt;op>).  If all the genes
     /// in a genome are used and the tree is still incompete an invalid tree error is returned.
@@ -102,11 +100,11 @@ namespace BraneCloud.Evolution.EC.GP.GE
     /// <td valign="top">(the GPSpecies subservient to the GESpecies)</td></tr>
     /// 
     /// <tr><td valign="top"><i>base.</i><tt>parser</tt><br/>
-    /// <font size="-1">classname, inherits and != ec.gp.ge.GrammarParser</font></td>
+    /// <font size="-1">classname, inherits and != ge.GrammarParser</font></td>
     /// <td valign="top">(the GrammarParser used by the GESpecies)</td></tr>
     /// </table>
      /// <p/><b>Default Base</b><br/>
-    /// ec.gp.ge.GESpecies
+    /// ge.GESpecies
     /// </summary>
     [Serializable]
     [ECConfiguration("ec.gp.ge.GESpecies")]
@@ -120,6 +118,8 @@ namespace BraneCloud.Evolution.EC.GP.GE
         public const string P_FILE = "file";
         public const string P_GPSPECIES = "gp-species";
         public const string P_PARSER = "parser";
+        public const string P_PASSES = "passes";
+        public const string P_INITSCHEME = "init-scheme" ;
 
         /// <summary>
         /// Return value which denotes that the tree has grown too large.
@@ -129,10 +129,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GEDefaults.ParamBase.Push(P_GESPECIES); }
-        }
+        public override IParameter DefaultBase => GEDefaults.ParamBase.Push(P_GESPECIES);
 
         /// <summary>
         /// The GPSpecies subsidiary to GESpecies.
@@ -140,7 +137,11 @@ namespace BraneCloud.Evolution.EC.GP.GE
         public GPSpecies GPSpecies { get; set; }
 
         /// <summary>
-        /// All the ERCs created so far.
+        /// All the ERCs created so far, the ERCs are mapped as,
+        /// "key --> list of ERC nodes", where the key = (genome[i] - minGene[i]);
+        /// The ERCBank is "static", beacause we need one identical copy
+        /// for all the individuals; Moreover, this copy may be sent to
+        /// other sub-populations as well.
         /// </summary>
         public Hashtable ERCBank { get; set; }
 
@@ -149,10 +150,20 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// </summary>
         public GrammarRuleNode[] Grammar { get; set; }
 
+        /** The number of passes permitted through the genome if we're wrapping.   Must be >= 1. */
+        public int Passes { get; set; }
+
+        public string InitScheme { get; set; } = "default";
+
         /// <summary>
         /// The prototypical parser used to parse the grammars.
         /// </summary>
         public GrammarParser ParserPrototype { get; set; }
+
+        /// <summary>
+        /// Parser for each grammar -- khaled.
+        /// </summary>
+        public GrammarParser[] GrammarParser { get; set; } = null;
 
         #endregion // Properties
         #region Setup
@@ -168,9 +179,9 @@ namespace BraneCloud.Evolution.EC.GP.GE
             GPSpecies.Setup(state, p);
 
             // check to make sure that our individual prototype is a GPIndividual
-            if (!(I_Prototype is ByteVectorIndividual))
+            if (!(I_Prototype is IntegerVectorIndividual))
             {
-                state.Output.Fatal("The Individual class for the Species " + GetType().Name + " is must be a subclass of ec.gp.ge.GEIndividual.", paramBase);
+                state.Output.Fatal("The Individual class for the Species " + GetType().Name + " must be a subclass of ge.GEIndividual.", paramBase);
             }
 
             ERCBank = Hashtable.Synchronized(new Hashtable());
@@ -180,7 +191,10 @@ namespace BraneCloud.Evolution.EC.GP.GE
             var trees = gpi.Trees;
             var numGrammars = trees.Length;
 
-            ParserPrototype = (GrammarParser)(state.Parameters.GetInstanceForParameterEq(paramBase.Push(P_PARSER), def.Push(P_PARSER), typeof(GrammarParser)));
+            ParserPrototype = (GrammarParser)state.Parameters.GetInstanceForParameterEq(
+                paramBase.Push(P_PARSER), 
+                def.Push(P_PARSER), 
+                typeof(GrammarParser));
 
             Grammar = new GrammarRuleNode[numGrammars];
             for (var i = 0; i < numGrammars; i++)
@@ -196,18 +210,90 @@ namespace BraneCloud.Evolution.EC.GP.GE
                     state.Output.Fatal("Error retrieving grammar file(s): " + def + "." + P_FILE + "." + i + " is undefined.");
                 }
 
-                //try
-                //{
-                    var gpfs = trees[i].Constraints((GPInitializer)state.Initializer).FunctionSet;
-                    var grammarparser = (GrammarParser)(ParserPrototype.Clone());
-                    //Grammar[i] = grammarparser.ParseRules(state, new StreamReader(grammarFile.FullName), gpfs);
-                    Grammar[i] = grammarparser.ParseRules(state, new StreamReader(grammarFile), gpfs);
-                //}
-                //catch (FileNotFoundException)
-                //{
-                //    state.Output.Fatal("Error retrieving grammar file(s): " + def + "." + P_FILE + "." + i + " does not exist or cannot be opened.");
-                //}
+                GPFunctionSet gpfs = trees[i].Constraints((GPInitializer)state.Initializer).FunctionSet;
+                // now we need different parser object for each of the grammars,
+                // why? see GrammarParser.java for details -- khaled
+                GrammarParser[i] = (GrammarParser)ParserPrototype.Clone();
+                StreamReader reader = new StreamReader(grammarFile);
+                Grammar[i] = GrammarParser[i].ParseRules(state, reader, gpfs);
+
+                // Enumerate the grammar tree -- khaled
+                GrammarParser[i].EnumerateGrammarTree(Grammar[i]);
+                // Generate the predictive parse table -- khaled
+                GrammarParser[i].PopulatePredictiveParseTable(Grammar[i]);
+
+                try
+                {
+                    reader.Close();
+                }
+                catch (IOException e)
+                {
+                    // do nothing
+                }
             }
+            // get the initialization scheme -- khaled
+            InitScheme = state.Parameters.GetString(paramBase.Push(P_INITSCHEME), def.Push(P_INITSCHEME));
+            if (InitScheme != null && InitScheme.Equals("sensible"))
+                state.Output.WarnOnce("Using a \"hacked\" version of \"sensible initialization\"");
+            else
+                state.Output.WarnOnce("Using default GE initialization scheme");
+
+            // setup the "passes" parameters
+            int MAXIMUM_PASSES = 1024;
+
+            Passes = state.Parameters.GetInt(paramBase.Push(P_PASSES), def.Push(P_PASSES), 1);
+            if (Passes < 1 || Passes > MAXIMUM_PASSES)
+                state.Output.Fatal("Number of allowed passes must be >= 1 and <="
+                                   + MAXIMUM_PASSES + ", likely small, such as <= 16.",
+                    paramBase.Push(P_PASSES), def.Push(P_PASSES));
+            int oldpasses = Passes;
+            Passes = NextPowerOfTwo(Passes);
+            if (oldpasses != Passes)
+                state.Output.Warning("Number of allowed passes must be a power of 2.  Bumping from "
+                                     + oldpasses + " to " + Passes, paramBase.Push(P_PASSES), def.Push(P_PASSES));
+        }
+
+        private int NextPowerOfTwo(int v)
+        {
+            // if negative or 0, couldn't bump.
+            // See http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+            v--;
+            v |= v >> 1;
+            v |= v >> 2;
+            v |= v >> 4;
+            v |= v >> 8;
+            v |= v >> 16;
+            v++;
+            return v;
+        }
+
+        /**
+         * This is an ugly hack to simulate the "Sensible Initialization",
+         * First we create a GPIndividual, then reverse-map it to GEIndividuals,
+         * We do not need to call IntegerVectorSpecies.newIndividual() since it is overriden
+         * by the GPSpecies.newIndividual();
+         *
+         * Moreover, as in the case for non-identical representations (i,e, GP-GE island
+         * models etc,), the grammar rules, tree constraints, ERC's etc, are supposed to be
+         * identical across all islands, so we are using the same "gpspecies" inside this class.
+         *
+         * However, the identicality of the GPTree particulars like grammar, constraints, ADFs,
+         * ERC's may not be universally true.
+         */
+        public Individual NewIndividual(IEvolutionState state, int thread)
+        {
+            GEIndividual gei = null;
+            if (InitScheme != null && InitScheme.Equals("sensible"))
+            {
+                GPIndividual gpi = (GPIndividual)GPSpecies.NewIndividual(state, thread);
+                gei = ReverseMap(state, gpi, thread);
+            }
+            else
+            {
+                gei = (GEIndividual)base.NewIndividual(state, thread);
+                gei.Species = this;
+            }
+            return gei;
         }
 
         #endregion // Setup
@@ -220,21 +306,45 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// <param name="ind">ind the GEIndividual</param>
         /// <param name="trees">array of trees for the individual</param>
         /// <param name="threadnum">thread number</param>
-        /// <param name="ercMappings"></param>
+        /// <param name="ercMapsForFancyPrint"></param>
         /// <returns>Number of chromosomes consumed</returns>
-        public int MakeTrees(IEvolutionState state, GEIndividual ind, GPTree[] trees, int threadnum, IDictionary<int, GPNode> ercMappings)
+        public int MakeTrees(IEvolutionState state, GEIndividual ind, GPTree[] trees, int threadnum, IDictionary<int, GPNode> ercMapsForFancyPrint)
         {
+            int[] genome = ind.genome;
             var position = 0;
 
-            for (var i = 0; i < trees.Length; i++)
+            // We start with one pass, then repeatedly double the genome length and
+            // try again until it's big enough. This is simple but very costly in terms of
+            // memory so our maximum pass size is MAXIMUM_PASSES, which should be small enough
+            // to allow for even pretty long genomes.
+            for (int i = 1; i <= Passes; i *= 2)  // note i starts at 1
             {
-                //cannot complete one of the trees with the given chromosome
+                position = MakeTrees(state, genome, trees, threadnum, ercMapsForFancyPrint);
+                if (position < 0 && i < Passes)  // gotta try again
+                {
+                    // this is a total hack
+                    int[] old = genome;
+                    genome = new int[old.Length * 2];
+                    Array.Copy(old, 0, genome, 0, old.Length);
+                    Array.Copy(old, 0, genome, old.Length, old.Length);  // duplicate
+                }
+            }
+            return (Math.Min(position, ind.genome.Length));
+        }
+
+        // called by the above
+        public int MakeTrees(IEvolutionState state, int[] genome, GPTree[] trees,
+            int threadnum, IDictionary<int, GPNode> ercMapsForFancyPrint)
+        {
+            int position = 0;
+
+            for (int i = 0; i < trees.Length; i++)
+            {
+                // cannot complete one of the trees with the given chromosome
                 if (position < 0)
                     return BIG_TREE_ERROR;
-
-                position = MakeTree(state, ind, trees[i], position, i, threadnum, ercMappings);
+                position = MakeTree(state, genome, trees[i], position, i, threadnum, ercMapsForFancyPrint);
             }
-
             return position;
         }
 
@@ -242,16 +352,17 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// MakeTree, edits the tree that its given by adding a root (and all subtrees attached)
         /// </summary>
         /// <returns>The number of chromosomes used, or an BIG_TREE_ERROR sentinel value.</returns>
-        public int MakeTree(IEvolutionState state, GEIndividual ind, GPTree tree, int position, int treeNum, int threadnum, IDictionary<int, GPNode> ercMappings)
+        public int MakeTree(IEvolutionState state, int[] genome, GPTree tree, int position, int treeNum, int threadnum, IDictionary<int, GPNode> ercMapsForFancyPrint)
         {
+            // hack, use an array to pass an extra value
             int[] countNumberOfChromosomesUsed = { position };  // hack, use an array to pass an extra value
-            var genome = ind.genome;
+
             var gpfs = tree.Constraints((GPInitializer)state.Initializer).FunctionSet;
             GPNode root;
 
             try // get the tree, or return an error.
             {
-                root = MakeSubtree(countNumberOfChromosomesUsed, genome, state, gpfs, Grammar[treeNum], treeNum, threadnum, ercMappings);
+                root = MakeSubtree(countNumberOfChromosomesUsed, genome, state, gpfs, Grammar[treeNum], treeNum, threadnum, ercMapsForFancyPrint, tree, (byte)0);
             }
             catch (BigTreeException)
             {
@@ -271,9 +382,11 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// <summary>
         /// Thrown by makeSubtree when chromosome is not large enough for the generated tree.
         /// </summary>
-        class BigTreeException : Exception { /* ECJ has: static long serialVersionUID = 1L; */ }
+        class BigTreeException : InvalidOperationException { const long SerialVersionUID = 1L; }
 
-        GPNode MakeSubtree(IList<int> index, IList<byte> genome, IEvolutionState es, GPFunctionSet gpfs, GrammarRuleNode rule, int treeNum, int threadnum, IDictionary<int, GPNode> ercMappings)
+        GPNode MakeSubtree(IList<int> index, IList<int> genome, 
+            IEvolutionState es, GPFunctionSet gpfs, GrammarRuleNode rule, 
+            int treeNum, int threadNum, IDictionary<int, GPNode> ercMapsForFancyPrint, IGPNodeParent parent, byte argPosition)
         {
             //have we exceeded the length of the genome?  No point in going further.
             if (index[0] >= genome.Count)
@@ -291,41 +404,43 @@ namespace BraneCloud.Evolution.EC.GP.GE
             }
 
             //more than one rule to consider, pick one based off the genome, and consume the current gene
+            // avoid mod operation as much as possible
             if (rule.GetNumChoices() > 1)
             {
-                //casting to an int should be ok since the biggest these genes can be is a byte
                 i = (genome[index[0]] - (int)GetMinGene(index[0])) % rule.GetNumChoices();
-                index[0]++;
             }
-            //only 1 rule to consider
             else
             {
                 i = 0;
             }
-            var choice = rule.GetChoice(i);
+            index[0]++;
+            GrammarNode choice = rule.GetChoice(i);
 
             // if body is another rule head
             //look up rule
             if (choice is GrammarRuleNode)
             {
                 var nextrule = (GrammarRuleNode)choice;
-                return MakeSubtree(index, genome, es, gpfs, nextrule, treeNum, threadnum, ercMappings);
+                return MakeSubtree(index, genome, es, gpfs, nextrule, 
+                    treeNum, threadNum, ercMapsForFancyPrint, parent, argPosition);
             }
             else //handle functions
             {
-                var funcgrammarnode = (GrammarFunctionNode)choice;
+                GrammarFunctionNode funcgrammarnode = (GrammarFunctionNode)choice;
 
-                var validNode = funcgrammarnode.GetGPNodePrototype();
+                GPNode validNode = funcgrammarnode.GetGPNodePrototype();
 
-                var numChildren = validNode.Children.Length;
+                int numChildren = validNode.Children.Length;
                 //index 0 is the node itself
-                var numChildrenInGrammar = funcgrammarnode.GetNumArguments();
+                int numChildrenInGrammar = funcgrammarnode.GetNumArguments();
 
                 //does the grammar contain the correct amount of children that the GPNode requires
                 if (numChildren != numChildrenInGrammar)
                 {
-                    es.Output.Fatal("GPNode " + validNode.ToStringForHumans() + " requires " + numChildren + " children.  "
-                        + numChildrenInGrammar + " children found in the grammar.");
+                    es.Output.Fatal("GPNode " + validNode.ToStringForHumans() + " requires " 
+                        + numChildren + " children.  "
+                        + numChildrenInGrammar 
+                        + " children found in the grammar.");
                 }
 
                 //check to see if it is an ERC node
@@ -337,12 +452,21 @@ namespace BraneCloud.Evolution.EC.GP.GE
                         throw new BigTreeException();
                     }
 
+                    // ** do we actually need to maintain two vlaues ? key and originalVal ?
+                    // ** there is no problem if we use the originalVal for both ERCBank and
+                    // ** ercMapsForFancyPrint, moreover, this will also make the reverse-mapping case
+                    // ** easier -- khaled
+
+                    // these below two lines are from the original code --
                     // key for ERC hashtable look ups is the current index within the genome.  Consume it.
-                    var key = genome[index[0]] - (int)GetMinGene(index[0]);
-                    int originalVal = genome[index[0]];
+                    //int key = genome[index[0]] - (int)GetMinGene(index[0]);
+                    //int originalVal = genome[index[0]];
+
+                    // this single line is khaled's mod --
+                    int genomeVal = genome[index[0]];
                     index[0]++;
 
-                    validNode = ObtainERC(es, key, originalVal, threadnum, validNode, ercMappings);
+                    validNode = ObtainERC(es, genomeVal, threadNum, validNode, ercMapsForFancyPrint);
                 }
                 //non ERC node
                 else
@@ -355,7 +479,8 @@ namespace BraneCloud.Evolution.EC.GP.GE
                 {
                     //get and link children to the current GPNode
                     validNode.Children[childNumber] = MakeSubtree(index, genome, es, gpfs,
-                        (GrammarRuleNode)funcgrammarnode.GetArgument(j), treeNum, threadnum, ercMappings);
+                        (GrammarRuleNode)funcgrammarnode.GetArgument(j), treeNum, threadNum, 
+                        ercMapsForFancyPrint, validNode, (byte)childNumber);
 
                     if (validNode.Children[childNumber] == null)
                     {
@@ -363,6 +488,8 @@ namespace BraneCloud.Evolution.EC.GP.GE
                     }
                     childNumber++;
                 }
+                validNode.ArgPosition = argPosition;
+                validNode.Parent = parent;
                 return validNode;
             }
         }
@@ -372,14 +499,16 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// If there is no such ERC, then one is created and randomized, then added to the bank.
         /// The point of this mechanism is to enable ERCs to appear in multiple places in a GPTree. 
         /// </summary>
-        public GPNode ObtainERC(IEvolutionState state, int key, int genomeVal, int threadnum, GPNode node, IDictionary<int, GPNode> ercMappings)
+        public GPNode ObtainERC(IEvolutionState state, int genomeVal, int threadnum, 
+            GPNode node, IDictionary<int, GPNode> ercMapsForFancyPrint)
         {
-            var ercList = (List<GPNode>)(ERCBank[key]);
+            // TODO: BRS: Questionable key here because of Java -> C# conversion (hash codes)
+            var ercList = (IList<GPNode>)ERCBank[genomeVal];
 
             if (ercList == null)
             {
                 ercList = new List<GPNode>();
-                ERCBank[key] = ercList;
+                ERCBank[genomeVal] = ercList;
             }
 
             GPNode dummy;
@@ -392,7 +521,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
                 // ERC was found inside the list
                 if (dummy.NodeEquivalentTo(node))
                 {
-                    if (ercMappings != null) ercMappings[genomeVal] = dummy;
+                    if (ercMapsForFancyPrint != null) ercMapsForFancyPrint[genomeVal] = dummy;
                     return dummy.LightClone();
                 }
             }
@@ -401,7 +530,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
             node = node.LightClone();
             node.ResetNode(state, threadnum);
             ercList.Add(node);
-            if (ercMappings != null) ercMappings[genomeVal] = node;
+            if (ercMapsForFancyPrint != null) ercMapsForFancyPrint[genomeVal] = node;
             return node;
         }
 
@@ -410,6 +539,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
             var other = (GESpecies)(base.Clone());
             other.GPSpecies = (GPSpecies)(GPSpecies.Clone());
             // ERCBank isn't cloned
+            // ** I think we need to clone it -- khaled
             return other;
         }
 
@@ -423,7 +553,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         public int Consumed(IEvolutionState state, GEIndividual ind, int threadnum)
         {
             // create a dummy individual
-            var newind = ((GPIndividual)(GPSpecies.I_Prototype)).LightClone();
+            var newind = ((GPIndividual)GPSpecies.I_Prototype).LightClone();
 
             // do the mapping and return the number consumed
             return MakeTrees(state, ind, newind.Trees, threadnum, null);
@@ -434,7 +564,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// over the elements of the given GEIndividual.  Null is returned if an error occurs,
         /// specifically, if all elements were consumed and the tree had still not been completed.
         /// </summary>
-        public GPIndividual Map(IEvolutionState state, GEIndividual ind, int threadnum, IDictionary<int, GPNode> ercMappings)
+        public GPIndividual Map(IEvolutionState state, GEIndividual ind, int threadnum, IDictionary<int, GPNode> ercMapsForFancyPrint)
         {
             // create a dummy individual
             var newind = ((GPIndividual) GPSpecies.I_Prototype).LightClone();
@@ -449,12 +579,232 @@ namespace BraneCloud.Evolution.EC.GP.GE
             newind.Species = GPSpecies;
 
             // do the mapping
-            if (MakeTrees(state, ind, newind.Trees, threadnum, ercMappings) < 0)  // error
+            if (MakeTrees(state, ind, newind.Trees, threadnum, ercMapsForFancyPrint) < 0)  // error
                 return null;
 
             return newind;
         }
 
+        /** Flattens an S-expression */
+        public IList FlattenSexp(IEvolutionState state, int threadnum, GPTree tree)
+        {
+            IList nodeList = GatherNodeString(state, threadnum, tree.Child, 0);
+            return nodeList;
+        }
+
+        /** Used by the above function */
+        public IList GatherNodeString(IEvolutionState state, int threadnum, GPNode node, int index)
+        {
+            ArrayList list = new ArrayList();
+            if (node is ERC)
+            {
+                // Now, get the "key" from the "node", NOTE: the "node" is inside an ArrayList,
+                // since the ERCBank is mapped as key --> ArrayList of GPNodes.
+                // The "key" is the corresponding int value for the ERC.
+                list.Add(node.Name.Trim()); // add "ERC"
+                                              // then add the ERC key (original genome value)
+                list.Add(GetKeyFromNode(state, threadnum, node, index).Trim());
+            }
+        else
+            list.Add(node.ToString().Trim());
+            if (node.Children.Length > 0)
+            {
+                for (int i = 0; i < node.Children.Length; i++)
+                {
+                    index++;
+                    IList sublist = GatherNodeString(state, threadnum, node.Children[i], index);
+                    list.AddRange(sublist);
+                }
+            }
+            return list;
+        }
+
+        public string GetKeyFromNode(IEvolutionState state, int threadnum, GPNode node, int index)
+        {
+            throw new NotImplementedException();
+            /*
+            string str = null;
+            // ERCBank has some contents at least.
+            if (ERCBank != null && ERCBank.Count != 0)
+            {
+                Iterator iter = ERCBank.EntrySet().iterator();
+                while (iter.hasNext())
+                {
+                    Map.Entry pairs = (Map.Entry)iter.next();
+                    ArrayList nodeList = (ArrayList)pairs.getValue();
+                    if (Collections.binarySearch(
+                            nodeList,
+                            node,
+                            new Comparator()
+                            {
+                                    public int compare(Object o1, Object o2)
+                                        {
+                                            if (o1 is GPNode && o2 is GPNode)
+                                                return ((GPNode)o1).ToString().
+                                                    CompareTo(((GPNode)o2).ToString());
+                                            return 0;
+                                        }
+                }) >= 0 )
+                            {
+                    // a match found, save the key, break loop.
+                    str = ((Int32)pairs.getKey()).ToString();
+                    break;
+                }
+            }
+        }
+
+            // If a suitable match is not found in the above loop,
+            // Add the node in a new list and add it to the ERCBank
+            // with a new random value as a key.
+            if (str == null)
+            {
+                // if the hash-map is not created yet
+                if (ERCBank == null) ERCBank = new Hashtable();
+                // if the index is still in the range of minGene.Length, use it.
+                // otherwise use the minGene[0] value.
+                int minIndex = 0;
+                if (index < MinGenes.Length) minIndex = index;
+                // now generate a new key
+                Int32 key = Integer.valueOf((int) MinGenes[minIndex]
+                                            + state.Random[threadnum]
+                                                .NextInt((int) (MaxGenes[minIndex] - MinGenes[minIndex] + 1)));
+                ArrayList list = new ArrayList();
+                list.Add(node.LightClone());
+                ERCBank.Put(key, list);
+                str = key.ToString();
+            }
+            return str;
+            */
+        }
+
+        /**
+         * The LL(1) parsing algorithm to parse the lisp tree, the lisp tree is actually
+         * fed as a flattened list, the parsing code uses the "exact" (and as-is) procedure 
+         * described in the dragon book.
+         **/
+    public int[] ParseSexp(ArrayList flatSexp, GrammarParser gp)
+{
+            throw new NotImplementedException();
+            /*
+    // We can't use array here, because we don't know how we are going to traverse
+    // the grammar tree, so the length is not known beforehand.
+    ArrayList intList = new ArrayList();
+    Queue input = new Queue((ArrayList)flatSexp.Clone());
+    Stack stack = new Stack();
+    stack.Push(((GrammarNode)gp.ProductionRuleList.get(0)).GetHead());
+    int index = 0;
+    while (input.Count != 0)
+    {
+        String token = (String)input.Remove();
+        while (true)
+        {
+            if (stack.Peek().Equals(token))
+            {
+                // if found a match, pop it from the stack
+                stack.Pop();
+                // if the stack top is an ERC, read the next token
+                if (token.Equals("ERC"))
+                {
+                    token = (String)input.Remove();
+                    intList.Add(Integer.valueOf(token));
+                }
+                break;
+            }
+            else
+            {
+                int rIndex = ((Integer)gp.RuleHeadToIndex.get(stack.peek())).intValue();
+                int fIndex = ((Integer)gp.FunctionHeadToIndex.get(token)).intValue();
+                Integer ruleIndex = new Integer(gp.PredictiveParseTable[rIndex][fIndex]);
+                // get the action (rule) to expand
+                GrammarNode action = (GrammarNode)gp.IndexToRule.get(ruleIndex);
+                // if the index is still in the range of minGene.Length, use it.
+                // otherwise use the minGene[0] value.
+                int minIndex = 0; if (index < MinGenes.Length) minIndex = index;
+                // now add
+                intList.Add(new Integer(((Integer)gp.AbsIndexToRelIndex.get(ruleIndex)).intValue() + (int)MinGenes[minIndex]));
+                index++;
+                stack.Pop();
+                action = action.Children[0];
+                if (action is GrammarFunctionNode)
+                        {
+                    // push the rule (action) arguments in reverse way
+                    for (int i = ((GrammarFunctionNode)action).GetNumArguments() - 1
+                            ; i >= 0; i--)
+                        stack.Push(((GrammarFunctionNode)action).GetArgument(i).GetHead());
+                    // the rule (action) head should be on the top
+                    stack.Push(action.GetHead());
+                }
+                    else if (action is GrammarRuleNode) // push as usual
+                        stack.Push(((GrammarRuleNode)action).GetHead());
+            }
+        }
+    }
+    // now convert the list into an array
+    int[] genomeVals = new int[intList.Count];
+    for (int i = 0; i < intList.Count; i++) { genomeVals[i] = ((Int32)intList[i]).intValue(); }
+    return genomeVals;
+    */
+}
+
+/**
+   Reverse of the original map() function, takes a GPIndividual and returns
+   a corresponding GEIndividual; The GPIndividual may contain more than one trees,
+   and such cases are handled accordingly, see the 3rd bullet below --
+
+   NOTE:
+   * This reverse mapping is only valid for S-expression trees ;
+
+   * This procedure supports ERC for the current population (not for population
+   /subpopulation from other islands); However, that could be done by merging
+   all ERCBanks from all the sub-populations but that is not done yet ;
+
+   * Support for the ADF's are done as follows -- suppose in one GPIndividual,
+   there are N trees -- T1, T2, ,,, Tn and each of them follows n different
+   grammars G1, G2, ,,, Gn respectively; now if they are reverse-mapped to
+   int arrays, there will be n int arrays A1[], A2[], ,,, An[]; and suppose
+   the i-th tree Ti is reverse mapped to int array Ai[] and morevoer Ai[] is 
+   the longest among all the arrays (Bj[]s); so Bi[] is sufficient to build 
+   all ADF trees Tjs.
+*/
+public GEIndividual ReverseMap(IEvolutionState state, GPIndividual ind, int threadnum)
+{
+    // create a dummy individual
+    GEIndividual newind = (GEIndividual)I_Prototype.Clone();
+
+    // The longest int will be able to contain all ADF trees.
+    int longestIntLength = -1;
+    int[] longestInt = null;
+    // Now go through all the ADF trees.
+    for (int treeIndex = 0; treeIndex < ind.Trees.Length; treeIndex++)
+    {
+        // Flatten the Lisp tree
+        ArrayList flatSexp = (ArrayList)FlattenSexp(state, threadnum,
+            ind.Trees[treeIndex]);
+        // Now convert the flatten list into an array of ints
+        // no. of trees == no. of grammars
+        int[] genomeVals = ParseSexp(flatSexp, GrammarParser[treeIndex]);
+        // store the longest int array
+        if (genomeVals.Length >= longestIntLength)
+        {
+            longestIntLength = genomeVals.Length;
+            longestInt = new int[genomeVals.Length];
+            Array.Copy(genomeVals, 0, longestInt, 0, genomeVals.Length);
+        }
+        genomeVals = null;
+    }
+    // assign the longest int to the individual's genome
+    newind.genome = longestInt;
+
+    // update the GPIndividual's fitness information
+    newind.Fitness = ind.Fitness;
+    newind.Evaluated = false;
+
+    // Set the species to me ? not sure.
+    newind.Species = this;
+
+    // return it
+    return newind;
+}
         #endregion // Operations
     }
 }

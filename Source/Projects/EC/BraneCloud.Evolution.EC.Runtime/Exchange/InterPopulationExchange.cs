@@ -296,8 +296,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                 
                 // else, check whether the emigrants need to be sent
                 if ((state.Generation >= ExchangeInformation[i].Offset) 
-                            && ((ExchangeInformation[i].Modulo == 0) 
-                            || (((state.Generation - ExchangeInformation[i].Offset) % ExchangeInformation[i].Modulo) == 0)))
+                            && (ExchangeInformation[i].Modulo == 0 
+                            || (state.Generation - ExchangeInformation[i].Offset) % ExchangeInformation[i].Modulo == 0))
                 {
                     
                     // send the individuals!!!!
@@ -318,7 +318,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                             // get the index of the immigrant
                             var index = ExchangeInformation[i].ImmigrantsSelectionMethod.Produce(i, state, 0);
                             // copy the individual to the mailbox of the destination subpop
-                            Immigrants[ExchangeInformation[i].Destinations[x]][NumImmigrants[ExchangeInformation[i].Destinations[x]]] = state.Population.Subpops[i].Individuals[index];
+                            Immigrants[ExchangeInformation[i].Destinations[x]][NumImmigrants[ExchangeInformation[i].Destinations[x]]] =
+                                Process(state, 0, null, ExchangeInformation[i].Destinations[x], (Individual)state.Population.Subpops[i].Individuals[index].Clone());
                             // increment the counter with the number of individuals in the mailbox
                             NumImmigrants[ExchangeInformation[i].Destinations[x]]++;
                         }
@@ -349,7 +350,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                     state.Output.Fatal("Number of immigrants (" + NumImmigrants[x] + ") is larger than subpop #" + x + "'s size (" + len + ").  This would cause an infinite loop in the selection-to-die procedure.");
                 
                 var selected = new bool[len];
-                var indeces = new int[NumImmigrants[x]];
+                var indices = new int[NumImmigrants[x]];
                 for (var i = 0; i < selected.Length; i++)
                     selected[i] = false;
 
@@ -358,10 +359,10 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                 {
                     do 
                     {
-                        indeces[i] = ExchangeInformation[x].IndsToDieSelectionMethod.Produce(x, state, 0);
+                        indices[i] = ExchangeInformation[x].IndsToDieSelectionMethod.Produce(x, state, 0);
                     }
-                    while (selected[indeces[i]]);
-                    selected[indeces[i]] = true;
+                    while (selected[indices[i]]);
+                    selected[indices[i]] = true;
                 }
                 ExchangeInformation[x].IndsToDieSelectionMethod.FinishProducing(state, x, 0);
                 
@@ -369,10 +370,10 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                 {
                     
                     // read the individual
-                    state.Population.Subpops[x].Individuals[indeces[y]] = Immigrants[x][y];
+                    state.Population.Subpops[x].Individuals[indices[y]] = Immigrants[x][y];
                     
                     // reset the evaluated flag (the individuals are not evaluated in the current island */
-                    state.Population.Subpops[x].Individuals[indeces[y]].Evaluated = false;
+                    state.Population.Subpops[x].Individuals[indices[y]].Evaluated = false;
                 }
                 
                 // reset the number of immigrants in the mailbox for the current subpop

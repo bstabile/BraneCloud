@@ -110,7 +110,7 @@ namespace BraneCloud.Evolution.EC.App.NK
             }
 
             fitness /= n;
-            ((SimpleFitness)(ind2.Fitness)).SetFitness(state, (float)fitness, false);
+            ((SimpleFitness)ind2.Fitness).SetFitness(state, fitness, false);
             ind2.Evaluated = true;
         }
     }

@@ -116,13 +116,13 @@ namespace BraneCloud.Evolution.EC.GP
             }
 
             // Am I an ADM or an ADF?
-            if (Adf == null)
-                state.Output.Fatal("ADF is null for " + Adf.ErrorInfo());
-            else if (!(Adf is ADM))
-                // it's an ADF
+            //if (Adf == null)
+            //    state.Output.Fatal("ADF is null for " + Adf.ErrorInfo());
+            //else 
+
+            if (!(Adf is ADM)) // it's an ADF
                 Arguments[argument].CopyTo(input);
-            // it's an ADM
-            else
+            else // it's an ADM
             {
                 // get rid of my context temporarily
                 if (stack.MoveOntoSubstack(1) != 1)

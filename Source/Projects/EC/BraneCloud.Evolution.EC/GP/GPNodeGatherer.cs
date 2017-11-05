@@ -31,6 +31,7 @@ namespace BraneCloud.Evolution.EC.GP
     {
         #region Properties
 
+        // used internally by GPNode
         public GPNode Node { get; set; }
 
         #endregion // Properties

@@ -241,7 +241,7 @@ namespace BraneCloud.Evolution.EC.Configuration
         /// not found, the defaultParameter is used. The parameter chosen is marked
         /// "used".
         /// </summary>
-        public virtual object GetTypeForParameter(IParameter parameter, IParameter defaultParameter, Type mustCastToBaseType)
+        public virtual Type GetTypeForParameter(IParameter parameter, IParameter defaultParameter, Type mustCastToBaseType)
         {
             PrintGotten(parameter, defaultParameter, false);
             IParameter p;

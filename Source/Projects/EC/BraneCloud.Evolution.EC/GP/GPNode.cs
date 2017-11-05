@@ -20,7 +20,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Configuration;
@@ -94,35 +93,31 @@ namespace BraneCloud.Evolution.EC.GP
         public const string P_NODECONSTRAINTS = "nc";
         public const string GPNODEPRINTTAB = "    ";
         public const int MAXPRINTBYTES = 40;
-        
+
         public const int NODESEARCH_ALL = 0;
         public const int NODESEARCH_TERMINALS = 1;
         public const int NODESEARCH_NONTERMINALS = 2;
-        public const int NODESEARCH_CUSTOM = 3;
-        
+        const int NODESEARCH_CUSTOM = 3;  // should not be public
+
         public const int CHILDREN_UNKNOWN = -1;
 
         #endregion // Constants
+
         #region Properties
 
         /// <summary>
         /// The default base for GPNodes -- defined even though
         /// GPNode is abstract so you don't have to in subclasses. 
         /// </summary>
-        public virtual IParameter DefaultBase
-        {
-            get { return GPDefaults.ParamBase.Push(P_NODE); }
-        }
+        public virtual IParameter DefaultBase=> GPDefaults.ParamBase.Push(P_NODE); 
+        
 
         /// <summary>
         /// Returns a Lisp-like atom for the node which can be read in again by computer.
         /// If you need to encode an integer or a float or whatever for some reason
         /// (perhaps if it's an ERC), you should use the ec.util.Code library.  
         /// </summary>
-        public virtual string Name
-        {
-            get { return ToString(); }
-        }
+        public virtual string Name => ToString();
 
         /// <summary>
         /// The GPNode's Parent.  4 bytes.  :-(  But it really helps simplify breeding. 
@@ -163,6 +158,7 @@ namespace BraneCloud.Evolution.EC.GP
         public virtual int ExpectedChildren => CHILDREN_UNKNOWN;
 
         #endregion // Properties
+
         #region Setup
 
         /// <summary>
@@ -191,7 +187,8 @@ namespace BraneCloud.Evolution.EC.GP
             var s = state.Parameters.GetString(paramBase.Push(P_NODECONSTRAINTS), def.Push(P_NODECONSTRAINTS));
             if (s == null)
                 state.Output.Fatal("No node Constraints are defined for the GPNode "
-                    + ToStringForError(), paramBase.Push(P_NODECONSTRAINTS), def.Push(P_NODECONSTRAINTS));
+                                   + ToStringForError(), paramBase.Push(P_NODECONSTRAINTS),
+                    def.Push(P_NODECONSTRAINTS));
             else
                 ConstraintsIndex = GPNodeConstraints.ConstraintsFor(s, state).ConstraintIndex;
 
@@ -199,13 +196,14 @@ namespace BraneCloud.Evolution.EC.GP
             // for some special versions of GPNode, we may have to enforce certain
             // rules, checked in Children versions of Setup(...)
 
-            var constraintsObj = Constraints(((GPInitializer)state.Initializer));
+            var constraintsObj = Constraints(((GPInitializer) state.Initializer));
             var len = constraintsObj.ChildTypes.Length;
             if (len == 0) Children = constraintsObj.ZeroChildren;
             else Children = new GPNode[len];
         }
 
         #endregion // Setup
+
         #region Operations
 
         /// <summary>
@@ -219,7 +217,7 @@ namespace BraneCloud.Evolution.EC.GP
                 return index + 1;
             }
 
-            var initializer = (GPInitializer)(state.Initializer);
+            var initializer = (GPInitializer) (state.Initializer);
 
             // 1. Is the Parent and ArgPosition right?
             if (Parent == null)
@@ -232,9 +230,10 @@ namespace BraneCloud.Evolution.EC.GP
                 state.Output.Error("" + index + ": negative ArgPosition");
                 return index + 1;
             }
-            if (Parent is GPTree && ((GPTree)Parent).Child != this)
+            if (Parent is GPTree && ((GPTree) Parent).Child != this)
             {
-                state.Output.Error("" + index + ": I think I am a root node, but my GPTree does not think I am a root node");
+                state.Output.Error("" + index +
+                                   ": I think I am a root node, but my GPTree does not think I am a root node");
                 return index + 1;
             }
             if (Parent is GPTree && ArgPosition != 0)
@@ -242,14 +241,15 @@ namespace BraneCloud.Evolution.EC.GP
                 state.Output.Error("" + index + ": I think I am a root node, but my ArgPosition is not 0");
                 return index + 1;
             }
-            if (Parent is GPNode && ArgPosition >= ((GPNode)Parent).Children.Length)
+            if (Parent is GPNode && ArgPosition >= ((GPNode) Parent).Children.Length)
             {
                 state.Output.Error("" + index + ": ArgPosition outside range of Parent's Children array");
                 return index + 1;
             }
-            if (Parent is GPNode && ((GPNode)Parent).Children[ArgPosition] != this)
+            if (Parent is GPNode && ((GPNode) Parent).Children[ArgPosition] != this)
             {
-                state.Output.Error("" + index + ": I am not found in the provided ArgPosition (" + ArgPosition + ") of my Parent's Children array");
+                state.Output.Error("" + index + ": I am not found in the provided ArgPosition (" + ArgPosition +
+                                   ") of my Parent's Children array");
                 return index + 1;
             }
 
@@ -278,7 +278,8 @@ namespace BraneCloud.Evolution.EC.GP
                 }
                 if (Children[x].ArgPosition != x)
                 {
-                    state.Output.Error("" + index + ": child #" + x + " ArgPosition does not match position in the Children array");
+                    state.Output.Error("" + index + ": child #" + x +
+                                       " ArgPosition does not match position in the Children array");
                     return index + 1;
                 }
             }
@@ -291,16 +292,17 @@ namespace BraneCloud.Evolution.EC.GP
             }
 
             // 4. Am I swap-compatable with my Parent?
-            if (Parent is GPNode && !Constraints(initializer).ReturnType.CompatibleWith(initializer, ((GPNode)(Parent))
-                                                                                                         .Constraints(initializer).ChildTypes[ArgPosition]))
+            if (Parent is GPNode && !Constraints(initializer).ReturnType.CompatibleWith(initializer, ((GPNode) (Parent))
+                    .Constraints(initializer).ChildTypes[ArgPosition]))
             {
                 state.Output.Error("" + index + ": Incompatable GP type between me and my Parent");
                 return index + 1;
             }
-            if (Parent is GPTree && !Constraints(initializer).ReturnType.CompatibleWith(initializer, ((GPTree)(Parent))
-                                                                                .Constraints(initializer).TreeType))
+            if (Parent is GPTree && !Constraints(initializer).ReturnType.CompatibleWith(initializer, ((GPTree) (Parent))
+                    .Constraints(initializer).TreeType))
             {
-                state.Output.Error("" + index + ": I am root, but incompatable GP type between me and my tree return type");
+                state.Output.Error("" + index +
+                                   ": I am root, but incompatable GP type between me and my tree return type");
                 return index + 1;
             }
 
@@ -367,15 +369,18 @@ namespace BraneCloud.Evolution.EC.GP
         /// instead of state.Output.Fatal(), which will help a lot.
         /// </summary>
         /// <remarks>Warning: this method may get called more than once.</remarks>
-        public virtual void CheckConstraints(IEvolutionState state, int tree, GPIndividual typicalIndividual, IParameter individualBase)
+        public virtual void CheckConstraints(IEvolutionState state, int tree, GPIndividual typicalIndividual,
+            IParameter individualBase)
         {
             int numChildren = ExpectedChildren;
-            if (numChildren >= 0 && Children.Length != numChildren)  // uh oh
-                state.Output.Error("Incorrect number of children for node " + ToStringForError() + " at " + individualBase +
-                ", was expecting " + numChildren + " but got " + Children.Length);
+            if (numChildren >= 0 && Children.Length != numChildren) // uh oh
+                state.Output.Error("Incorrect number of children for node " + ToStringForError() + " at " +
+                                   individualBase +
+                                   ", was expecting " + numChildren + " but got " + Children.Length);
         }
-        
+
         #endregion // Constraints
+
         #region Tree
 
         #region Parent
@@ -387,10 +392,10 @@ namespace BraneCloud.Evolution.EC.GP
         public GPType ParentType(GPInitializer initializer)
         {
             if (Parent is GPNode)
-                return ((GPNode)Parent).Constraints(initializer).ChildTypes[ArgPosition];
+                return ((GPNode) Parent).Constraints(initializer).ChildTypes[ArgPosition];
 
             // else it's a tree root
-            return ((GPTree)Parent).Constraints(initializer).TreeType;
+            return ((GPTree) Parent).Constraints(initializer).TreeType;
         }
 
         /// <summary>
@@ -402,11 +407,12 @@ namespace BraneCloud.Evolution.EC.GP
             // -- new code, no need for recursion
             IGPNodeParent cParent = this;
             while (cParent != null && cParent is GPNode)
-                cParent = ((GPNode)cParent).Parent;
+                cParent = ((GPNode) cParent).Parent;
             return cParent;
         }
 
         #endregion // Parent
+
         #region RootedTree
 
         /// <summary>
@@ -418,7 +424,8 @@ namespace BraneCloud.Evolution.EC.GP
         {
             var hash = NodeHashCode();
 
-            return Children.Aggregate(hash, (current, t) => (current << 1 | BitShifter.URShift(current, 31)) ^ t.RootedTreeHashCode());
+            return Children.Aggregate(hash,
+                (current, t) => (current << 1 | BitShifter.URShift(current, 31)) ^ t.RootedTreeHashCode());
         }
 
         /// <summary>
@@ -436,25 +443,30 @@ namespace BraneCloud.Evolution.EC.GP
         }
 
         #endregion // RootedTree
+
         #region PathLength
 
         /// <summary>
         /// Returns the path length of the tree, which is the sum of all paths from all nodes to the root.   O(n).
         /// </summary>
-        public int PathLength(int nodesearch) { return pathLength(NODESEARCH_ALL, 0); }
+        public int PathLength(int nodesearch)
+        {
+            return PathLength(NODESEARCH_ALL, 0);
+        }
 
-        private int pathLength(int nodesearch, int currentDepth)
+        private int PathLength(int nodesearch, int currentDepth)
         {
             var sum = currentDepth;
-            if (nodesearch == NODESEARCH_NONTERMINALS && Children.Length == 0 ||  // I'm a leaf, don't include me
-                nodesearch == NODESEARCH_TERMINALS && Children.Length > 0)  // I'm a nonleaf, don't include me
+            if (nodesearch == NODESEARCH_NONTERMINALS && Children.Length == 0 || // I'm a leaf, don't include me
+                nodesearch == NODESEARCH_TERMINALS && Children.Length > 0) // I'm a nonleaf, don't include me
                 sum = 0;
 
-            sum += Children.Sum(t => pathLength(nodesearch, currentDepth + 1));
+            sum += Children.Sum(t => PathLength(nodesearch, currentDepth + 1));
             return sum;
         }
 
         #endregion // PathLength
+
         #region Depth
 
         /// <summary>
@@ -475,16 +487,18 @@ namespace BraneCloud.Evolution.EC.GP
             var cParent = Parent;
             var count = 0;
 
-            while (cParent != null && cParent is GPNode)
+            while (cParent is GPNode)
             {
                 count++;
-                cParent = ((GPNode)(cParent)).Parent;
+                cParent = ((GPNode) (cParent)).Parent;
             }
             return count;
         }
 
         #endregion // Depth
+
         #region Nodes
+
 
         /// <summary>
         /// Returns the number of nodes, constrained by g.Test(...)
@@ -511,8 +525,36 @@ namespace BraneCloud.Evolution.EC.GP
             for (var x = 0; x < Children.Length; x++)
                 s += Children[x].NumNodes(nodesearch);
             return s + ((nodesearch == NODESEARCH_ALL
-                     || (nodesearch == NODESEARCH_TERMINALS && Children.Length == 0)
-                     || (nodesearch == NODESEARCH_NONTERMINALS && Children.Length > 0)) ? 1 : 0);
+                         || (nodesearch == NODESEARCH_TERMINALS && Children.Length == 0)
+                         || (nodesearch == NODESEARCH_NONTERMINALS && Children.Length > 0))
+                       ? 1
+                       : 0);
+        }
+
+        /** Returns the p'th node, constrained by nodesearch,
+            in the subtree for which this GPNode is root.
+            Use numNodes(nodesearch) to determine the total number.  
+            g.test(...) is used as the constraining predicate.
+            p ranges from 0 to this number minus 1. O(n). The
+            resultant node is returned in <i>g</i>.*/
+        public GPNode NodeInPosition(int p, GPNodeGatherer g)
+        {
+            NodeInPosition(p, g, NODESEARCH_CUSTOM);
+            return g.Node;
+        }
+
+        /** Returns the p'th node, constrained by nodesearch,
+            in the subtree for which this GPNode is root.
+            Use numNodes(nodesearch) to determine the total number.  
+            g.test(...) is used as the constraining predicate.
+            p ranges from 0 to this number minus 1. O(n). The
+            resultant node is returned in <i>g</i>.*/
+        public GPNode NodeInPosition(int p, int nodesearch)
+        {
+            // The default gatherer returns true to include all nodes in the gather count
+            var g = new GPNodeGatherer() /*{ public bool Test(GPNode node) { return true; } }*/;
+            NodeInPosition(p, g, nodesearch);
+            return g.Node;
         }
 
         /// <summary>
@@ -581,7 +623,8 @@ namespace BraneCloud.Evolution.EC.GP
         /// </summary>
         public virtual bool NodeEquivalentTo(GPNode node)
         {
-            return (GetType().Equals(node.GetType()) && Children.Length == node.Children.Length && ConstraintsIndex == node.ConstraintsIndex);
+            return (GetType().Equals(node.GetType()) && Children.Length == node.Children.Length &&
+                    ConstraintsIndex == node.ConstraintsIndex);
         }
 
         /// <summary>
@@ -629,9 +672,9 @@ namespace BraneCloud.Evolution.EC.GP
 
             // replace the Parent pointer
             if (Parent is GPNode)
-                ((GPNode)(Parent)).Children[ArgPosition] = newNode;
+                ((GPNode) (Parent)).Children[ArgPosition] = newNode;
             else
-                ((GPTree)(Parent)).Child = newNode;
+                ((GPTree) (Parent)).Child = newNode;
 
             // replace the child pointers
             for (var x = 0; x < Children.Length; x++)
@@ -656,10 +699,10 @@ namespace BraneCloud.Evolution.EC.GP
             GPType type;
             if (node.Parent is GPNode)
                 // it's a GPNode
-                type = ((GPNode)(node.Parent)).Constraints(initializer).ChildTypes[node.ArgPosition];
+                type = ((GPNode) (node.Parent)).Constraints(initializer).ChildTypes[node.ArgPosition];
             // it's a tree root; I'm set compatible with the GPTree type
             else
-                type = ((GPTree)(node.Parent)).Constraints(initializer).TreeType;
+                type = ((GPTree) (node.Parent)).Constraints(initializer).TreeType;
 
             return Constraints(initializer).ReturnType.CompatibleWith(initializer, type);
         }
@@ -698,12 +741,12 @@ namespace BraneCloud.Evolution.EC.GP
         /// </code>
         /// <p/>...so, you might implement your Eval(...) function as follows:
         /// <code>
-        ///         public void Eval(final IEvolutionState state,
-        ///             final int thread,
-        ///             final GPData input,
-        ///             final ADFStack stack,
-        ///             final GPIndividual individual,
-        ///             final IProblem problem
+        ///         public void Eval(IEvolutionState state,
+        ///             int thread,
+        ///             GPData input,
+        ///             ADFStack stack,
+        ///             GPIndividual individual,
+        ///             IProblem problem
         ///         {
         ///             BooleanData dat = (BooleanData)input;
         ///             boolean x;
@@ -724,13 +767,15 @@ namespace BraneCloud.Evolution.EC.GP
         ///         }
         /// </code>
         /// </summary>		
-        public abstract void Eval(IEvolutionState state, int thread, GPData input, ADFStack stack, GPIndividual individual, IProblem problem);
+        public abstract void Eval(IEvolutionState state, int thread, GPData input, ADFStack stack,
+            GPIndividual individual, IProblem problem);
 
         #endregion // Nodes
 
         #endregion // Tree
 
         #endregion // Operations
+
         #region Cloning
 
         public virtual GPNode LightClone()
@@ -748,7 +793,7 @@ namespace BraneCloud.Evolution.EC.GP
                 throw new ApplicationException("Cloning Error!", ex);
             } // never happens
         }
-        
+
         /// <summary>
         /// Deep-clones the tree rooted at this node, and returns the entire
         /// copied tree.  The result has everything set except for the root
@@ -761,7 +806,7 @@ namespace BraneCloud.Evolution.EC.GP
             var newnode = LightClone();
             for (var x = 0; x < Children.Length; x++)
             {
-                newnode.Children[x] = (GPNode)Children[x].Clone();
+                newnode.Children[x] = (GPNode) Children[x].Clone();
                 // if you think about it, the following CAN'T be implemented by
                 // the children's clone method.  So it's set here.
                 newnode.Children[x].Parent = newnode;
@@ -769,7 +814,7 @@ namespace BraneCloud.Evolution.EC.GP
             }
             return newnode;
         }
-        
+
         /// <summary>
         /// Deep-clones the tree rooted at this node, and returns the entire
         /// copied tree.  If the node oldSubtree is located somewhere in this
@@ -779,7 +824,7 @@ namespace BraneCloud.Evolution.EC.GP
         /// </summary>		
         public GPNode CloneReplacing(GPNode newSubtree, GPNode oldSubtree)
         {
-            if (this == oldSubtree) return (GPNode)newSubtree.Clone();
+            if (this == oldSubtree) return (GPNode) newSubtree.Clone();
 
             var newnode = LightClone();
             for (var x = 0; x < Children.Length; x++)
@@ -791,8 +836,8 @@ namespace BraneCloud.Evolution.EC.GP
                 newnode.Children[x].ArgPosition = x;
             }
             return newnode;
-        }		
-        
+        }
+
         /// <summary>
         /// Deep-clones the tree rooted at this node, and returns the entire
         /// copied tree.  If the node oldSubtree is located somewhere in this
@@ -816,7 +861,7 @@ namespace BraneCloud.Evolution.EC.GP
             }
             return newnode;
         }
-                   
+
         /// <summary>
         /// Deep-clones the tree rooted at this node, and returns the entire
         /// copied tree.  If a node in oldSubtrees is located somewhere in this
@@ -828,14 +873,14 @@ namespace BraneCloud.Evolution.EC.GP
         public GPNode CloneReplacing(GPNode[] newSubtrees, GPNode[] oldSubtrees)
         {
             // am I a candidate?
-            var candidate = - 1;
+            var candidate = -1;
             for (var x = 0; x < oldSubtrees.Length; x++)
                 if (this == oldSubtrees[x])
                 {
-                    candidate = x; 
+                    candidate = x;
                     break;
                 }
-            
+
             if (candidate >= 0)
                 return newSubtrees[candidate].CloneReplacing(newSubtrees, oldSubtrees);
 
@@ -850,7 +895,7 @@ namespace BraneCloud.Evolution.EC.GP
             }
             return newnode;
         }
-                
+
         /// <summary>
         /// Clones a new subtree, but with the single node oldNode 
         /// (which may or may not be in the subtree) 
@@ -875,7 +920,7 @@ namespace BraneCloud.Evolution.EC.GP
                 numArgs = Children.Length;
                 currNode = LightClone();
             }
-            
+
             // populate
             for (var x = 0; x < numArgs; x++)
             {
@@ -886,8 +931,8 @@ namespace BraneCloud.Evolution.EC.GP
                 currNode.Children[x].ArgPosition = x;
             }
             return currNode;
-        }		
-        
+        }
+
         /// <summary>
         /// Clones a new subtree, but with each node in oldNodes[] respectively
         /// (which may or may not be in the subtree) replaced with
@@ -903,15 +948,15 @@ namespace BraneCloud.Evolution.EC.GP
         {
             int numArgs;
             GPNode currNode;
-            var found = - 1;
-            
+            var found = -1;
+
             for (var x = 0; x < newNodes.Length; x++)
             {
                 if (this != oldNodes[x]) continue;
                 found = x;
                 break;
             }
-            
+
             if (found > -1)
             {
                 numArgs = Math.Max(newNodes[found].Children.Length, Children.Length);
@@ -922,7 +967,7 @@ namespace BraneCloud.Evolution.EC.GP
                 numArgs = Children.Length;
                 currNode = LightClone();
             }
-            
+
             // populate
             for (var x = 0; x < numArgs; x++)
             {
@@ -936,6 +981,7 @@ namespace BraneCloud.Evolution.EC.GP
         }
 
         #endregion // Cloning
+
         #region ToString
 
         abstract public override string ToString();
@@ -957,10 +1003,10 @@ namespace BraneCloud.Evolution.EC.GP
         /// </summary>		
         public virtual string ToStringForError()
         {
-            var rootp = (GPTree)RootParent();
+            var rootp = (GPTree) RootParent();
             if (rootp != null)
             {
-                var tnum = ((GPTree)(RootParent())).TreeNumber;
+                var tnum = ((GPTree) (RootParent())).TreeNumber;
                 return ToString() + (tnum == GPTree.NO_TREENUM ? "" : " in tree " + tnum);
             }
             return ToString();
@@ -971,10 +1017,11 @@ namespace BraneCloud.Evolution.EC.GP
         /// </summary>
         public virtual string ErrorInfo()
         {
-            return "GPNode " + ToString() + " in the function set for tree " + ((GPTree)(RootParent())).TreeNumber;
+            return "GPNode " + ToString() + " in the function set for tree " + ((GPTree) (RootParent())).TreeNumber;
         }
 
         #endregion // ToString
+
         #region IO
 
         #region Print
@@ -1027,11 +1074,13 @@ namespace BraneCloud.Evolution.EC.GP
         {
             if (Children.Length > 0)
             {
-                state.Output.Print(" (", log); printbytes += 2;
+                state.Output.Print(" (", log);
+                printbytes += 2;
             }
             else
             {
-                state.Output.Print(" ", log); printbytes += 1;
+                state.Output.Print(" ", log);
+                printbytes += 1;
             }
             printbytes += PrintNode(state, log);
 
@@ -1039,7 +1088,8 @@ namespace BraneCloud.Evolution.EC.GP
 
             if (Children.Length > 0)
             {
-                state.Output.Print(")", log); printbytes += 1;
+                state.Output.Print(")", log);
+                printbytes += 1;
             }
             return printbytes;
         }
@@ -1102,7 +1152,8 @@ namespace BraneCloud.Evolution.EC.GP
             }
             printbytes += PrintNodeForHumans(state, log);
 
-            printbytes = Children.Aggregate(printbytes, (current, t) => t.PrintRootedTreeForHumans(state, log, tablevel, current));
+            printbytes = Children.Aggregate(printbytes,
+                (current, t) => t.PrintRootedTreeForHumans(state, log, tablevel, current));
 
             if (Children.Length > 0)
             {
@@ -1123,7 +1174,7 @@ namespace BraneCloud.Evolution.EC.GP
         /// <returns></returns>
         public string MakeGraphvizTree()
         {
-            return "digraph g {\nnode [shape=rectangle];\n" + MakeGraphvizSubtree("n") + "}\n";
+            return "digraph g {\ngraph [ordering=out];\nnode [shape=rectangle];\n" + MakeGraphvizSubtree("n") + "}\n";
         }
 
         /// <summary>
@@ -1149,6 +1200,7 @@ namespace BraneCloud.Evolution.EC.GP
         }
 
         #endregion // Graphviz
+
         #region Latex
 
         /// <summary>
@@ -1175,6 +1227,7 @@ namespace BraneCloud.Evolution.EC.GP
         }
 
         #endregion // Latex
+
         #region CTree
 
         /// <summary>
@@ -1194,13 +1247,14 @@ namespace BraneCloud.Evolution.EC.GP
             }
             if (Children.Length == 1)
             {
-                return ToStringForHumans() + "(" + Children[0].MakeCTree(true, printTerminalsAsVariables, useOperatorForm) + ")";
+                return ToStringForHumans() + "(" +
+                       Children[0].MakeCTree(true, printTerminalsAsVariables, useOperatorForm) + ")";
             }
             if (Children.Length == 2 && useOperatorForm)
             {
                 return (parentMadeParens ? "" : "(")
-                    + Children[0].MakeCTree(false, printTerminalsAsVariables, true) + " " + ToStringForHumans() + " "
-                    + Children[1].MakeCTree(false, printTerminalsAsVariables, true) + (parentMadeParens ? "" : ")");
+                       + Children[0].MakeCTree(false, printTerminalsAsVariables, true) + " " + ToStringForHumans() + " "
+                       + Children[1].MakeCTree(false, printTerminalsAsVariables, true) + (parentMadeParens ? "" : ")");
             }
             var s = ToStringForHumans() + "(" + Children[0].MakeCTree(true, printTerminalsAsVariables, useOperatorForm);
             for (var x = 1; x < Children.Length; x++)
@@ -1209,6 +1263,7 @@ namespace BraneCloud.Evolution.EC.GP
         }
 
         #endregion // CTree
+
         #region Lisp
 
         public StringBuilder MakeLispTree(StringBuilder buf)
@@ -1240,9 +1295,11 @@ namespace BraneCloud.Evolution.EC.GP
         #endregion // Lisp
 
         #endregion // Print
+
         #region Binary
 
-        public virtual void WriteRootedTree(IEvolutionState state, GPType expectedType, GPFunctionSet funcs, BinaryWriter writer)
+        public virtual void WriteRootedTree(IEvolutionState state, GPType expectedType, GPFunctionSet funcs,
+            BinaryWriter writer)
         {
             writer.Write(Children.Length);
             var isTerminal = (Children.Length == 0);
@@ -1256,21 +1313,22 @@ namespace BraneCloud.Evolution.EC.GP
                     break;
 
             if (index == gpfi.Length)
-            // uh oh
+                // uh oh
             {
                 state.Output.Fatal("No node in the function set can be found that is equivalent to the node "
-                    + this + " when performing WriteRootedTree(EvolutionState, GPType, GPFunctionSet, DataOutput).");
+                                   + this +
+                                   " when performing WriteRootedTree(EvolutionState, GPType, GPFunctionSet, DataOutput).");
             }
             writer.Write(index); // what kind of node it is
             WriteNode(state, writer);
 
-            var initializer = ((GPInitializer)state.Initializer);
+            var initializer = ((GPInitializer) state.Initializer);
             for (var x = 0; x < Children.Length; x++)
                 Children[x].WriteRootedTree(state, Constraints(initializer).ChildTypes[x], funcs, writer);
         }
 
         public static GPNode ReadRootedTree(IEvolutionState state, BinaryReader reader,
-                        GPType expectedType, GPFunctionSet funcs, IGPNodeParent parent, int argPosition)
+            GPType expectedType, GPFunctionSet funcs, IGPNodeParent parent, int argPosition)
         {
             var len = reader.ReadInt32(); // num Children
             var index = reader.ReadInt32(); // index in function set
@@ -1284,7 +1342,8 @@ namespace BraneCloud.Evolution.EC.GP
 
             if (node.Children == null || node.Children.Length != len)
             {
-                state.Output.Fatal("Mismatch in number of Children (" + len + ") when performing readRootedTree(...DataInput...) on " + node);
+                state.Output.Fatal("Mismatch in number of Children (" + len +
+                                   ") when performing readRootedTree(...DataInput...) on " + node);
             }
 
             node.Parent = parent;
@@ -1292,14 +1351,16 @@ namespace BraneCloud.Evolution.EC.GP
             node.ReadNode(state, reader);
 
             // do its Children
-            var initializer = ((GPInitializer)state.Initializer);
+            var initializer = ((GPInitializer) state.Initializer);
             for (var x = 0; x < node.Children.Length; x++)
-                node.Children[x] = ReadRootedTree(state, reader, node.Constraints(initializer).ChildTypes[x], funcs, node, x);
+                node.Children[x] = ReadRootedTree(state, reader, node.Constraints(initializer).ChildTypes[x], funcs,
+                    node, x);
 
             return node;
         }
 
         #endregion // Binary
+
         #region From DecodeReturn
 
         /// <summary>
@@ -1320,7 +1381,8 @@ namespace BraneCloud.Evolution.EC.GP
 
             if (dret.Pos >= len)
                 state.Output.Fatal("Reading line " + linenumber + ": "
-                    + "Premature end of tree structure -- did you forget a close-Parenthesis?\nThe tree was" + dret.Data);
+                                   + "Premature end of tree structure -- did you forget a close-Parenthesis?\nThe tree was" +
+                                   dret.Data);
 
             // if I've found a ')', complain
             if (dret.Data[dret.Pos] == ')')
@@ -1329,7 +1391,8 @@ namespace BraneCloud.Evolution.EC.GP
                 sb[dret.Pos] = REPLACEMENT_CHAR;
                 dret.Data = sb.ToString();
                 state.Output.Fatal("Reading line " + linenumber + ": "
-                    + "Premature ')' which I have replaced with a '" + REPLACEMENT_CHAR + "', in tree:\n" + dret.Data);
+                                   + "Premature ')' which I have replaced with a '" + REPLACEMENT_CHAR +
+                                   "', in tree:\n" + dret.Data);
             }
 
             // determine if I'm a terminal or not
@@ -1346,7 +1409,8 @@ namespace BraneCloud.Evolution.EC.GP
 
             if (dret.Pos >= len)
                 state.Output.Fatal("Reading line " + linenumber + ": "
-                    + "Premature end of tree structure -- did you forget a close-Parenthesis?\nThe tree was" + dret.Data);
+                                   + "Premature end of tree structure -- did you forget a close-Parenthesis?\nThe tree was" +
+                                   dret.Data);
 
             // check again if I found a ')'
             if (dret.Data[dret.Pos] == ')')
@@ -1355,7 +1419,8 @@ namespace BraneCloud.Evolution.EC.GP
                 sb[dret.Pos] = REPLACEMENT_CHAR;
                 dret.Data = sb.ToString();
                 state.Output.Fatal("Reading line " + linenumber + ": "
-                    + "Premature ')' which I have replaced with a '" + REPLACEMENT_CHAR + "', in tree:\n" + dret.Data);
+                                   + "Premature ')' which I have replaced with a '" + REPLACEMENT_CHAR +
+                                   "', in tree:\n" + dret.Data);
             }
 
 
@@ -1383,10 +1448,10 @@ namespace BraneCloud.Evolution.EC.GP
                 else
                     dret.Data = "" + REPLACEMENT_CHAR + dret.Data;
 
-                var msg = "Reading line " + linenumber + ": " 
-                        + "I came across a symbol which I could not match up with a type-valid node.\n"
-                        + "I have replaced the position immediately before the node in question with a '"
-                        + REPLACEMENT_CHAR + "':\n" + dret.Data;
+                var msg = "Reading line " + linenumber + ": "
+                          + "I came across a symbol which I could not match up with a type-valid node.\n"
+                          + "I have replaced the position immediately before the node in question with a '"
+                          + REPLACEMENT_CHAR + "':\n" + dret.Data;
 
                 state.Output.Fatal(msg);
                 //throw new InvalidOperationException(msg);
@@ -1394,22 +1459,26 @@ namespace BraneCloud.Evolution.EC.GP
 
             node.Parent = parent;
             node.ArgPosition = argPosition;
-            var initializer = ((GPInitializer)state.Initializer);
+            var initializer = ((GPInitializer) state.Initializer);
 
             // do its Children
             for (var x = 0; x < node.Children.Length; x++)
-                node.Children[x] = ReadRootedTree(linenumber, dret, node.Constraints(initializer).ChildTypes[x], funcs, node, x, state);
+                node.Children[x] = ReadRootedTree(linenumber, dret, node.Constraints(initializer).ChildTypes[x], funcs,
+                    node, x, state);
 
             // if I'm not a terminal, look for a ')'
 
             if (!isTerminal)
             {
                 // clear whitespace
-                for (; dret.Pos < len && Char.IsWhiteSpace(dret.Data[dret.Pos]); dret.Pos++){ }
+                for (; dret.Pos < len && Char.IsWhiteSpace(dret.Data[dret.Pos]); dret.Pos++)
+                {
+                }
 
                 if (dret.Pos >= len)
                     state.Output.Fatal("Reading line " + linenumber + ": "
-                        + "Premature end of tree structure -- did you forget a close-Parenthesis?\nThe tree was" + dret.Data);
+                                       + "Premature end of tree structure -- did you forget a close-Parenthesis?\nThe tree was" +
+                                       dret.Data);
 
                 if (dret.Data[dret.Pos] != ')')
                 {
@@ -1424,8 +1493,8 @@ namespace BraneCloud.Evolution.EC.GP
                         dret.Data = "" + REPLACEMENT_CHAR + dret.Data;
                     }
                     state.Output.Fatal("Reading line " + linenumber + ": "
-                        + "A nonterminal node has too many arguments.  I have put a '"
-                        + REPLACEMENT_CHAR + "' just before the offending argument.\n" + dret.Data);
+                                       + "A nonterminal node has too many arguments.  I have put a '"
+                                       + REPLACEMENT_CHAR + "' just before the offending argument.\n" + dret.Data);
                 }
                 else
                 {

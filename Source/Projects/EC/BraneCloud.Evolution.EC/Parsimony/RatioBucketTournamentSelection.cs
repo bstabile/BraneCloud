@@ -61,7 +61,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
     /// <font size="-1"> bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
     /// <td valign="top">(should we pick the <i>worst</i> individual in the tournament instead of the <i>best</i>?)</td></tr>
     /// <tr><td valign="top"><i>base.</i><tt>ratio</tt><br/>
-    /// <font size="-1">float &gt;= 2 (default)</font></td>
+    /// <font size="-1">double &gt;= 2 (default)</font></td>
     /// <td valign="top">(the ratio of worst out of remaining individuals that go in the next bucket)</td></tr>
     /// </table>
     /// <p/><b>Default Base</b><br/>
@@ -96,7 +96,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
         /// <summary>
         /// The default value for RATIO
         /// </summary>
-        const float DefaultRatio = 2;
+        const double DefaultRatio = 2;
 
         #endregion // Constants
         #region Fields
@@ -109,10 +109,8 @@ namespace BraneCloud.Evolution.EC.Parsimony
         #endregion // Fields
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_RATIO_BUCKET_TOURNAMENT); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_RATIO_BUCKET_TOURNAMENT); 
+        
 
         /// <summary>
         /// Size of the tournament
@@ -127,7 +125,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
         /// <summary>
         /// The value of RATIO
         /// </summary>
-        public float Ratio { get; set; }
+        public double Ratio { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -144,7 +142,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
 
             if (state.Parameters.ParameterExists(paramBase.Push(P_RATIO), def.Push(P_RATIO)))
             {
-                Ratio = state.Parameters.GetFloat(paramBase.Push(P_RATIO), def.Push(P_RATIO), 2.0f);
+                Ratio = state.Parameters.GetDouble(paramBase.Push(P_RATIO), def.Push(P_RATIO), 2.0);
                 if (Ratio < 2)
                 {
                     state.Output.Fatal("The value of b must be >= 2.", paramBase.Push(P_RATIO), def.Push(P_RATIO));
@@ -173,7 +171,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
 
             // how many individuals in current bucket
 
-            float totalInds = state.Population.Subpops[subpop].Individuals.Length;
+            double totalInds = state.Population.Subpops[subpop].Individuals.Length;
             var averageBuck = Math.Max(totalInds / Ratio, 1);
 
             // first individual goes into first bucket

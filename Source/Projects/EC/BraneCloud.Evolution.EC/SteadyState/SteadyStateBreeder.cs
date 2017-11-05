@@ -133,11 +133,10 @@ namespace BraneCloud.Evolution.EC.SteadyState
         /// </summary>
         public virtual void SourcesAreProperForm(SteadyStateEvolutionState state, BreedingPipeline[] breedingPipelines)
         {
-            for (var x = 0; x < breedingPipelines.Length; x++)
+            foreach (BreedingPipeline bp in breedingPipelines)
             {
-                if (!(breedingPipelines[x] is ISteadyStateBSource))
-                    state.Output.Error("Breeding Pipeline of subpop " + x + " is not of ISteadyStateBSource");
-                ((ISteadyStateBSource)(breedingPipelines[x])).SourcesAreProperForm(state);
+                // all breeding pipelines are ISteadyStateBSource
+                ((ISteadyStateBSource)bp).SourcesAreProperForm(state);
             }
         }
 
@@ -189,7 +188,7 @@ namespace BraneCloud.Evolution.EC.SteadyState
 
         public virtual Individual BreedIndividual(IEvolutionState state, int subpop, int thread)
         {
-            var st = (SteadyStateEvolutionState)state;
+            //var st = (SteadyStateEvolutionState)state;
             var newind = new Individual[1];
 
             // breed a single individual 

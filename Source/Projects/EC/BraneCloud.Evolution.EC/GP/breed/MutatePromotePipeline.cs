@@ -120,10 +120,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         #endregion // Fields
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPBreedDefaults.ParamBase.Push(P_MUTATEPROMOTE); }
-        }
+        public override IParameter DefaultBase => GPBreedDefaults.ParamBase.Push(P_MUTATEPROMOTE); 
 
         /// <summary>
         /// Is our tree fixed?  If not, this is -1 
@@ -136,10 +133,8 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         /// </summary>
         public int NumTries { get; set; }
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES; 
+        
 
         #endregion // Properties
         #region Setup

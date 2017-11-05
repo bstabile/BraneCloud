@@ -17,9 +17,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
 
@@ -85,10 +82,8 @@ namespace BraneCloud.Evolution.EC.Select
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_SUS); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_SUS); 
+        
 
         /// <summary>
         /// An array of pointers to individuals in the population, shuffled along with the fitnesses array.
@@ -98,7 +93,7 @@ namespace BraneCloud.Evolution.EC.Select
         /// <summary>
         /// The distribution of fitnesses.
         /// </summary>
-        public float[] Fitnesses;
+        public double[] Fitnesses { get; set; }
 
         /// <summary>
         /// Should we shuffle first?
@@ -108,7 +103,7 @@ namespace BraneCloud.Evolution.EC.Select
         /// <summary>
         /// The floating point value to consider for the next selected individual.
         /// </summary>
-        public float Offset { get; protected set; }
+        public double Offset { get; protected set; }
 
         /// <summary>
         /// The index in the array of the last individual selected.
@@ -141,7 +136,7 @@ namespace BraneCloud.Evolution.EC.Select
         /// BRS: I'm not really sure what the point is of passing in these arrays as arguments???
         /// They are simply references to the instance member arrays.
         /// </remarks>
-        void ShuffleFitnessesAndIndices(IMersenneTwister random, float[] fitnesses, int[] indices)
+        void ShuffleFitnessesAndIndices(IMersenneTwister random, double[] fitnesses, int[] indices)
         {
             // TODO : Figure out why Sean passes these into this method.
             //        The member arrays are basically overwritten in PrepareToProduce
@@ -174,10 +169,10 @@ namespace BraneCloud.Evolution.EC.Select
             LastIndex = 0;
             Steps = 0;
 
-            Fitnesses = new float[s.Population.Subpops[subpop].Individuals.Length];
+            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Length];
 
             // compute offset
-            Offset = (float)(s.Random[thread].NextDouble() / Fitnesses.Length);
+            Offset = (double)(s.Random[thread].NextDouble() / Fitnesses.Length);
 
             // load fitnesses but don't build distribution yet
             for (var x = 0; x < Fitnesses.Length; x++)
@@ -212,7 +207,7 @@ namespace BraneCloud.Evolution.EC.Select
                 if ((LastIndex == 0 || Offset >= Fitnesses[LastIndex - 1]) && Offset < Fitnesses[LastIndex])
                     break;
 
-            Offset += (float)(1.0 / Fitnesses.Length);  // update for next time
+            Offset += (double)(1.0 / Fitnesses.Length);  // update for next time
             Steps++;
             return Indices[LastIndex];
         }

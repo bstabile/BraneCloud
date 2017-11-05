@@ -17,9 +17,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
 
@@ -79,15 +76,12 @@ namespace BraneCloud.Evolution.EC.Select
         /// <summary>
         /// Floor for sigma scaled fitnesses.
         /// </summary>
-        private float _fitnessFloor;
+        private double _fitnessFloor;
 
         #endregion // Fields
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_SIGMA_SCALING); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_SIGMA_SCALING);
 
         #endregion // Properties
         #region Setup
@@ -98,7 +92,7 @@ namespace BraneCloud.Evolution.EC.Select
 
             var def = DefaultBase;
 
-            _fitnessFloor = state.Parameters.GetFloatWithDefault(
+            _fitnessFloor = state.Parameters.GetDoubleWithDefault(
                 paramBase.Push(P_SCALED_FITNESS_FLOOR), def.Push(P_SCALED_FITNESS_FLOOR), 0.1); // default scaled fitness floor of 0.1 according to Tanese (1989)
 
             if (_fitnessFloor < 0)
@@ -118,7 +112,7 @@ namespace BraneCloud.Evolution.EC.Select
         public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
         {
             // load fitnesses
-            Fitnesses = new float[s.Population.Subpops[subpop].Individuals.Length];
+            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Length];
 
             double meanSum = 0;
             double squaredDeviationsSum = 0;
@@ -148,7 +142,7 @@ namespace BraneCloud.Evolution.EC.Select
             // Fill fitnesses[] with sigma scaled fitness values
             for (var x = 0; x < Fitnesses.Length; x++)
             {
-                Fitnesses[x] = (float)SigmaScaledValue(Fitnesses[x], meanFitness, sigma, s); // adjust the fitness proportion according to sigma scaling.
+                Fitnesses[x] = (double)SigmaScaledValue(Fitnesses[x], meanFitness, sigma, s); // adjust the fitness proportion according to sigma scaling.
 
                 // Sigma scaling formula can return negative values, this is unacceptable for fitness proportionate style selection...
                 // so we must substitute the fitnessFloor (some value >= 0) when a sigma scaled fitness <= fitnessFloor is encountered.
@@ -162,7 +156,7 @@ namespace BraneCloud.Evolution.EC.Select
 
         private static double SigmaScaledValue(double fitness, double meanFitness, double sigma, IEvolutionState s)
         {
-            if (sigma != 0)
+            if (!sigma.Equals(0))
                 return 1 + (fitness - meanFitness) / (2 * sigma);
             return 1.0;
         }

@@ -66,8 +66,6 @@ namespace BraneCloud.Evolution.EC.Simple
         /// </summary>
         public const string P_COMPRESS = "gzip";
 
-        public const string P_MUZZLE = "muzzle";
-
         public const string P_DO_FINAL = "do-final";
         public const string P_DO_GENERATION = "do-generation";
         public const string P_DO_MESSAGE = "do-message";
@@ -98,9 +96,6 @@ namespace BraneCloud.Evolution.EC.Simple
         public bool DoDescription { get; set; }
         public bool DoPerGenerationDescription { get; set; }
 
-        /** Should we even open up a file and write to it at all? */
-        public bool Muzzle { get; set; }
-
         #endregion // Properties
         #region Setup
 
@@ -119,9 +114,7 @@ namespace BraneCloud.Evolution.EC.Simple
             DoPerGenerationDescription =
                 state.Parameters.GetBoolean(paramBase.Push(P_DO_PER_GENERATION_DESCRIPTION), null, false);
 
-            Muzzle = state.Parameters.GetBoolean(paramBase.Push(P_MUZZLE), null, false);
-
-            if (Muzzle)
+            if (SilentFile)
             {
                 StatisticsLog = Output.NO_LOGS;
             }
@@ -137,6 +130,7 @@ namespace BraneCloud.Evolution.EC.Simple
                                        ":\n" + i);
                 }
             }
+            else state.Output.Warning("No statistics file specified, printing to stdout at end.", paramBase.Push(P_STATISTICS_FILE));
         }
 
         #endregion // Setup
@@ -154,6 +148,7 @@ namespace BraneCloud.Evolution.EC.Simple
             BestOfRun = new Individual[state.Population.Subpops.Length];
         }
 
+        bool warned = false;
         /// <summary>
         /// Logs the best individual of the generation. 
         /// </summary>
@@ -167,8 +162,26 @@ namespace BraneCloud.Evolution.EC.Simple
             {
                 bestI[x] = state.Population.Subpops[x].Individuals[0];
                 for (var y = 1; y < state.Population.Subpops[x].Individuals.Length; y++)
-                    if (state.Population.Subpops[x].Individuals[y].Fitness.BetterThan(bestI[x].Fitness))
+                {
+                    if (state.Population.Subpops[x].Individuals[y] == null)
+                    {
+                        if (!warned)
+                        {
+                            state.Output.WarnOnce("Null individuals found in subpopulation");
+                            warned = true;  // we do this rather than relying on warnOnce because it is much faster in a tight loop
+                        }
+                    }
+                    else if (bestI[x] == null || state.Population.Subpops[x].Individuals[y].Fitness.BetterThan(bestI[x].Fitness))
                         bestI[x] = state.Population.Subpops[x].Individuals[y];
+                    if (bestI[x] == null)
+                    {
+                        if (!warned)
+                        {
+                            state.Output.WarnOnce("Null individuals found in subpopulation");
+                            warned = true;  // we do this rather than relying on warnOnce because it is much faster in a tight loop
+                        }
+                    }
+                }
 
                 // now test to see if it's the new Best_Of_Run
                 if (BestOfRun[x] == null || bestI[x].Fitness.BetterThan(BestOfRun[x].Fitness))
@@ -182,7 +195,7 @@ namespace BraneCloud.Evolution.EC.Simple
             {
                 if (DoGeneration) state.Output.PrintLn("Subpopulation " + x + ":", StatisticsLog);
                 if (DoGeneration) bestI[x].PrintIndividualForHumans(state, StatisticsLog);
-                if (DoMessage)
+                if (DoMessage && !SilentPrint)
                     state.Output.Message("Subpop " + x + " best fitness of generation: " +
                                          (bestI[x].Evaluated ? " " : " (evaluated flag not set): ") +
                                          bestI[x].Fitness.FitnessToStringForHumans());
@@ -195,6 +208,15 @@ namespace BraneCloud.Evolution.EC.Simple
                 }
             }
 }
+
+        /// <summary>
+        /// Allows MultiObjectiveStatistics etc. to call base.base.finalStatistics(...) 
+        /// without calling base.finalStatistics(...).
+        /// </summary>
+        protected void BypassFinalStatistics(IEvolutionState state, int result)
+        {
+            base.FinalStatistics(state, result);
+        }
 
         /// <summary>
         /// Logs the best individual of the run. 
@@ -211,7 +233,7 @@ namespace BraneCloud.Evolution.EC.Simple
             {
                 if (DoFinal) state.Output.PrintLn("Subpopulation " + x + ":", StatisticsLog);
                 if (DoFinal) BestOfRun[x].PrintIndividualForHumans(state, StatisticsLog);
-                if (DoMessage) state.Output.Message("Subpop " + x + " best fitness of run: " + BestOfRun[x].Fitness.FitnessToStringForHumans());
+                if (DoMessage && !SilentPrint) state.Output.Message("Subpop " + x + " best fitness of run: " + BestOfRun[x].Fitness.FitnessToStringForHumans());
 
                 // finally describe the winner if there is a description
                 if (DoFinal && DoDescription)

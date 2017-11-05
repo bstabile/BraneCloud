@@ -379,7 +379,7 @@ namespace BraneCloud.Evolution.EC
             var seedMessage = "Seed: ";
 
             // Get time in milliseconds
-            var time = (int)((DateTime.Now.Ticks - 621355968000000000) / 10000);
+            var time = (int)DateTimeHelper.CurrentTimeMilliseconds;
 
             var seed = 0;
             seed = DetermineSeed(output, parameters, new Parameter(P_SEED).Push("" + 0),
@@ -400,7 +400,7 @@ namespace BraneCloud.Evolution.EC
             state.BreedThreads = breedthreads;
             state.RandomSeedOffset = randomSeedOffset;
 
-            output.SystemMessage(String.Format("Threads:  breed/{0} eval/{1}", breedthreads, evalthreads));
+            output.SystemMessage($"Threads:  breed/{breedthreads} eval/{evalthreads}");
             output.SystemMessage(seedMessage);
 
             return state;
@@ -417,7 +417,7 @@ namespace BraneCloud.Evolution.EC
 
             if (!File.Exists(paramsFileName))
             {
-                Output.InitialError(String.Format("The specified parameter file does not exist: {0}", paramsFileName), false);
+                Output.InitialError($"The specified parameter file does not exist: {paramsFileName}", false);
                 Environment.Exit(1); // This was originally part of the InitialError call in ECJ. But we make Evolve responsible.
             }
 
@@ -429,7 +429,7 @@ namespace BraneCloud.Evolution.EC
             }
             catch (Exception e)
             {
-                Output.InitialError(String.Format("Error reading the parameter file \"{0}\": {1}" + paramsFileName, e.Message), false);
+                Output.InitialError($"Error reading the parameter file \"{paramsFileName}\": {e.Message}", false);
                 Environment.Exit(1); // This was originally part of the InitialError call in ECJ. But we make Evolve responsible.
             }
             if (parameters == null)

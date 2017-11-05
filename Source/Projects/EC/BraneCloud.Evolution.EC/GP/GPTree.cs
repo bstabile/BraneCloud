@@ -18,7 +18,6 @@
 
 using System;
 using System.IO;
-using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Configuration;
 

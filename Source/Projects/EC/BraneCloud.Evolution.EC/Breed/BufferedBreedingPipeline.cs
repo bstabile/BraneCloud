@@ -105,7 +105,7 @@ namespace BraneCloud.Evolution.EC.Breed
             CurrentSize = 0; // just in case 
 
             // declare that likelihood isn't used
-            if (Likelihood < 1.0f)
+            if (Likelihood < 1.0)
                 state.Output.Warning("BufferedBreedingPipeline does not respond to the 'likelihood' parameter.",
                     paramBase.Push(P_LIKELIHOOD), def.Push(P_LIKELIHOOD));
         }

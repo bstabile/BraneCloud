@@ -17,12 +17,9 @@
  */
 
 using System;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks.Dataflow;
 using BraneCloud.Evolution.EC.Breed;
 using BraneCloud.Evolution.EC.Util;
-using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Simple
@@ -54,6 +51,12 @@ namespace BraneCloud.Evolution.EC.Simple
     /// <tr><td valign="top"><tt><i>base</i>.Elite.<i>i</i></tt><br/>
     /// <font size="-1">int >= 0 (default=0)</font></td>
     /// <td valign="top">(the number of elitist individuals for subpop <i>i</i>)</td></tr>
+    /// <tr><td valign="top"><tt><i>base</i>.reduce - by.<i>i</i></tt><br/>
+    /// <font size="-1">int >= 0 (default=0)</font></td>
+    /// <td valign="top">(how many to reduce subpopulation<i>i</i> by each generation)</td></tr>
+    /// <tr><td valign="top"><tt><i>base</i>.minimum - size.<i>i</i></tt><br/>
+    /// <font size="-1">int >= 2 (default=2)</font></td>
+    /// <td valign="top">(the minimum size for subpopulation <i>i</i> regardless of reduction)</td></tr>
     /// <tr><td valign="top"><tt><i>base</i>.reevaluate-elites.<i>i</i></tt><br/>
     /// <font size="-1">boolean (default = false)</font></td>    
     /// <td valign="top">(should we reevaluate the elites of subpopulation <i>i</i> each generation?)</td></tr>
@@ -66,23 +69,6 @@ namespace BraneCloud.Evolution.EC.Simple
     [ECConfiguration("ec.simple.SimpleBreeder")]
     public class SimpleBreeder : Breeder
     {
-        internal class EliteComparator : ISortComparatorL
-        {
-            internal Individual[] Inds;
-            public EliteComparator(Individual[] inds)
-            {
-                Inds = inds;
-            }
-            public virtual bool lt(long a, long b)
-            {
-                return Inds[(int)b].Fitness.BetterThan(Inds[(int)a].Fitness);
-            }
-            public virtual bool gt(long a, long b)
-            {
-                return Inds[(int)a].Fitness.BetterThan(Inds[(int)b].Fitness);
-            }
-        }
-
         #region Constants
 
         public const string P_ELITE = "elite";
@@ -90,6 +76,8 @@ namespace BraneCloud.Evolution.EC.Simple
         public const string P_REEVALUATE_ELITES = "reevaluate-elites";
         public const string P_SEQUENTIAL_BREEDING = "sequential";
         public const string P_CLONE_PIPELINE_AND_POPULATION = "clone-pipeline-and-population";
+        public const string P_REDUCE_BY = "reduce-by";
+        public const string P_MINIMUM_SIZE = "minimum-size";
 
         public const int NOT_SET = -1;
 
@@ -103,7 +91,8 @@ namespace BraneCloud.Evolution.EC.Simple
 
         public double[] EliteFrac { get; set; }
 
-
+        public int[] ReduceBy { get; set; }
+        public int[] MinimumSize { get; set; }
 
         public bool[] ReevaluateElites { get; set; }
 
@@ -128,6 +117,10 @@ namespace BraneCloud.Evolution.EC.Simple
             for (var i = 0; i < size; i++)
                 EliteFrac[i] = Elite[i] = NOT_SET;
             ReevaluateElites = new bool[size];
+            ReduceBy = new int[size];  // all zero
+            MinimumSize = new int[size];
+            for (int i = 0; i < size; i++)
+                MinimumSize[i] = 2;
 
             SequentialBreeding = state.Parameters.GetBoolean(paramBase.Push(P_SEQUENTIAL_BREEDING), null, false);
             if (SequentialBreeding && size == 1) // uh oh, this can't be right
@@ -142,6 +135,14 @@ namespace BraneCloud.Evolution.EC.Simple
             var defaultSubpop = state.Parameters.GetInt(new Parameter(Initializer.P_POP).Push(Population.P_DEFAULT_SUBPOP), null, 0);
             for (var x = 0; x < size; x++)
             {
+                ReduceBy[x] = state.Parameters.GetIntWithDefault(paramBase.Push(P_REDUCE_BY).Push("" + x), null, 0);
+                if (ReduceBy[x] < 0)
+                    state.Output.Fatal("reduce-by must be set to an integer >= 0.", paramBase.Push(P_REDUCE_BY).Push("" + x));
+
+                MinimumSize[x] = state.Parameters.GetIntWithDefault(paramBase.Push(P_MINIMUM_SIZE).Push("" + x), null, 2);
+                if (MinimumSize[x] < 2)
+                    state.Output.Fatal("minimum-size must be set to an integer >= 2.", paramBase.Push(P_MINIMUM_SIZE).Push("" + x));
+
                 // get elites
                 if (state.Parameters.ParameterExists(paramBase.Push(P_ELITE).Push("" + x), null))
                 {
@@ -208,8 +209,7 @@ namespace BraneCloud.Evolution.EC.Simple
 
         public bool UsingElitism(int subpopulation)
         {
-            return Elite[subpopulation] != NOT_SET 
-                || !EliteFrac[subpopulation].Equals(NOT_SET); // Floating point comparison!
+            return Elite[subpopulation] > 0 || EliteFrac[subpopulation] > 0;
         }
 
         public int NumElites(IEvolutionState state, int subpopulation)
@@ -298,7 +298,7 @@ namespace BraneCloud.Evolution.EC.Simple
                     var inds = newpop.Subpops[sub].Individuals;
                     var oldinds = state.Population.Subpops[sub].Individuals;
                     for (var x = inds.Length - NumElites(state, sub); x < inds.Length; x++)
-                        inds[x] = (Individual)(oldinds[orderedPop[x]].Clone());
+                        inds[x] = (Individual)oldinds[orderedPop[x]].Clone();
                 }
                 // optionally force reevaluation
                 UnmarkElitesEvaluated(state, newpop);
@@ -338,6 +338,22 @@ namespace BraneCloud.Evolution.EC.Simple
                 BackupPopulation = state.Population;  // swap in
             }
 
+            // maybe resize?
+            for (int i = 0; i < state.Population.Subpops.Length; i++)
+            {
+                if (ReduceBy[i] > 0)
+                {
+                    int prospectiveSize = Math.Max(
+                        Math.Max(state.Population.Subpops[i].Individuals.Length - ReduceBy[i], MinimumSize[i]),
+                        NumElites(state, i));
+                    if (prospectiveSize < state.Population.Subpops[i].Individuals.Length)  // let's resize!
+                    {
+                        state.Output.Message("Subpop " + i + " reduced " + state.Population.Subpops[i].Individuals.Length + " -> " + prospectiveSize);
+                        newpop.Subpops[i].Resize(prospectiveSize);
+                    }
+                }
+            }
+
             // load Elites into top of newpop
             LoadElites(state, newpop);
 
@@ -350,16 +366,18 @@ namespace BraneCloud.Evolution.EC.Simple
                 state.Output.WarnOnce("Largest subpopulation size (" + numThreads + ") is smaller than number of breedthreads (" + state.BreedThreads +
                                       "), so fewer breedthreads will be created.");
 
-            var numinds = new int[state.BreedThreads][];
-            for (var i = 0; i < state.BreedThreads; i++)
-            {
-                numinds[i] = new int[state.Population.Subpops.Length];
-            }
-            var from = new int[state.BreedThreads][];
-            for (var i2 = 0; i2 < state.BreedThreads; i2++)
-            {
-                from[i2] = new int[state.Population.Subpops.Length];
-            }
+            int[][] numinds = TensorFactory.Create<int>(state.BreedThreads, state.Population.Subpops.Length);
+            //var numinds = new int[state.BreedThreads][];
+            //for (var i = 0; i < state.BreedThreads; i++)
+            //{
+            //    numinds[i] = new int[state.Population.Subpops.Length];
+            //}
+            int[][] from = TensorFactory.Create<int>(state.BreedThreads, state.Population.Subpops.Length);
+            //var from = new int[state.BreedThreads][];
+            //for (var i2 = 0; i2 < state.BreedThreads; i2++)
+            //{
+            //    from[i2] = new int[state.Population.Subpops.Length];
+            //}
 
             for (int x = 0; x < state.Population.Subpops.Length; x++)
             {
@@ -498,5 +516,23 @@ namespace BraneCloud.Evolution.EC.Simple
         }
 
         #endregion // Operations
+
+        private class EliteComparator : ISortComparatorL
+        {
+            internal Individual[] Inds;
+            public EliteComparator(Individual[] inds)
+            {
+                Inds = inds;
+            }
+            public virtual bool lt(long a, long b)
+            {
+                return Inds[(int)b].Fitness.BetterThan(Inds[(int)a].Fitness);
+            }
+            public virtual bool gt(long a, long b)
+            {
+                return Inds[(int)a].Fitness.BetterThan(Inds[(int)b].Fitness);
+            }
+        }
+
     }
 }

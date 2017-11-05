@@ -55,10 +55,10 @@ namespace BraneCloud.Evolution.EC.Select
     /// <p/><b>Parameters</b><br/>
     /// <table>
     /// <tr><td valign="top"><i>base.</i><tt>top</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0</font></td>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0</font></td>
     /// <td valign="top">(the percentage of the population going into the "good" (top) group)</td></tr>
     /// <tr><td valign="top"><i>base.</i><tt>gets</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0</font></td>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0</font></td>
     /// <td valign="top">(the likelihood that an individual will be picked from the "good" group)</td></tr>
     /// </table>
     /// <p/><b>Default Base</b><br/>
@@ -82,8 +82,8 @@ namespace BraneCloud.Evolution.EC.Select
             get { return SelectDefaults.ParamBase.Push(P_GREEDY); }
         }
 
-        public float[] SortedFitOver { get; set; }
-        public float[] SortedFitUnder { get; set; }
+        public double[] SortedFitOver { get; set; }
+        public double[] SortedFitUnder { get; set; }
 
         /// <summary>
         /// Sorted population -- since I *have* to use an int-sized individual (short gives me only 16K), 
@@ -91,8 +91,8 @@ namespace BraneCloud.Evolution.EC.Select
         /// </summary>
         public int[] SortedPop { get; set; }
 
-        public float Top_N_Percent { get; set; }
-        public float Gets_N_Percent { get; set; }
+        public double Top_N_Percent { get; set; }
+        public double Gets_N_Percent { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -103,11 +103,11 @@ namespace BraneCloud.Evolution.EC.Select
             
             var def = DefaultBase;
             
-            Top_N_Percent = state.Parameters.GetFloatWithMax(paramBase.Push(P_TOP), def.Push(P_TOP), 0.0, 1.0);
+            Top_N_Percent = state.Parameters.GetDoubleWithMax(paramBase.Push(P_TOP), def.Push(P_TOP), 0.0, 1.0);
             if (Top_N_Percent < 0.0)
                 state.Output.Fatal("Top-N-Percent must be between 0.0 and 1.0", paramBase.Push(P_TOP), def.Push(P_TOP));
             
-            Gets_N_Percent = state.Parameters.GetFloatWithMax(paramBase.Push(P_GETS), def.Push(P_GETS), 0.0, 1.0);
+            Gets_N_Percent = state.Parameters.GetDoubleWithMax(paramBase.Push(P_GETS), def.Push(P_GETS), 0.0, 1.0);
             if (Gets_N_Percent < 0.0)
                 state.Output.Fatal("Gets-n-percent must be between 0.0 and 1.0", paramBase.Push(P_GETS), def.Push(P_GETS));
         }
@@ -141,7 +141,7 @@ namespace BraneCloud.Evolution.EC.Select
                 s.Output.Fatal("Greedy Overselection can only be done with a population of size 2 or more (offending subpop #" + subpop + ")");
 
             // load SortedFitOver
-            SortedFitOver = new float[boundary];
+            SortedFitOver = new double[boundary];
             var y = 0;
             for (var x = SortedPop.Length - boundary; x < SortedPop.Length; x++)
             {
@@ -154,7 +154,7 @@ namespace BraneCloud.Evolution.EC.Select
             }
 
             // load SortedFitUnder
-            SortedFitUnder = new float[SortedPop.Length - boundary];
+            SortedFitUnder = new double[SortedPop.Length - boundary];
             y = 0;
             for (var x = 0; x < SortedPop.Length - boundary; x++)
             {
@@ -177,10 +177,10 @@ namespace BraneCloud.Evolution.EC.Select
             if (state.Random[thread].NextBoolean(Gets_N_Percent))
                 // over -- SortedFitUnder.length to SortedPop.length
                 return SortedPop[SortedFitUnder.Length
-                    + RandomChoice.PickFromDistribution(SortedFitOver, state.Random[thread].NextFloat())];
+                    + RandomChoice.PickFromDistribution(SortedFitOver, state.Random[thread].NextDouble())];
 
             // under -- 0 to SortedFitUnder.length
-            return SortedPop[RandomChoice.PickFromDistribution(SortedFitUnder, state.Random[thread].NextFloat())];
+            return SortedPop[RandomChoice.PickFromDistribution(SortedFitUnder, state.Random[thread].NextDouble())];
         }
 
         public override void FinishProducing(IEvolutionState s, int subpop, int thread)

@@ -49,13 +49,13 @@ namespace BraneCloud.Evolution.EC.Select
      <font size=-1> bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
      <td valign=top>(should we pick from among the <i>worst n</i> individuals in the tournament instead of the <i>best n</i>?)</td></tr>
      <tr><td valign=top><i>base.</i><tt>size</tt><br>
-     <font size=-1>float &gt;= 1</font></td>
+     <font size=-1>double &gt;= 1</font></td>
      <td valign=top>(the tournament size)</td></tr>
      <tr><td valign=top><i>base.</i><tt>n</tt><br>
      <font size=-1> int > 0 </font></td>
      <td valign=top>(the number of best-individuals to select from)</td></tr>
      <tr><td valign=top><i>base.</i><tt>n-fraction</tt><br>
-     <font size=-1> 0.0 <= float < 1.0 (default is 1)</font></td>
+     <font size=-1> 0.0 <= double < 1.0 (default is 1)</font></td>
      <td valign=top>(the number of best-individuals to select from, as a fraction of the total population)</td></tr>
      </table>
 
@@ -86,10 +86,8 @@ namespace BraneCloud.Evolution.EC.Select
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_BEST); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_BEST);
+        
 
         /** Base size of the tournament; this may change.  */
         public int Size { get; set; }
@@ -109,7 +107,7 @@ namespace BraneCloud.Evolution.EC.Select
         /// <summary>
         /// Sorted, normalized, totalized fitnesses for the population. 
         /// </summary>
-        public float[] SortedFit { get; set; }
+        public double[] SortedFit { get; set; }
 
         /// <summary>
         /// Sorted population -- since I *have* to use an int-sized
@@ -143,7 +141,7 @@ namespace BraneCloud.Evolution.EC.Select
                 BestNFrac =
                     state.Parameters.GetDoubleWithMax(paramBase.Push(P_N_FRACTION), def.Push(P_N_FRACTION), 0.0, 1.0);
                 if (BestNFrac <= 0.0)
-                    state.Output.Fatal("n-fraction must be a floating-point value greater than 0.0 and <= 1.0", paramBase.Push(P_N_FRACTION), def.Push(P_N_FRACTION));
+                    state.Output.Fatal("n-fraction must be a double floating-point value greater than 0.0 and <= 1.0", paramBase.Push(P_N_FRACTION), def.Push(P_N_FRACTION));
             }
             else state.Output.Fatal("Either n or n-fraction must be defined for BestSelection.", paramBase.Push(P_N), def.Push(P_N));
 

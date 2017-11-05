@@ -165,7 +165,7 @@ namespace BraneCloud.Evolution.EC.Configuration
         {
             throw new NotImplementedException();
         }
-        public object GetTypeForParameter(IParameter parameter, IParameter defaultParameter, Type mustCastToBaseType)
+        public Type GetTypeForParameter(IParameter parameter, IParameter defaultParameter, Type mustCastToBaseType)
         {
             throw new NotImplementedException();
         }

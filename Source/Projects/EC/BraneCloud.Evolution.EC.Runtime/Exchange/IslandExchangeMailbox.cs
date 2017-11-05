@@ -65,7 +65,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         #region Fields
 
         // synchronization variables
-        internal bool syncVar;
+        internal bool[] syncVar = new bool[1];
         internal object syncRoot = new object();
 
         #endregion // Fields
@@ -73,7 +73,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
 
         /// <summary>
         /// Return the port of the ServerSocket (where the islands where the other islands should
-        /// connect in order to send their emigrants).
+        /// connect in order to send their immigrants).
         /// </summary>
         public virtual int Port
         {
@@ -85,7 +85,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         }
 
         /// <summary>
-        /// Storage for the incoming immigrants: 2 sizes: the subpop and the index of the emigrant. 
+        /// Storage for the incoming immigrants: 2 sizes: the subpop and the index of the immigrant. 
         /// </summary>
         public Individual[][] Immigrants { get; set; }
 
@@ -97,7 +97,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         /// <summary>
         /// Auxiliary variables to manage the queue storages.
         /// </summary>
-        public int[] Person2Die { get; set; }
+        public int[] NextIndexPosition { get; set; }
 
         /// <summary>
         /// The socket where it listens for incomming messages.
@@ -153,7 +153,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         /// n_incoming_p : the number of islands that will send messages to the current island
         /// how_many : how many immigrants to manage in the queue-like storage for each of the subpops
         /// </summary>
-        public IslandExchangeMailbox(IEvolutionState state_p, int port, int n_incoming_p, int how_many, string myId, bool chatty, bool compressedCommunication)
+        public IslandExchangeMailbox(IEvolutionState state, int port, int numIncoming, int howMany, string myId, bool chatty, bool compressedCommunication)
         {
             MyId = myId;
             CompressedCommunication = compressedCommunication;
@@ -161,11 +161,11 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
             Chatty = chatty;
 
             // initialize public variables from the parameters of the constructor
-            State = state_p;
-            NumIncoming = n_incoming_p;
+            State = state;
+            NumIncoming = numIncoming;
 
-            var p_numsubpops = new Parameter(Initializer.P_POP).Push(Population.P_SIZE);
-            var numsubpops = State.Parameters.GetInt(p_numsubpops, null, 1);
+            var n = new Parameter(Initializer.P_POP).Push(Population.P_SIZE);
+            var numsubpops = State.Parameters.GetInt(n, null, 1);
             if (numsubpops == 0)
             {
                 // later on, Population will complain with this fatally, so don't
@@ -182,13 +182,13 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
             Immigrants = new Individual[numsubpops][];
             for (var i = 0; i < numsubpops; i++)
             {
-                Immigrants[i] = new Individual[how_many];
+                Immigrants[i] = new Individual[howMany];
             }
-            Person2Die = new int[numsubpops];
+            NextIndexPosition = new int[numsubpops];
             NumImmigrants = new int[numsubpops];
 
             // set the synchronization variable to false (it will be set to true to signal exiting the waiting loop)
-            syncVar = false;
+            syncVar[0] = false;
 
             // create the ServerSocket to listen to incoming messages
             try
@@ -337,7 +337,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                                     // so we have to reset it now
                                     if (NumImmigrants[subpop] == 0)
                                         // if it was reset
-                                        Person2Die[subpop] = 0; // reset the person2die[x]
+                                        NextIndexPosition[subpop] = 0; // reset the person2die[x]
 
                                     // loop in order to receive all the incoming individuals in the current dialogue
                                     for (var ind = 0; ind < how_many_to_come; ind++)
@@ -345,17 +345,17 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                                         // read the individual
                                         try
                                         {
-                                            // read the emigrant in the storage
-                                            Immigrants[subpop][Person2Die[subpop]] =
+                                            // read the immigrant in the storage
+                                            Immigrants[subpop][NextIndexPosition[subpop]] =
                                                 State.Population.Subpops[subpop].Species.NewIndividual(State, DataInput[x]);
 
                                             //state.Output.Message( "Individual received." );
 
                                             // increase the queue index
-                                            if (Person2Die[subpop] == Immigrants[subpop].Length - 1)
-                                                Person2Die[subpop] = 0;
+                                            if (NextIndexPosition[subpop] == Immigrants[subpop].Length - 1)
+                                                NextIndexPosition[subpop] = 0;
                                             else
-                                                Person2Die[subpop]++;
+                                                NextIndexPosition[subpop]++;
 
                                             // can increment it without synchronization, as we do synchronization on the immigrants
                                             if (NumImmigrants[subpop] < Immigrants[subpop].Length)
@@ -413,10 +413,10 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                 // again with synchronization, try to access the syncVar to check whether the Mailbox needs to finish
                 // Running (maybe some other island already found the perfect individual, or the resources of the current
                 // run have been wasted)
-                lock (syncRoot)
+                lock (syncVar)
                 {
                     // get the value of the syncVar. If it is true, we should exit.
-                    shouldExit = syncVar;
+                    shouldExit = syncVar[0];
                 }
             }
             while (!shouldExit);
@@ -451,18 +451,17 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         /// </summary>
         public virtual void ShutDown()
         {
-            // BRS : TODO : The synchronization code is not implemented properly. Fix it!
             // set the syncVar to true (such that if another thread executes this.Run(), it will exit the main loop
             // (hopefully, the information from the server was correct
             lock (syncRoot)
             {
-                syncVar = true;
+                syncVar[0] = true;
             }
         }
 
         /// <summary>
         /// Return the port of the ServerSocket (where the islands where the other islands should
-        /// connect in order to send their emigrants).
+        /// connect in order to send their immigrants).
         /// </summary>
         public int GetPort()
         {

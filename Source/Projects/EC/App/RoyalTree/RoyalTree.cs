@@ -41,7 +41,7 @@ namespace BraneCloud.Evolution.EC.App.RoyalTree
                 double score = Fitness(((GPIndividual) ind).Trees[0].Child, state);
 
                 var f = (SimpleFitness) ind.Fitness;
-                f.SetFitness(state, (float) score, false);
+                f.SetFitness(state, score, false);
                 ind.Evaluated = true;
             }
         }

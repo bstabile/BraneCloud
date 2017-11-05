@@ -83,12 +83,12 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         public const string P_ID = "id";
 
         /// <summary>
-        /// The number of islands that will send emigrants to the current island.
+        /// The number of islands that will send immigrants to the current island.
         /// </summary>
         public const string P_NUM_INCOMING_MIGRATING_COUNTRIES = "num-incoming-mig";
 
         /// <summary>
-        /// The number of islands where emigrants will be sent. 
+        /// The number of islands where immigrants will be sent. 
         /// </summary>
         public const string P_NUM_MIGRATING_COUNTRIES = "num-mig";
 
@@ -108,7 +108,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         public const string P_MODULO = "mod";
 
         /// <summary>
-        /// The number of emigrants to be sent. 
+        /// The number of immigrants to be sent. 
         /// </summary>
         public const string P_SIZE = "size";
 
@@ -143,24 +143,6 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         public const string GOODBYE = "bye-bye";
 
         #endregion // Constants
-        #region Static
-
-        /// <summary>
-        /// The found message. 
-        /// </summary>
-        public static readonly string FOUND = IslandExchange.FOUND;
-
-        /// <summary>
-        /// The okay message. 
-        /// </summary>
-        public static readonly string OKAY = IslandExchange.OKAY;
-
-        /// <summary>
-        /// The synchronize message. 
-        /// </summary>
-        public static readonly string SYNC = IslandExchange.SYNC;
-
-        #endregion // Static
         #region Properties
 
         /// <summary>
@@ -218,11 +200,11 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         /// <summary>
         /// This Setup should get called from the IslandExchange Setup method. 
         /// </summary>
-        public virtual void SetupServerFromDatabase(IEvolutionState state_p, IParameter paramBase)
+        public virtual void SetupServerFromDatabase(IEvolutionState state, IParameter paramBase)
         {
 
             // Store the evolution state for further use in other functions ( ie. run )
-            State = state_p;
+            State = state;
 
             // Don't bother with getting the default base -- we're a singleton!
 
@@ -620,16 +602,16 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
             try
             {
                 // Next we wait until everyone acknowledges this
-                for (var x = 0; x < dataIn.Length; x++)
+                foreach (BinaryReader t in dataIn)
                 {
-                    dataIn[x].ReadString();
+                    t.ReadString();
                 }
 
                 // Now we tell everyone to start Running
-                for (var x = 0; x < dataOut.Length; x++)
+                foreach (BinaryWriter t in dataOut)
                 {
-                    dataOut[x].Write(RUN);
-                    dataOut[x].Flush();
+                    t.Write(RUN);
+                    t.Flush();
                 }
             }
             catch (IOException)
@@ -677,16 +659,14 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                 {
                 }
 
-                string ww;
-
                 for (var x = 0; x < dataOut.Length; x++)
                 {
                     if (clientRunning[x])
                     {
 
                         // initialize ww
-                        ww = "";
-
+                        string ww;
+                        
                         // check to see if he's still up, and if he's
                         // sent us a "I found it" signal
                         try
@@ -740,7 +720,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                             {
                             }
                         }
-                        else if (ww.Equals(FOUND))
+                        else if (ww.Equals(IslandExchange.FOUND))
                         // he found it!
                         {
                             // inform everyone that they need to shut down --
@@ -768,14 +748,14 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                             shouldExit = true;
                             break;
                         }
-                        else if (ww.Equals(SYNC))
+                        else if (ww.Equals(IslandExchange.SYNC))
                         {
                             WhoIsSynchronized[x] = true;
 
                             var complete_synchronization = true;
 
                             for (var y = 0; y < NumIslands; y++)
-                                complete_synchronization = complete_synchronization && ((!clientRunning[y]) || WhoIsSynchronized[y]);
+                                complete_synchronization = complete_synchronization && (!clientRunning[y] || WhoIsSynchronized[y]);
 
                             // if the number of total Running islands is smaller than the
                             // number of islands that ask for synchronization, let them continue
@@ -789,7 +769,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                                     if (clientRunning[y])
                                         try
                                         {
-                                            dataOut[y].Write(OKAY);
+                                            dataOut[y].Write(IslandExchange.OKAY);
                                             dataOut[y].Flush();
                                         }
                                         catch (IOException)
@@ -811,7 +791,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
         /// </summary>
         public virtual ThreadClass SpawnThread()
         {
-            var thread = new ThreadClass(new ThreadStart(this.Run));
+            var thread = new ThreadClass(this.Run);
             thread.Start();
             return thread;
         }

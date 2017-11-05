@@ -37,7 +37,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
     {
         #region Fields
 
-        GPNode prototype;
+        readonly GPNode _prototype;
 
         #endregion // Fields
         #region Setup
@@ -50,7 +50,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         public GrammarFunctionNode(GPFunctionSet gpfs, String name)
             : base(name)
         {
-            prototype = ((GPNode[])(gpfs.NodesByName[name]))[0];
+            _prototype = ((GPNode[])gpfs.NodesByName[name])[0];
         }
 
         #endregion // Setup
@@ -75,13 +75,13 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// <summary>
         /// Return a given argument.
         /// </summary>
-        public GrammarNode GetArgument(int index) { return (GrammarNode)Children[index]; }
+        public GrammarNode GetArgument(int index) { return Children[index]; }
 
         /// <summary>
         /// Returns the prototype without cloning it first.  Be certain to clone before using.
         /// </summary>
         /// <returns></returns>
-        public GPNode GetGPNodePrototype() { return prototype; }
+        public GPNode GetGPNodePrototype() { return _prototype; }
 
         #endregion // Operations
         #region ToString
@@ -93,7 +93,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
             var first = true;
             while (i.MoveNext())
             {
-                ret = ret + (first ? "" : " ") + ((GrammarNode)(i.Current)).Head;
+                ret = ret + (first ? "" : " ") + i.Current.Head;
                 first = false;
             }
             return ret + ")";

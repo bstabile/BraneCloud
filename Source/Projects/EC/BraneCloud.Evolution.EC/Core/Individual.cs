@@ -19,7 +19,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Configuration;
 
@@ -227,7 +226,7 @@ namespace BraneCloud.Evolution.EC
             {
                 var myobj = (Individual) MemberwiseClone();
                 if (myobj.Fitness != null)
-                    myobj.Fitness = (IFitness) (Fitness.Clone());
+                    myobj.Fitness = (IFitness) Fitness.Clone();
                 return myobj;
             }
             catch (Exception ex)

@@ -18,9 +18,11 @@
 
 using System;
 using System.Diagnostics;
-
+using System.IO;
 using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Randomization;
+using BraneCloud.Evolution.EC.Util;
 using SharpenMinimal;
 
 namespace BraneCloud.Evolution.EC.Simple
@@ -104,7 +106,6 @@ namespace BraneCloud.Evolution.EC.Simple
         public const string P_DO_TIME = "do-time";
         public const string P_DO_SUBPOPS = "do-subpops";
         public const string P_STATISTICS_FILE = "file";
-        public const string P_MUZZLE = "muzzle";
 
         #endregion // Constants
         #region Public Properties
@@ -116,7 +117,6 @@ namespace BraneCloud.Evolution.EC.Simple
         public bool DoSize { get; set; }
         public bool DoTime { get; set; }
         public bool DoSubpops { get; set; }
-        public bool Muzzle { get; set; }
 
         public Individual[] BestSoFar { get; set; }
         public long[] TotalSizeSoFar { get; set; }
@@ -139,12 +139,11 @@ namespace BraneCloud.Evolution.EC.Simple
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
             base.Setup(state, paramBase);
-            var statisticsFile = state.Parameters.GetFile(paramBase.Push(P_STATISTICS_FILE), null);
+            FileInfo statisticsFile = state.Parameters.GetFile(paramBase.Push(P_STATISTICS_FILE), null);
 
             Modulus = state.Parameters.GetIntWithDefault(paramBase.Push(P_STATISTICS_MODULUS), null, 1);
-            Muzzle = state.Parameters.GetBoolean(paramBase.Push(P_MUZZLE), null, false);
 
-            if (Muzzle)
+            if (SilentFile)
             {
                 StatisticsLog = Output.NO_LOGS;
             }
@@ -156,28 +155,19 @@ namespace BraneCloud.Evolution.EC.Simple
                                                         !state.Parameters.GetBoolean(paramBase.Push(P_COMPRESS), null, false),
                                                         state.Parameters.GetBoolean(paramBase.Push(P_COMPRESS), null, false));
                 }
-                catch (System.IO.IOException i)
+                catch (IOException i)
                 {
                     state.Output.Fatal("An IOException occurred while trying to create the log " + statisticsFile + ":\n" + i);
                 }
-                DoSize = state.Parameters.GetBoolean(paramBase.Push(P_DO_SIZE), null, false);
-                DoTime = state.Parameters.GetBoolean(paramBase.Push(P_DO_TIME), null, false);
-                if (state.Parameters.ParameterExists(paramBase.Push(P_FULL), null))
-                {
-                    state.Output.Warning(P_FULL + " is deprecated.  Use " + P_DO_SIZE + " and " + P_DO_TIME + " instead.  Also be warned that the table columns have been reorganized. ", paramBase.Push(P_FULL), null);
-                    bool gather = state.Parameters.GetBoolean(paramBase.Push(P_FULL), null, false);
-                    DoSize = DoSize || gather;
-                    DoTime = DoTime || gather;
-                }
-                DoSubpops = state.Parameters.GetBoolean(paramBase.Push(P_DO_SUBPOPS), null, false);
             }
+            else state.Output.Warning("No statistics file specified, printing to stdout at end.", paramBase.Push(P_STATISTICS_FILE));
 
             DoSize = state.Parameters.GetBoolean(paramBase.Push(P_DO_SIZE), null, false);
             DoTime = state.Parameters.GetBoolean(paramBase.Push(P_DO_TIME), null, false);
             if (state.Parameters.ParameterExists(paramBase.Push(P_FULL), null))
             {
                 state.Output.Warning(P_FULL + " is deprecated.  Use " + P_DO_SIZE + " and " + P_DO_TIME + " instead.  Also be warned that the table columns have been reorganized. ", paramBase.Push(P_FULL), null);
-                var gather = state.Parameters.GetBoolean(paramBase.Push(P_FULL), null, false);
+                bool gather = state.Parameters.GetBoolean(paramBase.Push(P_FULL), null, false);
                 DoSize = DoSize || gather;
                 DoTime = DoTime || gather;
             }
@@ -202,7 +192,7 @@ namespace BraneCloud.Evolution.EC.Simple
             if (output && DoTime)
             {
                 // ECJ: lastTime = System.currentTimeMillis();
-                LastTime = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+                LastTime = DateTimeHelper.CurrentTimeMilliseconds;
             }
         }
 
@@ -229,7 +219,7 @@ namespace BraneCloud.Evolution.EC.Simple
             if (output && DoTime)
             {
                 // ECJ: state.output.print("" + (System.currentTimeMillis() - lastTime) + " ", statisticslog);
-                state.Output.Print("" + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - LastTime) + " ", StatisticsLog);
+                state.Output.Print("" + (DateTimeHelper.CurrentTimeMilliseconds - LastTime) + " ", StatisticsLog);
             }
         }
 
@@ -243,7 +233,7 @@ namespace BraneCloud.Evolution.EC.Simple
             if (output && DoTime)
             {
                 // ECJ: lastTime = System.currentTimeMillis();
-                LastTime = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+                LastTime = DateTimeHelper.CurrentTimeMilliseconds;
             }
         }
 
@@ -257,7 +247,7 @@ namespace BraneCloud.Evolution.EC.Simple
             if (output && DoTime)
             {
                 // ECJ: state.output.print("" + (System.currentTimeMillis() - lastTime) + " ", statisticslog);
-                state.Output.Print("" + (((DateTime.Now.Ticks - 621355968000000000) / 10000) - LastTime) + " ", StatisticsLog);
+                state.Output.Print("" + (DateTimeHelper.CurrentTimeMilliseconds - LastTime) + " ", StatisticsLog);
             }
         }
 
@@ -272,7 +262,7 @@ namespace BraneCloud.Evolution.EC.Simple
             if (output && DoTime)
             {
                 // ECJ: lastTime = System.currentTimeMillis();
-                LastTime = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+                LastTime = DateTimeHelper.CurrentTimeMilliseconds;
             }
         }
 
@@ -286,7 +276,7 @@ namespace BraneCloud.Evolution.EC.Simple
             if (output && DoTime)
             {
                 // ECJ: state.output.print("" + (System.currentTimeMillis() - lastTime) + " ", statisticslog);
-                state.Output.Print("" + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - LastTime) + " ", StatisticsLog);
+                state.Output.Print("" + (DateTimeHelper.CurrentTimeMilliseconds - LastTime) + " ", StatisticsLog);
             }
 
             int subpops = state.Population.Subpops.Length;				// number of supopulations

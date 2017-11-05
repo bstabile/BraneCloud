@@ -17,7 +17,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Eval;
 using BraneCloud.Evolution.EC.Simple;
@@ -152,6 +151,16 @@ namespace BraneCloud.Evolution.EC.SteadyState
             return _subpopulationBeingEvaluated;
         }
 
+        /// <summary>
+        /// The SimpleEvaluator determines that a run is complete by asking
+        /// each individual in each population if he's optimal; if he 
+        /// finds an individual somewhere that's optimal,
+        /// he signals that the run is complete. 
+        /// </summary>
+        public bool RunComplete(IEvolutionState state, Individual ind)
+        {
+            return ind.Fitness.IsIdeal;
+        }
         #endregion // Operations
     }
 }

@@ -17,15 +17,11 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using BraneCloud.Evolution.EC.CoEvolve;
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.Eval;
 using BraneCloud.Evolution.EC.Simple;
 using BraneCloud.Evolution.EC.SteadyState;
 
@@ -96,7 +92,7 @@ namespace BraneCloud.Evolution.EC.Eval
     /// </table>
     /// </summary>    
     [ECConfiguration("ec.eval.IMasterProblem")]
-    public interface IMasterProblem : ISimpleProblem, IGroupedProblem, ISetup, ICloneable, ISerializable
+    public interface IMasterProblem : ISimpleProblem, IGroupedProblem, ISetup, ICloneable
     {
         #region Properties
 

@@ -31,7 +31,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
     /// The specific individuals in this proportion is determined at random.
     /// 
     /// <p/>Different Fitnesses have different meanings of the word "bad".  At present, we set the fitness
-    /// to -Float.MAX_VALUE if it's a SimpleFitness, and set it to Float.MAX_VALUE if it's a KozaFitnesss.
+    /// to -Double.MaxValue if it's a SimpleFitness, and set it to Double.MaxValue if it's a KozaFitnesss.
     /// If it's any other kind of Fitness, an error is reported.  You can override the "bad-setter" function
     /// setMinimumFitness(...) to make other kinds of fitness bad in different ways.  In the future we may
     /// revisit how to set Fitnesses to "bad" in a more general way if this becomes an issue.
@@ -70,7 +70,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
         #endregion // Constants
         #region Properties
 
-        public float KillProportion { get; set; }
+        public double KillProportion { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -79,7 +79,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
         {
             base.Setup(state, paramBase);
             
-            KillProportion = state.Parameters.GetFloat(paramBase.Push(P_KILL_PROPORTION), null, 0.0);
+            KillProportion = state.Parameters.GetDouble(paramBase.Push(P_KILL_PROPORTION), null, 0.0);
             if (KillProportion < 0 || KillProportion > 1)
                 state.Output.Fatal("Parameter not found, or it has an invalid value (<0 or >1).", paramBase.Push(P_KILL_PROPORTION));
         }
@@ -104,7 +104,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
                 
                 for (var i = 0; i < state.Population.Subpops[subpop].Individuals.Length; i++)
                 {
-                    if ((state.Population.Subpops[subpop].Individuals[i].Size > averageSize) && (state.Random[0].NextFloat() < KillProportion))
+                    if ((state.Population.Subpops[subpop].Individuals[i].Size > averageSize) && (state.Random[0].NextDouble() < KillProportion))
                     {
                         var ind = state.Population.Subpops[subpop].Individuals[i];
                         SetMinimumFitness(state, subpop, ind);
@@ -113,11 +113,11 @@ namespace BraneCloud.Evolution.EC.Parsimony
                 }
             }
         }
-        
+
         /// <summary>
         /// Sets the fitness of an individual to the minimum fitness possible.
-        /// If the fitness is of type ec.simple.SimpleFitness, that minimum value is -Float.MAX_VALUE;
-        /// If the fitness is of type KozaFitness, that minimum value is Float.MAX_VALUE;
+        /// If the fitness is of type ec.simple.SimpleFitness, that minimum value is -Double.MaxValue;
+        /// If the fitness is of type KozaFitness, that minimum value is Double.MaxValue;
         /// Else, a fatal error is reported.
         /// You need to override this method if you're using any other type of fitness.
         /// </summary>
@@ -125,9 +125,9 @@ namespace BraneCloud.Evolution.EC.Parsimony
         {
             var fitness = ind.Fitness;
             if (fitness is KozaFitness)
-                ((KozaFitness) fitness).SetStandardizedFitness(state, Single.MaxValue);
+                ((KozaFitness) fitness).SetStandardizedFitness(state, double.MaxValue);
             else if (fitness is SimpleFitness)
-                ((SimpleFitness) fitness).SetFitness(state, - Single.MaxValue, false);
+                ((SimpleFitness) fitness).SetFitness(state, -double.MaxValue, false);
             else
                 state.Output.Fatal("TarpeianStatistics only accepts individuals with fitness of type ec.simple.SimpleFitness or KozaFitness.");
         }

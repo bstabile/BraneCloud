@@ -40,15 +40,15 @@ namespace BraneCloud.Evolution.EC.App.Mona
         {
             if (ind.Evaluated) return;
 
-            DoubleVectorIndividual _ind = (DoubleVectorIndividual) ind;
+            var cast = (DoubleVectorIndividual) ind;
             int vertexSkip = NumVertices * 2 + 4; // for four colors
 
             pic.Clear();
-            for (int i = 0; i < _ind.genome.Length; i += vertexSkip)
-                pic.AddPolygon(_ind.genome, i, NumVertices);
+            for (int i = 0; i < cast.genome.Length; i += vertexSkip)
+                pic.AddPolygon(cast.genome, i, NumVertices);
 
             double error = pic.Error();
-            ((SimpleFitness) _ind.Fitness).SetFitness(state, (float) (1.0 - error), error == 0);
+            ((SimpleFitness) cast.Fitness).SetFitness(state, 1.0 - error, error.Equals(0));
             ind.Evaluated = true;
         }
 

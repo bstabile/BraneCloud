@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections;
 using System.IO;
 using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Configuration;
@@ -209,6 +210,12 @@ namespace BraneCloud.Evolution.EC
         public Output Output { get; set; }
 
         /// <summary>
+        /// An array of HashMaps, indexed by the thread number you were given (or, if you're not in a multithreaded area, use 0).  
+        /// This allows you to store per-thread specialized information (typically keyed with a string).
+        /// </summary>
+        public Hashtable[] Data { get; set; }
+
+        /// <summary>
         /// Current job iteration variables, set by Evolve.  The default version simply sets this to a single Object[1] containing
         /// the current job iteration number as an Integer (for a single job, it's 0).  You probably should not modify this inside
         /// an evolutionary run.  
@@ -369,6 +376,11 @@ namespace BraneCloud.Evolution.EC
         /// <seealso cref="IPrototype.Setup(IEvolutionState,IParameter)"/>
         public virtual void Setup(IEvolutionState state, IParameter paramBase)
         {
+            // set up the per-thread data
+            Data = new Hashtable[Random.Length];
+            for (int i = 0; i < Data.Length; i++)
+                Data[i] = new Hashtable();
+
             // we ignore the base, it's worthless anyway for EvolutionState
 
             IParameter p = new Parameter(P_CHECKPOINT);

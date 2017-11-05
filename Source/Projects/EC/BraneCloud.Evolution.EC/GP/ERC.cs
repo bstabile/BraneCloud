@@ -121,10 +121,7 @@ namespace BraneCloud.Evolution.EC.GP
         /// numbers, or hyphens or underscores in it.
         /// No whitespace or other characters. 
         /// </summary>
-        public override string Name
-        {
-            get { return "ERC"; }
-        }
+        public override string Name => "ERC";
 
         /// <summary>
         /// Usually ERCs don't have children, and this default implementation makes certain of it. 

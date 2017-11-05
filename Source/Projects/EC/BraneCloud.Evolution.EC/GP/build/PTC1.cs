@@ -71,10 +71,8 @@ namespace BraneCloud.Evolution.EC.GP.Build
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPBuildDefaults.ParamBase.Push(P_PTC1); }
-        }
+        public override IParameter DefaultBase=> GPBuildDefaults.ParamBase.Push(P_PTC1);
+       
 
         /// <summary>
         /// The largest maximum tree depth PTC1 can specify -- should be big. 
@@ -127,7 +125,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
         /// A private function which recursively returns a GROW tree to NewRootedTree(...) 
         /// </summary>
         private GPNode Ptc1(IEvolutionState state, int current, GPType type, int thread, IGPNodeParent parent, 
-            int argPosition, GPFunctionSet funcs, IPTCFunctionSet pfuncs, float[] nonterminalSelectProbs)
+            int argPosition, GPFunctionSet funcs, IPTCFunctionSet pfuncs, double[] nonterminalSelectProbs)
         {
             // ptc1 can mess up if there are no available terminals for a given type.  If this occurs,
             // and we find ourselves unable to pick a terminal when we want to do so, we will issue a warning,
@@ -156,7 +154,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
                     && (triedTerminals = true) && terminals.Length != 0)
             {
                 var n = terminals[RandomChoice.PickFromDistribution(pfuncs.TerminalProbabilities(t), 
-                                                state.Random[thread].NextFloat())].LightClone();
+                                                state.Random[thread].NextDouble())].LightClone();
 
                 n.ResetNode(state, thread); // give ERCs a chance to randomize
                 n.ArgPosition = (sbyte) argPosition;
@@ -170,7 +168,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
                     WarnAboutNoTerminalWithType(type, false, state); // we tried terminals and we're here because there were none!
                 
                 var n = nonterminals[RandomChoice.PickFromDistribution(pfuncs.NonterminalProbabilities(t), 
-                                                        state.Random[thread].NextFloat())].LightClone();
+                                                        state.Random[thread].NextDouble())].LightClone();
 
                 n.ResetNode(state, thread); // give ERCs a chance to randomize
                 n.ArgPosition = (sbyte) argPosition;

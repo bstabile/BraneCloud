@@ -17,12 +17,10 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Simple;
 using BraneCloud.Evolution.EC.Util;
 
@@ -59,14 +57,12 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// Front file parameter
         /// </summary>
         public const string P_PARETO_FRONT_FILE = "front";
-
-        /// <summary>
-        /// The pareto front log
-        /// </summary>
-        public const int NO_FRONT_LOG = -1;
+        public const string P_SILENT_FRONT_FILE = "silent.front";
 
         #endregion // Constants
         #region Properties
+
+        public bool SilentFront { get; set; }
 
         public int FrontLog { get; set; }
 
@@ -77,9 +73,17 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         {
             base.Setup(state, paramBase);
 
+            SilentFront = state.Parameters.GetBoolean(paramBase.Push(P_SILENT), null, false);
+            // yes, we're stating it a second time.  It's correct logic.
+            SilentFront = state.Parameters.GetBoolean(paramBase.Push(P_SILENT_FRONT_FILE), null, SilentFront);
+
             var frontFile = state.Parameters.GetFile(paramBase.Push(P_PARETO_FRONT_FILE), null);
 
-            if (frontFile != null)
+            if (SilentFront)
+            {
+                FrontLog = Output.NO_LOGS;
+            }
+            else if (frontFile != null)
                 try
                 {
                     FrontLog = state.Output.AddLog(frontFile, !Compress, Compress);
@@ -88,7 +92,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
                 {
                     state.Output.Fatal("An IOException occurred while trying to create the log " + frontFile + ":\n" + i);
                 }
-            else state.Output.Warning("No Pareto Front statistics file specified.", paramBase.Push(P_PARETO_FRONT_FILE));
+            else state.Output.Warning("No Pareto Front statistics file specified, printing to stdout at end.", paramBase.Push(P_PARETO_FRONT_FILE));
         }
 
         #endregion // Setup
@@ -99,14 +103,13 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// </summary>
         public override void FinalStatistics(IEvolutionState state, int result)
         {
-            // super.finalStatistics(state,result);
-            // I don't want just a single best fitness
+            BypassFinalStatistics(state, result);  // just call base.base.finalStatistics(...)
 
-            state.Output.PrintLn("\n\n\n PARETO FRONTS", StatisticsLog);
+            if (DoFinal) state.Output.PrintLn("\n\n\n PARETO FRONTS", StatisticsLog);
             for (var s = 0; s < state.Population.Subpops.Length; s++)
             {
-                var typicalFitness = (MultiObjectiveFitness)(state.Population.Subpops[s].Individuals[0].Fitness);
-                state.Output.PrintLn("\n\nPareto Front of Subpopulation " + s, StatisticsLog);
+                if (DoFinal)
+                    state.Output.PrintLn("\n\nPareto Front of Subpopulation " + s, StatisticsLog);
 
                 // build front
                 var front = MultiObjectiveFitness.PartitionIntoParetoFront(state.Population.Subpops[s].Individuals, null, null);
@@ -115,33 +118,11 @@ namespace BraneCloud.Evolution.EC.MultiObjective
                 var sortedFront = front.ToArray();
                 QuickSort.QSort(sortedFront, new MultiObjectiveFitnessComparator());
 
-                // print out header
-                state.Output.Message("Pareto Front Summary: " + sortedFront.Length + " Individuals");
-                var message = "Ind";
-                var numObjectives = typicalFitness.GetObjectives().Length;
-                for (var i = 0; i < numObjectives; i++)
-                    message += ("\t" + "Objective " + i);
-                var names = typicalFitness.GetAuxilliaryFitnessNames();
-                message = names.Aggregate(message, (current, t) => current + ("\t" + t));
-                state.Output.Message(message);
-
-                // write front to screen
-                for (var i = 0; i < sortedFront.Length; i++)
-                {
-                    var individual = (Individual)sortedFront[i];
-
-                    var objectives = ((MultiObjectiveFitness)individual.Fitness).GetObjectives();
-                    var line = "" + i;
-                    line = objectives.Aggregate(line, (current, t) => current + ("\t" + t));
-
-                    var vals = ((MultiObjectiveFitness)individual.Fitness).GetAuxilliaryFitnessValues();
-                    line = vals.Aggregate(line, (current, t) => current + ("\t" + t));
-                    state.Output.Message(line);
-                }
 
                 // print out front to statistics log
-                foreach (var t in sortedFront)
-                    ((Individual)t).PrintIndividualForHumans(state, StatisticsLog);
+                if (DoFinal)
+                    foreach (var t in sortedFront)
+                        ((Individual)t).PrintIndividualForHumans(state, StatisticsLog);
 
                 // write short version of front out to disk
                 if (FrontLog >= 0)

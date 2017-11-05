@@ -26,20 +26,11 @@ eval.problem.type = rastrigin
 # min					0			1
 
 
-# Eight threads
-evalthreads = 				8
-breedthreads = 				8
 
-# Eight seeds! Need Max(evalthreads, breedthreads)
-seed.0 =				time
-seed.1 =				time
-seed.2 =				time
-seed.3 =				time
-seed.4 =				time
-seed.5 =				time
-seed.6 =				time
-seed.7 =				time
-
+# Rotation Seed is the default.  But you can set it to an explicit value
+# here, like this:
+#
+# seed = 9234123
 
 
 
@@ -50,7 +41,6 @@ exch = 					ec.simple.SimpleExchanger
 breed =					ec.simple.SimpleBreeder
 eval =					ec.simple.SimpleEvaluator
 stat =					ec.simple.SimpleStatistics
-
 generations =				1000
 quit-on-run-complete =			true
 pop = 					ec.Population
@@ -73,7 +63,6 @@ pop.subpop.0.species.max-gene =	5.12
 
 # You can change this to whatever you want, though Booth requires a genome size of 2
 pop.subpop.0.species.genome-size = 	100
-
 
 # ECJ will complain if this isn't set even if we don't use it, so here's a default
 pop.subpop.0.species.crossover-type = one

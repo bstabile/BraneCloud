@@ -94,24 +94,24 @@ namespace BraneCloud.Evolution.EC
                 if (!state.Parameters.GetBoolean(paramBase.Push(P_IAMSLAVE), null, false))
                 // I am a master (or possibly a slave -- same params)
                 {
-                    try
-                    {
-                        var masterproblem = (IProblem)(state.Parameters.GetInstanceForParameter(
-                            paramBase.Push(P_MASTERPROBLEM), null, typeof(IProblem)));
-                        masterproblem.Setup(state, paramBase.Push(P_MASTERPROBLEM));
+                    //try
+                    //{
+                    //    var masterproblem = (IProblem)(state.Parameters.GetInstanceForParameter(
+                    //        paramBase.Push(P_MASTERPROBLEM), null, typeof(IProblem)));
+                    //    masterproblem.Setup(state, paramBase.Push(P_MASTERPROBLEM));
 
                         /*
                          * If a MasterProblem was specified, interpose it between the
                          * evaluator and the real problem.  This allows seamless use
                          * of the master problem.
                          */
-                        ((IMasterProblem)masterproblem).Problem = p_problem;
-                        p_problem = masterproblem;
-                    }
-                    catch (ParamClassLoadException)
-                    {
-                        state.Output.Fatal("Parameter has an invalid value: " + paramBase.Push(P_MASTERPROBLEM));
-                    }
+                        MasterProblem.Problem = p_problem;
+                        p_problem = MasterProblem;
+                    //}
+                    //catch (ParamClassLoadException)
+                    //{
+                    //    state.Output.Fatal("Parameter has an invalid value: " + paramBase.Push(P_MASTERPROBLEM));
+                    //}
                 }
             }
         }

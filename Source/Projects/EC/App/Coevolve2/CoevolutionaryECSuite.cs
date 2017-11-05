@@ -82,7 +82,7 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
                     for (var l = 0; l < len; l++)
                         max = Math.Max(fit.Trials[l], max); // it'll be the first one, but whatever
 
-                    fit.SetFitness(state, (float)max, IsOptimal(ProblemType, (float)max));
+                    fit.SetFitness(state, max, IsOptimal(ProblemType, max));
                     ind.Evaluated = true;
                 }
             }
@@ -155,7 +155,7 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
                     }
 
                     // finally set the fitness for good measure
-                    ((SimpleFitness)coind.Fitness).SetFitness(state, (float)trial, false);
+                    ((SimpleFitness)coind.Fitness).SetFitness(state, trial, false);
                 }
             }
         }

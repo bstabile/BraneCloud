@@ -175,11 +175,24 @@ namespace BraneCloud.Evolution.EC
                     ExtraBehavior = FILL;
                 else if (extra.ToLower() == V_WRAP.ToLower())
                     ExtraBehavior = WRAP;
-                else state.Output.Fatal("Subpouplation given a bad " + P_EXTRA_BEHAVIOR + ": " + extra,
+                else state.Output.Fatal("Subpopulation given a bad " + P_EXTRA_BEHAVIOR + ": " + extra,
                     paramBase.Push(P_EXTRA_BEHAVIOR), def.Push(P_EXTRA_BEHAVIOR));
             }
 
         }
+
+        /** Resizes the Subpopulation to a new size.  If the size is smaller, then
+            the Subpopulation is truncated such that the higher indexed individuals
+            may be deleted.  If the size is larger, then the resulting Subpopulation will have
+            null individuals (this almost certainly is not what you will want).
+        */
+        public void Resize(int toThis)
+        {
+            Individual[] temp = new Individual[toThis];
+            Array.Copy(Individuals, 0, temp, 0, toThis);
+            Individuals = temp;
+        }
+
 
         /// <summary>
         /// Sets all Individuals in the Subpopulation to null, preparing it to be reused.
@@ -224,7 +237,6 @@ namespace BraneCloud.Evolution.EC
                     state.Output.Message("Old subpopulation was of size " + len + ", expanding to size " + Individuals.Length);
                     return;
                 }
-
                 if (len > Individuals.Length)   // the population was shrunk, there's more space yet
                 {
                     // What do we do with the remainder?
@@ -233,7 +245,7 @@ namespace BraneCloud.Evolution.EC
                         state.Output.Message("Old subpopulation was of size " + len + ", truncating to size " + Individuals.Length);
                         return;  // we're done
                     }
-                    else if (ExtraBehavior == WRAP)
+                    if (ExtraBehavior == WRAP)
                     {
                         state.Output.Message("Only " + Individuals.Length + " individuals were read in.  Subpopulation will stay size " + len +
                             ", and the rest will be filled with copies of the read-in individuals.");
@@ -251,7 +263,7 @@ namespace BraneCloud.Evolution.EC
                         }
                         return;
                     }
-                    else // if (extraBehavior == FILL)
+                    else // if (ExtraBehavior == FILL)
                     {
                         state.Output.Message("Only " + Individuals.Length + " individuals were read in.  Subpopulation will stay size " + len +
                             ", and the rest will be filled using randomly generated individuals.");
@@ -263,33 +275,35 @@ namespace BraneCloud.Evolution.EC
                         // now go on to fill the rest below...
                     }
                 }
-            }
-            else
-            {
-                Hashtable h = null;
-                if (NumDuplicateRetries >= 1)
-                    h = new Hashtable((Individuals.Length - start) / 2); // seems reasonable
-
-                for (var x = start; x < Individuals.Length; x++)
+                else // exactly right number, we're done
                 {
-                    for (var tries = 0; tries <= NumDuplicateRetries; tries++)
-                    {
-                        Individuals[x] = Species.NewIndividual(state, thread);
-
-                        if (NumDuplicateRetries >= 1)
-                        {
-                            // TODO: Test this! Java has a Hashtable and a HashMap (used by newer versions of ECJ)
-                            // check for duplicates
-                            if (!h.Contains(Individuals[x]))
-                            // found nothing, we're safe
-                            // hash it and go
-                            {
-                                h[Individuals[x]] = Individuals[x];
-                                break;
-                            }
-                        }
-                    } // oh well, we tried to cut down the duplicates
+                    return;
                 }
+            }
+
+            Hashtable h = null;
+            if (NumDuplicateRetries >= 1)
+                h = new Hashtable((Individuals.Length - start) / 2); // seems reasonable
+
+            for (var x = start; x < Individuals.Length; x++)
+            {
+                for (var tries = 0; tries <= NumDuplicateRetries; tries++)
+                {
+                    Individuals[x] = Species.NewIndividual(state, thread);
+
+                    if (NumDuplicateRetries >= 1)
+                    {
+                        // TODO: Test this! Java has a Hashtable and a HashMap (used by newer versions of ECJ)
+                        // check for duplicates
+                        if (!h.Contains(Individuals[x]))
+                        // found nothing, we're safe
+                        // hash it and go
+                        {
+                            h[Individuals[x]] = Individuals[x];
+                            break;
+                        }
+                    }
+                } // oh well, we tried to cut down the duplicates
             }
         }
 
@@ -327,6 +341,8 @@ namespace BraneCloud.Evolution.EC
         #endregion // Cloning
         #region IO
 
+        bool _warned;
+
         /// <summary>
         /// Prints an entire subpop in a form readable by humans. 
         /// </summary>
@@ -336,7 +352,13 @@ namespace BraneCloud.Evolution.EC
             for (var i = 0; i < Individuals.Length; i++)
             {
                 state.Output.PrintLn(INDIVIDUAL_INDEX_PREAMBLE + Code.Encode(i), log);
-                Individuals[i].PrintIndividualForHumans(state, log);
+                if (Individuals[i] != null)
+                    Individuals[i].PrintIndividualForHumans(state, log);
+                else if (!_warned)
+                {
+                    state.Output.WarnOnce("Null individuals found in subpopulation");
+                    _warned = true;  // we do this rather than relying on warnOnce because it is much faster in a tight loop
+                }
             }
         }
 

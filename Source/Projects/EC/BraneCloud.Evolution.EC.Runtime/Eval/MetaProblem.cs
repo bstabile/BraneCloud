@@ -19,15 +19,8 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Runtime.Serialization;
-using BraneCloud.Evolution.EC.Eval;
-using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Simple;
-using BraneCloud.Evolution.EC.CoEvolve;
-using BraneCloud.Evolution.EC.SteadyState;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Randomization;
@@ -54,20 +47,11 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
     ///
     /// <p/>The way it works is as follows.First, you set up the base-level ECJ system as normal, with a
     /// parameter file defining all of its parameters (ideally including default settings for the
-    /// parameters you'll be optimizing).  You will probably also want to redirect statistics reporting
-    /// to /dev/null (on UNIX), as it'll make the system very slow and won't give you anything:
+    /// parameters you'll be optimizing).  You will probably also want to prevent statistics from writing
+    /// anything to files or printing anything to the screen, which would be very inefficient when
+    /// doing meta-level stuff.
     ///
-    /// <tt><pre>    stat.file = / dev / null </pre></tt>
-    ///
-    /// <p/> Or better still, just say
-    ///
-    /// <tt><p/><pre>     stat.muzzle = true </pre></tt>
-    ///
-    ///Warnings, messages, and errors generated from the base-level system are ordinarily not printed
-    /// to the screen because it is so costly.  This may make it problematic to debug initially.  To force
-    /// such errors to be printed as normal, you can set (in the meta-level parameters):
-    ///
-    /// <tt><pre>    eval.problem.muzzle = false    </pre></tt>
+    /// <tt><p/><pre>     stat.silent = true </pre></tt>
     ///
     /// <p/>Next you set up the meta-level ECJ system.Here you define the problem class as a MetaProblem:
     ///
@@ -213,6 +197,12 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
     ///     sure, if only to turn it off.
     /// </ul>
     ///
+    /// <p/><b>Preparing for the final run</b> Once you've got everything working, you probably want
+    /// to eliminate all output at the base level before starting the big meta-level run.You can
+    /// do this in a base-level parameter file like this:
+    ///
+    /// <tt><pre>    silent = true </pre></tt>
+    ///
     /// <p/><b>Caveats.</b> A meta-level individual is tested by setting a base-level EA with its
     /// parameters, then running the base-level EA, then extracting the best individual of the run and
     /// getting its fitness.  This is done some N times, and the fitness is combined from these
@@ -255,13 +245,10 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
     /// <td valign="top" > (when a meta individual has its evaluated flag set, should we reevaluate it anyway?)</td></tr>
     /// <tr><td valign="top" ><tt><i> base </i>.set - random </tt><br/>
     /// <font size="-1">boolean(default=false)</font></td>
-    /// <td valign="top" > (Should we override the random seed settings in the base parameter file and seed the base EA generators with random values?)</td></tr>
-    /// <tr><td valign="top" ><tt><i> base </i>.muzzle </tt><br/>
-    /// <font size="-1">boolean(default=false)</font></td>
-    /// <td valign="top" > (Should we muzzle the stdout and stderr logs of the Output of the base EA?)</td></tr>
+    /// <td valign="top" > (Should we silence the stdout and stderr logs of the Output of the base EA?)</td></tr>
     /// <tr><td valign="top" ><tt><i> base </i>.num -params</tt><br/>
     /// <font size = "-1" > int >= 1 </font></td>
-    /// <td valign=top>(How many parameters are being evolved? This should match the genome length of the meta-level EA individuals)</td></tr>
+    /// <td valign="top">(How many parameters are being evolved? This should match the genome length of the meta-level EA individuals)</td></tr>
     ///
     /// <tr><td valign="top" ><tt><i> base </i>.param.< i > number </i></tt><br/>
     /// <font size="-1">String</font></td>
@@ -304,21 +291,17 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
         public IParameter ParamBase { get; set; }
 
         /** A prototypical parameter database for the underlying (base-level) evolutionary computation system.  This is never directly used, just cloned. */
-        public ParameterDatabase p_database { get; set; }
+        public IParameterDatabase p_database { get; set; }
 
         /** This points to the database presently used by the underlying (base-level) evolutionary computation system.  It is a cloned and modified version
             of p_database. */
-        public ParameterDatabase CurrentDatabase { get; set; }
+        public IParameterDatabase CurrentDatabase { get; set; }
 
         /** The number of base-level evolutionary runs to perform to evaluate an individual.  */
         public int Runs { get; set; }
 
         /** Whether to reevaluate individuals if and when they appear for evaluation in the future.  */
         public bool ReevaluateIndividuals { get; set; }
-
-        /** Whether to muzzle the stdout and stderr logs of the underlying base-level evolutionary computation system. */
-        public bool Muzzle { get; set; }
-
 
 
         /** The best underlying individual array, one per subpopulation.
@@ -380,9 +363,10 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     paramBase.Push(P_RUNS));
 
             ReevaluateIndividuals = state.Parameters.GetBoolean(paramBase.Push(P_REEVALUATE_INDIVIDUALS), null, true);
-            Muzzle = state.Parameters.GetBoolean(paramBase.Push(P_MUZZLE), null, false);
+            if (state.Parameters.ParameterExists(paramBase.Push(P_MUZZLE), null))
+                state.Output.Warning("" + paramBase.Push(P_MUZZLE) + " no longer exists.  Use 'silent' in the lower-level EA parameters instead.");
 
-            Parameter pop = new Parameter(Initializer.P_POP);
+            IParameter pop = new Parameter(Initializer.P_POP);
             int subpopsLength = state.Parameters.GetInt(pop.Push(Population.P_SIZE), null, 1);
             BestUnderlyingIndividual = new Individual[subpopsLength];
 
@@ -569,11 +553,6 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                 output.AddLog(Log.D_STDOUT, false);
                 output.AddLog(Log.D_STDERR, true);
                 output.ThrowsErrors = true; // don't do System.exit(1);
-                if (Muzzle)
-                {
-                    output.GetLog(0).Muzzle = true;
-                    output.GetLog(1).Muzzle = true;
-                }
 
                 EvolutionState evaluatedState = null;
                 try

@@ -99,10 +99,7 @@ namespace BraneCloud.Evolution.EC.GP
         #endregion // Fields
         #region Properties
 
-        public virtual IParameter DefaultBase
-        {
-            get { return GPDefaults.ParamBase.Push(P_ADFSTACK); }
-        }
+        public virtual IParameter DefaultBase => GPDefaults.ParamBase.Push(P_ADFSTACK);
 
         public ADFContext ContextProto { get; set; }
 

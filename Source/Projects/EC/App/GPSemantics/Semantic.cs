@@ -89,7 +89,7 @@ namespace BraneCloud.Evolution.EC.App.GPSemantics
                 }
 
                 SimpleFitness f = (SimpleFitness) ind.Fitness;
-                f.SetFitness(state, (float) score, false);
+                f.SetFitness(state, score, false);
                 ind.Evaluated = true;
             }
         }
@@ -110,9 +110,7 @@ namespace BraneCloud.Evolution.EC.App.GPSemantics
             int nterminals = t.Child.NumNodes(GPNode.NODESEARCH_TERMINALS);
             for (int i = 0; i < nterminals; i++)
             {
-                GPNodeGatherer g = new GPNodeGatherer();
-                t.Child.NodeInPosition(i, g, GPNode.NODESEARCH_TERMINALS);
-                nodes.Add(g.Node);
+                nodes.Add(t.Child.NodeInPosition(i, GPNode.NODESEARCH_TERMINALS));
             }
 
             if (_problemName.Equals(P_ORDER))

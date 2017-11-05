@@ -895,8 +895,8 @@ namespace BraneCloud.Evolution.EC.App.Regression
                 }
 
                 // the fitness better be KozaFitness!
-                var f = ((KozaFitness)ind.Fitness);
-                f.SetStandardizedFitness(state, (float)sum);
+                var f = (KozaFitness)ind.Fitness;
+                f.SetStandardizedFitness(state, sum);
                 f.Hits = hits;
                 ind.Evaluated = true;
             }
@@ -913,7 +913,7 @@ namespace BraneCloud.Evolution.EC.App.Regression
             for (var y = 0; y < testingInputs.Length; y++)
             {
                 currentValue = testingInputs[y];
-                ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, data, Stack, ((GPIndividual)ind), this);
+                ((GPIndividual)ind).Trees[0].Child.Eval(state, threadnum, data, Stack, (GPIndividual)ind, this);
 
                 var err = error(data.x, testingOutputs[y]);
 
@@ -925,8 +925,8 @@ namespace BraneCloud.Evolution.EC.App.Regression
             }
 
             // the fitness better be KozaFitness!
-            var f = (KozaFitness)(ind.Fitness.Clone());     // make a copy, we're just printing it out
-            f.SetStandardizedFitness(state, (float)sum);
+            var f = (KozaFitness)ind.Fitness.Clone();     // make a copy, we're just printing it out
+            f.SetStandardizedFitness(state, sum);
             f.Hits = hits;
 
             f.PrintFitnessForHumans(state, log);

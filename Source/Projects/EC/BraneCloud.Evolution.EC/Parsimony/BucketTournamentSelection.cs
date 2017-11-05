@@ -118,10 +118,8 @@ namespace BraneCloud.Evolution.EC.Parsimony
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_TOURNAMENT); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_TOURNAMENT); 
+        
 
         /// <summary>
         /// Size of the tournament
@@ -187,7 +185,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
                         
             // how many individuals in current bucket
 
-            var averageBuck = state.Population.Subpops[subpop].Individuals.Length / ((float) NumBuckets);
+            var averageBuck = state.Population.Subpops[subpop].Individuals.Length / (double) NumBuckets;
             
             // first individual goes into first bucket
             BucketValues[0] = 0;

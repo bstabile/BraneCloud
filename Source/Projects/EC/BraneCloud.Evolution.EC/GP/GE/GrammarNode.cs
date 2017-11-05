@@ -37,7 +37,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// <summary>
         /// May be empty but it's not very expensive
         /// </summary>
-        protected List<GrammarNode> Children = new List<GrammarNode>();
+        public IList<GrammarNode> Children { get; set; } = new List<GrammarNode>();
 
         public GrammarNode(string head)
         {

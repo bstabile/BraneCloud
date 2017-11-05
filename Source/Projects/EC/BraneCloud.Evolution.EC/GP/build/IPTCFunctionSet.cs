@@ -36,7 +36,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
         /// with the same return type.  The ordering of the array is the same as
         /// the terminals[type][...] array in GPFunctionSet.  
         /// </summary>
-        float[] TerminalProbabilities(int type);
+        double[] TerminalProbabilities(int type);
         
         /// <summary>
         /// Returns an organized distribution (see ec.util.RandomChoice) of likelihoods
@@ -44,13 +44,13 @@ namespace BraneCloud.Evolution.EC.GP.Build
         /// with the same return type. The ordering of the array is the same as
         /// the nonterminals[type][...] array in GPFunctionSet. 
         /// </summary>
-        float[] NonterminalProbabilities(int type);
+        double[] NonterminalProbabilities(int type);
         
         /// <summary>
         /// Returns an array (by return type) of the probability that PTC1 must pick a
         /// nonterminal over a terminal in order to guarantee the expectedTreeSize.
         /// Only used by PTC1, not by PTC2. 
         /// </summary>
-        float[] NonterminalSelectionProbabilities(int expectedTreeSize);
+        double[] NonterminalSelectionProbabilities(int expectedTreeSize);
     }
 }

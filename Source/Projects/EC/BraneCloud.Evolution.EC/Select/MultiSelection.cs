@@ -88,7 +88,7 @@ namespace BraneCloud.Evolution.EC.Select
             // make our arrays
             Selects = new SelectionMethod[numSelects];
 
-            var total = 0.0f;
+            var total = 0.0;
 
             for (var x = 0; x < numSelects; x++)
             {
@@ -111,7 +111,7 @@ namespace BraneCloud.Evolution.EC.Select
             if (total <= 0.0)
                 state.Output.Fatal("MultiSelection selects do not sum to a positive probability", paramBase);
 
-            if (total != 1.0)
+            if (!total.Equals(1.0))
             {
                 state.Output.Message("Must normalize probabilities for " + paramBase);
                 for (var x = 0; x < numSelects; x++)
@@ -119,14 +119,14 @@ namespace BraneCloud.Evolution.EC.Select
             }
 
             // totalize
-            var tmp = 0.0f;
+            var tmp = 0.0;
             for (var x = 0; x < numSelects - 1; x++)
             // yes, it's off by one
             {
                 tmp += Selects[x].Probability;
                 Selects[x].Probability = tmp;
             }
-            Selects[numSelects - 1].Probability = 1.0f;
+            Selects[numSelects - 1].Probability = 1.0;
         }
 
         #endregion // Setup
@@ -145,18 +145,18 @@ namespace BraneCloud.Evolution.EC.Select
 
         public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
         {
-            for (var x = 0; x < Selects.Length; x++)
-                Selects[x].PrepareToProduce(s, subpop, thread);
+            foreach (SelectionMethod sm in Selects)
+                sm.PrepareToProduce(s, subpop, thread);
         }
 
         public override int Produce(int subpop, IEvolutionState state, int thread)
         {
-            return Selects[PickRandom(Selects, state.Random[thread].NextFloat())].Produce(subpop, state, thread);
+            return Selects[PickRandom(Selects, state.Random[thread].NextDouble())].Produce(subpop, state, thread);
         }
 
         public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
         {
-            return Selects[PickRandom(Selects, state.Random[thread].NextFloat())].Produce(min, max, start, subpop, inds, state, thread);
+            return Selects[PickRandom(Selects, state.Random[thread].NextDouble())].Produce(min, max, start, subpop, inds, state, thread);
         }
 
         public override void PreparePipeline(object hook)
@@ -164,8 +164,8 @@ namespace BraneCloud.Evolution.EC.Select
             // the default form calls this on all the selects.
             // note that it follows all the source paths even if they're
             // duplicates
-            for (var x = 0; x < Selects.Length; x++)
-                Selects[x].PreparePipeline(hook);
+            foreach (SelectionMethod sm in Selects)
+                sm.PreparePipeline(hook);
         }
 
         #endregion // Operations

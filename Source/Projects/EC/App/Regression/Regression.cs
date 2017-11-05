@@ -200,7 +200,7 @@ namespace BraneCloud.Evolution.EC.App.Regression
 
                 // the fitness better be KozaFitness!
                 var f = (KozaFitness)ind.Fitness;
-                f.SetStandardizedFitness(state, (float)sum);
+                f.SetStandardizedFitness(state, sum);
                 f.Hits = hits;
                 ind.Evaluated = true;
             }

@@ -92,7 +92,7 @@ namespace BraneCloud.Evolution.EC.App.Lid
                 double score = scoreTerminals + scoreDepth;
 
                 SimpleFitness f = (SimpleFitness) ind.Fitness;
-                f.SetFitness(state, (float) score, false);
+                f.SetFitness(state, score, false);
                 ind.Evaluated = true;
             }
         }

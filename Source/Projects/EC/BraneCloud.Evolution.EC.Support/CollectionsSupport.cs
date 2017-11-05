@@ -144,7 +144,7 @@ namespace BraneCloud.Evolution.EC.Support
         /// <returns>true if the element is in the collection.</returns>
         public static bool Contains(ICollection c, object obj)
         {
-            var contains = false;
+            bool contains;
 
             //Reflection. Invoke "contains" method for proprietary classes
             System.Reflection.MethodInfo method;
@@ -155,7 +155,7 @@ namespace BraneCloud.Evolution.EC.Support
                 if (method == null)
                     method = c.GetType().GetMethod("contains");
 
-                contains = (bool)method.Invoke(c, new object[] { obj });
+                contains = (bool)method.Invoke(c, new[] { obj });
             }
             catch (Exception e)
             {

@@ -54,6 +54,12 @@
   <ItemGroup>
     <Content Include="Readme.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC\BraneCloud.Evolution.EC.csproj">
+      <Project>{197fc1bd-8578-4de7-9aea-d7098a3505ea}</Project>
+      <Name>BraneCloud.Evolution.EC</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

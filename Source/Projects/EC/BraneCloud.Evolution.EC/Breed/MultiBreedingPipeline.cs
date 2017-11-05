@@ -92,7 +92,11 @@ namespace BraneCloud.Evolution.EC.Breed
 
             var def = DefaultBase;
 
-            var total = 0.0f;
+            var total = 0.0;
+
+            if (Sources.Length == 0)  // uh oh
+                state.Output.Fatal("num-sources must be provided and > 0 for MultiBreedingPipeline",
+                    paramBase.Push(P_NUMSOURCES), def.Push(P_NUMSOURCES));
 
             for (var x = 0; x < Sources.Length; x++)
             {
@@ -109,7 +113,7 @@ namespace BraneCloud.Evolution.EC.Breed
             state.Output.ExitIfErrors();
 
             // Now check for nonzero probability (we know it's positive)
-            if (total == 0.0)
+            if (total.Equals(0.0))
                 state.Output.Warning("MultiBreedingPipeline's children have all zero probabilities -- this will be treated as a uniform distribution.  This could be an error.", paramBase);
 
             // allow all zero probabilities
@@ -119,7 +123,7 @@ namespace BraneCloud.Evolution.EC.Breed
             MaxGeneratable = 0; // indicates that I don't know what it is yet.  
 
             // declare that likelihood isn't used
-            if (Likelihood < 1.0f)
+            if (Likelihood < 1.0)
                 state.Output.Warning("MultiBreedingPipeline does not respond to the 'likelihood' parameter.",
                     paramBase.Push(P_LIKELIHOOD), def.Push(P_LIKELIHOOD));
         }
@@ -129,7 +133,7 @@ namespace BraneCloud.Evolution.EC.Breed
 
         public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
         {
-            var s = Sources[PickRandom(Sources, state.Random[thread].NextFloat())];
+            var s = Sources[PickRandom(Sources, state.Random[thread].NextDouble())];
             int total;
 
             if (GenerateMax)

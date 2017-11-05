@@ -379,7 +379,7 @@ namespace BraneCloud.Evolution.EC.App.Tutorial1.Test
             var seedMessage = "Seed: ";
 
             // Get time in milliseconds
-            var time = (int)((DateTime.Now.Ticks - 621355968000000000) / 10000);
+            var time = (int)DateTimeHelper.CurrentTimeMilliseconds;
 
             var seed = 0;
             seed = DetermineSeed(output, parameters, new Parameter(P_SEED).Push("" + 0),

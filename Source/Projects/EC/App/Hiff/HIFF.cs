@@ -76,7 +76,7 @@ namespace BraneCloud.Evolution.EC.App.Hiff
                 genes[i] = (ind2.genome[i] ? 1 : 0);
             var fitness = H(genes);
 
-            ((SimpleFitness) ind2.Fitness).SetFitness(state, (float)fitness, false);
+            ((SimpleFitness) ind2.Fitness).SetFitness(state, fitness, false);
             ind2.Evaluated = true;
         }
 

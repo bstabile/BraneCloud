@@ -91,20 +91,12 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         #endregion // Constants
         #region Fields
 
-        /// <summary>
-        /// Temporary Node Gatherer 
-        /// </summary>
-        private GPNodeGatherer _gatherer;
-
         private GPNode _demotableNode;
 
         #endregion // Fields
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPBreedDefaults.ParamBase.Push(P_MUTATEDEMOTE); }
-        }
+        public override IParameter DefaultBase => GPBreedDefaults.ParamBase.Push(P_MUTATEDEMOTE); 
 
         /// <summary>
         /// The number of times the pipeline tries to build a valid mutated
@@ -122,18 +114,10 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         /// </summary>
         public int Tree { get; set; }
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
         #endregion // Properties
         #region Setup
-
-        public MutateDemotePipeline()
-        {
-            _gatherer = new GPNodeGatherer();
-        }
 
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
@@ -374,12 +358,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
             // the num-th nonterminal
             if (initializer.NumAtomicTypes + initializer.NumSetTypes == 1)
             {
-                _gatherer.Node = null;
-                root.NodeInPosition(num, _gatherer, GPNode.NODESEARCH_ALL);
-                if (_gatherer.Node == null)
-                    // uh oh
-                    throw new ApplicationException("Internal error in pickDemotableNode, nodeInPosition didn't find a node!"); // should never happen
-                _demotableNode = _gatherer.Node;
+                _demotableNode = root.NodeInPosition(num, GPNode.NODESEARCH_ALL);
                 return -1; // what PickDemotableNodeDirtyWork() returns...
             }
 
@@ -513,15 +492,5 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         }
 
         #endregion // Operations
-        #region Cloning
-
-        public override object Clone()
-        {
-            var obj = (MutateDemotePipeline) (base.Clone());
-            obj._gatherer = new GPNodeGatherer(); // make sure they're different
-            return obj;
-        }
-
-        #endregion // Cloning
     }
 }

@@ -17,9 +17,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.CoEvolve;
 using BraneCloud.Evolution.EC.GP.Koza;
@@ -75,30 +72,35 @@ namespace BraneCloud.Evolution.EC.GP.GE
         public new const string P_PROBLEM = "problem";
 
         #endregion // Constants
+
         #region Properties
 
         public IGPProblem Problem { get; set; }
 
         #endregion // Properties
+
         #region Setup
 
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
-            Problem = (GPProblem)state.Parameters.GetInstanceForParameter(paramBase.Push(P_PROBLEM), null, typeof(GPProblem));
+            Problem = (GPProblem) state.Parameters.GetInstanceForParameter(paramBase.Push(P_PROBLEM), null,
+                typeof(GPProblem));
             Problem.Setup(state, paramBase.Push(P_PROBLEM));
         }
 
         #endregion // Setup
+
         #region Cloning
 
         public override object Clone()
         {
-            var other = (GEProblem)(base.Clone());
-            other.Problem = (GPProblem)(Problem.Clone());
+            var other = (GEProblem) (base.Clone());
+            other.Problem = (GPProblem) (Problem.Clone());
             return other;
         }
 
         #endregion // Cloning
+
         #region Operations
 
         public override void PrepareToEvaluate(IEvolutionState state, int threadnum)
@@ -126,21 +128,21 @@ namespace BraneCloud.Evolution.EC.GP.GE
             Problem.CloseContacts(state, result);
         }
 
-        public override bool CanEvaluate
-        {
-            get { return Problem.CanEvaluate; }
-        }
+        public override bool CanEvaluate => Problem.CanEvaluate;
 
-        public void PreprocessPopulation(IEvolutionState state, Population pop, bool[] prepareForFitnessAssessment, bool countVictoriesOnly)
+        public void PreprocessPopulation(IEvolutionState state, Population pop, bool[] prepareForFitnessAssessment,
+            bool countVictoriesOnly)
         {
             if (!(Problem is IGroupedProblem))
                 state.Output.Fatal("GEProblem's underlying Problem is not a IGroupedProblem");
-            ((IGroupedProblem)Problem).PreprocessPopulation(state, pop, prepareForFitnessAssessment, countVictoriesOnly);
+            ((IGroupedProblem) Problem).PreprocessPopulation(state, pop, prepareForFitnessAssessment,
+                countVictoriesOnly);
         }
 
-        public void PostprocessPopulation(IEvolutionState state, Population pop, bool[] assessFitness, bool countVictoriesOnly)
+        public void PostprocessPopulation(IEvolutionState state, Population pop, bool[] assessFitness,
+            bool countVictoriesOnly)
         {
-            ((IGroupedProblem)Problem).PreprocessPopulation(state, pop, assessFitness, countVictoriesOnly);
+            ((IGroupedProblem) Problem).PreprocessPopulation(state, pop, assessFitness, countVictoriesOnly);
         }
 
         /// <summary>
@@ -166,14 +168,28 @@ namespace BraneCloud.Evolution.EC.GP.GE
             var gpi = new GPIndividual[ind.Length];
             for (var i = 0; i < gpi.Length; i++)
             {
-                var indiv = (GEIndividual)ind[i];
-                var species = (GESpecies)(ind[i].Species);
+                if (ind[i] is GEIndividual)
+                {
+                    var indiv = (GEIndividual) ind[i];
+                    var species = (GESpecies) ind[i].Species;
 
-                // warning: gpi[i] may be null
-                gpi[i] = species.Map(state, indiv, threadnum, null);
+                    // warning: gpi[i] may be null
+                    gpi[i] = species.Map(state, indiv, threadnum, null);
+                }
+                else if (ind[i] is GPIndividual)
+                {
+                    state.Output.WarnOnce("GPIndividual provided to GEProblem.  Hope that's correct.");
+                    gpi[i] = (GPIndividual) ind[i];
+                }
+                else
+                {
+                    state.Output.Fatal("Individual " + i +
+                                       " passed to Grouped evaluate(...) was neither a GP nor GE Individual: " +
+                                       ind[i]);
+                }
             }
 
-            ((IGroupedProblem)Problem).Evaluate(state, gpi, updateFitness, countVictoriesOnly, subpops, threadnum);
+            ((IGroupedProblem) Problem).Evaluate(state, gpi, updateFitness, countVictoriesOnly, subpops, threadnum);
 
             for (var i = 0; i < gpi.Length; i++)
             {
@@ -182,51 +198,77 @@ namespace BraneCloud.Evolution.EC.GP.GE
                 // the GPIndividual's fitness because even though the mapping function
                 // set the two Individuals to share the same fitness, it's possible
                 // that the evaluation function may have replaced the fitness.
-                ind[i].Fitness = gpi[i].Fitness;
-                ind[i].Evaluated = gpi[i].Evaluated;
+                ind[i].Fitness = gpi[i].Fitness; // if it's a GPIndividual anyway it'll just copy onto itself
+                ind[i].Evaluated = gpi[i].Evaluated; // if it's a GPIndividual anyway it'll just copy onto itself
             }
         }
 
         public void Evaluate(IEvolutionState state, Individual ind, int subpop, int threadnum)
         {
+            // this shouldn't ever happen because GEProblem's Problems are ALWAYS
+            // ISimpleProblem, but we include it here to be future-proof
             if (!(Problem is ISimpleProblem))
-                state.Output.Fatal("GEProblem's underlying Problem is not a SimpleProblemForm");
+                state.Output.Fatal("GEProblem's underlying Problem is not a ISimpleProblem");
 
-            var indiv = (GEIndividual)ind;
-            var species = (GESpecies)(ind.Species);
-            var gpi = species.Map(state, indiv, threadnum, null);
-            if (gpi == null)
+            if (ind is GEIndividual)
             {
-                var fitness = (KozaFitness)(ind.Fitness);
-                fitness.SetStandardizedFitness(state, Single.MaxValue);
+                var indiv = (GEIndividual) ind;
+                var species = (GESpecies) (ind.Species);
+                var gpi = species.Map(state, indiv, threadnum, null);
+                if (gpi == null)
+                {
+                    var fitness = (KozaFitness) (ind.Fitness);
+                    fitness.SetStandardizedFitness(state, Single.MaxValue);
+                }
+                else
+                {
+                    ((ISimpleProblem) Problem).Evaluate(state, gpi, subpop, threadnum);
+                    // Now we need to move the evaluated flag from the GPIndividual
+                    // to the GEIndividual, and also for good measure, let's copy over
+                    // the GPIndividual's fitness because even though the mapping function
+                    // set the two Individuals to share the same fitness, it's possible
+                    // that the evaluation function may have replaced the fitness.
+                    ind.Fitness = gpi.Fitness;
+                    ind.Evaluated = gpi.Evaluated;
+                }
+            }
+            else if (ind is GPIndividual)
+            {
+                state.Output.WarnOnce("GPIndividual provided to GEProblem.  Hope that's correct.");
+                ((ISimpleProblem) Problem).Evaluate(state, ind, subpop, threadnum); // just evaluate directly
             }
             else
             {
-                ((ISimpleProblem)Problem).Evaluate(state, gpi, subpop, threadnum);
-                // Now we need to move the evaluated flag from the GPIndividual
-                // to the GEIndividual, and also for good measure, let's copy over
-                // the GPIndividual's fitness because even though the mapping function
-                // set the two Individuals to share the same fitness, it's possible
-                // that the evaluation function may have replaced the fitness.
-                ind.Fitness = gpi.Fitness;
-                ind.Evaluated = gpi.Evaluated;
+                state.Output.Fatal("Individual passed to Evaluate(...) was neither a GP nor GE Individual: " + ind);
             }
         }
 
         public override void Describe(IEvolutionState state, Individual ind, int subpop, int threadnum, int log)
         {
-            var indiv = (GEIndividual)ind;
-            var species = (GESpecies)(ind.Species);
-            var gpi = species.Map(state, indiv, threadnum, null);
-            if (gpi != null)
+            if (ind is GEIndividual)
             {
-                Problem.Describe(state, gpi, subpop, threadnum, log);
+                var indiv = (GEIndividual) ind;
+                var species = (GESpecies) (ind.Species);
+                var gpi = species.Map(state, indiv, threadnum, null);
+                if (gpi != null)
+                {
+                    Problem.Describe(state, gpi, subpop, threadnum, log);
 
-                // though this is probably not necessary for describe(...),
-                // for good measure we're doing the same rigamarole that we
-                // did for evaluate(...) above.
-                ind.Fitness = gpi.Fitness;
-                ind.Evaluated = gpi.Evaluated;
+                    // though this is probably not necessary for describe(...),
+                    // for good measure we're doing the same rigamarole that we
+                    // did for evaluate(...) above.
+                    ind.Fitness = gpi.Fitness;
+                    ind.Evaluated = gpi.Evaluated;
+                }
+            }
+            else if (ind is GPIndividual)
+            {
+                state.Output.WarnOnce("GPIndividual provided to GEProblem.  Hope that's correct.");
+                ((ISimpleProblem) Problem).Describe(state, ind, subpop, threadnum, log); // just describe directly
+            }
+            else
+            {
+                state.Output.Fatal("Individual passed to Describe(...) was neither a GP nor GE Individual: " + ind);
             }
         }
 

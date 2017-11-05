@@ -73,10 +73,13 @@
     <Compile Include="Breed\BreedDefaults.cs" />
     <Compile Include="Breed\BreederThread.cs" />
     <Compile Include="Breed\BufferedBreedingPipeline.cs" />
+    <Compile Include="Breed\CheckingPipeline.cs" />
     <Compile Include="Breed\ForceBreedingPipeline.cs" />
     <Compile Include="Breed\GenerationSwitchPipeline.cs" />
+    <Compile Include="Breed\InitializationPipeline.cs" />
     <Compile Include="Breed\MultiBreedingPipeline.cs" />
     <Compile Include="Breed\ReproductionPipeline.cs" />
+    <Compile Include="Breed\UniquePipeline.cs" />
     <Compile Include="CoEvolve\IGroupedProblem.cs" />
     <Compile Include="Core\Breeder.cs" />
     <Compile Include="Core\BreedingPipeline.cs" />
@@ -113,6 +116,7 @@
     <Compile Include="Eval\SlaveReturnType.cs" />
     <Compile Include="GP\Breed\SizeFairCrossoverPipeline.cs" />
     <Compile Include="GP\Build\UniformGPNodeStorage.cs" />
+    <Compile Include="GP\GE\Breed\GECrossoverPipeline.cs" />
     <Compile Include="GP\GE\Breed\GETruncationPipeline.cs" />
     <Compile Include="GP\GE\GEDefaults.cs" />
     <Compile Include="GP\GE\GEIndividual.cs" />
@@ -120,9 +124,11 @@
     <Compile Include="GP\GE\GESpecies.cs" />
     <Compile Include="GP\GE\GrammarFunctionNode.cs" />
     <Compile Include="GP\GE\GrammarNode.cs" />
+    <Compile Include="GP\GE\GrammarNodeExtensions.cs" />
     <Compile Include="GP\GE\GrammarParser.cs" />
     <Compile Include="GP\GE\GrammarRuleNode.cs" />
     <Compile Include="GP\GE\IGPProblemParent.cs" />
+    <Compile Include="GP\GPNodeExtensions.cs" />
     <Compile Include="GP\IGPProblem.cs" />
     <Compile Include="CloneNotSupportedException.cs" />
     <Compile Include="GP\Push\Nonterminal.cs" />
@@ -324,6 +330,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="GP\GE\README.txt" />
+    <Content Include="MultiObjective\README.txt" />
     <Content Include="Readme.txt" />
   </ItemGroup>
   <ItemGroup>

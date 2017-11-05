@@ -29,6 +29,8 @@ using BraneCloud.Evolution.EC.Randomization;
 namespace BraneCloud.Evolution.EC.Vector
 {
     /// <summary> 
+    /// BRS: WARNING: Java "BYTE" is signed so we are using C# SBYTE.
+    /// 
     /// ByteVectorIndividual is a VectorIndividual whose genome is an array of bytes.
     /// Gene values may range from species.GetMinGene(x) to species.GetMaxGene(x), inclusive.
     /// The default mutation method randomizes genes to new values in this range,
@@ -39,14 +41,14 @@ namespace BraneCloud.Evolution.EC.Vector
     /// <p/>In addition to serialization for checkpointing, Individuals may read and write themselves to streams in three ways.
     /// 
     /// <ul>
-    /// <li/><b>WriteIndividual(...,BinaryWriter) / ReadIndividual(...,BinaryReader)</b>&nbsp;&nbsp;&nbsp;
+    /// <li/><b>WriteIndividual(...,BinaryWriter) / ReadIndividual(...,BinaryReader)</b>&#160;&#160;&#160;
     /// This method transmits or receives an individual in binary.  It is the most efficient approach to sending
     /// individuals over networks, etc.  These methods write the evaluated flag and the fitness, then
     /// call <b>ReadGenotype/WriteGenotype</b>, which you must implement to write those parts of your 
     /// Individual special to your functions-- the default versions of ReadGenotype/WriteGenotype throw errors.
     /// You don't need to implement them if you don't plan on using Read/WriteIndividual.
     /// 
-    /// <li/><b>PrintIndividual(...,StreamWriter) / ReadIndividual(...,StreamReader)</b>&nbsp;&nbsp;&nbsp;
+    /// <li/><b>PrintIndividual(...,StreamWriter) / ReadIndividual(...,StreamReader)</b>&#160;&#160;&#160;
     /// This approach transmits or receives an indivdual in text encoded such that the individual is largely readable
     /// by humans but can be read back in 100% by ECJ as well.  To do this, these methods will encode numbers
     /// using the <tt>ec.util.Code</tt> class.  These methods are mostly used to write out populations to
@@ -60,7 +62,7 @@ namespace BraneCloud.Evolution.EC.Vector
     /// form of <b>ParseGenotype</b> throws an error.  You are not required to implement these methods, but without
     /// them you will not be able to write individuals to files in a simultaneously computer- and human-readable fashion.
     /// 
-    /// <li/><b>PrintIndividualForHumans(...,StreamWriter)</b>&nbsp;&nbsp;&nbsp;
+    /// <li/><b>PrintIndividualForHumans(...,StreamWriter)</b>&#160;&#160;&#160;
     /// This approach prints an individual in a fashion intended for human consumption only.
     /// <b>PrintIndividualForHumans</b> writes out the fitness and evaluation flag, then calls <b>GenotypeToStringForHumans</b> 
     /// and PrintLns the resultant string. You are responsible for implementing the GenotypeToStringForHumans method.
@@ -85,31 +87,21 @@ namespace BraneCloud.Evolution.EC.Vector
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return VectorDefaults.ParamBase.Push(P_BYTEVECTORINDIVIDUAL); }
-        }
+        public override IParameter DefaultBase => VectorDefaults.ParamBase.Push(P_BYTEVECTORINDIVIDUAL); 
 
         public override object Genome
         {
-            get
-            {
-                return genome;
-            }
+            get => genome;
 
-            set
-            {
-                genome = (byte[])value;
-            }
-
+            set => genome = (sbyte[])value;
         }
-        public byte[] genome { get; set; }
+        public sbyte[] genome { get; set; }
         public override int GenomeLength
         {
-            get { return genome.Length; }
+            get => genome.Length;
             set
             {
-                var newGenome = new byte[value];
+                var newGenome = new sbyte[value];
                 Array.Copy(genome, 0, newGenome, 0, genome.Length < newGenome.Length ? genome.Length : newGenome.Length);
                 genome = newGenome;
             }
@@ -148,7 +140,7 @@ namespace BraneCloud.Evolution.EC.Vector
                 state.Output.Fatal("ByteVectorIndividual requires an IntegerVectorSpecies", paramBase, def);
             var s = (IntegerVectorSpecies)Species;
 
-            genome = new byte[s.GenomeSize];
+            genome = new sbyte[s.GenomeSize];
         }
 
         #endregion // Setup
@@ -158,7 +150,7 @@ namespace BraneCloud.Evolution.EC.Vector
 
         public void SetGenomeLength(int len)
         {
-            var newGenome = new byte[len];
+            var newGenome = new sbyte[len];
             Array.Copy(genome, 0, newGenome, 0, genome.Length < newGenome.Length ? genome.Length : newGenome.Length);
             genome = newGenome;
         }
@@ -188,11 +180,11 @@ namespace BraneCloud.Evolution.EC.Vector
             var sum = pieces.Sum(t => ((sbyte[])t).Length);
 
             var runningsum = 0;
-            var newgenome = new byte[sum];
+            var newgenome = new sbyte[sum];
             foreach (var t in pieces)
             {
-                Array.Copy((Array)t, 0, newgenome, runningsum, ((byte[])t).Length);
-                runningsum += ((byte[])t).Length;
+                Array.Copy((Array)t, 0, newgenome, runningsum, ((sbyte[])t).Length);
+                runningsum += ((sbyte[])t).Length;
             }
             // set genome
             genome = newgenome;
@@ -203,16 +195,16 @@ namespace BraneCloud.Evolution.EC.Vector
         /// overflows that complicate this computation.  Does NOT check that
         /// min is less than or equal to max.  You must check this yourself.
         /// </summary>
-        public byte RandomValueFromClosedInterval(byte min, byte max, IMersenneTwister random)
+        public sbyte RandomValueFromClosedInterval(sbyte min, sbyte max, IMersenneTwister random)
         {
             if (max - min < 0) // we had an overflow
             {
-                byte l = 0;
-                do l = (byte)random.NextInt();
+                sbyte l;
+                do l = (sbyte)random.NextInt();
                 while (l < min || l > max);
                 return l;
             }
-            return (byte)(min + random.NextInt(max - min + 1));
+            return (sbyte)(min + random.NextInt(max - min + 1));
         }
 
         /// <summary>
@@ -222,7 +214,7 @@ namespace BraneCloud.Evolution.EC.Vector
         {
             var s = (IntegerVectorSpecies)Species;
             for (var x = 0; x < genome.Length; x++)
-                genome[x] = (byte)RandomValueFromClosedInterval((byte)s.GetMinGene(x), (byte)s.GetMaxGene(x), state.Random[thread]);
+                genome[x] = (sbyte)RandomValueFromClosedInterval((sbyte)s.GetMinGene(x), (sbyte)s.GetMaxGene(x), state.Random[thread]);
         }
 
         /// <summary>
@@ -233,12 +225,12 @@ namespace BraneCloud.Evolution.EC.Vector
             var species = (IntegerVectorSpecies)Species;
             for (var i = 0; i < Length; i++)
             {
-                var minGene = (byte)species.GetMinGene(i);
+                var minGene = (sbyte)species.GetMinGene(i);
                 if (genome[i] < minGene)
                     genome[i] = minGene;
                 else
                 {
-                    var maxGene = (byte)species.GetMaxGene(i);
+                    var maxGene = (sbyte)species.GetMaxGene(i);
                     if (genome[i] > maxGene)
                         genome[i] = maxGene;
                 }
@@ -252,7 +244,7 @@ namespace BraneCloud.Evolution.EC.Vector
         {
             var s = (IntegerVectorSpecies)Species;
             var i = (ByteVectorIndividual)ind;
-            byte tmp;
+            sbyte tmp;
             int point;
 
             if (genome.Length != i.genome.Length)
@@ -309,8 +301,8 @@ namespace BraneCloud.Evolution.EC.Vector
                             var u = (long)Math.Floor(beta * i.genome[x] + (1 - beta) * genome[x] + 0.5);
                             if (!(t < min || t > max || u < min || u > max))
                             {
-                                genome[x] = (byte)t;
-                                i.genome[x] = (byte)u;
+                                genome[x] = (sbyte)t;
+                                i.genome[x] = (sbyte)u;
                             }
                         }
                     }
@@ -332,8 +324,8 @@ namespace BraneCloud.Evolution.EC.Vector
                                 t = (long)Math.Floor(alpha * genome[x] + (1 - alpha) * i.genome[x] + 0.5);
                                 u = (long)Math.Floor(beta * i.genome[x] + (1 - beta) * genome[x] + 0.5);
                             } while (t < min || t > max || u < min || u > max);
-                            genome[x] = (byte)t;
-                            i.genome[x] = (byte)u;
+                            genome[x] = (sbyte)t;
+                            i.genome[x] = (sbyte)u;
                         }
                     }
                     break;
@@ -350,13 +342,13 @@ namespace BraneCloud.Evolution.EC.Vector
             for (int x = 0; x < genome.Length; x++)
                 if (state.Random[thread].NextBoolean(s.GetMutationProbability(x)))
                 {
-                    byte old = genome[x];
+                    sbyte old = genome[x];
                     for (int retries = 0; retries < s.GetDuplicateRetries(x) + 1; retries++)
                     {
                         switch (s.GetMutationType(x))
                         {
                             case IntegerVectorSpecies.C_RESET_MUTATION:
-                                genome[x] = (byte)RandomValueFromClosedInterval((byte)s.GetMinGene(x), (byte)s.GetMaxGene(x), state.Random[thread]);
+                                genome[x] = (sbyte)RandomValueFromClosedInterval((sbyte)s.GetMinGene(x), (sbyte)s.GetMaxGene(x), state.Random[thread]);
                                 break;
                             case IntegerVectorSpecies.C_RANDOM_WALK_MUTATION:
                                 int min = (int)s.GetMinGene(x);
@@ -373,10 +365,10 @@ namespace BraneCloud.Evolution.EC.Vector
                                     int g = genome[x];
                                     if ((n == 1 && g < max) ||
                                         (n == -1 && g > min))
-                                        genome[x] = (byte)(g + n);
+                                        genome[x] = (sbyte)(g + n);
                                     else if ((n == -1 && g < max) ||
                                         (n == 1 && g > min))
-                                        genome[x] = (byte)(g - n);
+                                        genome[x] = (sbyte)(g - n);
                                 }
                                 while (state.Random[thread].NextBoolean(s.GetRandomWalkProbability(x)));
                                 break;
@@ -473,13 +465,13 @@ namespace BraneCloud.Evolution.EC.Vector
                 state.Output.Fatal("Individual with genome:\n" + s + "\n... does not have an integer at the beginning indicating the genome count.");
             var lll = (int)d.L;
 
-            genome = new byte[lll];
+            genome = new sbyte[lll];
 
             // read in the genes
             for (var i = 0; i < genome.Length; i++)
             {
                 Code.Decode(d);
-                genome[i] = (byte)d.L;
+                genome[i] = (sbyte)d.L;
             }
         }
 
@@ -494,9 +486,9 @@ namespace BraneCloud.Evolution.EC.Vector
         {
             var len = reader.ReadInt32();
             if (genome == null || genome.Length != len)
-                genome = new byte[len];
+                genome = new sbyte[len];
             for (var x = 0; x < genome.Length; x++)
-                genome[x] = (byte)reader.ReadByte();
+                genome[x] = (sbyte)reader.ReadByte();
         }
 
         #endregion // IO

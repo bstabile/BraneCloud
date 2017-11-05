@@ -126,7 +126,7 @@ namespace BraneCloud.Evolution.EC.App.KLandscapes
             {
                 double score = Fitness(((GPIndividual) ind).Trees[0].Child);
                 SimpleFitness f = (SimpleFitness) ind.Fitness;
-                f.SetFitness(state, (float) score, score == 1.0);
+                f.SetFitness(state, score, score.Equals(1.0));
                 ind.Evaluated = true;
             }
         }
@@ -134,7 +134,7 @@ namespace BraneCloud.Evolution.EC.App.KLandscapes
         double Fitness(GPNode root)
         {
             // Compute the penality (it increases with the difference in depth between the tree and k.
-            double penalty = 1 / (1 + Math.Abs(k + 1 - root.Depth));
+            double penalty = 1.0 / (1 + Math.Abs(k + 1 - root.Depth));
             return penalty * FitnessHelper(root) / _bestFitness;
         }
 

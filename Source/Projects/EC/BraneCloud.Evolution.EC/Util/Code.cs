@@ -105,6 +105,8 @@ namespace BraneCloud.Evolution.EC.Util
                             case 2:  s = "'\\u00" + s + "'"; break;
                             case 3:  s = "'\\u0" + s + "'"; break;
                             case 4:  s = "'\\u" + s + "'"; break;
+                            default:
+                                throw new InvalidOperationException("Default case should never occur");
                         }
                         return s;
                     }
@@ -247,14 +249,12 @@ namespace BraneCloud.Evolution.EC.Util
                         // pad with 0's  -- parser might freak out otherwise (ecj)
                         switch (ss.Length)
                         {
-                            
                             case 1:  sb.Append("000" + ss); break;
-                            
                             case 2:  sb.Append("00" + ss); break;
-                            
                             case 3:  sb.Append("0" + ss); break;
-                            
                             case 4:  sb.Append(ss); break;
+                            default:
+                                throw new InvalidOperationException("Default case should never occur");
                         }
                     }
                 }
@@ -821,6 +821,18 @@ namespace BraneCloud.Evolution.EC.Util
                 state.Output.Fatal("On line " + linenumber + "an IO error occurred:\n\n" + e);
                 return null; // never happens
             }
+        }
+
+        /** Finds the next nonblank line, skips past an expected preamble, and reads in a string if there is one, and returns it.
+            Generates an error otherwise. */
+        public static string ReadStringWithPreamble(string preamble, IEvolutionState state, StreamReader reader)
+        {
+            DecodeReturn d = CheckPreamble(preamble, state, reader);
+            Decode(d);
+            if (d.Type != DecodeReturn.T_STRING)
+                state.Output.Fatal("Line " + d.LineNumber +
+                                   " has no string after preamble '" + preamble + "'\n-->" + d.Data);
+            return d.S;
         }
 
         /// <summary>

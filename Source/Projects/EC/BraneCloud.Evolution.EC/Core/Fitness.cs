@@ -77,7 +77,7 @@ namespace BraneCloud.Evolution.EC
         public abstract IParameter DefaultBase { get; }
 
         /// <inheritdoc />
-        public abstract float Value { get; /* protected set; */ } // The actual value should be handled in each derived type!
+        public abstract double Value { get; /* protected set; */ } // The actual value should be handled in each derived type!
 
         /// <inheritdoc />
         public abstract bool IsIdeal { get; }
@@ -250,7 +250,7 @@ namespace BraneCloud.Evolution.EC
             }
             else
             {
-                SetToMeanOf(state, new[] { f2[f2.Length / 2 - 1], f2[f2.Length / 2] });  // for example, 6/2 = 3, and 0, 1, *2<, *3*, 4, 5
+                SetToMeanOf(state, new[] { f2[f2.Length / 2 - 1], f2[f2.Length / 2] });  // for example, 6/2 = 3, and 0, 1, *2*, *3*, 4, 5
             }
         }
 

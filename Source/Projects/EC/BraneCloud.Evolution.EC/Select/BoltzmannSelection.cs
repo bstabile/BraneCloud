@@ -17,9 +17,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
 
@@ -98,10 +95,7 @@ namespace BraneCloud.Evolution.EC.Select
         #endregion // Fields
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_BOLTZMANN); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_BOLTZMANN);
 
         #endregion // Properties
         #region Setup
@@ -152,11 +146,11 @@ namespace BraneCloud.Evolution.EC.Select
         public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
         {
             // load fitnesses
-            Fitnesses = new float[s.Population.Subpops[subpop].Individuals.Length];
+            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Length];
             for (var x = 0; x < Fitnesses.Length; x++)
             {
                 // adjust the fitness proportion according to current temperature.                
-                Fitnesses[x] = (float)BoltzmannExpectedValue(s.Population.Subpops[subpop].Individuals[x].Fitness.Value, s);
+                Fitnesses[x] = (double)BoltzmannExpectedValue(s.Population.Subpops[subpop].Individuals[x].Fitness.Value, s);
                 if (Fitnesses[x] < 0) // uh oh
                     s.Output.Fatal("Discovered a negative fitness value.  BoltzmannnSelection requires that all fitness values be non-negative(offending subpopulation #"
                         + subpop + ")");

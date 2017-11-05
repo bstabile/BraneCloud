@@ -93,7 +93,6 @@ namespace BraneCloud.Evolution.EC.Breed
             // we'll modify them from there
             int n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
 
-            // now let's reproduce 'em
             if (MustClone || (Sources[0] is SelectionMethod))
                 for (var q = start; q < n + start; q++)
                     inds[q] = (Individual)(inds[q].Clone());

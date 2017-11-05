@@ -19,11 +19,9 @@
 using System;
 using System.IO;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Configuration;
@@ -66,11 +64,6 @@ namespace BraneCloud.Evolution.EC.Logging
     /// </ol>
     /// 
     /// <p/>
-    /// Output by default will automatically flush any log which prints an announcement
-    /// (or anything printed with Output.PrintLn(...).  You can change this behavior with
-    /// the setFlush() method.
-    /// 
-    /// <p/>
     /// Output will also store all announcements in memory by default so as to reproduce
     /// them if it's restarted from a checkpoint.  You can change this behavior also by
     /// 
@@ -104,8 +97,10 @@ namespace BraneCloud.Evolution.EC.Logging
         //public const int V_TOTALLY_SILENT = 5000;
 
         #endregion // Constants
+
         #region Private Fields
 
+        private readonly object _syncLock = new object();
         private bool _errors;
         private ArrayList _announcements = ArrayList.Synchronized(new ArrayList(10));
         private readonly HashSetSupport _oneTimeWarnings = new HashSetSupport();
@@ -140,11 +135,17 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             get
             {
-                return String.IsNullOrEmpty(_filePrefix) ? "" : _filePrefix;
+                lock (_syncLock)
+                {
+                    return string.IsNullOrEmpty(_filePrefix) ? "" : _filePrefix;
+                }
             }
             set
             {
-                _filePrefix = String.IsNullOrEmpty(value) ? "" : value;
+                lock (_syncLock)
+                {
+                    _filePrefix = string.IsNullOrEmpty(value) ? "" : value;
+                }
             }
         }
         private string _filePrefix = "";
@@ -156,14 +157,14 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             get
             {
-                lock (this)
+                lock (_syncLock)
                 {
                     return _autoFlush;
                 }
             }
             set
             {
-                lock (this)
+                lock (_syncLock)
                 {
                     _autoFlush = value;
                 }
@@ -179,11 +180,11 @@ namespace BraneCloud.Evolution.EC.Logging
             // Returns the Output's storing behavior.
             get
             {
-                lock (this) { return _storeAnnouncements; }
+                lock (_syncLock) { return _storeAnnouncements; }
             }
             set
             {
-                lock (this) { _storeAnnouncements = value; }
+                lock (_syncLock) { _storeAnnouncements = value; }
             }
         }
         private bool _storeAnnouncements;
@@ -192,7 +193,7 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             get
             {
-                lock (this)
+                lock (_syncLock)
                 {
                     return _announcements != null ? _announcements.Count : 0;
                 }
@@ -206,21 +207,26 @@ namespace BraneCloud.Evolution.EC.Logging
         {
             get
             {
-                lock (this)
+                lock (_syncLock)
                 {
                     return _logs.Count;
                 }
             }
         }
 
-        // BRS: ECJ has this as a private field with accessor methods. I didn't see the point.
-        public bool ThrowsErrors { get; set; }
+        public bool ThrowsErrors
+        {
+            get { lock (_syncLock) { return _throwsErrors; } }
+            set { lock (_syncLock) { _throwsErrors = value; } }
+        }
+
+        private bool _throwsErrors;
 
         public bool HasErrors
         {
             get
             {
-                lock (this)
+                lock (_syncLock)
                 {
                     return _errors;
                 }
@@ -249,7 +255,7 @@ namespace BraneCloud.Evolution.EC.Logging
 
         public virtual void Restart()
         {
-            lock (this)
+            lock (_syncLock)
             {
                 // restart logs, then repost announcements to them
                 var ls = _logs.Count;
@@ -279,7 +285,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void Close()
         {
-            lock (this)
+            lock (_syncLock)
             {
                 // just in case
                 Flush();
@@ -303,7 +309,7 @@ namespace BraneCloud.Evolution.EC.Logging
             Environment.Exit(1);
         }
 
-        private static void ExitWithError(Output output, String message, bool throwException)
+        private static void ExitWithError(Output output, string message, bool throwException)
         {
             // flush logs first
             output?.Close(); // This flushes
@@ -322,7 +328,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void ExitIfErrors()
         {
-            lock (this)
+            lock (_syncLock)
             {
                 if (!_errors) return;
                 PrintLn("SYSTEM EXITING FROM ERRORS\n", ALL_MESSAGE_LOGS, true);
@@ -351,7 +357,7 @@ namespace BraneCloud.Evolution.EC.Logging
             // BRS : TODO : None of this nonsense seems to help when running in MSTest (which may mean that multi-threading needs attention).
             // NOTE: Although the tests DO pass, there is an exception in the test result details.
             // All in all, the Flush(), Close(), Dispose(), Finalize semantics of all of this needs to be cleaned up considerably!
-            lock (this)
+            lock (_syncLock)
             {
                 foreach (var log in _logs.Cast<Log>().Where(log => log?.Writer != null))
                 {
@@ -382,7 +388,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void ClearErrors()
         {
-            lock (this)
+            lock (_syncLock)
             {
                 _errors = false;
             }
@@ -394,7 +400,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void ClearAnnouncements()
         {
-            lock (this)
+            lock (_syncLock)
             {
                 if (_announcements != null)
                     _announcements = ArrayList.Synchronized(new ArrayList(10));
@@ -405,32 +411,30 @@ namespace BraneCloud.Evolution.EC.Logging
         #region Compression
 
         /// <summary>
-        /// This method uses the .NET DeflateStream found in System.IO.Compression.
-        /// DeflateStream uses ZLib algorithms under the covers.
+        /// This method uses the .NET GZipStream found in System.IO.Compression.
         /// </summary>
         /// <remarks>
         /// Because it is so easy to forget to close or dispose of a resource,
         /// it might be wiser to create it in a using() statement where it will be used:
-        /// <code>using (DeflateStream decompressionStream = new DeflateStream(input, CompressionMode.Decompress){...}</code>
+        /// <code>using (GZipStream decompressionStream = new GZipStream(input, CompressionMode.Decompress){...}</code>
         /// </remarks>
         public static Stream MakeCompressingInputStream(Stream input)
         {
-            DeflateStream decompressionStream = new DeflateStream(input, CompressionMode.Decompress);
+            GZipStream decompressionStream = new GZipStream(input, CompressionMode.Decompress);
             return decompressionStream;
         }
 
         /// <summary>
-        /// This method uses the .NET DeflateStream found in System.IO.Compression.
-        /// DeflateStream uses ZLib algorithms under the covers.
+        /// This method uses the .NET GZipStream found in System.IO.Compression.
         /// </summary>
         /// <remarks>
         /// Because it is so easy to forget to close or dispose of a resource,
         /// it might be wiser to create it in a using() statement where it will be used:
-        /// <code>using (DeflateStream compressingStream = new DeflateStream(output, CompressionLevel.Optimal){...}</code>
+        /// <code>using (GZipStream compressingStream = new GZipStream(output, CompressionLevel.Optimal){...}</code>
         /// </remarks>
         public static Stream MakeCompressingOutputStream(Stream output)
         {
-            DeflateStream compressingOutputStream = new DeflateStream(output, CompressionLevel.Optimal);
+            GZipStream compressingOutputStream = new GZipStream(output, CompressionLevel.Optimal);
             return compressingOutputStream;
         }
 
@@ -450,8 +454,11 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public int AddLog(string fileName)
         {
-            var name = String.IsNullOrEmpty(_filePrefix) ? fileName : _filePrefix + fileName;
-            return AddLog(new Log(new FileInfo(name), false, false, false));
+            lock (_syncLock)
+            {
+                var name = string.IsNullOrEmpty(_filePrefix) ? fileName : _filePrefix + fileName;
+                return AddLog(new Log(new FileInfo(name), false, false, false));
+            }
         }
 
         /// <summary>
@@ -466,8 +473,11 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public int AddLog(string fileName, bool appendOnRestart)
         {
-            var name = String.IsNullOrEmpty(_filePrefix) ? fileName : _filePrefix + fileName;
-            return AddLog(new Log(new FileInfo(name), false, appendOnRestart, false));
+            lock (_syncLock)
+            {
+                var name = string.IsNullOrEmpty(_filePrefix) ? fileName : _filePrefix + fileName;
+                return AddLog(new Log(new FileInfo(name), false, appendOnRestart, false));
+            }
         }
 
         /// <summary>
@@ -484,8 +494,11 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public int AddLog(string fileName, bool appendOnRestart, bool gzip)
         {
-            var name = String.IsNullOrEmpty(_filePrefix) ? fileName : _filePrefix + fileName;
-            return AddLog(new Log(new FileInfo(name), false, appendOnRestart, gzip));
+            lock (_syncLock)
+            {
+                var name = string.IsNullOrEmpty(_filePrefix) ? fileName : _filePrefix + fileName;
+                return AddLog(new Log(new FileInfo(name), false, appendOnRestart, gzip));
+            }
         }
 
         /// <summary>
@@ -504,8 +517,11 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public int AddLog(string fileName, bool postAnnouncements, bool appendOnRestart, bool gzip)
         {
-            var name = String.IsNullOrEmpty(_filePrefix) ? fileName : _filePrefix + fileName;
-            return AddLog(new Log(new FileInfo(name), postAnnouncements, appendOnRestart, gzip));
+            lock (_syncLock)
+            {
+                var name = string.IsNullOrEmpty(_filePrefix) ? fileName : _filePrefix + fileName;
+                return AddLog(new Log(new FileInfo(name), postAnnouncements, appendOnRestart, gzip));
+            }
         }
 
         /// <summary>
@@ -522,8 +538,11 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public int AddLog(FileInfo fileInfo)
         {
-            var name = String.IsNullOrEmpty(_filePrefix) ? fileInfo.FullName : _filePrefix + fileInfo.FullName;
-            return AddLog(new Log(new FileInfo(name), false, false, false));
+            lock (_syncLock)
+            {
+                var name = string.IsNullOrEmpty(_filePrefix) ? fileInfo.FullName : _filePrefix + fileInfo.FullName;
+                return AddLog(new Log(new FileInfo(name), false, false, false));
+            }
         }
 
         /// <summary>
@@ -540,8 +559,11 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public int AddLog(FileInfo fileInfo, bool appendOnRestart)
         {
-            var name = String.IsNullOrEmpty(_filePrefix) ? fileInfo.FullName : _filePrefix + fileInfo.FullName;
-            return AddLog(new Log(new FileInfo(name), false, appendOnRestart, false));
+            lock (_syncLock)
+            {
+                var name = string.IsNullOrEmpty(_filePrefix) ? fileInfo.FullName : _filePrefix + fileInfo.FullName;
+                return AddLog(new Log(new FileInfo(name), false, appendOnRestart, false));
+            }
         }
 
         /// <summary>
@@ -560,8 +582,11 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public int AddLog(FileInfo fileInfo, bool appendOnRestart, bool gzip)
         {
-            var name = String.IsNullOrEmpty(_filePrefix) ? fileInfo.FullName : _filePrefix + fileInfo.FullName;
-            return AddLog(new Log(new FileInfo(name), false, appendOnRestart, gzip));
+            lock (_syncLock)
+            {
+                var name = string.IsNullOrEmpty(_filePrefix) ? fileInfo.FullName : _filePrefix + fileInfo.FullName;
+                return AddLog(new Log(new FileInfo(name), false, appendOnRestart, gzip));
+            }
         }
 
         /// <summary>
@@ -582,8 +607,11 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public int AddLog(FileInfo fileInfo, bool postAnnouncements, bool appendOnRestart, bool gzip)
         {
-            var name = String.IsNullOrEmpty(_filePrefix) ? fileInfo.FullName : _filePrefix + fileInfo.FullName;
-            return AddLog(new Log(new FileInfo(name), postAnnouncements, appendOnRestart, gzip));
+            lock (_syncLock)
+            {
+                var name = string.IsNullOrEmpty(_filePrefix) ? fileInfo.FullName : _filePrefix + fileInfo.FullName;
+                return AddLog(new Log(new FileInfo(name), postAnnouncements, appendOnRestart, gzip));
+            }
         }
 
         /// <summary>
@@ -597,7 +625,10 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public int AddLog(int descriptor, bool postAnnouncements)
         {
-            return AddLog(new Log(descriptor, postAnnouncements));
+            lock (_syncLock)
+            {
+                return AddLog(new Log(descriptor, postAnnouncements));
+            }
         }
 
         /// <summary>
@@ -612,7 +643,10 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public int AddLog(StreamWriter writer, LogRestarter restarter, bool postAnnouncements, bool repostAnnouncements)
         {
-            return AddLog(new Log(writer, restarter, postAnnouncements, repostAnnouncements));
+            lock (_syncLock)
+            {
+                return AddLog(new Log(writer, restarter, postAnnouncements, repostAnnouncements));
+            }
         }
 
         /// <summary>
@@ -624,7 +658,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual int AddLog(Log l)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 _logs.Add(l);
                 return _logs.Count - 1;
@@ -636,7 +670,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual Log RemoveLog(int x)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 var l = GetLog(x);
                 _logs.RemoveAt(x);
@@ -652,7 +686,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>		
         public virtual void Reopen(int log)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 var oldlog = (Log)_logs[log];
                 _logs[log] = oldlog.Reopen();
@@ -665,7 +699,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>	
         public virtual void Reopen(int[] logs)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 foreach (var t in logs)
                 {
@@ -682,7 +716,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual Log GetLog(int x)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 return (Log)_logs[x];
             }
@@ -704,7 +738,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         /// <param name="str">A partial message that is appended to the "_error" StringBuilder.</param>
         /// <returns>The original string argument that is passed in.</returns>
-        private String _a(String str)
+        private string _a(string str)
         {
             _error.Append(str);
             _error.Append("\n");
@@ -728,7 +762,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void SystemMessage(string s)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn(s, ALL_MESSAGE_LOGS, true);
             }
@@ -739,7 +773,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void Message(string s)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn(s, ALL_MESSAGE_LOGS, true);
             }
@@ -753,7 +787,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void Fatal(string s)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn(_a("FATAL ERROR:\n" + s), ALL_MESSAGE_LOGS, true);
                 ExitWithError(this, _error.ToString(), ThrowsErrors);
@@ -765,7 +799,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void Fatal(string s, IParameter p1)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn(_a("FATAL ERROR:\n" + s), ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
@@ -781,7 +815,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void Fatal(string s, IParameter p1, IParameter p2)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn("FATAL ERROR:\n" + s, ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
@@ -949,7 +983,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void Error(string s)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn(_a("ERROR:\n" + s), ALL_MESSAGE_LOGS, true);
                 _errors = true;
@@ -961,7 +995,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void Error(string s, IParameter p1)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn(_a("ERROR:\n" + s), ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
@@ -977,7 +1011,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void Error(string s, IParameter p1, IParameter p2)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn(_a("ERROR:\n" + s), ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
@@ -999,12 +1033,42 @@ namespace BraneCloud.Evolution.EC.Logging
         #endregion // Error
         #region Warning
 
+        /** Prints an initial warning to System.err.  This is only to
+            be used by ec.Evolve in starting up the system. */
+        public static void InitialWarning(string s)
+        {
+            InitialWarning(s, null, null);
+        }
+
+        /** Prints an initial warning to System.err.  This is only to
+            be used by ec.Evolve in starting up the system. */
+        public static void InitialWarning(string s, Parameter p1)
+        {
+            InitialWarning(s, p1, null);
+        }
+
+        /** Prints an initial warning to System.err.  This is only to
+            be used by ec.Evolve in starting up the system. */
+        public static void InitialWarning(string s, Parameter p1, Parameter p2)
+        {
+            Console.Error.WriteLine("STARTUP WARNING:\n" + s);
+            if (p1 != null)
+            {
+                Console.Error.WriteLine("PARAMETER: " + p1);
+            }
+
+            if (p2 != null && p1 != null)
+            {
+                Console.Error.WriteLine("     ALSO: " + p2);
+            }
+        }
+
         /// <summary>
         /// Posts a warning. 
         /// </summary>
         public virtual void Warning(string s)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn("WARNING:\n" + s, ALL_MESSAGE_LOGS, true);
             }
@@ -1015,7 +1079,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void Warning(string s, IParameter p1)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn("WARNING:\n" + s, ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
@@ -1030,7 +1094,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void Warning(string s, IParameter p1, IParameter p2)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 PrintLn("WARNING:\n" + s, ALL_MESSAGE_LOGS, true);
                 if (p1 != null)
@@ -1056,7 +1120,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>
         public virtual void WarnOnce(string s)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 if (_oneTimeWarnings.Contains(s)) return;
                 _oneTimeWarnings.Add(s);
@@ -1066,7 +1130,7 @@ namespace BraneCloud.Evolution.EC.Logging
 
         public virtual void WarnOnce(string s, IParameter p1)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 if (_oneTimeWarnings.Contains(s)) return;
                 _oneTimeWarnings.Add(s);
@@ -1080,7 +1144,7 @@ namespace BraneCloud.Evolution.EC.Logging
 
         public virtual void WarnOnce(string s, IParameter p1, IParameter p2)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 if (_oneTimeWarnings.Contains(s)) return;
                 _oneTimeWarnings.Add(s);
@@ -1109,7 +1173,7 @@ namespace BraneCloud.Evolution.EC.Logging
         /// </summary>		
         protected internal virtual void PrintLn(string s, Log log, bool announcement, bool reposting)
         {
-            lock (this)
+            lock (_syncLock)
             {
                 if (log.Writer == null)
                 {
@@ -1117,7 +1181,7 @@ namespace BraneCloud.Evolution.EC.Logging
                 }
                 if (!log.PostAnnouncements && announcement)
                     return; // don't write it
-                if (log.Muzzle) return;  // don't write it
+                if (log.Silent) return;  // don't write it
 
                 // now write it
                 log.Writer.WriteLine(s);
@@ -1137,12 +1201,12 @@ namespace BraneCloud.Evolution.EC.Logging
         public void PrintLn(string s, int log, bool announcement)
         {
             if (log == NO_LOGS) return;
-            lock (this)
+            lock (_syncLock)
             {
                 if (log == ALL_MESSAGE_LOGS)
-                    for (var x = 0; x < _logs.Count; x++)
+                    foreach (object t in _logs)
                     {
-                        var l = (Log) _logs[x];
+                        var l = (Log) t;
                         if (l == null) throw new OutputException("Unknown log number" + l);
                         PrintLn(s, l, announcement, false);
                     }
@@ -1158,9 +1222,12 @@ namespace BraneCloud.Evolution.EC.Logging
         /// <summary>
         /// Prints a non-announcement message to the given logs.
         /// </summary>
-        public void PrintLn(String s, int log)
+        public void PrintLn(string s, int log)
         {
-            PrintLn(s, (Log)_logs[log], false, false);
+            lock (_syncLock)
+            {
+                PrintLn(s, (Log) _logs[log], false, false);
+            }
         }
 
         #endregion // PrintLn
@@ -1169,22 +1236,24 @@ namespace BraneCloud.Evolution.EC.Logging
         /// <summary>
         /// Prints a non-announcement message to a given log.
         /// If log==ALL_MESSAGE_LOGS, posted to all logs which accept announcements. No '\n' is printed.
+        /// If the log is NO_LOGS, nothing is printed.
         /// </summary>
-        public void Print(String s, int log)
+        public void Print(string s, int log)
         {
-            lock (this)
+            if (log == NO_LOGS) return;
+            lock (_syncLock)
             {
                 if (log == ALL_MESSAGE_LOGS)
-                    for (var x = 0; x < _logs.Count; x++)
+                    foreach (object t in _logs)
                     {
-                        var l = (Log) _logs[x];
-                        if (l == null) throw new OutputException("Unknown log number" + l);
+                        var l = (Log) t;
+                        if (l == null) throw new OutputException("Unknown log number" + log);
                         Print(s, l);
                     }
                 else
                 {
                     var l = (Log) _logs[log];
-                    if (l == null) throw new OutputException("Unknown log number" + l);
+                    if (l == null) throw new OutputException("Unknown log number" + log);
                     Print(s, l);
                 }
             }
@@ -1197,20 +1266,38 @@ namespace BraneCloud.Evolution.EC.Logging
         public void Print(string s, Log log)
         {
             if (log == null) return;
-            lock (this)
+            lock (_syncLock)
             {
                 if (log.Writer == null)
                 {
                     throw new OutputException("Log with a null writer: " + log);
                 }
-                if (log.Muzzle) return;  // don't write it
+                if (log.Silent) return;  // don't write it
                 // now write it
                 log.Writer.Write(s);
             }
         }
 
-        #endregion // Print
+        /// <summary>
+        /// Prints a non-announcement message to the given logs,
+        /// with a certain verbosity.No '\n' is printed.
+        /// If a log is NO_LOGS, nothing is printed to that log.
+        /// </summary>
+        public void Print(string s, int[] logs)
+        {
+            lock (_syncLock)
+            {
+                foreach (var l in logs)
+                {
+                    if (l == NO_LOGS) return;
+                    Print(s, l);
+                }
+            }
+        }
 
-        #endregion // Messages
-    }
+
+    #endregion // Print
+
+    #endregion // Messages
+}
 }

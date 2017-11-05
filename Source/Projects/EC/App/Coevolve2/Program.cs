@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
                Assembly.GetAssembly(typeof(CoevolutionaryECSuite))
              });
 
-            Evolve.Run(new[] { "-file", @"Params/App/Coevolve2/ecsuite2.params" });
+            Evolve.Run(new[] { "-file", @"Params/App/Coevolve2/coevolve2.params" });
             Console.WriteLine("\nDone!");
             Console.ReadLine();
         }

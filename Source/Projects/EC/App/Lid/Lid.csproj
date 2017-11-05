@@ -63,7 +63,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="README.txt" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Configuration\BraneCloud.Evolution.EC.Configuration.csproj">
       <Project>{9a7b8efc-d36e-435d-99e2-10793aa3ffcd}</Project>

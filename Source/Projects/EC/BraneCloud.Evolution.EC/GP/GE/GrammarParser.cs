@@ -20,8 +20,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Util;
@@ -45,6 +43,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
 
         // the following three are reserved for future use
         protected const int NUMERIC_CONSTANT = 6;
+
         protected const int BOOLEAN_CONSTANT = 7;
         protected const int STRING_CONSTANT = 8;
 
@@ -54,6 +53,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         protected const int FUNCTION = 9;
 
         #endregion // Constants
+
         #region Static
 
         // NOTE: SEE BELOW FOR THE .NET VERSION OF DEFAULT_REGEXES
@@ -92,21 +92,22 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// The only change is that the "\\p{Blank}" (unicode property) is replaced by "\\s" to match whitespace.
         /// After testing this together with the regex changes in GELexer, everything seems to tokenize just fine. 
         /// </remarks>
-        public static readonly string[] DEFAULT_REGEXES = 
+        public static readonly string[] DEFAULT_REGEXES =
         {
-            "\\s*#[^\\n\\r]*",        // COMMENT: matches a #foo up to but not including the newline.  Should appear first.
-            "\\s*\\(",                // LPAREN: matches a (
-            "\\s*\\)",                // RPAREN: matches a )
-            "\\s*<[^<>()\\s]*>",      // RULE: matches a rule of the form <foo>.  No <, >, (, ), |, or spaces may appear in foo
-            "\\s*[|]",                // PIPE: matches a |
-            "\\s*::=",                // EQUALS: matches a ::=
-            "\\s*::=",                // NUMERIC_CONSTANT: does nothing right now, so set to be identical to EQUALS.  Reserved for future use.
-            "\\s*::=",                // BOOLEAN_CONSTANT: does nothing right now, so set to be identical to EQUALS.  Reserved for future use.
-            "\\s*::=",                // STRING_CONSTANT: does nothing right now, so set to be identical to EQUALS.  Reserved for future use.
-            "\\s*[^<>()|\\s]+",       // FUNCTION (must appear after RULE and PIPE): matches a rule of the form foo.  No <, >, (, ), |, or spaces may appear in foo, and foo must have at least one character.
+            "\\s*#[^\\n\\r]*", // COMMENT: matches a #foo up to but not including the newline.  Should appear first.
+            "\\s*\\(", // LPAREN: matches a (
+            "\\s*\\)", // RPAREN: matches a )
+            "\\s*<[^<>()\\s]*>", // RULE: matches a rule of the form <foo>.  No <, >, (, ), |, or spaces may appear in foo
+            "\\s*[|]", // PIPE: matches a |
+            "\\s*::=", // EQUALS: matches a ::=
+            "\\s*::=", // NUMERIC_CONSTANT: does nothing right now, so set to be identical to EQUALS.  Reserved for future use.
+            "\\s*::=", // BOOLEAN_CONSTANT: does nothing right now, so set to be identical to EQUALS.  Reserved for future use.
+            "\\s*::=", // STRING_CONSTANT: does nothing right now, so set to be identical to EQUALS.  Reserved for future use.
+            "\\s*[^<>()|\\s]+", // FUNCTION (must appear after RULE and PIPE): matches a rule of the form foo.  No <, >, (, ), |, or spaces may appear in foo, and foo must have at least one character.
         };
 
         #endregion // Static
+
         #region Fields
 
         /// <summary>
@@ -119,23 +120,56 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// </summary>
         GrammarRuleNode _root = null;
 
+        /** 
+         * Lots of stuffs to enumerate/analyze the grammar tree, 
+         * these are needed to generate the predictive parse table.
+         */
+        // The list of production rules after flattenning the grammar tree
+        ArrayList productionRuleList = new ArrayList();
+
+        // Assign integer index to each of the rules, starting from 0
+        Hashtable indexToRule = new Hashtable();
+
+        // Reverse map of the above Hashtable indexToRule
+        Hashtable ruleToIndex = new Hashtable();
+
+        // Function heads' (i.e. terminals') indices
+        Hashtable functionHeadToIndex = new Hashtable();
+
+        // Rule heads' (i.e. non-terminals') indices
+        Hashtable ruleHeadToIndex = new Hashtable();
+
+        // Absolute production rule indices to relative indices (w.r.t. sub-rules)
+        Hashtable absIndexToRelIndex = new Hashtable();
+
+        /** 
+         * The hash-map for the so called FIRST-SET, FOLLOW-SET and PREDICT-SET 
+         * for each of the production rules. 
+         */
+        Hashtable ruleToFirstSet = new Hashtable();
+
+        Hashtable ruleToFollowSet = new Hashtable();
+        Hashtable ruleToPredictSet = new Hashtable();
+
+        /** 
+         * The predictive parse table to parse the lisp tree, 
+         * this is what we are looking for.
+         */
+        int[][] predictiveParseTable = null;
+
         #endregion // Fields
+
         #region Properties
 
-        public IParameter DefaultBase
-        {
-            get { return GEDefaults.ParamBase.Push(P_PARSER); }
-        }
+        public IParameter DefaultBase => GEDefaults.ParamBase.Push(P_PARSER);
 
         /// <summary>
         /// Returns the regular expressions to use for tokenizing these rules.  By default DEFAULT_REGEXES are returned.
         /// </summary>
-        public string[] DefaultRegexes
-        {
-            get { return DEFAULT_REGEXES; }
-        }
+        public string[] DefaultRegexes => DEFAULT_REGEXES;
 
         #endregion // Properties
+
         #region Setup
 
         public void Setup(IEvolutionState state, IParameter paramBase)
@@ -143,16 +177,17 @@ namespace BraneCloud.Evolution.EC.GP.GE
         }
 
         #endregion // Setup
+
         #region Operations
 
         /// <summary>
         /// Returns a rule from the hashmap.  If one does not exist, creates a rule with the
         /// given head and stores, then returns that.
         /// </summary>
-        static GrammarRuleNode GetRule(Hashtable rules, String head)
+        GrammarRuleNode GetRule(Hashtable rules, String head)
         {
             if (rules.ContainsKey(head))
-                return (GrammarRuleNode)(rules[head]);
+                return (GrammarRuleNode) rules[head];
             else
             {
                 var node = new GrammarRuleNode(head);
@@ -207,7 +242,6 @@ namespace BraneCloud.Evolution.EC.GP.GE
         /// </summary>
         void ParseProductions(IEvolutionState state, GrammarRuleNode retResult, IGELexer lexer, GPFunctionSet gpfs)
         {
-            GrammarFunctionNode grammarfuncnode;
             do
             {
                 var token = lexer.NextToken();
@@ -220,26 +254,30 @@ namespace BraneCloud.Evolution.EC.GP.GE
                 {
                     if (lexer.MatchingIndex != LPAREN) //first expect '('
                     {
-                        state.Output.Fatal("GE Grammar Error - Unexpected token for rule: " + retResult.Head + "Expecting '('.");
+                        state.Output.Fatal("GE Grammar Error - Unexpected token for rule: " + retResult.Head +
+                                           "Expecting '('.");
                     }
                     token = lexer.NextToken();
                     if (lexer.MatchingIndex != FUNCTION) //now expecting function
                     {
-                        state.Output.Fatal("GE Grammar Error - Expecting a function name after first '(' for rule: " + retResult.Head + " Error: " + token);
+                        state.Output.Fatal("GE Grammar Error - Expecting a function name after first '(' for rule: " +
+                                           retResult.Head + " Error: " + token);
                     }
                     else
                     {
-                        if (!(gpfs.NodesByName.ContainsKey(token)))
+                        if (!gpfs.NodesByName.ContainsKey(token))
                         {
                             state.Output.Fatal("GPNode " + token + " is not defined in the function set.");
                         }
-                        grammarfuncnode = new GrammarFunctionNode(gpfs, token);
+                        var grammarfuncnode = new GrammarFunctionNode(gpfs, token);
                         token = lexer.NextToken();
                         while (lexer.MatchingIndex != RPAREN)
                         {
                             if (lexer.MatchingIndex != RULE) //this better be the name of a rule node
                             {
-                                state.Output.Fatal("GE Grammar Error - Expecting a rule name as argument for function definition: " + grammarfuncnode.Head + " Error on : " + token);
+                                state.Output.Fatal(
+                                    "GE Grammar Error - Expecting a rule name as argument for function definition: "
+                                    + grammarfuncnode.Head + " Error on : " + token);
                             }
                             grammarfuncnode.AddArgument(GetRule(_rules, token));
                             token = lexer.NextToken();
@@ -250,11 +288,11 @@ namespace BraneCloud.Evolution.EC.GP.GE
                     token = lexer.NextToken();
                     if (lexer.MatchingIndex != PIPE && lexer.MatchingIndex != Constants.GE_LEXER_FAILURE)
                     {
-                        state.Output.Fatal("GE Grammar Error - Expecting either '|' delimiter or newline. Error on : " + token);
+                        state.Output.Fatal("GE Grammar Error - Expecting either '|' delimiter or newline. Error on : " +
+                                           token);
                     }
                 }
-            }
-            while (lexer.MatchingIndex == PIPE);
+            } while (lexer.MatchingIndex == PIPE);
         }
 
         /// <summary>
@@ -268,11 +306,13 @@ namespace BraneCloud.Evolution.EC.GP.GE
                 String line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    var rule = ParseRule(state, new GELexer(line.Trim(), DEFAULT_REGEXES), gpfs);
+                    GrammarRuleNode rule = ParseRule(state, new GELexer(line.Trim(), DEFAULT_REGEXES), gpfs);
                     if (rule != null && _root == null) _root = rule;
                 }
             }
-            catch (IOException) { } // do nothing
+            catch (IOException)
+            {
+            } // do nothing
             state.Output.ExitIfErrors();
             return _root;
         }
@@ -287,7 +327,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
             var i = _rules.Values.GetEnumerator();
             while (i.MoveNext())
             {
-                var rule = (GrammarRuleNode)(i.Current);
+                var rule = (GrammarRuleNode) (i.Current);
                 if (rule.GetNumChoices() < 1)
                 {
                     Console.WriteLine("Grammar is bad! - Rule not defined: " + rule);
@@ -302,19 +342,219 @@ namespace BraneCloud.Evolution.EC.GP.GE
             return false;
         }
 
+        /**
+         * Run BFS to enumerate the whole grammar tree into all necessary
+         * indices lists/hash-maps, we *need* to run BFS because the decoding of 
+         * the "GE array to tree" works in a BFS fashion, so we need to stick with that;
+         * After enumeration, we will have four data-structures like these --
+         *
+         * (1) productionRuleList (a flattened grammar tree):
+         *      grammar-tree ==> {rule-0, rule-1, ,,, rule-(n-1)}
+         *
+         * (2) ruleToIndex:
+         *      rule-0 --> 0
+         *      rule-1 --> 1
+         *      ,
+         *      ,
+         *      rule-(n-1) --> (n-1)
+         *
+         * (3) indexToRule (reverse of ruleToIndex):
+         *      0 --> rule-0
+         *      1 --> rule-1
+         *      ,
+         *      ,
+         *      n-1 --> rule-(n-1)
+         *
+         * and then, last but not the least, the relative rule index --
+         * (4) absIndexToRelIndex: 
+         *      if we have two rules like "<A> -> <B> | <C>" and "<C> -> <D> | <E>" then,
+         *              [rule]          [absIndex]      [relIndex] 
+         *              <A> -> <B> -->  [0]     -->     [0]
+         *              <A> -> <C> -->  [1]     -->     [1] 
+         *              <C> -> <D> -->  [2]     -->     [0]
+         *              <C> -> <E> -->  [3]     -->     [1] etc,
+         */
+        public void EnumerateGrammarTree(GrammarNode gn)
+        {
+            throw new NotImplementedException();
+            /*
+            // The BFS queue
+            Queue q = new LinkedList<>();
+            int gnIndex = 0;
+            int fIndex = 0;
+            int rIndex = 0;
+            ruleHeadToIndex.Put(gn.GetHead(), rIndex++);
+            q.Add(gn);
+            while (!q.IsEmpty())
+            {
+                GrammarNode temp = (GrammarNode) q.Remove();
+                for (int i = 0; i < temp.Children.Count; i++)
+                {
+                    GrammarRuleNode grn = new GrammarRuleNode(temp.Head);
+                    GrammarNode child = ((GrammarRuleNode) temp).GetChoice(i);
+                    grn.Children.Add(child);
+                    productionRuleList.Add(grn);
+                    indexToRule.Put(gnIndex, grn);
+                    ruleToIndex.Put(grn, gnIndex);
+                    gnIndex++;
+                    if (child is GrammarRuleNode)
+                    {
+                        ruleHeadToIndex.Put(child.GetHead(), rIndex++);
+                        q.add(child);
+                    }
+                    else if (child is GrammarFunctionNode)
+                        functionHeadToIndex.Put(child.GetHead(), fIndex++);
+                }
+            }
+            // Now to the absolute index to relative index mapping
+            String oldHead = ((GrammarNode) indexToRule.Get(Integer.valueOf(0))).GetHead();
+            absIndexToRelIndex.Put(new Integer(0), new Integer(0));
+            for (int absIndex = 1, relIndex = 1; absIndex < indexToRule.size(); absIndex++)
+            {
+                String currentHead = ((GrammarNode) indexToRule.Get(new Integer(absIndex))).GetHead();
+                if (!currentHead.Equals(oldHead))
+                    relIndex = 0;
+                absIndexToRelIndex.Put(new Integer(absIndex), new Integer(relIndex++));
+                oldHead = currentHead;
+            }
+            */
+        }
+
+/**
+ * Generate the FIRST-SET for each production rule and store them in the
+ * global hash-table, this runs a DFS on the grammar tree, the returned ArrayList
+ * is discarded and the FIRST-SETs are organized in a hash-map called 
+ * "ruleToFirstSet" as follows -- 
+ *
+ *      rule-0 --> {FIRST-SET-0}
+ *      rule-1 --> {FIRST-SET-1}
+ *      ,
+ *      ,
+ *      rule-(n-1) --> {FIRST-SET-(n-1)}
+ */
+        public ArrayList GatherFirstSets(GrammarNode gn, GrammarNode parent)
+        {
+            throw new NotImplementedException();
+            /*
+            ArrayList firstSet = new ArrayList();
+            if (gn is GrammarRuleNode)
+            {
+                for (int i = 0; i < ((GrammarRuleNode) gn).GetNumChoices(); i++)
+                {
+                    ArrayList set =
+                        GatherFirstSets(((GrammarRuleNode) gn).GetChoice(i), gn);
+                    firstSet.AddAll(set);
+                }
+                if (parent != null)
+                {
+                    GrammarNode treeEdge = new GrammarRuleNode(parent.GetHead());
+                    treeEdge.Children.Add(gn);
+                    ruleToFirstSet.Put(treeEdge, firstSet);
+                }
+            }
+            else if (gn is GrammarFunctionNode)
+            {
+                firstSet.Add(gn.GetHead());
+                GrammarNode treeEdge = new GrammarRuleNode(parent.GetHead());
+                treeEdge.Children.Add(gn);
+                ruleToFirstSet.Put(treeEdge, firstSet);
+            }
+            return firstSet;
+            */
+        }
+
+        /**
+         * We do not have any example grammar to test with FOLLOW-SETs,
+         * so the FOLLOW-SET is empty, we need to test with a grammar 
+         * that contains post-fix notations;
+         *
+         * this needs to be implemented properly with a new grammar.
+         */
+        public ArrayList GatherFollowSets(GrammarNode gn, GrammarNode parent)
+        {
+            ArrayList followSet = new ArrayList();
+            return followSet;
+        }
+
+        /** 
+         * Populate the PREDICT-SET from the FIRST-SETs and the FOLLOW-SETs, 
+         * as we do not have FOLLOW-SET, so FIRST-SET == PREDICT-SET;
+         * 
+         * this needs to be implemented, when the FOLLOW-SETs are done properly.
+         */
+        public void GatherPredictSets(GrammarNode gn, GrammarNode parent)
+        {
+            throw new NotImplementedException();
+            /*
+            // gather FIRST-SET
+            GatherFirstSets(gn, null);
+            // gather FOLLOW-SET
+            GatherFollowSets(gn, null);
+            // then, gather PREDICT-SET
+            if (ruleToFollowSet.IsEmpty())
+            {
+                ruleToPredictSet = (Hashtable) ruleToFirstSet.Clone();
+            }
+            else
+            {
+                ; // not implemented yet
+            }
+            */
+        }
+
+        /**
+         * Now populate the predictive-parse table, this procedure reads
+         * hash-maps/tables for the grammar-rule indices, PREDICT-SETs etc, 
+         * and assigns the corresponding values in the predictive-parse table. 
+         */
+        public void PopulatePredictiveParseTable(GrammarNode gn)
+        {
+            throw new NotImplementedException();
+            /*
+            // calculate the predict sets
+            GatherPredictSets(gn, null);
+            // now make the predictive parse table
+            predictiveParseTable = TensorFactory.Create<int>(ruleHeadToIndex.Count, functionHeadToIndex.Count);
+            Iterator it = ruleToPredictSet.EntrySet().iterator();
+            while (it.HasNext())
+            {
+                Map.Entry pairs = (Map.Entry) it.Next();
+                GrammarNode action = (GrammarNode) pairs.getKey();
+                String ruleHead = action.GetHead();
+                int ruleIndex = ((Integer) ruleHeadToIndex.Get(ruleHead)).intValue();
+                ArrayList functionHeads = (ArrayList) pairs.getValue();
+                for (int i = 0; i < functionHeads.Count; i++)
+                {
+                    String functionHead = (String) functionHeads.Get(i);
+                    int functionHeadIndex = ((Integer) functionHeadToIndex.Get(functionHead)).intValue();
+                    predictiveParseTable[ruleIndex][functionHeadIndex]
+                        = ((Integer) ruleToIndex.Get(action)).intValue();
+                }
+            }
+            */
+        }
+
         #endregion // Operations
+
         #region Cloning
 
         public Object Clone()
         {
-            //var other = (GrammarParser) base.Clone();
-            var other = new GrammarParser();
-            other._rules = (Hashtable)_rules.Clone();
-            // we'll pointer-copy the root
-            return other;
+            try
+            {
+                GrammarParser other = (GrammarParser) base.MemberwiseClone();
+                other._rules = (Hashtable) _rules.Clone();
+                // we'll pointer-copy the root
+                return other;
+            }
+            catch (CloneNotSupportedException e)
+            {
+                return null; // never happens
+            }
         }
 
         #endregion // Cloning
+
         #region ToString
 
         public override string ToString()
@@ -329,6 +569,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
         }
 
         #endregion // ToString
+
         #region Testing
 
         /// <summary>
@@ -337,12 +578,13 @@ namespace BraneCloud.Evolution.EC.GP.GE
         public static void Main(string[] args)
         {
             // make a dummy EvolutionState that just has an output for testing
-            var state = new EvolutionState { Output = new Output(true) };
+            var state = new EvolutionState {Output = new Output(true)};
             state.Output.AddLog(Log.D_STDOUT, false);
             state.Output.AddLog(Log.D_STDERR, true);
 
             var gp = new GrammarParser();
-            gp.ParseRules(state, new StreamReader(new FileStream(args[0], FileMode.Open, FileAccess.Read, FileShare.Read)), null);
+            gp.ParseRules(state,
+                new StreamReader(new FileStream(args[0], FileMode.Open, FileAccess.Read, FileShare.Read)), null);
             gp.ValidateRules();
             Console.WriteLine(gp);
         }

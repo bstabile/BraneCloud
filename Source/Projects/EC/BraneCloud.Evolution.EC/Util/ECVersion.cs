@@ -17,10 +17,7 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Specialized;
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.Support;
 
 namespace BraneCloud.Evolution.EC.Util
 {
@@ -33,8 +30,8 @@ namespace BraneCloud.Evolution.EC.Util
         #region Constants
 
         public const string name = "BrainCloud.Evolution.EC";
-        public const String version = "21";
-        public const String copyright = "2013";
+        public const String version = "23";
+        public const String copyright = "2015";
         public const String authorDotNet = "Bennett R. Stabile";
         public const String authorECJ = "Sean Luke";
         public const String contributors = "L. Panait, G. Balan, S. Paus, Z. Skolicki, R. Kicinger,";
@@ -46,8 +43,8 @@ namespace BraneCloud.Evolution.EC.Util
         public const String authorEmail1 = "cs.gmu.edu";
         public const String authorEmail2 = "(better: join ECJ-INTEREST at URL above)";
         public const String authorURL = "http://cs.gmu.edu/~eclab/projects/ecj/";
-        public const String date = "May 1, 2013";
-        public const string minClrVersion = "4.0";
+        public const String date = "June 15, 2015";
+        public const string minClrVersion = "4.6.2";
 
         #endregion // Constants
         

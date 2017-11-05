@@ -46,7 +46,7 @@ namespace BraneCloud.Evolution.EC.App.Coevolve1
                 if (updateFitness[i])
                     foreach (var t in pop.Subpops[i].Individuals)
                     {
-                        var fit = ((SimpleFitness)(t.Fitness));
+                        var fit = (SimpleFitness)(t.Fitness);
 
                         // average of the trials we got
                         var len = fit.Trials.Count;
@@ -56,7 +56,7 @@ namespace BraneCloud.Evolution.EC.App.Coevolve1
                         sum /= len;
 
                         // we'll not bother declaring the ideal
-                        fit.SetFitness(state, (float)(sum), false);
+                        fit.SetFitness(state, sum, false);
                         t.Evaluated = true;
                     }
         }
@@ -99,12 +99,12 @@ namespace BraneCloud.Evolution.EC.App.Coevolve1
 
             if (updateFitness[1])
             {
-                var fit = ((SimpleFitness)(ind[1].Fitness));
+                var fit = (SimpleFitness)ind[1].Fitness;
                 fit.Trials.Add(-score);
 
                 // set the fitness because if we're doing Single Elimination Tournament, the tournament
                 // needs to know who won this time around.
-                fit.SetFitness(state, (float)-score, false);
+                fit.SetFitness(state, -score, false);
             }
         }
     }

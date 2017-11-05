@@ -17,7 +17,6 @@
  */
 
 using System;
-using BraneCloud.Evolution.EC;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
 using BraneCloud.Evolution.EC.Simple;
@@ -626,7 +625,7 @@ namespace BraneCloud.Evolution.EC.App.BBob
             var genome = temp.genome;
             var genomeSize = genome.Length;
             double value = 0;
-            float fit;
+            double fit;
             int i, j;
             double condition, alpha, beta, tmp = 0.0, tmp2, fAdd, fPen = 0.0, x1, fac, a, f = 0.0, f2;
             var tmx = new double[genomeSize];
@@ -684,8 +683,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                             break;
                     }
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit == 0.0);
                     break;
 
 
@@ -759,8 +758,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                             break;
                     }
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -793,8 +792,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     value = 10 * (genomeSize - tmp) + tmp2;
                     value += fAdd;
 
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -836,8 +835,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     value = 10 * (genomeSize - tmp) + tmp2;
                     value += fAdd;
 
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -850,9 +849,9 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     /* move "too" good coordinates back into domain */
                     for (i = 0; i < genomeSize; i++)
                     {
-                        if ((xOpt[i] == 5.0) && (genome[i] > 5))
+                        if (xOpt[i].Equals(5.0) && genome[i] > 5)
                             tmx[i] = 5.0;
-                        else if ((xOpt[i] == -5.0) && (genome[i] < -5))
+                        else if (xOpt[i].Equals(-5.0) && genome[i] < -5)
                             tmx[i] = -5.0;
                         else
                             tmx[i] = genome[i];
@@ -872,8 +871,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     }
                     value += fAdd;
 
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -914,8 +913,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     }
                     value = Math.Pow(value, 0.9);
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -997,8 +996,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                             break;
                     }
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1078,8 +1077,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
 
                     value += fAdd;
 
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1115,8 +1114,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     }
 
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1145,8 +1144,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                         fAdd += Math.Pow(condition, ((double)i) / ((double)(genomeSize - 1))) * tmx[i] * tmx[i];
                     }
                     value = fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1176,8 +1175,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                         value += tmx[i] * tmx[i];
                     }
                     value += fAdd; /* without noise */
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1219,8 +1218,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                         value += condition * tmx[i] * tmx[i];
                     }
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1251,8 +1250,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     value = alpha * Math.Sqrt(value);
                     value += tmx[0] * tmx[0];
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1312,8 +1311,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                             break;
                     }
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1359,8 +1358,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     }
                     value = 10.0 * ((double)genomeSize - tmp) + tmp2;
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1416,8 +1415,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     value += fAdd;
                     ;
 
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1492,8 +1491,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                             break;
                     }
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1548,8 +1547,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     }
                     value = Math.Pow(value / (double)(genomeSize - 1), 2.0);
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1631,8 +1630,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                             break;
                     }
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1682,8 +1681,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     }
                     value = 0.01 * ((418.9828872724339) - value / (double)genomeSize);
                     value += fAdd;/* without noise */
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1786,8 +1785,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     value += fAdd;
                     ; /* without noise */
 
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1856,8 +1855,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     value += fAdd;
                     ; /* without noise */
 
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1925,8 +1924,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     }
                     value = 10.0 / (double)genomeSize / (double)genomeSize * (-1.0 + Math.Pow(prod, 10.0 / Math.Pow((double)genomeSize, 1.2)));
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
 
 
@@ -1979,8 +1978,8 @@ namespace BraneCloud.Evolution.EC.App.BBob
                     }
                     value = Math.Min(tmp2, d * (double)genomeSize + s * tmp3) + 10.0 * ((double)genomeSize - tmp);
                     value += fAdd;
-                    fit = (float)(-value);
-                    ((SimpleFitness)(ind.Fitness)).SetFitness(state, fit, fit == 0.0f);
+                    fit = -value;
+                    ((SimpleFitness)ind.Fitness).SetFitness(state, fit, fit.Equals(0.0));
                     break;
                 default:
                     break;
@@ -2023,7 +2022,7 @@ namespace BraneCloud.Evolution.EC.App.BBob
             for (i = 0; i < n; i++)
             {
                 g[i] = Math.Sqrt(-2 * Math.Log(uniftmp[i])) * Math.Cos(2 * Math.PI * uniftmp[n + i]);
-                if (g[i] == 0.0)
+                if (g[i].Equals(0.0))
                     g[i] = 1e-99;
             }
             return;
@@ -2036,7 +2035,7 @@ namespace BraneCloud.Evolution.EC.App.BBob
             for (i = 0; i < n; i++)
             {
                 xOpt[i] = 8 * (int)Math.Floor(1e4 * nextDoubleClosedInterval(random)) / 1e4 - 4;
-                if (xOpt[i] == 0.0)
+                if (xOpt[i].Equals(0.0))
                     xOpt[i] = -1e-5;
             }
         }
@@ -2160,7 +2159,7 @@ namespace BraneCloud.Evolution.EC.App.BBob
             var gval2 = new double[1];
             gauss(gval, random, 1);
             gauss(gval2, random, 1);
-            return Math.Min(1000.0, Math.Max(-1000.0, (Math.Round(100.0 * 100.0 * gval[0] / gval2[0]) / 100.0)));
+            return Math.Min(1000.0, Math.Max(-1000.0, Math.Round(100.0 * 100.0 * gval[0] / gval2[0]) / 100.0));
         }
 
         double nextDoubleClosedInterval(IMersenneTwister random)

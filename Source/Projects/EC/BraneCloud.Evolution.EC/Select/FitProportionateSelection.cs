@@ -54,15 +54,12 @@ namespace BraneCloud.Evolution.EC.Select
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_FITNESSPROPORTIONATE); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_FITNESSPROPORTIONATE);
 
         /// <summary>
         /// Normalized, totalized fitnesses for the population.
         /// </summary>
-        public float[] Fitnesses { get; set; }
+        public double[] Fitnesses { get; set; }
 
         #endregion // Properties
 
@@ -73,7 +70,7 @@ namespace BraneCloud.Evolution.EC.Select
         public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
         {
             // load sortedFit
-            Fitnesses = new float[s.Population.Subpops[subpop].Individuals.Length];
+            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Length];
             for (var x = 0; x < Fitnesses.Length; x++)
             {
                 Fitnesses[x] = s.Population.Subpops[subpop].Individuals[x].Fitness.Value;
@@ -90,7 +87,7 @@ namespace BraneCloud.Evolution.EC.Select
         public override int Produce(int subpop, IEvolutionState state, int thread)
         {
             // Pick and return an individual from the population
-            return RandomChoice.PickFromDistribution(Fitnesses, state.Random[thread].NextFloat());
+            return RandomChoice.PickFromDistribution(Fitnesses, state.Random[thread].NextDouble());
         }
 
         public override void FinishProducing(IEvolutionState s, int subpop, int thread)

@@ -17,10 +17,10 @@ namespace BraneCloud.Evolution.EC.App.Majority
            of the target cell (left is less than, right is greater than).  Then the order of the rules are for the
            neighborhoods 0: 000, 1: 001, 2: 010, 3: 011, 4: 100, 5: 101, 6: 110, 7: 111.   In other words, the
            neighborhood is interpreted as a binary number and that's the index into the rule.
-*/
+    */
 
 
-
+    [Serializable]
     [ECConfiguration("ec.app.majority.CA")]
     public class CA
     {

@@ -346,7 +346,7 @@ namespace BraneCloud.Evolution.EC.Randomization
         /// Constructor using the default seed.
         /// </summary>
         public MersenneTwisterFast()
-            : this((DateTime.Now.Ticks - 621355968000000000) / 10000)
+            : this(DateTimeHelper.CurrentTimeMilliseconds)
         {
         }
 
@@ -1445,19 +1445,19 @@ namespace BraneCloud.Evolution.EC.Randomization
 
             var rr = new Random((Int32)SEED);
             var xx = 0;
-            var ms = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+            var ms = DateTimeHelper.CurrentTimeMilliseconds;
             for (j = 0; j < 100000000; j++)
             {
                 xx += rr.Next();
             }
-            Console.Out.WriteLine("java.util.Random: " + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - ms) + "          Ignore this: " + xx);
+            Console.Out.WriteLine("java.util.Random: " + (DateTimeHelper.CurrentTimeMilliseconds - ms) + "          Ignore this: " + xx);
 
             r = new MersenneTwisterFast(SEED);
-            ms = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+            ms = DateTimeHelper.CurrentTimeMilliseconds;
             xx = 0;
             for (j = 0; j < 100000000; j++)
                 xx += r.NextInt();
-            Console.Out.WriteLine("Mersenne Twister Fast: " + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - ms) + "          Ignore this: " + xx);
+            Console.Out.WriteLine("Mersenne Twister Fast: " + (DateTimeHelper.CurrentTimeMilliseconds - ms) + "          Ignore this: " + xx);
 
             // TEST TO COMPARE TYPE CONVERSION BETWEEN
             // MersenneTwisterFast.java AND MersenneTwister.java

@@ -17,8 +17,6 @@
  */
 
 using System;
-using System.Runtime.Serialization;
-
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
 
@@ -51,18 +49,18 @@ namespace BraneCloud.Evolution.EC.GP.Build
         /// <summary>
         /// Terminal probabilities[type][thenodes], in organized form 
         /// </summary>
-        public float[][] q_ty { get; set; }
+        public double[][] q_ty { get; set; }
 
         /// <summary>
         /// Nonterminal probabilities[type][thenodes], in organized form 
         /// </summary>
-        public float[][] q_ny { get; set; }
+        public double[][] q_ny { get; set; }
 
         /// <summary>
         /// Cache of nonterminal selection probabilities -- dense array 
         /// [size-1][type].  If any items are null, they're not in the dense cache. 
         /// </summary>
-        public float[][] p_y { get; set; }
+        public double[][] p_y { get; set; }
 
         #endregion // Properties
 
@@ -74,8 +72,8 @@ namespace BraneCloud.Evolution.EC.GP.Build
 
             // load our probabilities here.
 
-            q_ny = new float[Nonterminals.Length][];
-            q_ty = new float[Terminals.Length][];
+            q_ny = new double[Nonterminals.Length][];
+            q_ty = new double[Terminals.Length][];
 
             var allOnes = true;
             var noOnes = true;
@@ -84,13 +82,13 @@ namespace BraneCloud.Evolution.EC.GP.Build
 
             for (var type = 0; type < Nonterminals.Length; type++)
             {
-                q_ny[type] = new float[Nonterminals[type].Length];
+                q_ny[type] = new double[Nonterminals[type].Length];
                 for (var x = 0; x < Nonterminals[type].Length; x++)
                 {
                     q_ny[type][x] = Nonterminals[type][x].Constraints(initializer).ProbabilityOfSelection;
-                    if (q_ny[type][x] != 0.0f)
+                    if (q_ny[type][x] != 0.0)
                         allZeros = false;
-                    if (q_ny[type][x] == 1.0f)
+                    if (q_ny[type][x] == 1.0)
                         noOnes = false;
                     else
                         allOnes = false;
@@ -111,13 +109,13 @@ namespace BraneCloud.Evolution.EC.GP.Build
 
             for (var type = 0; type < Terminals.Length; type++)
             {
-                q_ty[type] = new float[Terminals[type].Length];
+                q_ty[type] = new double[Terminals[type].Length];
                 for (var x = 0; x < Terminals[type].Length; x++)
                 {
                     q_ty[type][x] = Terminals[type][x].Constraints(initializer).ProbabilityOfSelection;
-                    if (q_ty[type][x] != 0.0f)
+                    if (q_ty[type][x] != 0.0)
                         allZeros = false;
-                    if (q_ty[type][x] == 1.0f)
+                    if (q_ty[type][x] == 1.0)
                         noOnes = false;
                     else
                         allOnes = false;
@@ -146,23 +144,23 @@ namespace BraneCloud.Evolution.EC.GP.Build
             }
 
             // set up cache
-            p_y = new float[CACHE_SIZE][];
+            p_y = new double[CACHE_SIZE][];
         }
 
         #endregion // Setup
         #region Operations
 
-        public virtual float[] TerminalProbabilities(int type)
+        public virtual double[] TerminalProbabilities(int type)
         {
             return q_ty[type];
         }
 
-        public virtual float[] NonterminalProbabilities(int type)
+        public virtual double[] NonterminalProbabilities(int type)
         {
             return q_ny[type];
         }
 
-        public virtual float[] NonterminalSelectionProbabilities(int expectedTreeSize)
+        public virtual double[] NonterminalSelectionProbabilities(int expectedTreeSize)
         {
             // check cache first
             if (expectedTreeSize < CACHE_SIZE)
@@ -176,9 +174,9 @@ namespace BraneCloud.Evolution.EC.GP.Build
             return ComputeNonterminalSelectionProbabilities(expectedTreeSize);
         }
 
-        public virtual float[] ComputeNonterminalSelectionProbabilities(int expectedTreeSize)
+        public virtual double[] ComputeNonterminalSelectionProbabilities(int expectedTreeSize)
         {
-            var p = new float[q_ny.Length];
+            var p = new double[q_ny.Length];
 
             // for each type...
             for (var x = 0; x < q_ny.Length; x++)
@@ -189,7 +187,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
                     count += (y == 0 ? q_ny[x][y] : q_ny[x][y] - q_ny[x][y - 1]) // it's organized
                         * Nonterminals[x][y].Children.Length;
 
-                p[x] = (float)((1.0 - (1.0 / expectedTreeSize)) / count);
+                p[x] = (1.0 - (1.0 / expectedTreeSize)) / count;
             }
             return p;
         }

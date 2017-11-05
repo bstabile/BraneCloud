@@ -1043,10 +1043,8 @@ namespace BraneCloud.Evolution.EC.Configuration
                 Uncheck();
 
                 // set hashtable appropriately
-                if (parameter != null)
-                    _accessed[parameter.Param] = true;
-                if (parameter != null)
-                    _gotten[parameter.Param] = true;
+                _accessed[parameter.Param] = true;
+                _gotten[parameter.Param] = true;
 
                 return result;
             }

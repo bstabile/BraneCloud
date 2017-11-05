@@ -20,6 +20,7 @@ using System;
 using System.IO;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
+using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.App.Regression.Func
@@ -41,7 +42,12 @@ namespace BraneCloud.Evolution.EC.App.Regression.Func
         public override int NodeHashCode()
         {
             // a reasonable hash code
-            return GetType().GetHashCode() + Convert.ToInt32((float)value);
+            long l = BitConverter.DoubleToInt64Bits(value);
+            // BRS: Java has BigEndianess, so these are reversed for C#
+            //      It doesn't matter since we're just adding them together, but.... ;)
+            int iLower = (int)(l & 0x00000000FFFFFFFF);
+            int iUpper = (int) BitShifter.URShift(l, 32);
+            return this.GetType().GetHashCode() + iUpper + iLower;
         }
 
         public override bool NodeEquals(GPNode node)
@@ -91,7 +97,7 @@ namespace BraneCloud.Evolution.EC.App.Regression.Func
         }
 
         public override string ToStringForHumans()
-        { return "" + (double)value; }
+        { return "" + value; }
 
         public override void Eval(IEvolutionState state,
             int thread,

@@ -89,6 +89,61 @@ namespace BraneCloud.Evolution.EC.GP.Tests
         [TestMethod]
         public void TestMethod1()
         {
+            var tree = new GPTree();
+
+            var root = new ADF { FunctionName = "ADF0", Children = new GPNode[2]};
+            tree.Child = root;
+
+            var c1 = new ADM { FunctionName = "ADM1", Parent = root, Children = new GPNode[2] };
+            var c11 = new ADF {FunctionName = "ADF11", Parent = c1 };
+            var c12 = new DummyERC {FunctionName = "ERC12", Parent = c1 };
+            c1.Children[0] = c11;
+            c1.Children[1] = c12;
+
+            var c2 = new ADM { FunctionName = "ADM2", Parent = root, Children = new GPNode[1] };
+            var c21 = new ADF {FunctionName = "ADF21", Parent = c2};
+            c2.Children[0] = c21;
+
+            root.Children = new GPNode[3];
+            root.Children[0] = c1;
+            root.Children[1] = c2;
+            root.Children[2] = new DummyERC { Parent = root };
+
+            // nodesearch (0=All, 1=Terminals, 2=Nonterminals)
+            foreach (GPNode node in tree.Descendants(nodesearch: GPNode.NODESEARCH_ALL))
+            {
+                var nodeName = node.Name;
+                var t1 = node.Parent != null;
+                var t2 = ((GPNode) node.Parent)?.Parent != null;
+                var tabs = t2 ? 2 : t1 ? 1 : 0;
+                var s = (tabs == 2 ? "\t\t" : tabs == 1 ? "\t" : "") + $"{nodeName}";
+                Console.WriteLine(s);
+            }
+        }
+    }
+
+    public class DummyERC : ERC
+    {
+        public string FunctionName { get; set; }
+
+        public override void ResetNode(IEvolutionState state, int thread)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool NodeEquals(GPNode node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string Encode()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Eval(IEvolutionState state, int thread, GPData input, ADFStack stack, GPIndividual individual, IProblem problem)
+        {
+            throw new NotImplementedException();
         }
     }
 }

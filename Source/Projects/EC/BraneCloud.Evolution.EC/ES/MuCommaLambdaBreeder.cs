@@ -296,9 +296,9 @@ namespace BraneCloud.Evolution.EC.ES
                         if (state.Population.Subpops[x].Individuals[i].Fitness.BetterThan(ParentPopulation.Subpops[x].Individuals[parent].Fitness))
                             numChildrenBetter++;
                     }
-                    if (numChildrenBetter > Lambda[x] / 5.0) // note float division
+                    if (numChildrenBetter > Lambda[x] / 5.0) // note double division
                         Comparison[x] = C_OVER_ONE_FIFTH_BETTER;
-                    else if (numChildrenBetter < Lambda[x] / 5.0) // note float division
+                    else if (numChildrenBetter < Lambda[x] / 5.0) // note double division
                         Comparison[x] = C_UNDER_ONE_FIFTH_BETTER;
                     else
                         Comparison[x] = C_EXACTLY_ONE_FIFTH_BETTER;

@@ -17,7 +17,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
@@ -124,7 +123,7 @@ namespace BraneCloud.Evolution.EC
         /// a single positive value (for example, MultiObjectiveFitness), you should 
         /// perform some reasonable translation.
         /// </summary>
-        float Value { get; }
+        double Value { get; }
 
         /// <summary>
         /// Should return true if this fitness is in the same equivalence class

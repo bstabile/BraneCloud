@@ -26,7 +26,7 @@ namespace BraneCloud.Evolution.EC.Randomization
         /// <summary>
         /// Returns obj's probability. 
         /// </summary>
-        float GetProbability(object obj);
+        double GetProbability(object obj);
 
         /// <summary>
         /// Sets obj's probability.

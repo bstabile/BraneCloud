@@ -16,7 +16,6 @@
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
 
-using System;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 

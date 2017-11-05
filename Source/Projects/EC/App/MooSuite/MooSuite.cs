@@ -156,7 +156,7 @@ namespace BraneCloud.Evolution.EC.App.MooSuite
             var genome = temp.genome;
             var numDecisionVars = genome.Length;
 
-            float[] objectives = ((MultiObjectiveFitness)ind.Fitness).GetObjectives();
+            double[] objectives = ((MultiObjectiveFitness)ind.Fitness).GetObjectives();
 
             double f, g, h, sum;
 
@@ -164,57 +164,57 @@ namespace BraneCloud.Evolution.EC.App.MooSuite
             {
                 case PROB_ZDT1:
                     f = genome[0];
-                    objectives[0] = (float)f;
+                    objectives[0] = f;
                     sum = 0;
                     for (var i = 1; i < numDecisionVars; ++i)
                         sum += genome[i];
-                    g = 1d + 9d * sum / (numDecisionVars - 1);
+                    g = 1d + 9d * sum / (numDecisionVars - 1.0);
                     h = 1d - Math.Sqrt(f / g);
-                    objectives[1] = (float)(g * h);
+                    objectives[1] = g * h;
                     break;
 
                 case PROB_ZDT2:
                     f = genome[0];
-                    objectives[0] = (float)f;
+                    objectives[0] = f;
                     sum = 0;
                     for (var i = 1; i < numDecisionVars; i++)
                         sum += genome[i];
-                    g = 1.0 + 9.0 * sum / (numDecisionVars - 1);
+                    g = 1.0 + 9.0 * sum / (numDecisionVars - 1.0);
                     h = 1.0 - (f / g) * (f / g);
-                    objectives[1] = (float)(g * h);
+                    objectives[1] = g * h;
                     break;
 
                 case PROB_ZDT3:
                     f = genome[0];
-                    objectives[0] = (float)f;
+                    objectives[0] = f;
                     sum = 0;
                     for (var i = 1; i < numDecisionVars; i++)
                         sum += genome[i];
-                    g = 1.0 + 9.0 * sum / (numDecisionVars - 1);
+                    g = 1.0 + 9.0 * sum / (numDecisionVars - 1.0);
                     var foverg = f / g;
                     h = 1.0 - Math.Sqrt(foverg) - foverg * Math.Sin(TEN_PI * f);
-                    objectives[1] = (float)(g * h);
+                    objectives[1] = (g * h);
                     break;
                 case PROB_ZDT4:
                     f = genome[0];
-                    objectives[0] = (float)f;
+                    objectives[0] = f;
                     sum = 0;
                     for (var i = 1; i < numDecisionVars; ++i)
                         sum += genome[i] * genome[i] - 10 * Math.Cos(FOUR_PI * genome[i]);
 
-                    g = 1 + 10 * (numDecisionVars - 1) + sum;
+                    g = 1 + 10 * (numDecisionVars - 1.0) + sum;
                     h = 1 - Math.Sqrt(f / g);
-                    objectives[1] = (float)(g * h);
+                    objectives[1] = (g * h);
                     break;
                 case PROB_ZDT6:
                     f = 1 - (Math.Exp(-4 * genome[0]) * Math.Pow(Math.Sin(SIX_PI * genome[0]), 6));
-                    objectives[0] = (float)f;
+                    objectives[0] = f;
                     sum = 0;
                     for (var i = 1; i < numDecisionVars; ++i)
                         sum += genome[i];
-                    g = 1d + 9 * Math.Pow(sum / (numDecisionVars - 1), 0.25);
+                    g = 1d + 9 * Math.Pow(sum / (numDecisionVars - 1.0), 0.25);
                     h = 1d - Math.Pow(f / g, 2);
-                    objectives[1] = (float)(g * h);
+                    objectives[1] = (g * h);
                     break;
                 case PROB_SPHERE:
                     var numObjectives = objectives.Length;
@@ -224,27 +224,27 @@ namespace BraneCloud.Evolution.EC.App.MooSuite
                         for (var i = 0; i < numDecisionVars; ++i)
                             if (i != j)
                                 sum += genome[i] * genome[i];
-                        objectives[j] = (float)sum;
+                        objectives[j] = sum;
                     }
                     break;
                 case PROB_SCH:
                     if (numDecisionVars != 1) throw new ApplicationException("SCH needs exactly 1 decision variable (gene).");
                     var x = genome[0];
-                    objectives[0] = (float)(x * x);
-                    objectives[1] = (float)((x - 2) * (x - 2));
+                    objectives[0] = (x * x);
+                    objectives[1] = ((x - 2) * (x - 2));
                     break;
                 case PROB_F2:
                     if (numDecisionVars != 1) throw new ApplicationException("F2 needs exactly 1 decision variable (gene).");
                     x = genome[0];
-                    objectives[0] = (float)(x <= 1 ? -x : (x <= 3 ? x - 2 : (x <= 4 ? 4 - x : x - 4)));
-                    objectives[1] = (float)((x - 5) * (x - 5));
+                    objectives[0] = (x <= 1 ? -x : (x <= 3 ? x - 2 : (x <= 4 ? 4 - x : x - 4)));
+                    objectives[1] = ((x - 5) * (x - 5));
                     break;
                 case PROB_F3:
                     if (numDecisionVars != 2) throw new ApplicationException("F3 needs exactly 2 decision variable (gene).");
                     var x1 = genome[0];
                     var x2 = genome[1];
-                    objectives[0] = (float)((x1 - 2) * (x1 - 2) + (x2 - 1) * (x2 - 1) + 2);
-                    objectives[1] = (float)(9 * x1 - (x2 - 1) * (x2 - 1));
+                    objectives[0] = ((x1 - 2) * (x1 - 2) + (x2 - 1) * (x2 - 1) + 2);
+                    objectives[1] = (9 * x1 - (x2 - 1) * (x2 - 1));
                     break;
                 case PROB_FON:
                     if (numDecisionVars != 3) throw new ApplicationException("FON needs exactly 3 decision variables (genes).");
@@ -257,8 +257,8 @@ namespace BraneCloud.Evolution.EC.App.MooSuite
                         sum1 += d * d;
                         sum2 += s * s;
                     }
-                    objectives[0] = 1 - (float)Math.Exp(-sum1);
-                    objectives[1] = 1 - (float)Math.Exp(-sum2);
+                    objectives[0] = 1 - Math.Exp(-sum1);
+                    objectives[1] = 1 - Math.Exp(-sum2);
                     break;
                 case PROB_POL:
                     if (numDecisionVars != 2) throw new ApplicationException("POL needs exactly 2 decision variables (genes).");
@@ -266,8 +266,8 @@ namespace BraneCloud.Evolution.EC.App.MooSuite
                     x2 = genome[1];
                     var b1 = 0.5 * Math.Sin(x1) - 2 * Math.Cos(x1) + Math.Sin(x2) - 1.5 * Math.Cos(x2);
                     var b2 = 1.5 * Math.Sin(x1) - Math.Cos(x1) + 2 * Math.Sin(x2) - 0.5 * Math.Cos(x2);
-                    objectives[0] = (float)(1 + (A1 - b1) * (A1 - b1) + (A2 - b2) * (A2 - b2));
-                    objectives[1] = (float)((x1 + 3) * (x1 + 3) + (x2 + 1) * (x2 + 1));
+                    objectives[0] = (1 + (A1 - b1) * (A1 - b1) + (A2 - b2) * (A2 - b2));
+                    objectives[1] = ((x1 + 3) * (x1 + 3) + (x2 + 1) * (x2 + 1));
                     break;
                 case PROB_QV:
                     sum = 0;
@@ -276,14 +276,14 @@ namespace BraneCloud.Evolution.EC.App.MooSuite
                         var xi = genome[i];
                         sum += xi * xi - 10 * Math.Cos(TWO_PI * xi) + 10;
                     }
-                    objectives[0] = (float)Math.Pow(sum / numDecisionVars, 0.25);
+                    objectives[0] = Math.Pow(sum / numDecisionVars, 0.25);
                     sum = 0;
                     for (var i = 0; i < numDecisionVars; i++)
                     {
                         var xi = genome[i] - 1.5;
                         sum += xi * xi - 10 * Math.Cos(TWO_PI * xi) + 10;
                     }
-                    objectives[1] = (float)Math.Pow(sum / numDecisionVars, 0.25);
+                    objectives[1] = Math.Pow(sum / numDecisionVars, 0.25);
                     break;
                 case PROB_KUR_NSGA2:
                     double thisSquared = genome[0] * genome[0];
@@ -295,8 +295,8 @@ namespace BraneCloud.Evolution.EC.App.MooSuite
                         sum += -10 - Math.Exp(-0.2 * Math.Sqrt(thisSquared + nextSquared));
                         thisSquared = nextSquared;
                     }
-                    //objectives[1] = (float)sum;
-                    objectives[0] = (float)sum;
+                    //objectives[1] = sum;
+                    objectives[0] = sum;
                     sum = 0;
                     for (var i = 0; i < numDecisionVars; ++i)
                     {
@@ -309,8 +309,8 @@ namespace BraneCloud.Evolution.EC.App.MooSuite
                         var t2 = 5 * Math.Sin(xi3);
                         sum += t1 + t2;
                     }
-                    //objectives[0] = (float)sum;
-                    objectives[1] = (float)sum;
+                    //objectives[0] = sum;
+                    objectives[1] = sum;
                     break;
 
                 default:

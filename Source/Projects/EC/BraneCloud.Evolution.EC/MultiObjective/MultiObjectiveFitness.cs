@@ -17,7 +17,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
@@ -32,7 +31,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
     /// multi-objective selection mechanisms, including ones using pareto-optimality.
     /// 
     /// <p/>
-    /// The object contains two items: an array of floating point values representing
+    /// The object contains two items: an array of double floating point values representing
     /// the various multiple fitnesses, and a flag(maximize) indicating whether
     /// higher is considered better.By default, isIdealFitness() always returns
     /// false; you might want to override that, though it'd be unusual -- what is the
@@ -76,26 +75,26 @@ namespace BraneCloud.Evolution.EC.MultiObjective
     ///
     /// <tr>
     /// <td valign="top"><i>base</i>.<tt>max</tt><br/>
-    /// <font size="-1"> float (<tt>1.0</tt> default)</font></td>
+    /// <font size="-1"> double (<tt>1.0</tt> default)</font></td>
     /// <td valign="top"> (maximum fitness value for all objectives)</td>
     /// </tr>
     ///
     /// <tr>
     /// <td valign="top"><i>base</i>.<tt>max</tt>.<i>i</i><br/>
-    /// <font size="-1"> float (<tt>1.0</tt> default)</font></td>
+    /// <font size="-1"> double (<tt>1.0</tt> default)</font></td>
     /// <td valign="top"> (maximum fitness value for objective<i> i</i>. Overrides the
     /// all-objective maximum fitness.)</td>
     /// </tr>
     ///
     /// <tr>
     /// <td valign="top"><i>base</i>.<tt>min</tt><br/>
-    /// <font size="-1"> float (<tt>0.0</tt> (default)</font></td>
+    /// <font size="-1"> double (<tt>0.0</tt> (default)</font></td>
     /// <td valign="top"> (minimum fitness value for all objectives)</td>
     /// </tr>
     /// 
     /// <tr>
     /// <td valign="top"><i>base</i>.<tt>min</tt>.<i>i</i><br/>
-    /// <font size="-1"> float = <tt>0.0</tt> (default)</font></td>
+    /// <font size="-1"> double = <tt>0.0</tt> (default)</font></td>
     /// <td valign="top"> (minimum fitness value for objective<i> i</i>. Overrides the
     /// all-objective minimum fitness.)</td>
     /// </tr>
@@ -228,49 +227,43 @@ namespace BraneCloud.Evolution.EC.MultiObjective
 
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return MultiObjectiveDefaults.ParamBase.Push(P_FITNESS); }
-        }
+        public override IParameter DefaultBase => MultiObjectiveDefaults.ParamBase.Push(P_FITNESS);
 
         /// <summary>
         /// Returns true if this fitness is the "ideal" fitness. 
         /// Default always returns false.  
         /// You may want to override this. 
         /// </summary>
-        public override bool IsIdeal
-        {
-            get { return false; }
-        }
+        public override bool IsIdeal => false;
+        
 
         /// <summary>
         /// Desired maximum fitness values. By default these are 1.0. Shared.
         /// </summary>
-        public float[] MaxObjective
+        public double[] MaxObjective
         {
-            get { return _maxObjective; }
-            set { _maxObjective = value; }
+            get => _maxObjective;
+            set => _maxObjective = value;
         }
 
-        private float[] _maxObjective = new float[0]
-            ; // initialize to zero length array (in case anyone tries to access this)
+        private double[] _maxObjective = new double[0] ; // initialize to zero length array (in case anyone tries to access this)
 
         /// <summary>
         /// Desired minimum fitness values. By default these are 0.0. Shared.
         /// </summary>
-        public float[] MinObjective
+        public double[] MinObjective
         {
-            get { return _minObjective; }
-            set { _minObjective = value; }
+            get => _minObjective;
+            set => _minObjective = value;
         }
 
-        private float[] _minObjective = new float[0]
+        private double[] _minObjective = new double[0]
             ; // initialize to zero length array (in case anyone tries to access this)
 
         /// <summary>
         /// The various fitnesses (values range from 0 (worst) to 1 INCLUSIVE).
         /// </summary>
-        public float[] Objectives { get; set; }
+        public double[] Objectives { get; set; }
 
         /// <summary>
         /// Maximization.  Shared.
@@ -280,17 +273,15 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         public bool IsMaximizing() => Maximize[0];
         public bool IsMaximizing(int objective) => Maximize[objective];
 
-        public int NumObjectives
-        {
-            get { return Objectives.Length; }
-        }
+        public int NumObjectives => Objectives.Length;
+       
 
         /// <summary>
         /// Returns the Max() of MultiFitnesses, which adheres to the <see cref="Fitness"/> 
         /// protocol for this method. Though you should not rely on a selection
         /// or statistics method which requires this.  
         /// </summary>
-        public override float Value
+        public override double Value
         {
             get
             {
@@ -310,7 +301,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         ///// method which requires this.
         ///// </summary>
         ///// <returns></returns>
-        //public virtual float Fitness
+        //public virtual double Fitness
         //{
         //    get
         //    {
@@ -339,9 +330,9 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// <param name="numObjectives">The number of objective values required.</param>
         public MultiObjectiveFitness(int numObjectives)
         {
-            _minObjective = new float[numObjectives];
-            _maxObjective = new float[numObjectives];
-            Objectives = new float[numObjectives];
+            _minObjective = new double[numObjectives];
+            _maxObjective = new double[numObjectives];
+            Objectives = new double[numObjectives];
         }
 
         /// <summary>
@@ -359,9 +350,9 @@ namespace BraneCloud.Evolution.EC.MultiObjective
                 state.Output.Fatal("The number of objectives must be an integer >= 1.", paramBase.Push(P_NUMOBJECTIVES),
                     def.Push(P_NUMOBJECTIVES));
 
-            Objectives = new float[numFitnesses];
-            MaxObjective = new float[numFitnesses];
-            MinObjective = new float[numFitnesses];
+            Objectives = new double[numFitnesses];
+            MaxObjective = new double[numFitnesses];
+            MinObjective = new double[numFitnesses];
             Maximize = new bool[numFitnesses];
 
             for (var i = 0; i < numFitnesses; i++)
@@ -419,17 +410,17 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// rather, set them using SetObjectives().
         /// </summary>
         /// <returns></returns>
-        public float[] GetObjectives()
+        public double[] GetObjectives()
         {
             return Objectives;
         }
 
-        public float GetObjective(int i)
+        public double GetObjective(int i)
         {
             return Objectives[i];
         }
 
-        public void SetObjectives(IEvolutionState state, float[] newObjectives)
+        public void SetObjectives(IEvolutionState state, double[] newObjectives)
         {
             if (newObjectives == null)
             {
@@ -442,10 +433,10 @@ namespace BraneCloud.Evolution.EC.MultiObjective
             }
             for (var i = 0; i < newObjectives.Length; i++)
             {
-                var f = newObjectives[i];
-                if (f == Single.PositiveInfinity || f == Single.NegativeInfinity || Single.IsNaN(f))
+                var d = newObjectives[i];
+                if (d.Equals(double.PositiveInfinity) || d.Equals(double.NegativeInfinity) || double.IsNaN(d))
                 {
-                    state.Output.Warning("Bad objective #" + i + ": " + f +
+                    state.Output.Warning("Bad objective #" + i + ": " + d +
                                          ", setting to worst value for that objective.");
                     if (Maximize[i])
                         newObjectives[i] = MinObjective[i];
@@ -533,7 +524,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
             double s = 0;
             for (var i = 0; i < Objectives.Length; i++)
             {
-                double a = (Objectives[i] - other.Objectives[i]);
+                double a = Objectives[i] - other.Objectives[i];
                 s += a * a;
             }
             return s;
@@ -552,6 +543,30 @@ namespace BraneCloud.Evolution.EC.MultiObjective
             return s;
         }
 
+        public void SetToBestOf(EvolutionState state, Fitness[] fitnesses)
+        {
+            state.Output.Fatal("SetToBestOf(IEvolutionState, Fitness[]) not implemented in " + GetType().Name);
+        }
+
+        public void SetToMeanOf(IEvolutionState state, Fitness[] fitnesses)
+        {
+            // basically we compute the centroid of the fitnesses
+            double sum = 0.0;
+            for (int i = 0; i < Objectives.Length; i++)
+            {
+                for (int k = 0; k < fitnesses.Length; k++)
+                {
+                    MultiObjectiveFitness f = (MultiObjectiveFitness)fitnesses[k];
+                    sum += f.Objectives[i];
+                }
+                Objectives[i] = (double)(sum / fitnesses.Length);
+            }
+        }
+
+        public void SetToMedianOf(IEvolutionState state, Fitness[] fitnesses)
+        {
+            state.Output.Fatal("SetToMedianOf(IEvolutionState, Fitness[]) not implemented in " + GetType().Name);
+        }
         #endregion // Operations
 
         #region Comparison
@@ -625,7 +640,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         public override object Clone()
         {
             var f = (MultiObjectiveFitness) base.Clone();
-            f.Objectives = (float[]) Objectives.Clone(); // cloning an array
+            f.Objectives = (double[]) Objectives.Clone(); // cloning an array
             // note that we do NOT clone max and min fitness, or maximizing -- they're shared
             return f;
         }
@@ -674,10 +689,10 @@ namespace BraneCloud.Evolution.EC.MultiObjective
             for (var x = 0; x < Objectives.Length; x++)
             {
                 Code.Decode(d);
-                if (d.Type != DecodeReturn.T_FLOAT)
+                if (d.Type != DecodeReturn.T_DOUBLE)
                     state.Output.Fatal("Reading Line " + d.LineNumber + ": " + "Bad Fitness (objectives value #" + x +
                                        ").");
-                Objectives[x] = (float) d.D;
+                Objectives[x] = (double) d.D;
             }
         }
 
@@ -693,9 +708,9 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         {
             var len = reader.ReadInt32();
             if (Objectives == null || Objectives.Length != len)
-                Objectives = new float[len];
+                Objectives = new double[len];
             for (var x = 0; x < Objectives.Length; x++)
-                Objectives[x] = reader.ReadSingle();
+                Objectives[x] = reader.ReadDouble();
             ReadTrials(state, reader);
         }
 

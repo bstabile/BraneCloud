@@ -25,7 +25,7 @@ using BraneCloud.Evolution.EC.Configuration;
 namespace BraneCloud.Evolution.EC.Simple
 {
     /// <summary> 
-    /// A simple default fitness, consisting of a single floating-point value
+    /// A simple default fitness, consisting of a double floating-point value
     /// where fitness A is superior to fitness B if and only if A > B.  
     /// Fitness values may range from (-infinity,infinity) exclusive -- that is,
     /// you may not have infinite fitnesses.  
@@ -43,33 +43,30 @@ namespace BraneCloud.Evolution.EC.Simple
     [ECConfiguration("ec.simple.SimpleFitness")]
     public class SimpleFitness : Fitness
     {
+        #region Fields
+
+        protected bool _isIdeal;
+        protected double _value;
+
+        #endregion
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SimpleDefaults.ParamBase.Push(P_FITNESS); }
-        }
+        public override IParameter DefaultBase => SimpleDefaults.ParamBase.Push(P_FITNESS);
 
-        public override bool IsIdeal
-        {
-            get { return _isIdeal; }
-        }
-        protected internal bool _isIdeal;
 
-        public override float Value
-        {
-            get { return _value; }
-            //protected set { _value = value; }
-        }
-        protected internal float _value;
+        //public override bool IsIdeal => _isIdeal; 
+        public override bool IsIdeal => _isIdeal;
+
+
+        public override double Value => _value; 
 
         #endregion // Properties
         #region Operations
 
-        public virtual void SetFitness(IEvolutionState state, float f, bool isIdeal)
+        public virtual void SetFitness(IEvolutionState state, double f, bool isIdeal)
         {
             // we now allow f to be *any* value, positive or negative
-            if (f == Single.PositiveInfinity || f == Single.NegativeInfinity || Single.IsNaN(f))
+            if (f.Equals(double.PositiveInfinity) || f.Equals(double.NegativeInfinity) || double.IsNaN(f))
             {
                 state.Output.Warning("Bad fitness: " + f + ", setting to 0.");
                 _value = 0;
@@ -86,13 +83,13 @@ namespace BraneCloud.Evolution.EC.Simple
             // since this function is meant to be used mostly for gathering trials together.
             var f = 0.0;
             var ideal = true;
-            foreach (var fit in fitnesses.Select(t => (SimpleFitness)(t)))
+            foreach (var fit in fitnesses.Select(t => (SimpleFitness)t))
             {
                 f += fit.Value;
                 ideal = ideal && fit.IsIdeal;
             }
             f /= fitnesses.Length;
-            _value = (float)f;
+            _value = f;
             _isIdeal = ideal;
         }
 
@@ -101,7 +98,7 @@ namespace BraneCloud.Evolution.EC.Simple
 
         public override bool EquivalentTo(IFitness fitness)
         {
-            return ((SimpleFitness)fitness).Value == Value;
+            return ((SimpleFitness)fitness).Value.Equals(Value);
         }
 
         public override bool BetterThan(IFitness fitness)
@@ -127,7 +124,7 @@ namespace BraneCloud.Evolution.EC.Simple
         /// </summary>
         public override void ReadFitness(IEvolutionState state, StreamReader reader)
         {
-            SetFitness(state, Code.ReadFloatWithPreamble(FITNESS_PREAMBLE, state, reader), false);
+            SetFitness(state, Code.ReadDoubleWithPreamble(FITNESS_PREAMBLE, state, reader), false);
         }
 
         public override void WriteFitness(IEvolutionState state, BinaryWriter dataOutput)
@@ -139,7 +136,7 @@ namespace BraneCloud.Evolution.EC.Simple
 
         public override void ReadFitness(IEvolutionState state, BinaryReader dataInput)
         {
-            _value = dataInput.ReadSingle();
+            _value = dataInput.ReadDouble();
             _isIdeal = dataInput.ReadBoolean();
             ReadTrials(state, dataInput);
         }

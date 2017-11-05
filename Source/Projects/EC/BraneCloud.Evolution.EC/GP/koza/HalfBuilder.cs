@@ -138,7 +138,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         /// <summary>
         /// The likelihood of using GROW over FULL. 
         /// </summary>
-        public float PickGrowProbability { get; set; }
+        public double PickGrowProbability { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -149,9 +149,9 @@ namespace BraneCloud.Evolution.EC.GP.Koza
 
             var def = DefaultBase;
 
-            PickGrowProbability = state.Parameters.GetFloatWithMax(paramBase.Push(P_PICKGROWPROBABILITY), def.Push(P_PICKGROWPROBABILITY), 0.0f, 1.0f);
-            if (PickGrowProbability < 0.0f)
-                state.Output.Fatal("The Pick-Grow Probability for HalfBuilder must be a floating-point value between 0.0 and 1.0 inclusive.",
+            PickGrowProbability = state.Parameters.GetDoubleWithMax(paramBase.Push(P_PICKGROWPROBABILITY), def.Push(P_PICKGROWPROBABILITY), 0.0f, 1.0f);
+            if (PickGrowProbability < 0.0)
+                state.Output.Fatal("The Pick-Grow Probability for HalfBuilder must be a double floating-point value between 0.0 and 1.0 inclusive.",
                     paramBase.Push(P_MAXDEPTH), def.Push(P_MAXDEPTH));
         }
 
@@ -161,7 +161,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         public override GPNode NewRootedTree(IEvolutionState state, GPType type, int thread, IGPNodeParent parent,
                                                 GPFunctionSet funcs, int argPosition, int requestedSize)
         {
-            if (state.Random[thread].NextFloat() < PickGrowProbability)
+            if (state.Random[thread].NextDouble() < PickGrowProbability)
                 return GrowNode(state, 0, state.Random[thread].NextInt(MaxDepth - MinDepth + 1) + MinDepth, type, thread, parent, argPosition, funcs);
 
             return FullNode(state, 0, state.Random[thread].NextInt(MaxDepth - MinDepth + 1) + MinDepth, type, thread, parent, argPosition, funcs);

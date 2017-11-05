@@ -86,7 +86,7 @@ namespace BraneCloud.Evolution.EC
         /// Indicates that the number of sources is variable and determined by the
         /// user in the parameter file. 
         /// </summary>       
-        public const int DYNAMIC_SOURCES = 0;
+        public const int DYNAMIC_SOURCES = -1;
 
         /// <summary>
         /// Standard parameter for number of sources (only used if numSources returns DYNAMIC_SOURCES. 
@@ -120,7 +120,7 @@ namespace BraneCloud.Evolution.EC
         /// </summary>        
         public abstract int NumSources { get; }
 
-        public float Likelihood { get; set; }
+        public double Likelihood { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -132,19 +132,29 @@ namespace BraneCloud.Evolution.EC
 
             var def = DefaultBase;
 
-            Likelihood = state.Parameters.GetFloatWithDefault(paramBase.Push(P_LIKELIHOOD), def.Push(P_LIKELIHOOD), 1.0f);
-            if (Likelihood < 0.0f || Likelihood > 1.0f)
+            Likelihood = state.Parameters.GetDoubleWithDefault(paramBase.Push(P_LIKELIHOOD), def.Push(P_LIKELIHOOD), 1.0);
+            if (Likelihood < 0.0 || Likelihood > 1.0)
                 state.Output.Fatal("Breeding Pipeline likelihood must be a value between 0.0 and 1.0 inclusive",
                     paramBase.Push(P_LIKELIHOOD),
                     def.Push(P_LIKELIHOOD));
 
             var numsources = NumSources;
-            if (numsources <= DYNAMIC_SOURCES)
+            if (numsources == DYNAMIC_SOURCES)
             {
                 // figure it from the file
-                numsources = state.Parameters.GetInt(paramBase.Push(P_NUMSOURCES), def.Push(P_NUMSOURCES), 1);
-                if (numsources == 0)
-                    state.Output.Fatal("Breeding pipeline num-sources value must be > 0", paramBase.Push(P_NUMSOURCES), def.Push(P_NUMSOURCES));
+                numsources = state.Parameters.GetInt(paramBase.Push(P_NUMSOURCES), def.Push(P_NUMSOURCES), 0);
+                if (numsources == -1)
+                    state.Output.Fatal("Breeding pipeline num-sources value must exist and be >= 0", paramBase.Push(P_NUMSOURCES), def.Push(P_NUMSOURCES));
+            }
+            else if (numsources <= DYNAMIC_SOURCES)  // it's negative
+            {
+                throw new InvalidOperationException("In " + this + " numSources() returned < DYNAMIC_SOURCES (that is, < -1)");
+            }
+            else
+            {
+                if (state.Parameters.ParameterExists(paramBase.Push(P_NUMSOURCES), def.Push(P_NUMSOURCES))) // uh oh
+                    state.Output.Warning("Breeding pipeline's number of sources is hard-coded to " + numsources + " yet num-sources was provided: num-sources will be ignored.",
+                        paramBase.Push(P_NUMSOURCES), def.Push(P_NUMSOURCES));
             }
 
             Sources = new IBreedingSource[numsources];

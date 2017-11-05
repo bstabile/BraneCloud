@@ -98,19 +98,19 @@ namespace BraneCloud.Evolution.EC.Randomization.Tests
 
             var rr = new Random((Int32)SEED);
             var xx = 0;
-            var ms = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+            var ms = DateTimeHelper.CurrentTimeMilliseconds;
             for (j = 0; j < 100000000; j++)
             {
                 xx += rr.Next();
             }
-            sb.AppendLine("System.Random: " + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - ms) + "          Ignore this: " + xx);
+            sb.AppendLine("System.Random: " + (DateTimeHelper.CurrentTimeMilliseconds - ms) + "          Ignore this: " + xx);
 
             r = new MersenneTwisterFast(SEED);
-            ms = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+            ms = DateTimeHelper.CurrentTimeMilliseconds;
             xx = 0;
             for (j = 0; j < 100000000; j++)
                 xx += r.NextInt();
-            sb.AppendLine("Mersenne Twister Fast: " + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - ms) + "          Ignore this: " + xx);
+            sb.AppendLine("Mersenne Twister Fast: " + (DateTimeHelper.CurrentTimeMilliseconds - ms) + "          Ignore this: " + xx);
 
             context.WriteLine(sb.ToString());
         }
@@ -133,19 +133,19 @@ namespace BraneCloud.Evolution.EC.Randomization.Tests
 
             var rr = new MersenneTwisterPlaire((Int32)SEED);
             var xx = 0;
-            var ms = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+            var ms = DateTimeHelper.CurrentTimeMilliseconds;
             for (j = 0; j < 100000000; j++)
             {
                 xx += rr.Next();
             }
-            sb.AppendLine("MersenneTwisterPlaire: " + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - ms) + "          Ignore this: " + xx);
+            sb.AppendLine("MersenneTwisterPlaire: " + (DateTimeHelper.CurrentTimeMilliseconds - ms) + "          Ignore this: " + xx);
 
             r = new MersenneTwisterFast(SEED);
-            ms = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+            ms = DateTimeHelper.CurrentTimeMilliseconds;
             xx = 0;
             for (j = 0; j < 100000000; j++)
                 xx += r.NextInt();
-            sb.AppendLine("MersenneTwisterFast: " + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - ms) + "          Ignore this: " + xx);
+            sb.AppendLine("MersenneTwisterFast: " + (DateTimeHelper.CurrentTimeMilliseconds - ms) + "          Ignore this: " + xx);
 
             context.WriteLine(sb.ToString());
         }
@@ -186,19 +186,19 @@ namespace BraneCloud.Evolution.EC.Randomization.Tests
 
             var rr = new Random((Int32)SEED);
             var xx = 0;
-            var ms = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+            var ms = DateTimeHelper.CurrentTimeMilliseconds;
             for (j = 0; j < 100000000; j++)
             {
                 xx += rr.Next();
             }
-            sb.AppendLine("System.Random: " + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - ms) + "          Ignore this: " + xx);
+            sb.AppendLine("System.Random: " + (DateTimeHelper.CurrentTimeMilliseconds - ms) + "          Ignore this: " + xx);
 
             r = new MersenneTwisterFast(SEED);
-            ms = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+            ms = DateTimeHelper.CurrentTimeMilliseconds;
             xx = 0;
             for (j = 0; j < 100000000; j++)
                 xx += r.NextInt();
-            sb.AppendLine("Mersenne Twister Fast: " + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - ms) + "          Ignore this: " + xx);
+            sb.AppendLine("Mersenne Twister Fast: " + (DateTimeHelper.CurrentTimeMilliseconds - ms) + "          Ignore this: " + xx);
 
             // TEST TO COMPARE TYPE CONVERSION BETWEEN
             // MersenneTwisterFast.java AND MersenneTwister.java

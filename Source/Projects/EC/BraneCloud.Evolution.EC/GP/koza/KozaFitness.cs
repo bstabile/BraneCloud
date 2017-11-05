@@ -55,10 +55,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPKozaDefaults.ParamBase.Push(P_KOZAFITNESS); }
-        }
+        public override IParameter DefaultBase => GPKozaDefaults.ParamBase.Push(P_KOZAFITNESS);
 
         /// <summary>
         /// This auxillary measure is used in some problems for additional
@@ -75,34 +72,26 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         /// <remarks>
         /// NOTE: There is no setter for Value. Each Fitness subclass needs to define its own way of handling this.
         /// </remarks>
-        public override float Value
-        {
-            get { return AdjustedFitness; }
-        }
+        public override double Value => AdjustedFitness;
 
         /// <summary>
         /// Returns the standardized fitness metric.
         /// </summary>
         /// <value></value>
-        public float StandardizedFitness
-        {
-            get { return _standardizedFitness; }
-        }
+        public double StandardizedFitness => _standardizedFitness;
+        
         /// <summary>
         /// This ranges from 0 (best) to infinity (worst).
         /// I define it here as equivalent to the standardized fitness.
         /// </summary>
-        protected float _standardizedFitness;
+        protected double _standardizedFitness;
 
         /// <summary>
         /// Returns the adjusted fitness metric, which recasts the fitness
         /// to the half-open interval (0,1], where 1 is ideal and 0 is worst.
         /// This metric is used when printing the fitness out.
         /// </summary>
-        public float AdjustedFitness
-        {
-            get { return 1.0f / (1.0f + _standardizedFitness); }
-        }
+        public double AdjustedFitness => 1.0 / (1.0 + _standardizedFitness);
 
         /// <summary>
         /// Set the standardized fitness in the half-open interval [0.0,infinity)
@@ -112,9 +101,9 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         /// </summary>
         /// <param name="state"></param>
         /// <param name="f"></param>
-        public void SetStandardizedFitness(IEvolutionState state, float f)
+        public void SetStandardizedFitness(IEvolutionState state, double f)
         {
-            if (f < 0.0f || f == Single.PositiveInfinity || Single.IsNaN(f))
+            if (f < 0.0 || f.Equals(double.PositiveInfinity) || double.IsNaN(f))
             {
                 state.Output.Warning("Bad fitness (may not be < 0, NaN, or infinity): " + f + ", setting to 0.");
                 _standardizedFitness = 0;
@@ -123,9 +112,9 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         }
 
         /// <summary>
-        /// should always be == 0.0f, less than 0.0f is illegal, but just in case...
+        /// should always be == 0.0, less than 0.0 is illegal, but just in case...
         /// </summary>
-        public override bool IsIdeal => _standardizedFitness <= 0.0f;
+        public override bool IsIdeal => _standardizedFitness <= 0.0;
 
         // BRS: See the Value property
         ///// <summary>
@@ -133,7 +122,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         ///// fitness to the half-open interval (0,1], where 1 is ideal and
         ///// 0 is worst.  Same as AdjustedFitness.
         ///// </summary>
-        //public float Fitness
+        //public double Fitness
         //{
         //    get { return AdjustedFitness; }
         //}
@@ -148,7 +137,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
 
         public override bool EquivalentTo(IFitness fitness)
         {
-            return fitness.Value == Value;
+            return fitness.Value.Equals(Value);
         }
 
         public override bool BetterThan(IFitness fitness)
@@ -168,13 +157,13 @@ namespace BraneCloud.Evolution.EC.GP.Koza
             long h = 0;
             for (var i = 0; i < fitnesses.Length; i++)
             {
-                var fit = (KozaFitness)(fitnesses[i]);
+                var fit = (KozaFitness)fitnesses[i];
                 f += fit._standardizedFitness;
                 h += fit.Hits;
             }
             f /= fitnesses.Length;
             h /= fitnesses.Length;
-            _standardizedFitness = (float)f;
+            _standardizedFitness = (double)f;
             Hits = (int)h;
         }
 
@@ -200,9 +189,9 @@ namespace BraneCloud.Evolution.EC.GP.Koza
 
             // extract fitness
             Code.Decode(d);
-            if (d.Type != DecodeReturn.T_FLOAT)
+            if (d.Type != DecodeReturn.T_DOUBLE)
                 state.Output.Fatal("Reading Line " + d.LineNumber + ": " + "Bad Fitness.");
-            _standardizedFitness = (float)d.D;
+            _standardizedFitness = (double)d.D;
 
             // extract hits
             Code.Decode(d);
@@ -220,7 +209,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
 
         public override void ReadFitness(IEvolutionState state, BinaryReader reader)
         {
-            _standardizedFitness = reader.ReadSingle();
+            _standardizedFitness = reader.ReadDouble();
             Hits = reader.ReadInt32();
             ReadTrials(state, reader);
         }

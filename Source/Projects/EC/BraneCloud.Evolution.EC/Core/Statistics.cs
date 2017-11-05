@@ -78,11 +78,17 @@ namespace BraneCloud.Evolution.EC
 
         public const string P_NUMCHILDREN = "num-children";
         public const string P_CHILD = "child";
+        public const string P_SILENT = "silent";
+        public const string P_MUZZLE = "muzzle";  // deprecated
+        public const string P_SILENT_PRINT = "silent.print";
+        public const string P_SILENT_FILE = "silent.file";
 
         #endregion // Constants
         #region Properties
 
         public Statistics[] Children { get; set; }
+        public bool SilentFile { get; set; }
+        public bool SilentPrint { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -92,6 +98,16 @@ namespace BraneCloud.Evolution.EC
             var t = state.Parameters.GetIntWithDefault(paramBase.Push(P_NUMCHILDREN), null, 0);
             if (t < 0)
                 state.Output.Fatal("A Statistics object cannot have negative number of Children", paramBase.Push(P_NUMCHILDREN));
+
+            SilentFile = SilentPrint = state.Parameters.GetBoolean(paramBase.Push(P_SILENT), null, false);
+            // yes, we're stating them a second time.  It's correct logic.
+            SilentFile = state.Parameters.GetBoolean(paramBase.Push(P_SILENT_FILE), null, SilentFile);
+            SilentPrint = state.Parameters.GetBoolean(paramBase.Push(P_SILENT_PRINT), null, SilentPrint);
+
+            if (state.Parameters.ParameterExists(paramBase.Push(P_MUZZLE), null))
+                state.Output.Warning("" + paramBase.Push(P_MUZZLE) + " has been deprecated.  We suggest you use " +
+                                     paramBase.Push(P_SILENT) + " or similar newer options.");
+            SilentFile = SilentFile || state.Parameters.GetBoolean(paramBase.Push(P_MUZZLE), null, false);
 
             // load the trees
             Children = new Statistics[t];

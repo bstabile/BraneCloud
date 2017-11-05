@@ -104,7 +104,9 @@ namespace BraneCloud.Evolution.EC.GP.Build
             // [first set triedTerminals]
             // AND if there are available terminals
             if ((maxLength == 1 || WarnAboutNonterminal(nonterminals.Length == 0, type, false, state))
-                                                    && (triedTerminals = true) && terminals.Length != 0)
+                                                    // this will freak out the static checkers
+                                                    && (triedTerminals = true) 
+                                                    && terminals.Length != 0)
             {
                 var n = terminals[state.Random[thread].NextInt(terminals.Length)].LightClone();
                 n.ResetNode(state, thread); // give ERCs a chance to randomize

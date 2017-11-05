@@ -2,15 +2,18 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Windows.Media.Imaging;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.App.Mona
 {
     /** Picture contains two images: an ORIGINAL image which is loaded from a file, and
-        writable IMAGE, which you scribble on and try to make as similar to the ORIGINAL.
-*/
+    writable IMAGE, which you scribble on and try to make as similar to the ORIGINAL.
+
+        BRS: We can use the Serializable attribute instead of implementing ISerializable
+             because System.Drawing.Image is serializable. The Graphics class is not
+             so that will be created when the instance is "thawed".
+    */
+
 
     [ECConfiguration("ec.app.mona.Picture")]
 	[Serializable]

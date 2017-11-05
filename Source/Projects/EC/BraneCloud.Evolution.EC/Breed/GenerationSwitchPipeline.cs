@@ -113,7 +113,7 @@ namespace BraneCloud.Evolution.EC.Breed
             MaxGeneratable = 0; // indicates that I don't know what it is yet.  
 
             // declare that likelihood isn't used
-            if (Likelihood < 1.0f)
+            if (Likelihood < 1.0)
                 state.Output.Warning("GenerationSwitchPipeline does not respond to the 'likelihood' parameter.",
                     paramBase.Push(P_LIKELIHOOD), def.Push(P_LIKELIHOOD));
         }

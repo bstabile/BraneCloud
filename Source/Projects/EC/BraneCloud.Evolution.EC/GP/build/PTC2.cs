@@ -216,7 +216,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
                                     && (triedTerminals = true) && terminals.Length != 0)
             {
                 root = terminals[RandomChoice.PickFromDistribution(pfuncs.TerminalProbabilities(t),
-                                    state.Random[thread].NextFloat())].LightClone();
+                                    state.Random[thread].NextDouble())].LightClone();
 
                 root.ResetNode(state, thread); // give ERCs a chance to randomize
                 root.ArgPosition = (sbyte)argPosition;
@@ -230,7 +230,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
 
                 // pick a nonterminal
                 root = nonterminals[RandomChoice.PickFromDistribution(pfuncs.NonterminalProbabilities(t),
-                                           state.Random[thread].NextFloat())].LightClone();
+                                           state.Random[thread].NextDouble())].LightClone();
 
                 root.ResetNode(state, thread); // give ERCs a chance to randomize
                 root.ArgPosition = (sbyte)argPosition;
@@ -271,7 +271,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
                                                      && (triedTerminals = true) && terminals.Length != 0)
                     {
                         var n = terminals[RandomChoice.PickFromDistribution(pfuncs.TerminalProbabilities(y),
-                                            state.Random[thread].NextFloat())].LightClone();
+                                            state.Random[thread].NextDouble())].LightClone();
 
                         DequeueNode.Children[DequeueArgpos] = n;
                         n.ResetNode(state, thread); // give ERCs a chance to randomize
@@ -285,7 +285,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
                             WarnAboutNoTerminalWithType(type, false, state); // we tried terminals and we're here because there were none!
 
                         var n = nonterminals[RandomChoice.PickFromDistribution(pfuncs.NonterminalProbabilities(y),
-                                                    state.Random[thread].NextFloat())].LightClone();
+                                                    state.Random[thread].NextDouble())].LightClone();
 
                         DequeueNode.Children[DequeueArgpos] = n;
                         n.ResetNode(state, thread); // give ERCs a chance to randomize

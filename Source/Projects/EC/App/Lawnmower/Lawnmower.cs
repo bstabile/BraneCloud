@@ -156,7 +156,7 @@ namespace BraneCloud.Evolution.EC.App.Lawnmower
 
                 // evaluate the individual
                 ((GPIndividual)ind).Trees[0].Child.Eval(
-                    state, threadnum, Input, Stack, ((GPIndividual)ind), this);
+                    state, threadnum, Input, Stack, (GPIndividual)ind, this);
 
                 // clean up the map
                 for (var x = 0; x < MaxX; x++)
@@ -164,8 +164,8 @@ namespace BraneCloud.Evolution.EC.App.Lawnmower
                         Map[x][y] = UNMOWED;
 
                 // the fitness better be KozaFitness!
-                var f = ((KozaFitness)ind.Fitness);
-                f.SetStandardizedFitness(state, (float)(MaxX * MaxY - Sum));
+                var f = (KozaFitness)ind.Fitness;
+                f.SetStandardizedFitness(state, MaxX * MaxY - Sum);
                 f.Hits = Sum;
                 ind.Evaluated = true;
             }

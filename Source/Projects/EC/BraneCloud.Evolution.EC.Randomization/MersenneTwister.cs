@@ -299,7 +299,7 @@ namespace BraneCloud.Evolution.EC.Randomization
         
         
         /// <summary> Constructor using the default seed.</summary>
-        public MersenneTwister() : this((DateTime.Now.Ticks - 621355968000000000) / 10000)
+        public MersenneTwister() : this(DateTimeHelper.CurrentTimeMilliseconds)
         {
         }
         
@@ -316,7 +316,7 @@ namespace BraneCloud.Evolution.EC.Randomization
         /// in the array are used; if the array is shorter than this then
         /// integers are repeatedly used in a wrap-around fashion.
         /// </summary>
-        public MersenneTwister(int[] array) : base((Int32) ((DateTime.Now.Ticks - 621355968000000000) / 10000))
+        public MersenneTwister(int[] array) : base((Int32) (DateTimeHelper.CurrentTimeMilliseconds))
         { /* pick something at random just in case */
             SetSeed(array);
         }
@@ -722,13 +722,13 @@ namespace BraneCloud.Evolution.EC.Randomization
             Console.Out.WriteLine("\nTime to test grabbing 100000000 ints");
             
             r = new MersenneTwister(SEED);
-            var ms = (DateTime.Now.Ticks - 621355968000000000) / 10000;
+            var ms = DateTimeHelper.CurrentTimeMilliseconds;
             var xx = 0;
             for (j = 0; j < 100000000; j++)
             {
                 xx += r.Next();
             }
-            Console.Out.WriteLine("Mersenne Twister: " + ((DateTime.Now.Ticks - 621355968000000000) / 10000 - ms) + "          Ignore this: " + xx);
+            Console.Out.WriteLine("Mersenne Twister: " + (DateTimeHelper.CurrentTimeMilliseconds - ms) + "          Ignore this: " + xx);
             
             Console.Out.WriteLine("To compare this with java.util.Random, run this same test on MersenneTwisterFast.");
             Console.Out.WriteLine("The comparison with Random is removed from MersenneTwister because it is a proper");

@@ -100,6 +100,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
     {
         #region Constants
 
+        private const long SerialVersionUID = 1;
+
         public const string P_DEBUG_INFO = "debug-info";
         public const string P_JOB_SIZE = "job-size";
 
@@ -110,7 +112,14 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
         public bool ShowDebugInfo { get; set; }
         public IProblem Problem { get; set; }
         public bool BatchMode { get; set; }
-        public ISlaveMonitor Monitor { get; set; }
+
+        public ISlaveMonitor Monitor
+        {
+            get => _monitor;
+            set => _monitor = value;
+        }
+        [NonSerialized]
+        private ISlaveMonitor _monitor;
 
         public List<QueueIndividual> Queue { get; set; }
 
@@ -411,24 +420,25 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
         }
 
         #endregion // Cloning
-        #region ISerializable
 
-        /// <summary>
-        /// Custom serialization. 
-        /// </summary>
-        public virtual void GetObjectData(SerializationInfo outputInfo, StreamingContext context)
-        {
-            outputInfo.AddValue("ec.eval.MasterProblemData1", Problem);
-        }
+        //#region ISerializable
 
-        /// <summary>
-        /// Custom serialization. 
-        /// </summary>
-        protected MasterProblem(SerializationInfo inputInfo, StreamingContext context)
-        {
-            Problem = (IProblem)inputInfo.GetValue("ec.eval.MasterProblemData1", typeof(IProblem));
-        }
+        ///// <summary>
+        ///// Custom serialization. 
+        ///// </summary>
+        //public virtual void GetObjectData(SerializationInfo outputInfo, StreamingContext context)
+        //{
+        //    outputInfo.AddValue("ec.eval.MasterProblemData1", Problem);
+        //}
 
-        #endregion // ISerializable
+        ///// <summary>
+        ///// Custom serialization. 
+        ///// </summary>
+        //protected MasterProblem(SerializationInfo inputInfo, StreamingContext context)
+        //{
+        //    Problem = (IProblem)inputInfo.GetValue("ec.eval.MasterProblemData1", typeof(IProblem));
+        //}
+
+        //#endregion // ISerializable
     }
 }

@@ -158,10 +158,11 @@ namespace BraneCloud.Evolution.EC.GP.Build
         #endregion // Static
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPBuildDefaults.ParamBase.Push(P_UNIFORM); }
-        }
+        public override IParameter DefaultBase => GPBuildDefaults.ParamBase.Push(P_UNIFORM);
+
+        // TODO: BRS: This is ALL a big mess with mapping integers to FunctionSets etc.
+        // The equivalent in C# has to be studied and tested!!!
+        // Java has Integer.valueOf and new Integer() for objects mapping to ints by a hash code.
 
         /// <summary>
         /// Mapping of integers to function sets
@@ -280,7 +281,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
             while (e.MoveNext())
             {
                 var funcs = (GPFunctionSet) e.Current;
-                FunctionSetsHash[funcs] = count;
+                FunctionSetsHash[funcs] =  count;
                 FunctionSets[count++] = funcs;
             }
             

@@ -16,10 +16,6 @@
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.GP.GE
@@ -33,9 +29,6 @@ namespace BraneCloud.Evolution.EC.GP.GE
     {
         public const string P_GE = "ge";
 
-        public static IParameter ParamBase
-        {
-            get { return new Parameter(P_GE); }
-        }
+        public static IParameter ParamBase => new Parameter(P_GE);
     }
 }

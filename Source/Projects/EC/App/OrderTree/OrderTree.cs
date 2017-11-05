@@ -70,8 +70,8 @@ namespace BraneCloud.Evolution.EC.App.OrderTree
                 _fitness = 0.0;
                 NodeCal(((GPIndividual) ind).Trees[0].Child, state);
 
-                SimpleFitness f = ((SimpleFitness) ind.Fitness);
-                f.SetFitness(state, (float) _fitness, false);
+                SimpleFitness f = (SimpleFitness) ind.Fitness;
+                f.SetFitness(state, _fitness, false);
                 ind.Evaluated = true;
             }
         }

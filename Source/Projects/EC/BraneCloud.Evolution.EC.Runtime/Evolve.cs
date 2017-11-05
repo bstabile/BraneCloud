@@ -175,6 +175,12 @@ namespace BraneCloud.Evolution.EC.Runtime
         /// </summary>
         public const string V_THREADS_AUTO = "auto";
 
+        /** Should we muzzle stdout and stderr? */
+        public const string P_SILENT = "silent";
+
+        /** Should we muzzle stdout and stderr? [deprecated] */
+        const string P_MUZZLE = "muzzle";
+
         #endregion // Constants
         #region Static
 
@@ -381,28 +387,10 @@ namespace BraneCloud.Evolution.EC.Runtime
         /// The adjustment offers a convenient way to change the seeds of the random number generators each time you
         /// do a new evolutionary run.  You are of course welcome to replace the random number generators after initialize(...)
         /// but before startFresh(...) 
-        /// <p/>This method works by first setting up an Output (using buildOutput), then calling initialize(ParameterDatabase, seed, output)
-        /// </summary>
-        public static EvolutionState Initialize(ParameterDatabase parameters, int randomSeedOffset)
-        {
-            return Initialize(parameters, randomSeedOffset, BuildOutput());
-        }
-
-        /// <summary>
-        /// Initializes an evolutionary run given the parameters and a random seed adjustment (added to each random seed).
-        /// The adjustment offers a convenient way to change the seeds of the random number generators each time you
-        /// do a new evolutionary run.  You are of course welcome to replace the random number generators after initialize(...)
-        /// but before startFresh(...) 
         /// </summary>
         public static EvolutionState Initialize(IParameterDatabase parameters, int randomSeedOffset)
         {
-            var output = new Output(true);
-
-            // stdout is always log #0.  stderr is always log #1.
-            // stderr accepts announcements, and both are fully verbose 
-            // by default.
-            output.AddLog(Log.D_STDOUT, false);
-            output.AddLog(Log.D_STDERR, true);
+            var output = BuildOutput();
 
             // now continue intialization
             return Initialize(parameters, randomSeedOffset, output);
@@ -419,6 +407,19 @@ namespace BraneCloud.Evolution.EC.Runtime
         {
             var breedthreads = 1;
             var evalthreads = 1;
+
+            // Should we muzzle stdout and stderr?
+
+            if (parameters.ParameterExists(new Parameter(P_MUZZLE), null))
+                output.Warning("" + new Parameter(P_MUZZLE) + " has been deprecated.  We suggest you use " +
+                               new Parameter(P_SILENT) + " or similar newer options.");
+
+            if (parameters.GetBoolean(new Parameter(P_SILENT), null, false) ||
+                parameters.GetBoolean(new Parameter(P_MUZZLE), null, false))
+            {
+                output.GetLog(0).Silent = true;
+                output.GetLog(1).Silent = true;
+            }
 
             //bool store;
             int x;
@@ -446,7 +447,7 @@ namespace BraneCloud.Evolution.EC.Runtime
             var seedMessage = "Seed: ";
 
             // Get time in milliseconds
-            var time = (int)((DateTime.Now.Ticks - 621355968000000000) / 10000);
+            var time = (int)DateTimeHelper.CurrentTimeMilliseconds;
 
             for (x = 0; x < random.Length; x++)
             {
@@ -474,7 +475,7 @@ namespace BraneCloud.Evolution.EC.Runtime
             state.BreedThreads = breedthreads;
             state.RandomSeedOffset = randomSeedOffset;
 
-            output.SystemMessage(String.Format("Threads:  breed/{0} eval/{1}", breedthreads, evalthreads));
+            output.SystemMessage($"Threads:  breed/{breedthreads} eval/{evalthreads}");
             output.SystemMessage(seedMessage);
 
             return state;
@@ -638,7 +639,7 @@ namespace BraneCloud.Evolution.EC.Runtime
                         Environment.Exit(1); // This was originally part of the InitialError call in ECJ. But we make Evolve responsible.
                     }
                     args = state.RuntimeArguments; // restore runtime arguments from checkpoint
-                    currentJob = ((int)(state.Job[0])) + 1; // extract next job number
+                    currentJob = (int)state.Job[0] + 1; // extract next job number
                 }
                 catch (Exception)
                 {

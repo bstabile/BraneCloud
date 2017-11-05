@@ -184,19 +184,19 @@ namespace BraneCloud.Evolution.EC.Serialization.Tests
             var rand = new MersenneTwisterFast(0);
             var f = new MultiObjectiveFitness(2);
             var f2 = new MultiObjectiveFitness(2); // We'll use this when we read the other one back in
-            f2.SetObjectives(null, new []{ 0.0f, 0.0f }); // setting these to zero allows us to check if they change
+            f2.SetObjectives(null, new []{ 0.0, 0.0 }); // setting these to zero allows us to check if they change
 
             // Default is to Maximize!
 
             // These need to be set up manually here because we are not running 'Setup'.
             // Every instance would thus normally share the same min and max values.
-            f.MaxObjective = new [] { 1.0f, 1.0f };
-            f.MinObjective = new [] { 0.0f, 0.0f };
-            f2.MaxObjective = new[] { 1.0f, 1.0f };
-            f2.MinObjective = new[] { 0.0f, 0.0f };
+            f.MaxObjective = new [] { 1.0, 1.0 };
+            f.MinObjective = new [] { 0.0, 0.0 };
+            f2.MaxObjective = new[] { 1.0, 1.0 };
+            f2.MinObjective = new[] { 0.0, 0.0 };
 
             // Set two objective (fitness) values, worst and best respectively
-            f.SetObjectives(null, new [] { 0.0f, 1.0f });
+            f.SetObjectives(null, new [] { 0.0, 1.0 });
 
             // Set up some random Trials just to check that they get transmitted
             const int n = 10;
@@ -218,9 +218,9 @@ namespace BraneCloud.Evolution.EC.Serialization.Tests
                 Assert.AreEqual(f.Value, f2.Value); // Value is same. This is the MAX objective value in the array
 
                 // Just for kicks, lets make sure BOTH objectives are equal to the original values
-                Assert.AreEqual(f.GetObjective(0), 0.0f);
+                Assert.AreEqual(f.GetObjective(0), 0.0);
                 Assert.AreEqual(f.GetObjective(0), f2.GetObjective(0));
-                Assert.AreEqual(f.GetObjective(1), 1.0f);
+                Assert.AreEqual(f.GetObjective(1), 1.0);
                 Assert.AreEqual(f.GetObjective(1), f2.GetObjective(1));
 
                 // And let's make sure our MAX and MIN are the same (these wouldn't normally change once established in 'Setup')

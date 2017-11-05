@@ -113,7 +113,7 @@ namespace BraneCloud.Evolution.EC.App.MultiplexerSlow
 
                 // the fitness better be KozaFitness!
                 var f = (KozaFitness)ind.Fitness;
-                f.SetStandardizedFitness(state, (amax * dmax - sum));
+                f.SetStandardizedFitness(state, amax * dmax - sum);
                 f.Hits = sum;
                 ind.Evaluated = true;
             }

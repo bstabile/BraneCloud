@@ -40,7 +40,7 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
     /// <font size="-1">bool = <tt>true</tt> or <tt>false</tt> (default)</font>/td>
     /// <td valign="top">(after crossing over with the first new individual, should its second sibling individual be thrown away instead of adding it to the population?)</td></tr>
     /// <tr><td valign="top"><i>base</i>.<tt>prob</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt; 1.0, or 0.5 (default)</font>/td>
+    /// <font size="-1">0.0 &lt;= double &lt; 1.0, or 0.5 (default)</font>/td>
     /// <td valign="top">(probability that a rule will cross over from one individual to the other)</td></tr>
     /// </table>
     /// <p/><b>Default Base</b><br/>
@@ -69,10 +69,7 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
         /// <summary>
         /// Returns 2 
         /// </summary>
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES; 
 
         /// <summary>
         /// Should the pipeline discard the second parent after crossing over? 
@@ -82,7 +79,7 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
         /// <summary>
         /// What is the probability of a rule migrating? 
         /// </summary>
-        public float RuleCrossProbability { get; set; }
+        public double RuleCrossProbability { get; set; }
 
         /// <summary>
         /// Temporary holding place for Parents 
@@ -92,10 +89,8 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
         /// <summary>
         /// Returns 2 (unless tossing the second sibling, in which case it returns 1) 
         /// </summary>
-        public override int TypicalIndsProduced
-        {
-            get { return (TossSecondParent ? 1 : INDS_PRODUCED); }
-        }
+        public override int TypicalIndsProduced => TossSecondParent ? 1 : INDS_PRODUCED;
+        
 
         #endregion // Properties
         #region Setup
@@ -111,7 +106,7 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
             var def = DefaultBase;
 
             TossSecondParent = state.Parameters.GetBoolean(paramBase.Push(P_TOSS), def.Push(P_TOSS), false);
-            RuleCrossProbability = state.Parameters.GetFloatWithDefault(paramBase.Push(P_CROSSOVERPROB), def.Push(P_CROSSOVERPROB), 0.5f);
+            RuleCrossProbability = state.Parameters.GetDoubleWithDefault(paramBase.Push(P_CROSSOVERPROB), def.Push(P_CROSSOVERPROB), 0.5);
 
             if (RuleCrossProbability > 1.0 || RuleCrossProbability < 0.0)
                 state.Output.Fatal("Rule cross probability must be between 0 and 1", paramBase.Push(P_CROSSOVERPROB), def.Push(P_CROSSOVERPROB));

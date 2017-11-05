@@ -48,7 +48,7 @@ namespace BraneCloud.Evolution.EC
     /// <p/><b>Parameters</b><br/>
     /// <table>
     /// <tr><td valign="top"><i>base</i><tt>.prob</tt><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0, or undefined</font></td>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0, or undefined</font></td>
     /// <td valign="top">(probability this BreedingSource gets chosen.  
     /// Undefined is only valid if the caller of this BreedingSource doesn't need a Probability)</td></tr>
     /// </table>
@@ -60,7 +60,7 @@ namespace BraneCloud.Evolution.EC
         #region Constants
 
         public const string P_PROB = "prob";
-        public const float NO_PROBABILITY = -1.0f;
+        public const double NO_PROBABILITY = -1.0;
 
         #endregion // Constants
         #region Properties
@@ -83,7 +83,7 @@ namespace BraneCloud.Evolution.EC
         /// they should get normalized and summed by the outside owners
         /// as: {0.3, 0.5, 0.6, 1.0}.
         /// </summary>
-        public float Probability { get; set; }
+        public double Probability { get; set; }
 
         /// <summary>
         /// Returns the "typical" number of individuals generated with one call of Produce(...). 
@@ -116,9 +116,9 @@ namespace BraneCloud.Evolution.EC
                 Probability = NO_PROBABILITY;
             else
             {
-                Probability = state.Parameters.GetFloat(paramBase.Push(P_PROB), def.Push(P_PROB), 0.0f);
+                Probability = state.Parameters.GetDouble(paramBase.Push(P_PROB), def.Push(P_PROB), 0.0);
                 if (Probability < 0.0)
-                    state.Output.Error("Breeding Source's Probability must be a floating point value >= 0.0, or empty, which represents NO_PROBABILITY.",
+                    state.Output.Error("Breeding Source's Probability must be a double floating point value >= 0.0, or empty, which represents NO_PROBABILITY.",
                         paramBase.Push(P_PROB), def.Push(P_PROB));
             }
         }
@@ -128,12 +128,12 @@ namespace BraneCloud.Evolution.EC
 
         #region Probability
 
-        public float GetProbability(object obj)
+        public double GetProbability(object obj)
         {
             return ((IBreedingSource)obj).Probability;
         }
 
-        public void SetProbability(object obj, float prob)
+        public void SetProbability(object obj, double prob)
         {
             ((IBreedingSource)obj).Probability = prob;
         }
@@ -162,12 +162,12 @@ namespace BraneCloud.Evolution.EC
         /// they should get normalized and summed by the outside owners
         /// as: {0.3, 0.5, 0.6, 1.0}. 
         /// </summary>		
-        public static int PickRandom(IBreedingSource[] sources, float prob)
+        public static int PickRandom(IBreedingSource[] sources, double prob)
         {
             return RandomChoice.PickFromDistribution(sources, sources[0], prob);
         }
 
-        int IBreedingSource.PickRandom(IBreedingSource[] sources, float prob)
+        int IBreedingSource.PickRandom(IBreedingSource[] sources, double prob)
         {
             return PickRandom(sources, prob);
         }

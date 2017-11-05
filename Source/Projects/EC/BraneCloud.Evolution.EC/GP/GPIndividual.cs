@@ -178,7 +178,8 @@ namespace BraneCloud.Evolution.EC.GP
                 return;
             }
 
-            // Not sure why this is in the ECJ code. Commenting it out for now...
+            // BRS: Not sure why this is in the ECJ code. Commenting it out for now...
+            //      Turns out they commented it out in v22! :)
             //var initializer = (GPInitializer)(state.Initializer);
 
             if (Trees == null)

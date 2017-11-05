@@ -51,7 +51,7 @@ namespace BraneCloud.Evolution.EC.GP
     /// <td valign="top">(number of sizes in the size distribution, see discussion above)
     /// </td></tr>
     /// <tr><td valign="top"><i>base</i>.<tt>size</tt>.<i>n</i><br/>
-    /// <font size="-1">0.0 &lt;= float &lt;= 1.0</font>, or undefined</td>
+    /// <font size="-1">0.0 &lt;= double &lt;= 1.0</font>, or undefined</td>
     /// <td valign="top">(probability of choosing size <i>n</i>.  See discussion above)
     /// </td></tr>
     /// </table>
@@ -87,7 +87,7 @@ namespace BraneCloud.Evolution.EC.GP
         /// <summary> 
         /// SizeDistribution[x] represents the likelihood of size x appearing -- if unused, it's null 
         /// </summary>
-        public float[] SizeDistribution { get; set; }
+        public double[] SizeDistribution { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -122,28 +122,28 @@ namespace BraneCloud.Evolution.EC.GP
                 var siz = state.Parameters.GetInt(paramBase.Push(P_NUMSIZES), def.Push(P_NUMSIZES), 1);
                 if (siz == 0)
                     state.Output.Fatal("The number of sizes in the GPNodeBuilder's distribution must be >= 1. ");
-                SizeDistribution = new float[siz];
+                SizeDistribution = new double[siz];
                 if (state.Parameters.ParameterExists(paramBase.Push(P_SIZE).Push("0"), def.Push(P_SIZE).Push("0")))
                     state.Output.Warning("GPNodeBuilder does not use size #0 in the distribution",
                         paramBase.Push(P_SIZE).Push("0"),
                         def.Push(P_SIZE).Push("0"));
 
-                var sum = 0.0f;
+                var sum = 0.0;
                 for (var x = 0; x < siz; x++)
                 {
-                    SizeDistribution[x] = state.Parameters.GetFloat(paramBase.Push(P_SIZE).Push("" + (x + 1)), def.Push(P_SIZE).Push("" + (x + 1)), 0.0f);
+                    SizeDistribution[x] = state.Parameters.GetDouble(paramBase.Push(P_SIZE).Push("" + (x + 1)), def.Push(P_SIZE).Push("" + (x + 1)), 0.0f);
                     if (SizeDistribution[x] < 0.0)
                     {
                         state.Output.Warning("Distribution value #" + x + " negative or not defined, assumed to be 0.0",
                             paramBase.Push(P_SIZE).Push("" + (x + 1)),
                             def.Push(P_SIZE).Push("" + (x + 1)));
-                        SizeDistribution[x] = 0.0f;
+                        SizeDistribution[x] = 0.0;
                     }
                     sum += SizeDistribution[x];
                 }
                 if (sum > 1.0)
                     state.Output.Warning("Distribution sums to greater than 1.0", paramBase.Push(P_SIZE), def.Push(P_SIZE));
-                if (sum == 0.0)
+                if (sum.Equals(0.0))
                     state.Output.Fatal("Distribution is all 0's", paramBase.Push(P_SIZE), def.Push(P_SIZE));
 
                 // normalize and prepare
@@ -290,7 +290,7 @@ namespace BraneCloud.Evolution.EC.GP
                 var c = (GPNodeBuilder) MemberwiseClone();
 
                 if (SizeDistribution != null)
-                    c.SizeDistribution = (float[]) SizeDistribution.Clone();
+                    c.SizeDistribution = (double[]) SizeDistribution.Clone();
 
                 return c;
             }

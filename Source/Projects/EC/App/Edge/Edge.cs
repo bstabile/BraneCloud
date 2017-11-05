@@ -500,6 +500,9 @@ namespace BraneCloud.Evolution.EC.App.Edge
                     case EPSILON:
                         Epsilon[From[y]][EpsilonL[From[y]]++] = To[y];
                         break;
+                    default:
+                        state.Output.Fatal("Invalid case " + Reading[y] + " in Edge.fullTest()");
+                        break;
                 }
 
             // create the states
@@ -540,7 +543,7 @@ namespace BraneCloud.Evolution.EC.App.Edge
 
             if (!ind.Evaluated)  // don't bother reevaluating
             {
-                EdgeData input = (EdgeData) Input;
+                //EdgeData input = (EdgeData) Input;
 
                 FullTest(state, ind, threadnum, PosT, NegT);
                 // the fitness better be KozaFitness!
@@ -549,9 +552,8 @@ namespace BraneCloud.Evolution.EC.App.Edge
                 // this is an awful fitness metric, but it's the standard
                 // one used for these problems.  :-(
 
-                f.SetStandardizedFitness(state, (float)
-                        (1.0 - (double)(_totpos + _totneg) /
-                        (PosT.Length + NegT.Length)));
+                f.SetStandardizedFitness(state, 
+                        1.0 - (double)(_totpos + _totneg) / (PosT.Length + NegT.Length));
 
                 // here are two other more reasonable fitness metrics
 
@@ -598,13 +600,13 @@ namespace BraneCloud.Evolution.EC.App.Edge
                     "Pos: " + _totpos + "/" + PosA.Length +
                     " Neg: " + _totneg + "/" + NegA.Length +
                     "\n(pos+neg)/(allpos+allneg):     " +
-                    (float)
-                    (((double)(_totpos + _totneg)) / (PosA.Length + NegA.Length)) +
+
+                    (double)(_totpos + _totneg) / (PosA.Length + NegA.Length) +
                     "\n((pos/allpos)+(neg/allneg))/2: " +
-                    (float)
-                    (((((double)_totpos) / PosA.Length) + (((double)_totneg) / NegA.Length)) / 2) +
+
+                    (((double)_totpos / PosA.Length + (double)_totneg / NegA.Length) / 2) +
                     "\nMin(pos/allpos,neg/allneg):    " +
-                    (float)Math.Min((((double)_totpos) / PosA.Length), (((double)_totneg) / NegA.Length)),
+                    Math.Min((double)_totpos / PosA.Length, (double)_totneg / NegA.Length),
                     log);
 
             state.Output.PrintLn("\nBest Individual's NFA\n=====================\n",

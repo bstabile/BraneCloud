@@ -17,7 +17,6 @@
  */
 
 using System;
-using BraneCloud.Evolution.EC;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.GP.GE.Breed
@@ -33,18 +32,9 @@ namespace BraneCloud.Evolution.EC.GP.GE.Breed
         #endregion // Constants
         #region Properties
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
-        public override IParameter DefaultBase
-        {
-            get
-            {
-                return GEDefaults.ParamBase.Push(P_TRUNCATION);
-            }
-        }
+        public override IParameter DefaultBase => GEDefaults.ParamBase.Push(P_TRUNCATION);
 
         #endregion // Properties
         #region Operations

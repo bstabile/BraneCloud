@@ -60,6 +60,14 @@ namespace BraneCloud.Evolution.EC.SteadyState
         bool RunComplete(IEvolutionState state);
 
         /// <summary>
+        /// The SimpleEvaluator determines that a run is complete by asking
+        /// each individual in each population if he's optimal; if he 
+        /// finds an individual somewhere that's optimal,
+        /// he signals that the run is complete. 
+        /// </summary>
+        bool RunComplete(IEvolutionState state, Individual ind);
+
+        /// <summary>
         /// Called to set up remote evaluation network contacts when the run is started.  
         /// Mostly used for client/server evaluation (see MasterProblem).  
         /// By default calls p_problem.initializeContacts(state) 

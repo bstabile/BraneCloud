@@ -21,7 +21,7 @@ namespace BraneCloud.Evolution.EC.App.Regression.Func
         public override string Name => "VladERCB";
 
         public override string ToStringForHumans()
-        { return "n+" + (float)value; }
+        { return "n+" + value; }
 
         public override void Eval(IEvolutionState state,
             int thread,

@@ -88,7 +88,7 @@ namespace BraneCloud.Evolution.EC.Breed
                 state.Output.Fatal("ForceBreedingPipeline must produce at least 1 child at a time", paramBase.Push(P_NUMINDS), def.Push(P_NUMINDS));
 
             // declare that likelihood isn't used
-            if (Likelihood < 1.0f)
+            if (Likelihood < 1.0)
                 state.Output.Warning("ForceBreedingPipeline does not respond to the 'likelihood' parameter.",
                     paramBase.Push(P_LIKELIHOOD), def.Push(P_LIKELIHOOD));
         }
@@ -110,6 +110,8 @@ namespace BraneCloud.Evolution.EC.Breed
                 var numToProduce = n - total;
                 if (numToProduce > NumInds)
                     numToProduce = NumInds;
+                if (numToProduce > NumInds)
+                    numToProduce = NumInds;
 
                 total += Sources[0].Produce(numToProduce, numToProduce, start + total, subpop, inds, state, thread);
             }
@@ -117,7 +119,7 @@ namespace BraneCloud.Evolution.EC.Breed
             // clone if necessary
             if (Sources[0] is SelectionMethod)
                 for (var q = start; q < total + start; q++)
-                    inds[q] = (Individual)(inds[q].Clone());
+                    inds[q] = (Individual)inds[q].Clone();
 
             return total;
         }

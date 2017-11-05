@@ -93,7 +93,6 @@ namespace BraneCloud.Evolution.EC.Configuration.Tests
                 { "ec.coevolve.CompetitiveEvaluator", ECNamespace.CoEvolve + "." + "CompetitiveEvaluator" },
                 { "ec.coevolve.EliteComparator", ECNamespace.CoEvolve + "." + "EliteComparator" },
                 { "ec.coevolve.EncapsulatedIndividual", ECNamespace.CoEvolve + "." + "EncapsulatedIndividual" },
-                { "ec.coevolve.IndividualAndVictories", ECNamespace.CoEvolve + "." + "IndividualAndVictories" },
                 { "ec.coevolve.IndComparator", ECNamespace.CoEvolve + "." + "IndComparator" },
                 { "ec.coevolve.CompetitiveEvaluatorThread", ECNamespace.CoEvolve + "." + "CompetitiveEvaluatorThread" },
                 { "ec.coevolve.RoundRobinCompetitiveEvaluatorThread", ECNamespace.CoEvolve + "." + "RoundRobinCompetitiveEvaluatorThread" },
