@@ -100,11 +100,12 @@ namespace BraneCloud.Evolution.EC.Simple
             Statistics.PreEvaluationStatistics(this);
             Evaluator.EvaluatePopulation(this);
             Statistics.PostEvaluationStatistics(this);
-            
+
             // SHOULD WE QUIT?
-            if (Evaluator.RunComplete(this) && QuitOnRunComplete)
+            string runCompleteMessage = Evaluator.RunComplete(this);
+            if (runCompleteMessage != null && QuitOnRunComplete)
             {
-                Output.Message("Found Ideal Individual");
+                Output.Message(runCompleteMessage);
                 return R_SUCCESS;
             }
             
@@ -123,18 +124,6 @@ namespace BraneCloud.Evolution.EC.Simple
             if (exchangerWantsToShutdown != null)
             {
                 Output.Message(exchangerWantsToShutdown);
-                /*
-                * Don't really know what to return here.  The only place I could
-                * find where runComplete ever returns non-null is 
-                * IslandExchange.  However, that can return non-null whether or
-                * not the ideal individual was found (for example, if there was
-                * a communication error with the server).
-                * 
-                * Since the original version of this code didn't care, and the
-                * result was initialized to R_SUCCESS before the while loop, I'm 
-                * just going to return R_SUCCESS here. 
-                */
-                
                 return R_SUCCESS;
             }
             

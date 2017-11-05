@@ -8,6 +8,8 @@ namespace BraneCloud.Evolution.EC
         IProblem p_problem { get; set; }
         IMasterProblem MasterProblem { get; set; }
 
+        string RunCompleted { get; }
+
         //void Setup(IEvolutionState state, IParameter paramBase);
 
         /// <summary>
@@ -18,11 +20,15 @@ namespace BraneCloud.Evolution.EC
         void EvaluatePopulation(IEvolutionState state);
 
         /// <summary>
-        /// Returns true if an ideal individual has been found or some
+        /// Returns non-NULL if the Evaluator believes that the run is
+        /// finished: perhaps an ideal individual has been found or some
         /// other run result has shortcircuited the run so that it should
-        /// end prematurely right now. 
+        /// end prematurely right now.  Typically a message is stored in
+        /// the String for the user to know why the system shut down.
         /// </summary>
-        bool RunComplete(IEvolutionState state);
+        string RunComplete(IEvolutionState state);
+
+        void SetRunCompleted(string message);
 
         /// <summary>
         /// Called to set up remote evaluation network contacts when the run is started.  

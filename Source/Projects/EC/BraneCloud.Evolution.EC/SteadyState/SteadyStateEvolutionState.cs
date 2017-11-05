@@ -262,9 +262,12 @@ namespace BraneCloud.Evolution.EC.SteadyState
             }
 
             ind = ((ISteadyStateEvaluator)Evaluator).GetNextEvaluatedIndividual();
+            int whichInd = -1;
+            int whichSubpop = -1;
             if (ind != null)   // do we have an evaluated individual? 
             {
                 var subpop = ((ISteadyStateEvaluator)Evaluator).GetSubpopulationOfEvaluatedIndividual();
+                whichSubpop = subpop;
 
                 if (partiallyFullSubpop) // is subpopulation full? 
                 {
@@ -281,11 +284,12 @@ namespace BraneCloud.Evolution.EC.SteadyState
                     var deadIndex = ((SteadyStateBreeder)Breeder).Deselectors[subpop].Produce(subpop, this, 0);
                     var deadInd = Population.Subpops[subpop].Individuals[deadIndex];
 
-                    // replace dead individual with new individual 
+                    // maybe replace dead individual with new individual 
                     if (ind.Fitness.BetterThan(deadInd.Fitness) || // it's better, we want it
                         Random[0].NextDouble() < ReplacementProbability) // it's not better but maybe we replace it directly anyway
                     {
                         Population.Subpops[subpop].Individuals[deadIndex] = ind;
+                        whichInd = deadIndex;
                     }
 
                     // update duplicate hash table 
@@ -308,9 +312,15 @@ namespace BraneCloud.Evolution.EC.SteadyState
             }
 
             // SHOULD WE QUIT?
-            if (!partiallyFullSubpop && ((ISteadyStateEvaluator)Evaluator).RunComplete(this, ind) && QuitOnRunComplete)
+            if (!partiallyFullSubpop && ((ISteadyStateEvaluator)Evaluator).IsIdeal(this, ind) && QuitOnRunComplete)
             {
-                Output.Message("Found Ideal Individual");
+                Output.Message("Individual " + whichInd + " of subpopulation " + _whichSubpop + " has an ideal fitness.");
+                return R_SUCCESS;
+            }
+
+            if (Evaluator.RunCompleted != null)
+            {
+                Output.Message(Evaluator.RunCompleted);
                 return R_SUCCESS;
             }
 

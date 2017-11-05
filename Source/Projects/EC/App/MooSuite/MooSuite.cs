@@ -136,7 +136,10 @@ namespace BraneCloud.Evolution.EC.App.MooSuite
                 "  " + P_KUR_SPEA2 + "\n" +
                 "  " + P_SPHERE + "\n" +
                 "  " + P_SCH + "(or " + P_F1 + ")\n" +
-                "  " + P_F2 + "\n",
+                "  " + P_F2 + "\n\n" +
+                "Are you by any chance running moosuite.params?  Instead\n" +
+                "You should be running one of the params files for these\n" +
+                "specific problems, such as zdt2.params.\n",
                 paramBase.Push(P_WHICH_PROBLEM));
         }
         private const double TWO_PI = Math.PI * 2;//QV uses it.

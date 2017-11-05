@@ -579,7 +579,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
                     {
                         var gj = genome[i - 1];
                         var gi = genome[i];
-                        value += 100 * (gj * gj - gj) * (gj * gj - gj) + (1 - gj) * (1 - gj);
+                        value += (1 - gj) * (1 - gj) + 100 * (gi - gj * gj) * (gi - gj * gj);
                     }
                     return -value;
 
@@ -617,7 +617,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
                     for (var i = 0; i < len; i++)
                     {
                         var gi = genome[i];
-                        value += (i + 1) * (gi * gi * gi * gi) + state.Random[threadnum].NextDouble();
+                        value += (i + 1) * (gi * gi * gi * gi) + state.Random[threadnum].NextGaussian(); // gauss(0,1)
                     }
                     return -value;
 
@@ -765,29 +765,25 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
                         // http://arxiv.org/pdf/1207.4318.pdf
                         // http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.154.1657
                         // // // //
-                        double s = 0.7; // The shape of the boundary of the double sphere, 
-                                        // could be like [0.2 - 1.4] but not 0.0.
-                                        // > 1.0 or < 1.0 means a parabolic shape, 1.0 means a linear boundary.
+
+                        double s = 1.0 - 1.0 / (2.0 * Math.Sqrt(genome.Length + 20.0) - 8.2);
+
+                        // depth of the sphere, could be 1, 2, 3, or 4. 1 is deeper than 4
+                        // this could be also be a fraction I guess.
                         double d = 1.0; // depth of the sphere, could be 1, 2, 3, or 4. 1 is deeper than 4
                                         // this could be also be a fraction I guess.
-                        double mu1 = 0.0;
-                        for (int i = 0; i < genome.Length; i++)
-                            mu1 = genome[i];
-                        double mu2 = -1.0 * Math.Sqrt(((mu1 * mu1) - d) / s);
-                        double sigma1 = 0.0;
-                        double sigma2 = 0.0;
-                        for (int i = 0; i < genome.Length; i++)
+                        double mu1 = 2.5;
+                        double mu2 = -1.0 * Math.Sqrt(Math.Abs((mu1 * mu1 - d) / s)); // probably don't need the abs
+                        double sum1 = 0.0;
+                        double sum2 = 0.0;
+                        double sum3 = 0.0;
+                        foreach (double genomei in genome)
                         {
-                            sigma1 = (genome[i] - mu1) * (genome[i] - mu1);
-                            sigma2 = (genome[i] - mu2) * (genome[i] - mu2);
+                            sum1 = (genomei - mu1) * (genomei - mu1);
+                            sum2 = (genomei - mu2) * (genomei - mu2);
+                            sum3 += 1.0 - Math.Cos(2.0 * Math.PI * (genomei - mu1));
                         }
-                        sigma2 = d * genome.Length + s * sigma1;
-                        double sphere = Math.Min(sigma1, sigma2);
-                        double rastrigin = Function(state, PROB_RASTRIGIN, genome, threadnum);
-                        // + or - ? not sure, I always get confused.
-                        // Lunacek function is a combination of Rastrigin and a Double Sphere.
-                        // As the Rastrigin is -, so this function should be.
-                        return -1.0 * (sphere + rastrigin);
+                        return Math.Min(sum1, d * genome.Length + s * sum2) + 10.0 * sum3;
                     }
 
                 default:

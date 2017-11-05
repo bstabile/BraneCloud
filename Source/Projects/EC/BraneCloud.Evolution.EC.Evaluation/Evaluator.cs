@@ -129,11 +129,17 @@ namespace BraneCloud.Evolution.EC
         public abstract void EvaluatePopulation(IEvolutionState state);
 
         /// <summary>
-        /// Returns true if an ideal individual has been found or some
+        /// Returns non-NULL if the Evaluator believes that the run is
+        /// finished: perhaps an ideal individual has been found or some
         /// other run result has shortcircuited the run so that it should
-        /// end prematurely right now. 
+        /// end prematurely right now.  Typically a message is stored in
+        /// the String for the user to know why the system shut down.
         /// </summary>
-        public abstract bool RunComplete(IEvolutionState state);
+        public abstract string RunComplete(IEvolutionState state);
+
+        public string RunCompleted { get; protected set; }
+        /** Requests that the Evaluator quit soon for a user-defined reason provided in the message. */
+        public void SetRunCompleted(string message) { RunCompleted = message; }
 
         #endregion // Evaluation
         #region Contacts

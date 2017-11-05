@@ -93,9 +93,6 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="Grammar\ant.grammar" />
-    <Content Include="Grammar\ant_progn4.grammar">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="Params\App\Ant\ant_losaltos.params" />
     <None Include="Params\App\Ant\ant_losaltos_ge.params" />
     <None Include="Params\App\Ant\ant_santafe_ge.params" />

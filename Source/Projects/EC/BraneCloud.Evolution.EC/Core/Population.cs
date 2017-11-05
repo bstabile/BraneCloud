@@ -20,7 +20,6 @@ using System;
 using System.IO;
 using System.Text;
 using BraneCloud.Evolution.EC.Util;
-using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC
@@ -102,7 +101,7 @@ namespace BraneCloud.Evolution.EC
 
             var p = paramBase.Push(P_SIZE);
             var size = state.Parameters.GetInt(p, null, 1);
-            if (size == 0)
+            if (size <= 0)
                 // uh oh
                 state.Output.Fatal("Population size must be >0.\n", paramBase.Push(P_SIZE));
             Subpops = new Subpopulation[size];

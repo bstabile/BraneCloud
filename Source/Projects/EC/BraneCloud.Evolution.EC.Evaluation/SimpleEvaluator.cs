@@ -301,9 +301,15 @@ namespace BraneCloud.Evolution.EC.Simple
         /// finds an individual somewhere that's optimal,
         /// he signals that the run is complete. 
         /// </summary>
-        public override bool RunComplete(IEvolutionState state)
+        public override string RunComplete(IEvolutionState state)
         {
-            return state.Population.Subpops.Any(t1 => t1.Individuals.Any(t => t.Fitness.IsIdeal));
+            for (int x = 0; x < state.Population.Subpops.Length; x++)
+            for (int y = 0; y < state.Population.Subpops[x].Individuals.Length; y++)
+                if (state.Population.Subpops[x].
+                    Individuals[y].Fitness.IsIdeal)
+                    return "Individual " + y + " of subpopulation " + x + " has an ideal fitness.";
+
+            return RunCompleted;
         }
 
         #endregion // Operations

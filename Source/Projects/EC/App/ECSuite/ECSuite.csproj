@@ -62,10 +62,16 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Params\App\ECSuite\base.params" />
+    <None Include="Params\App\ECSuite\cmaes.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Params\App\ECSuite\de.params" />
     <None Include="Params\App\ECSuite\es.params" />
     <None Include="Params\App\ECSuite\meta.params" />
     <None Include="Params\App\ECSuite\pso.params" />
+    <None Include="Params\App\ECSuite\single.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Params\DE\de.params" />
     <None Include="Params\ec.params">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

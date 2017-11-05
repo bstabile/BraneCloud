@@ -20,7 +20,7 @@ using System;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 
-namespace BraneCloud.Evolution.EC.App.AntTest.Func
+namespace BraneCloud.Evolution.EC.App.AntTest
 {
     [ECConfiguration("ec.app.ant.func.Progn2")]
     public class Progn2 : GPNode, IEvalPrint

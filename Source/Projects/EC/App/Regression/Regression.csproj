@@ -117,6 +117,7 @@
     <None Include="convertToMathematica.lisp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Grammar\foo.grammar" />
     <None Include="Params\App\Regression\benchmark.params">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

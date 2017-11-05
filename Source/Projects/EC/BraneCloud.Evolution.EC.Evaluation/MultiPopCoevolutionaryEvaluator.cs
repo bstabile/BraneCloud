@@ -235,9 +235,9 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         #endregion // Setup
         #region Operations
 
-        public override bool RunComplete(IEvolutionState state)
+        public override string RunComplete(IEvolutionState state)
         {
-            return false;
+            return null;
         }
 
         /// <summary>

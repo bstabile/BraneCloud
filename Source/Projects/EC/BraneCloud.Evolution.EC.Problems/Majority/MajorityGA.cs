@@ -192,7 +192,7 @@ namespace BraneCloud.Evolution.EC.Problems.Majority
                         sum++;
                 }
                 SimpleFitness f = (SimpleFitness) ind.Fitness;
-                f.SetFitness(state, (sum / (float) NUM_TRIALS), false);
+                f.SetFitness(state, sum / (double)NUM_TRIALS, false);
                 ind.Evaluated = true;
             }
         }

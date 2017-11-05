@@ -21,7 +21,7 @@ namespace BraneCloud.Evolution.EC.DE
         /// finds an individual somewhere that's optimal,
         /// he signals that the run is complete. 
         /// </summary>
-        bool RunComplete(IEvolutionState state);
+        string RunComplete(IEvolutionState state);
 
         /// <summary>
         /// Called to set up remote evaluation network contacts when the run is started.  

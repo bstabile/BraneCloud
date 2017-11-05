@@ -1,8 +1,6 @@
-using System;
 using System.Threading;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
-using BraneCloud.Evolution.EC.Randomization;
 using BraneCloud.Evolution.EC.Simple;
 using BraneCloud.Evolution.EC.Util;
 
@@ -199,7 +197,7 @@ namespace BraneCloud.Evolution.EC.Problems.Majority
                 }
 
                 SimpleFitness f = (SimpleFitness) ind.Fitness;
-                f.SetFitness(state, (float) sum / (float) NUM_TRIALS, sum == NUM_TRIALS);
+                f.SetFitness(state, sum / (double) NUM_TRIALS, sum == NUM_TRIALS);
                 ind.Evaluated = true;
             }
         }

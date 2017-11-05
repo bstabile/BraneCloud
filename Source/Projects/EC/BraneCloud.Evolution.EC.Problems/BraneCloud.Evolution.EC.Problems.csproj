@@ -193,6 +193,7 @@
     <Compile Include="Multiplexer\Multiplexer.cs" />
     <Compile Include="Multiplexer\MultiplexerData.cs" />
     <Compile Include="NK\NK.cs" />
+    <Compile Include="NullProblem\NullProblem.cs" />
     <Compile Include="OrderTree\Funcs.cs" />
     <Compile Include="OrderTree\OrderTree.cs" />
     <Compile Include="Parity\Func\And.cs" />
@@ -300,7 +301,6 @@
     <Compile Include="TwoBox\TwoBoxData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Async\" />
     <Folder Include="Spatial\" />
   </ItemGroup>
   <ItemGroup>

@@ -84,7 +84,7 @@ namespace BraneCloud.Evolution.EC.SteadyState
         #endregion // Properties
         #region Setup
 
-        public void Setup(EvolutionState state, IParameter paramBase)
+        public override void Setup(IEvolutionState state, IParameter paramBase)
         {
             base.Setup(state, paramBase);
             if (!CloneProblem)
@@ -95,7 +95,7 @@ namespace BraneCloud.Evolution.EC.SteadyState
         #endregion // Setup
         #region Operations
 
-        public void PrepareToEvaluate(EvolutionState state, int thread)
+        public void PrepareToEvaluate(IEvolutionState state, int thread)
         {
             _problem = (ISimpleProblem)p_problem.Clone();
 
@@ -157,10 +157,11 @@ namespace BraneCloud.Evolution.EC.SteadyState
         /// finds an individual somewhere that's optimal,
         /// he signals that the run is complete. 
         /// </summary>
-        public bool RunComplete(IEvolutionState state, Individual ind)
+        public bool IsIdeal(IEvolutionState state, Individual ind)
         {
             return ind.Fitness.IsIdeal;
         }
+
         #endregion // Operations
     }
 }

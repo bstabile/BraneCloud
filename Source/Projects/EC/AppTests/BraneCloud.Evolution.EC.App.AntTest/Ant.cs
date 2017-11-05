@@ -18,7 +18,6 @@
 
 using System;
 using System.IO;
-using BraneCloud.Evolution.EC.App.AntTest.Func;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 using BraneCloud.Evolution.EC.GP.Koza;
@@ -159,67 +158,67 @@ namespace BraneCloud.Evolution.EC.App.AntTest
                 state.Output.Fatal("Error loading file or resource", paramBase.Push(P_FILE), null);
 
             Food = 0;
-            try
+            using (var lnr = new StreamReader(stream))
             {
-                //var lnr = new StreamReader(fileInfo.FullName);
-                var lnr = new StreamReader(stream);
-
-                var st = new Tokenizer(lnr.ReadLine()); // ugh
-                MaxX = Int32.Parse(st.NextToken());
-                MaxY = Int32.Parse(st.NextToken());
-                Map = new int[MaxX][];
-                for (var x = 0; x < MaxX; x++)
+                try
                 {
-                    Map[x] = new int[MaxY];
-                }
-
-                int y;
-                for (y = 0; y < MaxY; y++)
-                {
-                    var s = lnr.ReadLine();
-                    if (s == null)
+                    var st = new Tokenizer(lnr.ReadLine()); // ugh
+                    MaxX = Int32.Parse(st.NextToken());
+                    MaxY = Int32.Parse(st.NextToken());
+                    Map = new int[MaxX][];
+                    for (var x = 0; x < MaxX; x++)
                     {
-                        state.Output.Warning("Ant trail file ended prematurely");
-                        break;
+                        Map[x] = new int[MaxY];
                     }
-                    int x;
-                    for (x = 0; x < s.Length; x++)
+
+                    int y;
+                    for (y = 0; y < MaxY; y++)
                     {
-                        switch (s[x])
+                        var s = lnr.ReadLine();
+                        if (s == null)
                         {
-                            case ' ':
-                                Map[x][y] = EMPTY;
-                                break;
-                            case '#':
-                                Map[x][y] = FOOD;
-                                Food++;
-                                break;
-                            case '.':
-                                Map[x][y] = TRAIL;
-                                break;
-                            default:
-                                state.Output.Error("Bad character '" + s[x] + "' on line number " + y
-                                                   /*lnr.GetLineNumber()*/+ " of the Ant trail file.");
-                                break;
+                            state.Output.Warning("Ant trail file ended prematurely");
+                            break;
                         }
+                        int x;
+                        for (x = 0; x < s.Length; x++)
+                        {
+                            switch (s[x])
+                            {
+                                case ' ':
+                                    Map[x][y] = EMPTY;
+                                    break;
+                                case '#':
+                                    Map[x][y] = FOOD;
+                                    Food++;
+                                    break;
+                                case '.':
+                                    Map[x][y] = TRAIL;
+                                    break;
+                                default:
+                                    state.Output.Error("Bad character '" + s[x] + "' on line number " + y
+                                                       /*lnr.GetLineNumber()*/ + " of the Ant trail file.");
+                                    break;
+                            }
+                        }
+                        // fill out rest of X's
+                        for (var z = x; z < MaxX; z++)
+                            Map[z][y] = EMPTY;
                     }
-                    // fill out rest of X's
-                    for (var z = x; z < MaxX; z++)
-                        Map[z][y] = EMPTY;
-                }
-                // fill out rest of Y's
-                for (var z = y; z < MaxY; z++)
+                    // fill out rest of Y's
+                    for (var z = y; z < MaxY; z++)
                     for (var x = 0; x < MaxX; x++)
                         Map[x][z] = EMPTY;
-            }
-            catch (FormatException)
-            {
-                state.Output.Fatal("The Ant trail file does not begin with x and y integer values.");
-            }
-            catch (IOException e)
-            {
-                state.Output.Fatal("The Ant trail file could not be read due to an IOException:\n" + e);
-            }
+                }
+                catch (FormatException)
+                {
+                    state.Output.Fatal("The Ant trail file does not begin with x and y integer values.");
+                }
+                catch (IOException e)
+                {
+                    state.Output.Fatal("The Ant trail file could not be read due to an IOException:\n" + e);
+                }
+            } // using StreamReader
             state.Output.ExitIfErrors();
 
             // load foodx and foody reset arrays
@@ -253,7 +252,7 @@ namespace BraneCloud.Evolution.EC.App.AntTest
 
                 // the fitness better be KozaFitness!
                 var f = (KozaFitness)ind.Fitness;
-                f.SetStandardizedFitness(state, (Food - Sum));
+                f.SetStandardizedFitness(state, Food - Sum);
                 f.Hits = Sum;
                 ind.Evaluated = true;
 
@@ -279,7 +278,7 @@ namespace BraneCloud.Evolution.EC.App.AntTest
 
             map2[PosX][PosY] = PMod; PMod++;
             for (Moves = 0; Moves < MaxMoves && Sum < Food; )
-                ((IEvalPrint)((GPIndividual)ind).Trees[0].Child).EvalPrint(state, threadnum, Input, Stack, (GPIndividual)ind, this, map2);
+                ((IEvalPrint)(((GPIndividual)ind).Trees[0].Child)).EvalPrint(state, threadnum, Input, Stack, ((GPIndividual)ind), this, map2);
             // print out the map
             for (var y = 0; y < map2.Length; y++)
             {
