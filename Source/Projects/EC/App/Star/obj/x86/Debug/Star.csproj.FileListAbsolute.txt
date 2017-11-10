@@ -1,0 +1,12 @@
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Star\Params\App\CoEvolve1\coevolve1.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Star\Params\App\ECSuite\meta.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Star\Params\App\Star\mastermeta.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Star\Params\App\Star\slavemeta.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Star\Params\ec.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Star\BraneCloud.Evolution.EC.App.Star.exe.config
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Star\BraneCloud.Evolution.EC.App.Star.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Star\BraneCloud.Evolution.EC.App.Star.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Star\obj\x86\Debug\Star.csprojResolveAssemblyReference.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Star\obj\x86\Debug\Star.csproj.CoreCompileInputs.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Star\obj\x86\Debug\BraneCloud.Evolution.EC.App.Star.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Star\obj\x86\Debug\BraneCloud.Evolution.EC.App.Star.pdb

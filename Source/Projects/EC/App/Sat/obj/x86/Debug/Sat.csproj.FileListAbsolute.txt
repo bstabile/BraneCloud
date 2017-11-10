@@ -1,0 +1,13 @@
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sat\Cnf\data-10.cnf
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sat\Cnf\data-1000.cnf
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sat\Cnf\data-215.cnf
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sat\Params\ec.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sat\Params\App\Sat\sat.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sat\Params\Simple\simple.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sat\BraneCloud.Evolution.EC.App.Sat.exe.config
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sat\BraneCloud.Evolution.EC.App.Sat.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sat\BraneCloud.Evolution.EC.App.Sat.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Sat\obj\x86\Debug\Sat.csprojResolveAssemblyReference.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Sat\obj\x86\Debug\Sat.csproj.CoreCompileInputs.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Sat\obj\x86\Debug\BraneCloud.Evolution.EC.App.Sat.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Sat\obj\x86\Debug\BraneCloud.Evolution.EC.App.Sat.pdb

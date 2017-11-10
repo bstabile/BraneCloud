@@ -1,0 +1,10 @@
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Coevolve1\obj\x86\Debug\Coevolve1.csprojResolveAssemblyReference.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Coevolve1\obj\x86\Debug\Coevolve1.csproj.CoreCompileInputs.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve1\Params\App\Coevolve1\coevolve1.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve1\Params\ec.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve1\Params\Simple\simple.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve1\BraneCloud.Evolution.EC.App.Coevolve1.exe.config
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve1\BraneCloud.Evolution.EC.App.Coevolve1.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve1\BraneCloud.Evolution.EC.App.Coevolve1.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Coevolve1\obj\x86\Debug\BraneCloud.Evolution.EC.App.Coevolve1.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Coevolve1\obj\x86\Debug\BraneCloud.Evolution.EC.App.Coevolve1.pdb

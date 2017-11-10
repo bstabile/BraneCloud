@@ -1,0 +1,12 @@
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\TwoBox\Params\App\TwoBox\adf.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\TwoBox\Params\ec.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\TwoBox\Params\GP\Koza\koza.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\TwoBox\Params\App\TwoBox\noadf.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\TwoBox\Params\Simple\simple.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\TwoBox\BraneCloud.Evolution.EC.App.TwoBox.exe.config
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\TwoBox\BraneCloud.Evolution.EC.App.TwoBox.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\TwoBox\BraneCloud.Evolution.EC.App.TwoBox.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\TwoBox\obj\x86\Debug\TwoBox.csproj.CoreCompileInputs.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\TwoBox\obj\x86\Debug\BraneCloud.Evolution.EC.App.TwoBox.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\TwoBox\obj\x86\Debug\BraneCloud.Evolution.EC.App.TwoBox.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\TwoBox\obj\x86\Debug\TwoBox.csprojResolveAssemblyReference.cache

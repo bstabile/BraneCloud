@@ -1,0 +1,13 @@
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve2\Params\ec.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve2\Params\App\ECSuite\ecsuite.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve2\Params\ES\es.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve2\Params\App\ECSuite\steady.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve2\BraneCloud.Evolution.EC.App.Coevolve2.exe.config
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve2\BraneCloud.Evolution.EC.App.Coevolve2.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve2\BraneCloud.Evolution.EC.App.Coevolve2.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Coevolve2\obj\x86\Debug\Coevolve2.csprojResolveAssemblyReference.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Coevolve2\obj\x86\Debug\Coevolve2.csproj.CoreCompileInputs.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Coevolve2\obj\x86\Debug\BraneCloud.Evolution.EC.App.Coevolve2.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Coevolve2\obj\x86\Debug\BraneCloud.Evolution.EC.App.Coevolve2.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve2\Params\App\ECSuite\cmaes.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Coevolve2\Params\App\ECSuite\single.params

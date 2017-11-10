@@ -1,0 +1,7 @@
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Gui\BraneCloud.Evolution.EC.App.Gui.exe.config
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Gui\BraneCloud.Evolution.EC.App.Gui.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Gui\BraneCloud.Evolution.EC.App.Gui.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Gui\obj\x86\Debug\Gui.csprojResolveAssemblyReference.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Gui\obj\x86\Debug\Gui.csproj.CoreCompileInputs.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Gui\obj\x86\Debug\BraneCloud.Evolution.EC.App.Gui.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Gui\obj\x86\Debug\BraneCloud.Evolution.EC.App.Gui.pdb

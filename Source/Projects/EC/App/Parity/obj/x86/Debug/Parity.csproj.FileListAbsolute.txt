@@ -1,0 +1,13 @@
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Parity\Params\App\Parity\adf.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Parity\Params\ec.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Parity\Params\GP\Koza\koza.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Parity\params-README
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Parity\Params\App\Parity\parity.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Parity\Params\Simple\simple.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Parity\BraneCloud.Evolution.EC.App.Parity.exe.config
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Parity\BraneCloud.Evolution.EC.App.Parity.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Parity\BraneCloud.Evolution.EC.App.Parity.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Parity\obj\x86\Debug\Parity.csprojResolveAssemblyReference.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Parity\obj\x86\Debug\Parity.csproj.CoreCompileInputs.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Parity\obj\x86\Debug\BraneCloud.Evolution.EC.App.Parity.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Parity\obj\x86\Debug\BraneCloud.Evolution.EC.App.Parity.pdb

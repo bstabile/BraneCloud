@@ -1,0 +1,12 @@
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sum\Params\Simple\simple.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sum\Params\SteadyState\steadystate.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sum\Params\App\Sum\steadysum.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sum\Params\App\Sum\sum.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sum\Params\ec.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sum\BraneCloud.Evolution.EC.App.Sum.exe.config
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sum\BraneCloud.Evolution.EC.App.Sum.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Sum\BraneCloud.Evolution.EC.App.Sum.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Sum\obj\x86\Debug\Sum.csprojResolveAssemblyReference.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Sum\obj\x86\Debug\Sum.csproj.CoreCompileInputs.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Sum\obj\x86\Debug\BraneCloud.Evolution.EC.App.Sum.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Sum\obj\x86\Debug\BraneCloud.Evolution.EC.App.Sum.pdb

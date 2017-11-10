@@ -1,0 +1,10 @@
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\NK\Params\ec.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\NK\Params\App\NK\nk.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\NK\Params\Simple\simple.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\NK\BraneCloud.Evolution.EC.App.NK.exe.config
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\NK\BraneCloud.Evolution.EC.App.NK.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\NK\BraneCloud.Evolution.EC.App.NK.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\NK\obj\x86\Debug\NK.csprojResolveAssemblyReference.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\NK\obj\x86\Debug\NK.csproj.CoreCompileInputs.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\NK\obj\x86\Debug\BraneCloud.Evolution.EC.App.NK.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\NK\obj\x86\Debug\BraneCloud.Evolution.EC.App.NK.pdb

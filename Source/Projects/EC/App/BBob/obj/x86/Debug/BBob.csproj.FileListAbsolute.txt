@@ -1,0 +1,10 @@
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\BBob\Params\App\BBob\de.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\BBob\Params\ec.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\BBob\Params\App\BBob\bbob.params
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\BBob\BraneCloud.Evolution.EC.App.BBob.exe.config
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\BBob\BraneCloud.Evolution.EC.App.BBob.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\BBob\BraneCloud.Evolution.EC.App.BBob.pdb
+W:\GitHub\BraneCloud\Source\Projects\EC\App\BBob\obj\x86\Debug\BBob.csprojResolveAssemblyReference.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\BBob\obj\x86\Debug\BBob.csproj.CoreCompileInputs.cache
+W:\GitHub\BraneCloud\Source\Projects\EC\App\BBob\obj\x86\Debug\BraneCloud.Evolution.EC.App.BBob.exe
+W:\GitHub\BraneCloud\Source\Projects\EC\App\BBob\obj\x86\Debug\BraneCloud.Evolution.EC.App.BBob.pdb
