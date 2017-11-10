@@ -44,16 +44,16 @@ namespace BraneCloud.Evolution.EC.Parsimony
     /// <td valign="top">(the tournament size for the initial ("qualifying") tournament)</td></tr>
     /// <tr><td valign="top"><i>base.</i><tt>size2</tt><br/>
     /// <font size="-1">int &gt;= 1 (default 7)</font></td>
-    /// <td valign="top">(the tournament size for the final ("champion") tournament)</td></tr>
+    /// <td valign="top">(the tournament size for the ("champion") tournament)</td></tr>
     /// <tr><td valign="top"><i>base.</i><tt>pick-worst</tt><br/>
     /// <font size="-1"> bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
     /// <td valign="top">(should we pick the <i>worst</i> individual in the initial ("qualifying") tournament instead of the <i>best</i>?)</td></tr>
     /// <tr><td valign="top"><i>base.</i><tt>pick-worst2</tt><br/>
     /// <font size="-1"> bool = <tt>true</tt> or <tt>false</tt> (default)</font></td>
-    /// <td valign="top">(should we pick the <i>worst</i> individual in the final ("champion") tournament instead of the <i>best</i>?)</td></tr>
+    /// <td valign="top">(should we pick the <i>worst</i> individual in the ("champion") tournament instead of the <i>best</i>?)</td></tr>
     /// <tr><td valign="top"><i>base.</i><tt>do-length-first</tt><br/>
     /// <font size="-1"> bool = <tt>true</tt> (default) or <tt>false</tt></font></td>
-    /// <td valign="top">(should the initial ("qualifying") tournament be based on the length of the individual or (if false) the fitness of the individual?  The final ("champion") tournament will be based on the alternative option)</td></tr>
+    /// <td valign="top">(should the initial ("qualifying") tournament be based on the length of the individual or (if false) the fitness of the individual?  The ("champion") tournament will be based on the alternative option)</td></tr>
     /// </table>
     /// <p/><b>Default Base</b><br/>
     /// select.double-tournament
@@ -207,7 +207,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
                     }
                 }
                 
-                if (ProbabilityOfSelection2 != 1.0 && !state.Random[thread].NextBoolean(ProbabilityOfSelection2))
+                if (!ProbabilityOfSelection2.Equals(1.0) && !state.Random[thread].NextBoolean(ProbabilityOfSelection2))
                     i = bad;
                 return i;
             }
@@ -243,7 +243,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
                     }
                 }
                 
-                if (ProbabilityOfSelection2 != 1.0 && !state.Random[thread].NextBoolean(ProbabilityOfSelection2))
+                if (!ProbabilityOfSelection2.Equals(1.0) && !state.Random[thread].NextBoolean(ProbabilityOfSelection2))
                     i = bad;
                 return i;
             }
@@ -261,12 +261,12 @@ namespace BraneCloud.Evolution.EC.Parsimony
             {
                 // pick size random individuals, then pick the best.
                 var oldinds = state.Population.Subpops[subpop].Individuals;
-                var i = state.Random[thread].NextInt(oldinds.Length);
+                var i = state.Random[thread].NextInt(oldinds.Count);
                 var bad = i;
                 
                 for (var x = 1; x < Size; x++)
                 {
-                    var j = state.Random[thread].NextInt(oldinds.Length);
+                    var j = state.Random[thread].NextInt(oldinds.Count);
                     if (PickWorst)
                     {
                         if (oldinds[j].Size > oldinds[i].Size) { bad = i; i = j; } else bad = j;
@@ -285,12 +285,12 @@ namespace BraneCloud.Evolution.EC.Parsimony
             {
                 // pick size random individuals, then pick the best.
                 var oldinds = state.Population.Subpops[subpop].Individuals;
-                var i = state.Random[thread].NextInt(oldinds.Length);
+                var i = state.Random[thread].NextInt(oldinds.Count);
                 var bad = i;
                 
                 for (var x = 1; x < Size; x++)
                 {
-                    var j = state.Random[thread].NextInt(oldinds.Length);
+                    var j = state.Random[thread].NextInt(oldinds.Count);
                     if (PickWorst)
                     {
                         if (! oldinds[j].Fitness.BetterThan(oldinds[i].Fitness)) { bad = i; i = j; } else bad = j;
@@ -301,7 +301,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
                     }
                 }
                 
-                if (ProbabilityOfSelection != 1.0 && !state.Random[thread].NextBoolean(ProbabilityOfSelection))
+                if (!ProbabilityOfSelection.Equals(1.0) && !state.Random[thread].NextBoolean(ProbabilityOfSelection))
                     i = bad;
                 return i;
             }

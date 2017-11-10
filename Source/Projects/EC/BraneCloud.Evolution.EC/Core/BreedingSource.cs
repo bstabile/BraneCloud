@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
 
@@ -38,7 +38,7 @@ namespace BraneCloud.Evolution.EC
     /// Some BreedingSources, <i>SelectionMethods</i>,
     /// are meant solely to plug into other BreedingSources, <i>BreedingPipelines</i>.
     /// BreedingPipelines can plug into other BreedingPipelines, and can also be
-    /// used to provide the final Individual meant to populate a new generation.
+    /// used to provide the Individual meant to populate a new generation.
     /// 
     /// <p/>Think of BreedingSources as Streams of Individuals; at one end of the
     /// stream is the provider, a SelectionMethod, which picks individuals from
@@ -167,12 +167,14 @@ namespace BraneCloud.Evolution.EC
             return RandomChoice.PickFromDistribution(sources, sources[0], prob);
         }
 
-        int IBreedingSource.PickRandom(IBreedingSource[] sources, double prob)
-        {
-            return PickRandom(sources, prob);
-        }
+        //int IBreedingSource.PickRandom(IBreedingSource[] sources, double prob)
+        //{
+        //    return PickRandom(sources, prob);
+        //}
 
         #endregion // Probability
+
+        public virtual void FillStubs(IEvolutionState state, IBreedingSource source) { }
 
         /// <summary>
         /// A hook which should be passed to all your subsidiary breeding
@@ -216,7 +218,7 @@ namespace BraneCloud.Evolution.EC
         /// Called after Produce(...), usually once a generation, or maybe only
         /// once if you're doing steady-state evolution (at the end of the run). 
         /// </summary>		
-        public abstract void FinishProducing(IEvolutionState s, int subpop, int thread);
+        public abstract void FinishProducing(IEvolutionState state, int subpop, int thread);
 
         /// <summary>
         /// Produces <i>n</i> individuals from the given subpop
@@ -227,7 +229,14 @@ namespace BraneCloud.Evolution.EC
         /// might typically produce two individuals, tournament selection might typically
         /// produce a single individual, etc. 
         /// </summary>
-        public abstract int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread);
+        public abstract int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc);
 
         #endregion // Operations
         #region Cloning
@@ -240,7 +249,7 @@ namespace BraneCloud.Evolution.EC
             }
             catch (Exception ex)
             {
-                throw new ApplicationException("A cloning error has occurred.", ex);
+                throw new InvalidOperationException("A cloning error has occurred.", ex);
             } // never happens
         }
 

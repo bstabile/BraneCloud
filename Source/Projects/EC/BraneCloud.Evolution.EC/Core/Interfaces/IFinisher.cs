@@ -23,7 +23,7 @@ namespace BraneCloud.Evolution.EC
     /// <summary> 
     /// Finisher is a singleton object which is responsible for cleaning up a
     /// population after a run has completed.  This is typically done after
-    /// final statistics have been performed but before the exchanger's
+    /// statistics have been performed but before the exchanger's
     /// contacts have been closed.
     /// </summary>
     [ECConfiguration("ec.IFinisher")]

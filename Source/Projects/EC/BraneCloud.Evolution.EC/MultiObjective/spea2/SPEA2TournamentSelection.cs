@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
         {
             //var oldinds = state.Population.Subpops[subpopulation].Individuals;
             var archiveSize = ((SimpleBreeder)state.Breeder).NumElites(state, subpopulation);
-            var archiveStart = state.Population.Subpops[subpopulation].Individuals.Length - archiveSize;
+            var archiveStart = state.Population.Subpops[subpopulation].Individuals.Count - archiveSize;
 
             return archiveStart + state.Random[thread].NextInt(archiveSize);
         }

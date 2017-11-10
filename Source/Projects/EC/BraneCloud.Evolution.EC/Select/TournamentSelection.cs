@@ -147,7 +147,7 @@ namespace BraneCloud.Evolution.EC.Select
         public int GetRandomIndividual(int number, int subpop, IEvolutionState state, int thread)
         {
             var oldinds = state.Population.Subpops[subpop].Individuals;
-            return state.Random[thread].NextInt(oldinds.Length);
+            return state.Random[thread].NextInt(oldinds.Count);
         }
 
         /// <summary>

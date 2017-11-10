@@ -17,11 +17,7 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Vector
@@ -80,7 +76,7 @@ namespace BraneCloud.Evolution.EC.Vector
             // nothing by default
         }
 
-        public IParameter DefaultBase => VectorDefaults.ParamBase.Push(P_GENE);
+        public virtual IParameter DefaultBase => VectorDefaults.ParamBase.Push(P_GENE);
 
         public virtual object Clone()
         {

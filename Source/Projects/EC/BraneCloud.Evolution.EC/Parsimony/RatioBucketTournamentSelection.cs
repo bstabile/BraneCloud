@@ -164,14 +164,14 @@ namespace BraneCloud.Evolution.EC.Parsimony
         /// </summary>
         public override void PrepareToProduce(IEvolutionState state, int subpop, int thread)
         {
-            _bucketValues = new int[state.Population.Subpops[subpop].Individuals.Length];
+            _bucketValues = new int[state.Population.Subpops[subpop].Individuals.Count];
 
-            // Default sort on fitness?
-            Array.Sort(state.Population.Subpops[subpop].Individuals);
+            // correct?
+            state.Population.Subpops[subpop].Individuals.SortByFitnessAscending();
 
             // how many individuals in current bucket
 
-            double totalInds = state.Population.Subpops[subpop].Individuals.Length;
+            double totalInds = state.Population.Subpops[subpop].Individuals.Count;
             var averageBuck = Math.Max(totalInds / Ratio, 1);
 
             // first individual goes into first bucket
@@ -181,7 +181,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
             var nInd = 1;
             totalInds--;
 
-            for (var i = 1; i < state.Population.Subpops[subpop].Individuals.Length; i++)
+            for (var i = 1; i < state.Population.Subpops[subpop].Individuals.Count; i++)
             {
                 // if there is still some place left in the current bucket, throw the current individual there too
                 if (nInd < averageBuck)
@@ -191,7 +191,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
                 }
                 else // check if it has the same fitness as last individual
                 {
-                    if ((state.Population.Subpops[subpop].Individuals[i]).Fitness
+                    if (state.Population.Subpops[subpop].Individuals[i].Fitness
                         .EquivalentTo(state.Population.Subpops[subpop].Individuals[i - 1].Fitness))
                     {
                         // now the individual has exactly the same fitness as previous one,
@@ -215,13 +215,13 @@ namespace BraneCloud.Evolution.EC.Parsimony
         public override int Produce(int subpop, IEvolutionState state, int thread)
         {
             // pick size random individuals, then pick the best.
-            var oldinds = (state.Population.Subpops[subpop].Individuals);
-            var i = state.Random[thread].NextInt(oldinds.Length);
+            var oldinds = state.Population.Subpops[subpop].Individuals;
+            var i = state.Random[thread].NextInt(oldinds.Count);
             long si = 0;
 
             for (var x = 1; x < Size; x++)
             {
-                var j = state.Random[thread].NextInt(oldinds.Length);
+                var j = state.Random[thread].NextInt(oldinds.Count);
                 if (PickWorst)
                 {
                     if (_bucketValues[j] > _bucketValues[i]) { i = j; si = 0; }

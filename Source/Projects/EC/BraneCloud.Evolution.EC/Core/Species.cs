@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 using BraneCloud.Evolution.EC.Configuration;
@@ -49,15 +50,15 @@ namespace BraneCloud.Evolution.EC
     /// <font size="-1">int &gt;= 1</font></td>
     /// <td valign="top">(total number of breeding pipelines for the species)</td></tr>
     /// <tr><td valign="top"><i>base</i>.<tt>pipe</tt><br/>
-    /// <font size="-1">classname, inherits and != ec.BreedingPipeline</font></td>
-    /// <td valign="top">(the class for the prototypical Breeding Pipeline)</td></tr>
+    /// <font size="-1">classname, inherits and != ec.BreedingSource</font></td>
+    /// <td valign="top">(the class for the prototypical Breeding Source)</td></tr>
     /// </table>
     /// <p/><b>Parameter bases</b><br/>
     /// <table>
     /// <tr><td valign="top"><i>base</i>.<tt>ind</tt></td>
     /// <td>I_Prototype (the prototypical individual)</td></tr>
     /// <tr><td valign="top"><i>base</i>.<tt>pipe</tt></td>
-    /// <td>Pipe_Prototype (breeding pipeline prototype)</td></tr>
+    /// <td>Pipe_Prototype (breeding source prototype)</td></tr>
     /// <tr><td valign="top"><i>base</i>.<tt>fitness</tt></td>
     /// <td>F_Prototype (the prototypical fitness)</td></tr>
     /// </table>
@@ -83,9 +84,9 @@ namespace BraneCloud.Evolution.EC
         public Individual I_Prototype { get; set; }
 
         /// <summary>
-        /// The prototypical breeding pipeline for this species. 
+        /// The prototypical breeding source for this species. 
         /// </summary>
-        public BreedingPipeline Pipe_Prototype { get; set; }
+        public BreedingSource Pipe_Prototype { get; set; }
 
         /// <summary>
         /// The prototypical fitness for individuals of this species. 
@@ -101,13 +102,13 @@ namespace BraneCloud.Evolution.EC
         /// then when you override this Setup method, you'll need to set those parameters BEFORE you call super.Setup(...),
         /// because the Setup(...) code in Species sets up the prototype.
         /// </summary>
-        /// <seealso cref="IPrototype.Setup(IEvolutionState,IParameter)" />		
+        /// <seealso cref="IPrototype.Setup(IEvolutionState, IParameter)" />		
         public virtual void Setup(IEvolutionState state, IParameter paramBase)
         {
             var def = DefaultBase;
 
             // load the breeding pipeline
-            Pipe_Prototype = (BreedingPipeline)(state.Parameters.GetInstanceForParameter(paramBase.Push(P_PIPE), def.Push(P_PIPE), typeof(BreedingPipeline)));
+            Pipe_Prototype = (BreedingSource)state.Parameters.GetInstanceForParameter(paramBase.Push(P_PIPE), def.Push(P_PIPE), typeof(BreedingSource));
             Pipe_Prototype.Setup(state, paramBase.Push(P_PIPE));
 
             // I promised over in BreedingSource.java that this method would get called.
@@ -126,6 +127,13 @@ namespace BraneCloud.Evolution.EC
 
         #endregion // Setup
         #region Operations
+
+        /** Called whenever the Breeder calls produce(...) on a BreedingPipeline, in order to pass
+            a new "misc" object.  Customize this as you see fit: the default just builds an empty hashmap. */
+        public IDictionary<string, object> BuildMisc(IEvolutionState state, int subpopIndex, int thread)
+        {
+            return new Dictionary<string, object>();
+        }
 
         /// <summary>
         /// Provides a brand-new individual to fill in a population.  The default form

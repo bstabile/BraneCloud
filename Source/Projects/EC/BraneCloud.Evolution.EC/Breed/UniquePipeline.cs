@@ -17,9 +17,11 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Support;
+using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.Breed
 {
@@ -104,12 +106,12 @@ namespace BraneCloud.Evolution.EC.Breed
             int thread)
         {
             Set.Clear();
-            Individual[] inds = state.Population.Subpops[subpopulation].Individuals;
+            IList<Individual> inds = state.Population.Subpops[subpopulation].Individuals;
             foreach (Individual i in inds)
                 Set.Add(i);
         }
 
-        int RemoveDuplicates(Individual[] inds, int start, int num)
+        int RemoveDuplicates(IList<Individual> inds, int start, int num)
         {
             for (int i = start; i < start + num; i++)
             {
@@ -127,12 +129,14 @@ namespace BraneCloud.Evolution.EC.Breed
         public override int Produce(
             int min,
             int max,
-            int start,
-            int subpopulation,
-            Individual[] inds,
+            int subpop,
+            IList<Individual> inds,
             IEvolutionState state,
-            int thread)
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = 0;
+
             int n = 0; // unique individuals we've built so far
             int remainder = (_generateMax ? max : min);
             for (int retry = 0; retry < NumDuplicateRetries + 1; retry++)
@@ -140,14 +144,14 @@ namespace BraneCloud.Evolution.EC.Breed
                 // grab individuals from our source and stick 'em right into inds.
                 // we'll verify them from there
                 int newmin = Math.Min(Math.Max(min - n, 1), max - n);
-                int num = Sources[0].Produce(newmin, max - n, start + n, subpopulation, inds, state, thread);
+                int num = Sources[0].Produce(newmin, max - n, subpop, inds, state, thread, misc);
 
                 int total = RemoveDuplicates(inds, start + n, num); // unique individuals out of the num
                 n += total; // we'll keep those
             }
 
             if (n < remainder) // never succeeded to build unique individuals, just make some non-unique ones
-                n += Sources[0].Produce(remainder - n, max - n, start + n, subpopulation, inds, state, thread);
+                n += Sources[0].Produce(remainder - n, max - n, subpop, inds, state, thread, misc);
 
             return n;
         }

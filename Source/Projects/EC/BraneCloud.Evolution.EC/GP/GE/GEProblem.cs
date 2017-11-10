@@ -63,7 +63,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
     /// </summary>
     [Serializable]
     [ECConfiguration("ec.gp.ge.GEProblem")]
-    public class GEProblem : Problem, ISimpleProblem, IGroupedProblem, IGPProblemParent
+    public class GEProblem : Problem, ISimpleProblem, IGroupedProblem
     {
         #region Constants
 
@@ -83,8 +83,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
 
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
-            Problem = (GPProblem) state.Parameters.GetInstanceForParameter(paramBase.Push(P_PROBLEM), null,
-                typeof(GPProblem));
+            Problem = (GPProblem) state.Parameters.GetInstanceForParameter(paramBase.Push(P_PROBLEM), null, typeof(GPProblem));
             Problem.Setup(state, paramBase.Push(P_PROBLEM));
         }
 
@@ -94,8 +93,8 @@ namespace BraneCloud.Evolution.EC.GP.GE
 
         public override object Clone()
         {
-            var other = (GEProblem) (base.Clone());
-            other.Problem = (GPProblem) (Problem.Clone());
+            var other = (GEProblem) base.Clone();
+            other.Problem = (GPProblem) Problem.Clone();
             return other;
         }
 
@@ -139,10 +138,9 @@ namespace BraneCloud.Evolution.EC.GP.GE
                 countVictoriesOnly);
         }
 
-        public void PostprocessPopulation(IEvolutionState state, Population pop, bool[] assessFitness,
-            bool countVictoriesOnly)
+        public int PostprocessPopulation(IEvolutionState state, Population pop, bool[] assessFitness, bool countVictoriesOnly)
         {
-            ((IGroupedProblem) Problem).PreprocessPopulation(state, pop, assessFitness, countVictoriesOnly);
+            return ((IGroupedProblem) Problem).PostprocessPopulation(state, pop, assessFitness, countVictoriesOnly);
         }
 
         /// <summary>

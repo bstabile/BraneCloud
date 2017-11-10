@@ -119,9 +119,9 @@ namespace BraneCloud.Evolution.EC.PSO
             if (!(Species.I_Prototype is DoubleVectorIndividual))
                 state.Output.Error("PSOSubpopulation requires that its Species' prototypical individual be is ec.vector.DoubleVectorSpecies or a subclass.  Yours is: " + Species.GetType(), null, null);
 
-            NeighborhoodBests = new DoubleVectorIndividual[Individuals.Length];
-            PersonalBests = new DoubleVectorIndividual[Individuals.Length];
-            PreviousIndividuals = new DoubleVectorIndividual[Individuals.Length];
+            NeighborhoodBests = new DoubleVectorIndividual[Individuals.Count];
+            PersonalBests = new DoubleVectorIndividual[Individuals.Count];
+            PreviousIndividuals = new DoubleVectorIndividual[Individuals.Count];
 
             NeighborhoodSize = state.Parameters.GetInt(paramBase.Push(P_NEIGHBORHOOD_SIZE), null);
             ClampRange = state.Parameters.GetBoolean(paramBase.Push(P_CLAMP_RANGE), null, false);
@@ -154,7 +154,7 @@ namespace BraneCloud.Evolution.EC.PSO
                 var fvSpecies = (FloatVectorSpecies)Species;
                 /* double range = fvSpecies.maxGene - fvSpecies.minGene; */
 
-                for (var i = 0; i < Individuals.Length; i++)
+                for (var i = 0; i < Individuals.Count; i++)
                 {
                     var prevInd = (DoubleVectorIndividual)Individuals[i].Clone();
 
@@ -194,7 +194,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             // NeighborhoodBests
             state.Output.PrintLn(NEIGHBORHOOD_BEST_PREAMBLE, log);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (NeighborhoodBests[i] == null)
                     state.Output.PrintLn(INDIVIDUAL_EXISTS_PREAMBLE + "false", log);
                 else
@@ -205,7 +205,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             // PersonalBests
             state.Output.PrintLn(PERSONAL_BEST_PREAMBLE, log);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (PersonalBests[i] == null)
                     state.Output.PrintLn(INDIVIDUAL_EXISTS_PREAMBLE + "false", log);
                 else
@@ -216,7 +216,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             // NeighborhoodBests
             state.Output.PrintLn(PREVIOUS_INDIVIDUAL_PREAMBLE, log);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (PreviousIndividuals[i] == null)
                     state.Output.PrintLn(INDIVIDUAL_EXISTS_PREAMBLE + "false", log);
                 else
@@ -247,7 +247,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             // NeighborhoodBests
             state.Output.PrintLn(NEIGHBORHOOD_BEST_PREAMBLE, log);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (NeighborhoodBests[i] == null)
                     state.Output.PrintLn(INDIVIDUAL_EXISTS_PREAMBLE + Code.Encode(false), log);
                 else
@@ -258,7 +258,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             // PersonalBests
             state.Output.PrintLn(PERSONAL_BEST_PREAMBLE, log);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (PersonalBests[i] == null)
                     state.Output.PrintLn(INDIVIDUAL_EXISTS_PREAMBLE + Code.Encode(false), log);
                 else
@@ -269,7 +269,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             // NeighborhoodBests
             state.Output.PrintLn(PREVIOUS_INDIVIDUAL_PREAMBLE, log);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (PreviousIndividuals[i] == null)
                     state.Output.PrintLn(INDIVIDUAL_EXISTS_PREAMBLE + Code.Encode(false), log);
                 else
@@ -302,7 +302,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             // NeighborhoodBests
             writer.WriteLine(NEIGHBORHOOD_BEST_PREAMBLE);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (NeighborhoodBests[i] == null)
                 {
                     writer.WriteLine(INDIVIDUAL_EXISTS_PREAMBLE + Code.Encode(false));
@@ -315,7 +315,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             // PersonalBests
             writer.WriteLine(PERSONAL_BEST_PREAMBLE);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (PersonalBests[i] == null)
                 {
                     writer.WriteLine(INDIVIDUAL_EXISTS_PREAMBLE + Code.Encode(false));
@@ -328,7 +328,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             // NeighborhoodBests
             writer.WriteLine(PREVIOUS_INDIVIDUAL_PREAMBLE);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (PreviousIndividuals[i] == null)
                 {
                     writer.WriteLine(INDIVIDUAL_EXISTS_PREAMBLE + Code.Encode(false));
@@ -363,17 +363,17 @@ namespace BraneCloud.Evolution.EC.PSO
 
             // NeighborhoodBests
             Code.CheckPreamble(NEIGHBORHOOD_BEST_PREAMBLE, state, reader);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 NeighborhoodBests[i] = PossiblyReadIndividual(state, reader);
 
             // PersonalBests
             Code.CheckPreamble(PERSONAL_BEST_PREAMBLE, state, reader);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 PersonalBests[i] = PossiblyReadIndividual(state, reader);
 
             // NeighborhoodBests
             Code.CheckPreamble(PREVIOUS_INDIVIDUAL_PREAMBLE, state, reader);
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 PreviousIndividuals[i] = PossiblyReadIndividual(state, reader);
 
             base.ReadSubpopulation(state, reader);
@@ -396,7 +396,7 @@ namespace BraneCloud.Evolution.EC.PSO
             }
 
             // NeighborhoodBests
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (NeighborhoodBests[i] == null)
                     writer.Write(false);
                 else
@@ -406,7 +406,7 @@ namespace BraneCloud.Evolution.EC.PSO
                 }
 
             // PersonalBests
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (PersonalBests[i] == null)
                     writer.Write(false);
                 else
@@ -416,7 +416,7 @@ namespace BraneCloud.Evolution.EC.PSO
                 }
 
             // previous Individuals
-            for (var i = 0; i < Individuals.Length; i++)
+            for (var i = 0; i < Individuals.Count; i++)
                 if (PreviousIndividuals[i] == null)
                     writer.Write(false);
                 else
@@ -439,16 +439,16 @@ namespace BraneCloud.Evolution.EC.PSO
             GlobalBest = (reader.ReadBoolean() ? (DoubleVectorIndividual)Species.NewIndividual(state, reader) : null);
 
             // NeighborhoodBests
-            for (var i = 0; i < Individuals.Length; i++)
-                NeighborhoodBests[i] = (reader.ReadBoolean() ? (DoubleVectorIndividual)Species.NewIndividual(state, reader) : null);
+            for (var i = 0; i < Individuals.Count; i++)
+                NeighborhoodBests[i] = reader.ReadBoolean() ? (DoubleVectorIndividual)Species.NewIndividual(state, reader) : null;
 
             // PersonalBests
-            for (var i = 0; i < Individuals.Length; i++)
-                PersonalBests[i] = (reader.ReadBoolean() ? (DoubleVectorIndividual)Species.NewIndividual(state, reader) : null);
+            for (var i = 0; i < Individuals.Count; i++)
+                PersonalBests[i] = reader.ReadBoolean() ? (DoubleVectorIndividual)Species.NewIndividual(state, reader) : null;
 
             // previous Individuals
-            for (var i = 0; i < Individuals.Length; i++)
-                PreviousIndividuals[i] = (reader.ReadBoolean() ? (DoubleVectorIndividual)Species.NewIndividual(state, reader) : null);
+            for (var i = 0; i < Individuals.Count; i++)
+                PreviousIndividuals[i] = reader.ReadBoolean() ? (DoubleVectorIndividual)Species.NewIndividual(state, reader) : null;
 
             base.ReadSubpopulation(state, reader);
         }

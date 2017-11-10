@@ -154,8 +154,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// If you provide null for the front, a List will be created for you.  If you provide
         /// null for the nonFront, non-front individuals will not be added to it.  This algorithm is O(n^2).
         /// </summary>
-        public static IList<Individual> PartitionIntoParetoFront(Individual[] inds, IList<Individual> front,
-            IList<Individual> nonFront)
+        public static IList<Individual> PartitionIntoParetoFront(IList<Individual> inds, IList<Individual> front, IList<Individual> nonFront)
         {
             if (front == null)
                 front = new List<Individual>();
@@ -164,7 +163,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
             front.Add(inds[0]);
 
             // iterate over all the remaining individuals
-            for (var i = 1; i < inds.Length; i++)
+            for (var i = 1; i < inds.Count; i++)
             {
                 var ind = inds[i];
 
@@ -177,23 +176,23 @@ namespace BraneCloud.Evolution.EC.MultiObjective
                     var frontmember = front[j];
 
                     // if the front member is better than the individual, dump the individual and go to the next one
-                    if (((MultiObjectiveFitness) (frontmember.Fitness)).ParetoDominates(
-                        (MultiObjectiveFitness) (ind.Fitness)))
+                    if (((MultiObjectiveFitness) frontmember.Fitness).ParetoDominates(
+                        (MultiObjectiveFitness) ind.Fitness))
                     {
-                        if (nonFront != null) nonFront.Add(ind);
+                        nonFront?.Add(ind);
                         noOneWasBetter = false;
                         break; // failed.  He's not in the front
                     }
                     // if the individual was better than the front member, dump the front member.  But look over the
                     // other front members (don't break) because others might be dominated by the individual as well.
-                    if (((MultiObjectiveFitness) (ind.Fitness)).ParetoDominates(
-                        (MultiObjectiveFitness) (frontmember.Fitness)))
+                    if (((MultiObjectiveFitness) ind.Fitness).ParetoDominates(
+                        (MultiObjectiveFitness) frontmember.Fitness))
                     {
                         Yank(j, front);
                         // a front member is dominated by the new individual.  Replace him
                         frontSize--; // member got removed
                         j--; // because there's another guy we now need to consider in his place
-                        if (nonFront != null) nonFront.Add(frontmember);
+                        nonFront?.Add(frontmember);
                     }
                 }
                 if (noOneWasBetter)
@@ -206,11 +205,11 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// Divides inds into pareto front ranks (each a List), 
         /// and returns them, in order, stored in a List.
         /// </summary>
-        public static IList<IList<Individual>> PartitionIntoRanks(Individual[] inds)
+        public static IList<IList<Individual>> PartitionIntoRanks(IList<Individual> inds)
         {
             var frontsByRank = new List<IList<Individual>>();
 
-            while (inds.Length > 0)
+            while (inds.Count > 0)
             {
                 var front = new List<Individual>();
                 var nonFront = new List<Individual>();
@@ -240,24 +239,12 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// <summary>
         /// Desired maximum fitness values. By default these are 1.0. Shared.
         /// </summary>
-        public double[] MaxObjective
-        {
-            get => _maxObjective;
-            set => _maxObjective = value;
-        }
-
-        private double[] _maxObjective = new double[0] ; // initialize to zero length array (in case anyone tries to access this)
+        public double[] MaxObjective { get; set; } = new double[0] ; // initialize to zero length array (in case anyone tries to access this)
 
         /// <summary>
         /// Desired minimum fitness values. By default these are 0.0. Shared.
         /// </summary>
-        public double[] MinObjective
-        {
-            get => _minObjective;
-            set => _minObjective = value;
-        }
-
-        private double[] _minObjective = new double[0]
+        public double[] MinObjective { get; set; } = new double[0]
             ; // initialize to zero length array (in case anyone tries to access this)
 
         /// <summary>
@@ -330,8 +317,8 @@ namespace BraneCloud.Evolution.EC.MultiObjective
         /// <param name="numObjectives">The number of objective values required.</param>
         public MultiObjectiveFitness(int numObjectives)
         {
-            _minObjective = new double[numObjectives];
-            _maxObjective = new double[numObjectives];
+            MinObjective = new double[numObjectives];
+            MaxObjective = new double[numObjectives];
             Objectives = new double[numObjectives];
         }
 
@@ -543,7 +530,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
             return s;
         }
 
-        public void SetToBestOf(EvolutionState state, Fitness[] fitnesses)
+        public void SetToBestOf(IEvolutionState state, Fitness[] fitnesses)
         {
             state.Output.Fatal("SetToBestOf(IEvolutionState, Fitness[]) not implemented in " + GetType().Name);
         }

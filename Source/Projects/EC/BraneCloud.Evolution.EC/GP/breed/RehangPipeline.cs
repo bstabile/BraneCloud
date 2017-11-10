@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using BraneCloud.Evolution.EC.Configuration;
 
@@ -149,10 +150,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         #endregion // Fields
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPBreedDefaults.ParamBase.Push(P_REHANG); }
-        }
+        public override IParameter DefaultBase => GPBreedDefaults.ParamBase.Push(P_REHANG);
 
         /// <summary>
         /// The number of times the pipeline tries to find a tree with a
@@ -165,10 +163,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         /// </summary>
         public int Tree { get; set; }
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
         #endregion // Properties
         #region Setup
@@ -236,15 +231,26 @@ namespace BraneCloud.Evolution.EC.GP.Breed
             return num;
         }
         
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min,
+            int max,
+            int subpop,
+            IList<Individual> inds,
+            IEvolutionState state,
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab n individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            var n = Sources[0].Produce(min, max, subpop, inds, state, thread, misc);
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
 
             // now let's rehang 'em
             for (var q = start; q < n + start; q++)
@@ -255,30 +261,6 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                 // uh oh
                     state.Output.Fatal("RehangPipeline attempted to fix tree.0 to a value which was out of bounds of the array of the individual's trees.  Check the pipeline's fixed tree values -- they may be negative or greater than the number of trees in an individual");
                 
-                GPIndividual j;
-                if (Sources[0] is BreedingPipeline)
-                // it's already a copy, so just smash the tree in
-                {
-                    j = i;
-                }
-                // need to copy it
-                else
-                {
-                    j = i.LightClone();
-                    
-                    // Fill in various tree information that didn't get filled in there
-                    j.Trees = new GPTree[i.Trees.Length];
-                    
-                    for (var x = 0; x < j.Trees.Length; x++)
-                    {
-                        j.Trees[x] = i.Trees[x].LightClone();
-                        j.Trees[x].Owner = j;
-                        j.Trees[x].Child = (GPNode)i.Trees[x].Child.Clone();
-                        j.Trees[x].Child.Parent = j.Trees[x];
-                        j.Trees[x].Child.ArgPosition = 0;
-                    }
-                }
-                                
                 for (var x = 0; x < NumTries; x++)
                 {
                     int t;
@@ -289,22 +271,22 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                         t = Tree;
                     
                     // is the tree rehangable?              
-                    if (j.Trees[t].Child.Children.Length == 0)
+                    if (i.Trees[t].Child.Children.Length == 0)
                         continue; // uh oh, try again
-                    var rehangable = j.Trees[t].Child.Children.Any(t1 => t1.Children.Length > 0);
+                    var rehangable = i.Trees[t].Child.Children.Any(t1 => t1.Children.Length > 0);
                     if (!rehangable)
                         continue; // the root's children are all terminals
                     
-                    var numrehang = NumRehangableNodes(j.Trees[t].Child, 0);
-                    PickRehangableNode(j.Trees[t].Child, state.Random[thread].NextInt(numrehang));
+                    var numrehang = NumRehangableNodes(i.Trees[t].Child, 0);
+                    PickRehangableNode(i.Trees[t].Child, state.Random[thread].NextInt(numrehang));
                     
-                    Rehang(state, thread, _rehangableNode, j.Trees[t].Child);
+                    Rehang(state, thread, _rehangableNode, i.Trees[t].Child);
                     
-                    j.Evaluated = false;
+                    i.Evaluated = false;
                 }
                 
                 // add the new individual, replacing its previous source
-                inds[q] = j;
+                inds[q] = i;
             }
             return n;
         }

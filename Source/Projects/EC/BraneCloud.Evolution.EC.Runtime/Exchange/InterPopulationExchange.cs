@@ -344,9 +344,9 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                     state.Output.Message("Immigrating " + NumImmigrants[x] + " individuals from mailbox for subpop " + x);
                 }
                 
-                var len = state.Population.Subpops[x].Individuals.Length;
+                var len = state.Population.Subpops[x].Individuals.Count;
                 // double check that we won't go into an infinite loop!
-                if (NumImmigrants[x] >= state.Population.Subpops[x].Individuals.Length)
+                if (NumImmigrants[x] >= state.Population.Subpops[x].Individuals.Count)
                     state.Output.Fatal("Number of immigrants (" + NumImmigrants[x] + ") is larger than subpop #" + x + "'s size (" + len + ").  This would cause an infinite loop in the selection-to-die procedure.");
                 
                 var selected = new bool[len];

@@ -41,45 +41,60 @@ namespace BraneCloud.Evolution.EC.ES
 
         #region Operations
 
-        /// <summary>
-        /// Sets all subpops in pop to the expected mu+lambda size.  Does not fill new slots with individuals. 
-        /// </summary>
-        public virtual Population SetToMuPlusLambda(Population pop, IEvolutionState state)
-        {
-            for (var x = 0; x < pop.Subpops.Length; x++)
-            {
-                var s = Mu[x] + Lambda[x];
+        ///// <summary>
+        ///// Sets all subpops in pop to the expected mu+lambda size.  Does not fill new slots with individuals. 
+        ///// </summary>
+        //public virtual Population SetToMuPlusLambda(Population pop, IEvolutionState state)
+        //{
+        //    for (var x = 0; x < pop.Subpops.Count; x++)
+        //    {
+        //        var s = Mu[x] + Lambda[x];
 
-                // check to see if the array's big enough
-                if (pop.Subpops[x].Individuals.Length != s)
-                // need to increase
-                {
-                    var newinds = new Individual[s];
-                    Array.Copy(pop.Subpops[x].Individuals, 0, newinds, 0,
-                        s < pop.Subpops[x].Individuals.Length ? s : pop.Subpops[x].Individuals.Length);
+        //        // check to see if the array's big enough
+        //        if (pop.Subpops[x].Individuals.Count != s)
+        //        // need to increase
+        //        {
+        //            var newinds = new Individual[s];
+        //            Array.Copy(pop.Subpops[x].Individuals, 0, newinds, 0,
+        //                s < pop.Subpops[x].Individuals.Count ? s : pop.Subpops[x].Individuals.Count);
 
-                    pop.Subpops[x].Individuals = newinds;
-                }
-            }
-            return pop;
-        }
+        //            pop.Subpops[x].Individuals = newinds;
+        //        }
+        //    }
+        //    return pop;
+        //}
 
         public override Population PostProcess(Population newpop, Population oldpop, IEvolutionState state)
         {
-            // first we need to expand newpop to mu+lambda in size
-            newpop = SetToMuPlusLambda(newpop, state);
-
             // now we need to dump the old population into the high end of the new population
 
-            for (var x = 0; x < newpop.Subpops.Length; x++)
+            for (var x = 0; x < newpop.Subpops.Count; x++)
             {
                 for (var y = 0; y < Mu[x]; y++)
                 {
-                    newpop.Subpops[x].Individuals[y + Lambda[x]] = (Individual)(oldpop.Subpops[x].Individuals[y].Clone());
+                    newpop.Subpops[x].Individuals.Add((Individual)oldpop.Subpops[x].Individuals[y].Clone());
                 }
             }
             return newpop;
         }
+
+        //    public Population postProcess(Population newpop, Population oldpop, EvolutionState state)
+        //        {
+        //        // first we need to expand newpop to mu+lambda in size
+        //        newpop = setToMuPlusLambda(newpop,state);
+        //        
+        //        // now we need to dump the old population into the high end of the new population
+        //         
+        //        for(int x = 0; x< newpop.subpops.size(); x++)
+        //            {
+        //            for(int y=0;y<mu[x];y++)
+        //                {
+        //                newpop.subpops.get(x).individuals.set(y+lambda[x],
+        //                    (Individual)(oldpop.subpops.get(x).individuals.get(y).clone()));
+        //                }
+        //            }
+        //        return newpop;
+        //        }
 
         #endregion // Operations
     }

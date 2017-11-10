@@ -17,10 +17,7 @@
  */
 
 using System;
-
-using BraneCloud.Evolution.EC.Util;
-using BraneCloud.Evolution.EC.Logging;
-using BraneCloud.Evolution.EC.Vector;
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Vector.Breed
@@ -50,38 +47,38 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return VectorDefaults.ParamBase.Push(P_MUTATION); }
-        }
+        public override IParameter DefaultBase => VectorDefaults.ParamBase.Push(P_MUTATION);
 
         /// <summary>
         /// Returns 1. 
         /// </summary>
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
         #endregion // Properties
         #region Operations
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            var n = Sources[0].Produce(min, max, subpop, inds, state, thread, misc);
 
-            // should we bother?
+            // should we use them straight?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
 
-            // clone the individuals if necessary
-            if (!(Sources[0] is BreedingPipeline))
-                for (var q = start; q < n + start; q++)
-                    inds[q] = (Individual)inds[q].Clone();
-
-            // mutate 'em
+            // else mutate 'em
             for (var q = start; q < n + start; q++)
             {
                 ((VectorIndividual)inds[q]).DefaultMutate(state, thread);

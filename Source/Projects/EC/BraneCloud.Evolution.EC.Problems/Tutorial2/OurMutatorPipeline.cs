@@ -16,6 +16,7 @@
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
 
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Vector;
 
@@ -42,10 +43,7 @@ namespace BraneCloud.Evolution.EC.Problems.Tutorial2
         /// We have to specify a default base, even though we never use it 
         /// </summary>
         /// <value></value>
-        public override IParameter DefaultBase
-        {
-            get { return VectorDefaults.ParamBase.Push(P_OURMUTATION); }
-        }
+        public override IParameter DefaultBase => VectorDefaults.ParamBase.Push(P_OURMUTATION); 
 
         public const int NUM_SOURCES = 1;
 
@@ -53,40 +51,35 @@ namespace BraneCloud.Evolution.EC.Problems.Tutorial2
         /// Return 1 -- we only use one source
         /// </summary>
         /// <value></value>
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES; 
 
         // We're supposed to create a most _max_ and at least _min_ individuals,
         // drawn from our source and mutated, and stick them into slots in inds[]
         // starting with the slot inds[start].  Let's do this by telling our 
         // source to stick those individuals into inds[] and then mutating them
         // right there.
-        public override int Produce(int min,
+        public override int Produce(
+            int min,
             int max,
-            int start,
             int subpopulation,
-            Individual[] inds,
+            IList<Individual> inds,
             IEvolutionState state,
-            int thread)
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpopulation, inds, state, thread);
+            var n = Sources[0].Produce(min, max, subpopulation, inds, state, thread, misc);
 
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpopulation, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
 
-
-            // clone the individuals if necessary -- if our source is a BreedingPipeline
-            // they've already been cloned, but if the source is a SelectionMethod, the
-            // individuals are actual individuals from the previous population
-            if (!(Sources[0] is BreedingPipeline))
-                for (var q = start; q < n + start; q++)
-                    inds[q] = (Individual)(inds[q].Clone());
 
             // Check to make sure that the individuals are IntegerVectorIndividuals and
             // grab their species.  For efficiency's sake, we assume that all the 

@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using BraneCloud.Evolution.EC.Util;
@@ -63,7 +64,7 @@ namespace BraneCloud.Evolution.EC
     /// </summary>   
     [Serializable]
     [ECConfiguration("ec.Population")]
-    public class Population : IGroup
+    public class Population : ICloneable, ISetup
     {
         #region Constants
 
@@ -79,7 +80,7 @@ namespace BraneCloud.Evolution.EC
         #endregion // Constants
         #region Properties
 
-        public Subpopulation[] Subpops { get; set; }
+        public IList<Subpopulation> Subpops { get; set; } = new List<Subpopulation>();
 
         /* A new population should be loaded from this resource name if it is non-null;
            otherwise they should be created at random.  */
@@ -104,9 +105,9 @@ namespace BraneCloud.Evolution.EC
             if (size <= 0)
                 // uh oh
                 state.Output.Fatal("Population size must be >0.\n", paramBase.Push(P_SIZE));
-            Subpops = new Subpopulation[size];
+            Subpops = new List<Subpopulation>(size);
 
-            // Load the subpops
+            // Set up the subpops
             for (var x = 0; x < size; x++)
             {
                 p = paramBase.Push(P_SUBPOP).Push("" + x);
@@ -120,7 +121,7 @@ namespace BraneCloud.Evolution.EC
                         p = paramBase.Push(P_SUBPOP).Push("" + defaultSubpop);
                     }                    // else an error will occur on the next line anyway.
                 }
-                Subpops[x] = (Subpopulation)(state.Parameters.GetInstanceForParameterEq(p, null, typeof(Subpopulation))); // Subpopulation.class is fine
+                Subpops.Add((Subpopulation)state.Parameters.GetInstanceForParameterEq(p, null, typeof(Subpopulation))); // Subpopulation.class is fine
                 Subpops[x].Setup(state, p);
 
                 // test for loadinds
@@ -129,16 +130,6 @@ namespace BraneCloud.Evolution.EC
                         paramBase.Push(P_FILE), null);
             }
         }
-
-        /* Sets all Individuals in the Population to null, preparing it to be reused. */
-        public void Clear()
-        {
-            foreach (Subpopulation t in Subpops)
-                t.Clear();
-        }
-
-        #endregion // Setup
-        #region Composition
 
         /// <summary>
         /// Populates the population with new random individuals. 
@@ -152,22 +143,32 @@ namespace BraneCloud.Evolution.EC
                 if (stream == null)
                     state.Output.Fatal("Could not load population from file", FileParam);
 
-                try { ReadPopulation(state, new StreamReader(stream, Encoding.Default)); }
+                try
+                {
+                    ReadPopulation(state, new StreamReader(stream, Encoding.Default));
+                }
                 catch (IOException e)
                 {
-                    state.Output.Fatal("An IOException occurred when trying to read from the file " + state.Parameters.GetString(FileParam, null) + ".  The IOException was: \n" + e,
-                        FileParam, null);
+                    state.Output.Fatal("An IOException occurred when trying to read from the file " + state.Parameters.GetString(FileParam, null) 
+                        + ".  The IOException was: \n" + e, FileParam, null);
                 }
             }
             else
             {
                 // let's populate!
-                foreach (Subpopulation t in Subpops)
-                    t.Populate(state, thread);
+                foreach (Subpopulation p in Subpops)
+                    p.Populate(state, thread);
             }
         }
 
-        #endregion // Composition
+        public void Clear()
+        {
+            foreach (Subpopulation t in Subpops)
+                t.Clear();
+        }
+
+        #endregion // Setup
+
         #region Cloning
 
         /// <summary>
@@ -177,15 +178,14 @@ namespace BraneCloud.Evolution.EC
         /// Population has been changed, then the clone will take on the new array
         /// size.  This helps some evolution strategies.
         /// </summary>
-        /// <seealso cref="IGroup.EmptyClone()" />
-        public virtual IGroup EmptyClone()
+        public virtual Population EmptyClone()
         {
             try
             {
                 var p = (Population)Clone();
-                p.Subpops = new Subpopulation[Subpops.Length];
-                for (var x = 0; x < Subpops.Length; x++)
-                    p.Subpops[x] = (Subpopulation)(Subpops[x].EmptyClone());
+                p.Subpops = new List<Subpopulation>(Subpops.Count);
+                for (var x = 0; x < Subpops.Count; x++)
+                    p.Subpops.Add(Subpops[x].EmptyClone());
                 return p;
             }
             catch (Exception)
@@ -194,13 +194,14 @@ namespace BraneCloud.Evolution.EC
             } // never happens
         }
 
-        virtual public object Clone()
+        public virtual object Clone()
         {
             // BRS : TODO : Figure out what this should do! Return MemberwiseClone()?
             return MemberwiseClone();
         }
 
         #endregion // Cloning
+
         #region IO
 
         /// <summary>
@@ -208,8 +209,8 @@ namespace BraneCloud.Evolution.EC
         /// </summary>
         public virtual void PrintPopulationForHumans(IEvolutionState state, int log)
         {
-            state.Output.PrintLn(NUM_SUBPOPS_PREAMBLE + Subpops.Length, log);
-            for (var i = 0; i < Subpops.Length; i++)
+            state.Output.PrintLn(NUM_SUBPOPS_PREAMBLE + Subpops.Count, log);
+            for (var i = 0; i < Subpops.Count; i++)
             {
                 state.Output.PrintLn(SUBPOP_INDEX_PREAMBLE + i, log);
                 Subpops[i].PrintSubpopulationForHumans(state, log);
@@ -222,8 +223,8 @@ namespace BraneCloud.Evolution.EC
         /// </summary>
         public virtual void PrintPopulation(IEvolutionState state, int log)
         {
-            state.Output.PrintLn(NUM_SUBPOPS_PREAMBLE + Code.Encode(Subpops.Length), log);
-            for (var i = 0; i < Subpops.Length; i++)
+            state.Output.PrintLn(NUM_SUBPOPS_PREAMBLE + Code.Encode(Subpops.Count), log);
+            for (var i = 0; i < Subpops.Count; i++)
             {
                 state.Output.PrintLn(SUBPOP_INDEX_PREAMBLE + Code.Encode(i), log);
                 Subpops[i].PrintSubpopulation(state, log);
@@ -236,8 +237,8 @@ namespace BraneCloud.Evolution.EC
         /// </summary>
         public virtual void PrintPopulation(IEvolutionState state, StreamWriter writer)
         {
-            writer.WriteLine(NUM_SUBPOPS_PREAMBLE + Code.Encode(Subpops.Length));
-            for (var i = 0; i < Subpops.Length; i++)
+            writer.WriteLine(NUM_SUBPOPS_PREAMBLE + Code.Encode(Subpops.Count));
+            for (var i = 0; i < Subpops.Count; i++)
             {
                 writer.WriteLine(SUBPOP_INDEX_PREAMBLE + Code.Encode(i));
                 Subpops[i].PrintSubpopulation(state, writer);
@@ -254,11 +255,11 @@ namespace BraneCloud.Evolution.EC
             var numSubpops = Code.ReadIntWithPreamble(NUM_SUBPOPS_PREAMBLE, state, reader);
 
             // read in subpops
-            if (numSubpops != Subpops.Length)
+            if (numSubpops != Subpops.Count)
                 // definitely wrong
                 state.Output.Fatal("On reading population from text stream, the number of subpops was wrong.");
 
-            for (var i = 0; i < Subpops.Length; i++)
+            for (var i = 0; i < Subpops.Count; i++)
             {
                 var j = Code.ReadIntWithPreamble(SUBPOP_INDEX_PREAMBLE, state, reader);
                 // sanity check
@@ -273,7 +274,7 @@ namespace BraneCloud.Evolution.EC
         /// </summary>
         public virtual void WritePopulation(IEvolutionState state, BinaryWriter dataOutput)
         {
-            dataOutput.Write(Subpops.Length);
+            dataOutput.Write(Subpops.Count);
             foreach (var t in Subpops)
                 t.WriteSubpopulation(state, dataOutput);
         }
@@ -285,7 +286,7 @@ namespace BraneCloud.Evolution.EC
         public virtual void ReadPopulation(IEvolutionState state, BinaryReader dataInput)
         {
             var numSubpops = dataInput.ReadInt32();
-            if (numSubpops != Subpops.Length)
+            if (numSubpops != Subpops.Count)
                 state.Output.Fatal("On reading subpop from binary stream, the number of subpops was wrong.");
 
             foreach (var t in Subpops)

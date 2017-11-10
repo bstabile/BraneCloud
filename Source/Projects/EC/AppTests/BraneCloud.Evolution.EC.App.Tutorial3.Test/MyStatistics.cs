@@ -78,7 +78,7 @@ namespace BraneCloud.Evolution.EC.App.Tutorial3.Test
             // print out best genome #3 individual in subpop 0
             var best = 0;
             var bestVal = ((DoubleVectorIndividual)state.Population.Subpops[0].Individuals[0]).genome[3];
-            for (var y = 1; y < state.Population.Subpops[0].Individuals.Length; y++)
+            for (var y = 1; y < state.Population.Subpops[0].Individuals.Count; y++)
             {
                 // We'll be unsafe and assume the individual is a DoubleVectorIndividual
                 var val = ((DoubleVectorIndividual)state.Population.Subpops[0].Individuals[y]).genome[3];

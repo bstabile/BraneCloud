@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Breed
@@ -58,18 +58,19 @@ namespace BraneCloud.Evolution.EC.Breed
                     def.Push(P_LIKELIHOOD));
         }
 
-        public override int Produce(int min,
+        public override int Produce(
+            int min,
             int max,
-            int start,
-            int subpopulation,
-            Individual[] inds,
+            int subpop,
+            IList<Individual> inds,
             IEvolutionState state,
-            int thread)
+            int thread,
+            IDictionary<string, object> misc)
         {
-            Species s = state.Population.Subpops[subpopulation].Species;
-            for (int q = start; q < start + max; q++)
+            Species s = state.Population.Subpops[subpop].Species;
+            for (int q = 0; q < max; q++)
             {
-                inds[q] = s.NewIndividual(state, thread);
+                inds.Add(s.NewIndividual(state, thread));
             }
             return max;
         }

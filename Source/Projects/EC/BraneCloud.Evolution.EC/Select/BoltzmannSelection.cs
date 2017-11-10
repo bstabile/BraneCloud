@@ -146,7 +146,7 @@ namespace BraneCloud.Evolution.EC.Select
         public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
         {
             // load fitnesses
-            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Length];
+            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Count];
             for (var x = 0; x < Fitnesses.Length; x++)
             {
                 // adjust the fitness proportion according to current temperature.                

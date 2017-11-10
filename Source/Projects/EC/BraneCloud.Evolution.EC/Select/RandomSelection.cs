@@ -17,9 +17,11 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.SteadyState;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
+using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.Select
 {
@@ -43,10 +45,7 @@ namespace BraneCloud.Evolution.EC.Select
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_RANDOM); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_RANDOM); 
 
         #endregion // Properties
         #region Operations
@@ -56,23 +55,37 @@ namespace BraneCloud.Evolution.EC.Select
         /// </summary>
         public override int Produce(int subpop, IEvolutionState state, int thread)
         {
-            return state.Random[thread].NextInt(state.Population.Subpops[subpop].Individuals.Length);
+            return state.Random[thread].NextInt(state.Population.Subpops[subpop].Individuals.Count);
         }
 
         /// <summary>
         /// I hard-code both Produce(...) methods for efficiency's sake.
         /// </summary>
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public int Produce(
+            int min, 
+            int max,
+            int start,
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread, 
+            IDictionary<string, object> misc)
         {
-            var n = 1;
+            int n = 1;
             if (n > max) n = max;
             if (n < min) n = min;
 
-            for (var q = 0; q < n; q++)
+            for (int q = 0; q < n; q++)
             {
-                // pick size random individuals, then pick the best.
-                var oldinds = state.Population.Subpops[subpop].Individuals;
-                inds[start + q] = oldinds[state.Random[thread].NextInt(state.Population.Subpops[subpop].Individuals.Length)];
+                IList<Individual> oldinds = state.Population.Subpops[subpop].Individuals;
+                int index = state.Random[thread].NextInt(state.Population.Subpops[subpop].Individuals.Count);
+                inds[start + q] = oldinds[index];
+                if (misc != null && misc[KEY_PARENTS] != null)
+                {
+                    IntBag parent = new IntBag(1);
+                    parent.Add(index);
+                    ((IntBag[])misc[KEY_PARENTS])[start + q] = parent;
+                }
             }
             return n;
         }

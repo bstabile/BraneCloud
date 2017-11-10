@@ -5,6 +5,7 @@ using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.GP;
 using BraneCloud.Evolution.EC.GP.Koza;
 using BraneCloud.Evolution.EC.Simple;
+using BraneCloud.Evolution.EC.Support;
 
 /*
  * Benchmarks by various people in the literature.

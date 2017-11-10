@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
 using BraneCloud.Evolution.EC.Simple;
@@ -127,7 +128,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
         /// Computes the strength of individuals, then the raw fitness (wimpiness) and kth-closest sparsity
         /// measure.  Finally, computes the final fitness of the individuals.
         /// </summary>
-        public void ComputeAuxiliaryData(IEvolutionState state, Individual[] inds)
+        public void ComputeAuxiliaryData(IEvolutionState state, IList<Individual> inds)
         {
             var distances = CalculateDistances(state, inds);
 
@@ -136,20 +137,20 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
             {
                 // Calculate the node strengths
                 var myStrength = 0;
-                for (var z = 0; z < inds.Length; z++)
+                for (var z = 0; z < inds.Count; z++)
                     if (((SPEA2MultiObjectiveFitness)t.Fitness).ParetoDominates((MultiObjectiveFitness)inds[z].Fitness))
                         myStrength++;
                 ((SPEA2MultiObjectiveFitness)t.Fitness).Strength = myStrength;
             }
 
             // calculate k value
-            var kTH = (int)Math.Sqrt(inds.Length);  // note that the first element is k=1, not k=0 
+            var kTH = (int)Math.Sqrt(inds.Count);  // note that the first element is k=1, not k=0 
 
             // For each individual calculate the Raw fitness and kth-distance
-            for (var y = 0; y < inds.Length; y++)
+            for (var y = 0; y < inds.Count; y++)
             {
                 double fitness = 0;
-                for (var z = 0; z < inds.Length; z++)
+                for (var z = 0; z < inds.Count; z++)
                 {
                     // Raw fitness 
                     if (((SPEA2MultiObjectiveFitness)inds[z].Fitness).ParetoDominates((MultiObjectiveFitness)inds[y].Fitness))
@@ -178,16 +179,16 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
         /// <summary>
         /// Returns a matrix of sum squared distances from each individual to each other individual.
         /// </summary>
-        public double[][] CalculateDistances(IEvolutionState state, Individual[] inds)
+        public double[][] CalculateDistances(IEvolutionState state, IList<Individual> inds)
         {
-            var distances = new double[inds.Length][];
-            for (var i = 0; i < inds.Length; i++)
-                distances[i] = new double[inds.Length];
+            var distances = new double[inds.Count][];
+            for (var i = 0; i < inds.Count; i++)
+                distances[i] = new double[inds.Count];
 
-            for (var y = 0; y < inds.Length; y++)
+            for (var y = 0; y < inds.Count; y++)
             {
                 distances[y][y] = 0;
-                for (var z = y + 1; z < inds.Length; z++)
+                for (var z = y + 1; z < inds.Count; z++)
                 {
                     distances[z][y] = distances[y][z] =
                                       ((SPEA2MultiObjectiveFitness)inds[y].Fitness).

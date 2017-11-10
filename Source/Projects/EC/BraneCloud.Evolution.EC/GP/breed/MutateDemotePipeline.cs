@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using BraneCloud.Evolution.EC.Configuration;
 
@@ -406,17 +407,28 @@ namespace BraneCloud.Evolution.EC.GP.Breed
             return true;
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab n individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            var n = Sources[0].Produce(min, max, subpop, inds, state, thread, misc);
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
 
-            var initializer = ((GPInitializer)state.Initializer);
+            var initializer = (GPInitializer)state.Initializer;
 
             // now let's mutate 'em
             for (var q = start; q < n + start; q++)
@@ -429,30 +441,6 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                         + " which was out of bounds of the array of the individual's trees. "
                         + " Check the pipeline's fixed tree values -- they may be negative"
                         + " or greater than the number of trees in an individual");
-
-                GPIndividual j;
-                if (Sources[0] is BreedingPipeline)
-                // it's already a copy, so just smash the tree in
-                {
-                    j = i;
-                }
-                // need to copy it
-                else
-                {
-                    j = i.LightClone();
-
-                    // Fill in various tree information that didn't get filled in there
-                    j.Trees = new GPTree[i.Trees.Length];
-
-                    for (var x = 0; x < j.Trees.Length; x++)
-                    {
-                        j.Trees[x] = i.Trees[x].LightClone();
-                        j.Trees[x].Owner = j;
-                        j.Trees[x].Child = (GPNode)i.Trees[x].Child.Clone();
-                        j.Trees[x].Child.Parent = j.Trees[x];
-                        j.Trees[x].Child.ArgPosition = 0;
-                    }
-                }
 
                 for (var x = 0; x < NumTries; x++)
                 {
@@ -467,26 +455,26 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                         t = Tree;
 
                     // is the tree demotable?
-                    int numdemote = NumDemotableNodes(initializer, j.Trees[t].Child, 0, j.Trees[t].Constraints(initializer).FunctionSet);
+                    int numdemote = NumDemotableNodes(initializer, i.Trees[t].Child, 0, i.Trees[t].Constraints(initializer).FunctionSet);
                     if (numdemote == 0)
                         continue; // uh oh, try again
 
                     // demote the node, or if we're unsuccessful, just leave it alone
-                    PickDemotableNode(initializer, j.Trees[t].Child, state.Random[thread].NextInt(numdemote),
-                                                   j.Trees[t].Constraints(initializer).FunctionSet);
+                    PickDemotableNode(initializer, i.Trees[t].Child, state.Random[thread].NextInt(numdemote),
+                                                   i.Trees[t].Constraints(initializer).FunctionSet);
 
                     // does this node exceed the maximum depth limits?
                     if (!VerifyPoint(_demotableNode))
                         continue; // uh oh, try again
 
                     // demote it
-                    DemoteSomething(_demotableNode, state, thread, j.Trees[t].Constraints(initializer).FunctionSet);
-                    j.Evaluated = false;
+                    DemoteSomething(_demotableNode, state, thread, i.Trees[t].Constraints(initializer).FunctionSet);
+                    i.Evaluated = false;
                     break;
                 }
 
                 // add the new individual, replacing its previous source
-                inds[q] = j;
+                inds[q] = i;
             }
             return n;
         }

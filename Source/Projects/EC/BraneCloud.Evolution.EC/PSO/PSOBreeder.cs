@@ -91,16 +91,16 @@ namespace BraneCloud.Evolution.EC.PSO
         public const int C_NEIGHBORHOOD_TOROIDAL = 1;
         public const int C_NEIGHBORHOOD_RANDOM_EACH_TIME = 2;
 
-        public const String P_VELOCITY_COEFFICIENT = "velocity-coefficient" ;
-        public const String P_PERSONAL_COEFFICIENT = "personal-coefficient" ;
-        public const String P_INFORMANT_COEFFICIENT = "informant-coefficient" ;
-        public const String P_GLOBAL_COEFFICIENT = "global-coefficient" ;
-        public const String P_INCLUDE_SELF = "include-self" ;
-        public const String P_NEIGHBORHOOD = "Neighborhood-style" ;
-        public const String P_NEIGHBORHOOD_SIZE = "Neighborhood-size" ;
-        public const String V_NEIGHBORHOOD_RANDOM = "random";
-        public const String V_NEIGHBORHOOD_TOROIDAL = "toroidal";
-        public const String V_NEIGHBORHOOD_RANDOM_EACH_TIME = "random-each-time";
+        public const string P_VELOCITY_COEFFICIENT = "velocity-coefficient" ;
+        public const string P_PERSONAL_COEFFICIENT = "personal-coefficient" ;
+        public const string P_INFORMANT_COEFFICIENT = "informant-coefficient" ;
+        public const string P_GLOBAL_COEFFICIENT = "global-coefficient" ;
+        public const string P_INCLUDE_SELF = "include-self" ;
+        public const string P_NEIGHBORHOOD = "Neighborhood-style" ;
+        public const string P_NEIGHBORHOOD_SIZE = "Neighborhood-size" ;
+        public const string V_NEIGHBORHOOD_RANDOM = "random";
+        public const string V_NEIGHBORHOOD_TOROIDAL = "toroidal";
+        public const string V_NEIGHBORHOOD_RANDOM_EACH_TIME = "random-each-time";
 
         #endregion
 
@@ -148,7 +148,7 @@ namespace BraneCloud.Evolution.EC.PSO
                 state.Output.Fatal("Neighbourhood size must be a value >= 1.", paramBase.Push(P_NEIGHBORHOOD_SIZE),
                     null);
 
-            String sch = state.Parameters.GetString(paramBase.Push(P_NEIGHBORHOOD), null);
+            string sch = state.Parameters.GetString(paramBase.Push(P_NEIGHBORHOOD), null);
             if (V_NEIGHBORHOOD_RANDOM.Equals(sch))
             {
                 Neighborhood = C_NEIGHBORHOOD_RANDOM; // default anyway
@@ -176,14 +176,14 @@ namespace BraneCloud.Evolution.EC.PSO
             // initialize the global best
             if (GlobalBest == null)
             {
-                GlobalBest = new double[state.Population.Subpops.Length][];
-                GlobalBestFitness = new IFitness[state.Population.Subpops.Length];
+                GlobalBest = new double[state.Population.Subpops.Count][];
+                GlobalBestFitness = new IFitness[state.Population.Subpops.Count];
             }
 
             // update global best, neighborhood best, and personal best 
-            for (int subpop = 0; subpop < state.Population.Subpops.Length; subpop++)
+            for (int subpop = 0; subpop < state.Population.Subpops.Count; subpop++)
             {
-                for (int ind = 0; ind < state.Population.Subpops[subpop].Individuals.Length; ind++)
+                for (int ind = 0; ind < state.Population.Subpops[subpop].Individuals.Count; ind++)
                 {
                     if (GlobalBestFitness[subpop] == null ||
                         state.Population.Subpops[subpop].Individuals[ind].Fitness.BetterThan(GlobalBestFitness[subpop]))
@@ -200,9 +200,9 @@ namespace BraneCloud.Evolution.EC.PSO
 
 
             // now move the particles
-            for (int subpop = 0; subpop < state.Population.Subpops.Length; subpop++)
+            for (int subpop = 0; subpop < state.Population.Subpops.Count; subpop++)
             {
-                for (int ind = 0; ind < state.Population.Subpops[subpop].Individuals.Length; ind++)
+                for (int ind = 0; ind < state.Population.Subpops[subpop].Individuals.Count; ind++)
                     // tweak in place, destructively
                     ((Particle)state.Population.Subpops[subpop].Individuals[ind]).Tweak(state, GlobalBest[subpop],
                         VelCoeff, PersonalCoeff, InformantCoeff, GlobalCoeff, 0);
@@ -221,16 +221,16 @@ namespace BraneCloud.Evolution.EC.PSO
 
         public virtual void AssignNeighborhoodBests(PSOSubpopulation subpop)
         {
-            for (var j = 0; j < subpop.Individuals.Length; j++)
+            for (var j = 0; j < subpop.Individuals.Count; j++)
             {
                 var hoodBest = subpop.NeighborhoodBests[j];
                 var start = (j - subpop.NeighborhoodSize / 2);
                 if (start < 0)
-                    start += subpop.Individuals.Length;
+                    start += subpop.Individuals.Count;
 
                 for (var i = 0; i < subpop.NeighborhoodSize; i++)
                 {
-                    var ind = (DoubleVectorIndividual)subpop.Individuals[(start + i) % subpop.Individuals.Length];
+                    var ind = (DoubleVectorIndividual)subpop.Individuals[(start + i) % subpop.Individuals.Count];
                     if ((hoodBest == null) || ind.Fitness.BetterThan(hoodBest.Fitness))
                         hoodBest = ind;
                 }

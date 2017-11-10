@@ -17,11 +17,13 @@
  */
 
 using System;
-
+using System.Collections.Generic;
+using System.Linq;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Vector;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
 
 namespace BraneCloud.Evolution.EC.Vector.Breed
 {			
@@ -57,6 +59,7 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
         public const string P_TOSS = "toss";
         public const string P_CROSSOVER = "xover";
         public const int NUM_SOURCES = 2;
+        public const string KEY_PARENTS = "parents";
 
         #endregion // Constants
         #region Fields
@@ -64,32 +67,23 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
         /// <summary>
         /// Temporary holding place for Parents. 
         /// </summary>
-        internal VectorIndividual[] Parents = new VectorIndividual[2];
+        protected IList<Individual> Parents { get; set; } = new List<Individual>();
 
         #endregion // Fields
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return VectorDefaults.ParamBase.Push(P_CROSSOVER); }
-        }
+        public override IParameter DefaultBase => VectorDefaults.ParamBase.Push(P_CROSSOVER);
 
         /// <summary>
         /// Returns 2 * minimum number of typical individuals produced by any Sources, else
         /// 1* minimum number if TossSecondParent is true. 
         /// </summary>
-        public override int TypicalIndsProduced
-        {
-            get { return (TossSecondParent ? MinChildProduction : MinChildProduction * 2); }
-        }
+        public override int TypicalIndsProduced => TossSecondParent ? MinChildProduction : MinChildProduction * 2;
 
         /// <summary>
         /// Returns 2. 
         /// </summary>
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
         /// <summary>
         /// Should the pipeline discard the second parent after crossing over? 
@@ -109,41 +103,57 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
         #endregion // Setup
         #region Operations
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // how many individuals should we make?
             var n = TypicalIndsProduced;
             if (n < min) n = min;
             if (n > max) n = max;
 
+            IntBag[] parentparents = null;
+            IntBag[] preserveParents = null;
+
+            if (misc != null && misc.ContainsKey(KEY_PARENTS))
+            {
+                preserveParents = (IntBag[])misc[KEY_PARENTS];
+                parentparents = new IntBag[2];
+                misc[KEY_PARENTS] = parentparents;
+            }
+
             // should we bother?
+            // should we use them straight?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, true);  // DO produce children from source -- we've not done so already
+            {
+                // just load from source 0 and clone 'em
+                Sources[0].Produce(n, n, subpop, inds, state, thread, misc);
+                return n;
+            }
 
             for (var q = start; q < n + start; )
             // keep on going until we're filled up
             {
+                Parents.Clear();
+
                 // grab two individuals from our Sources
                 if (Sources[0] == Sources[1])
                 // grab from the same source
                 {
-                    Sources[0].Produce(2, 2, 0, subpop, Parents, state, thread);
-                    if (!(Sources[0] is BreedingPipeline))
-                    // it's a selection method probably
-                    {
-                        Parents[0] = (VectorIndividual)(Parents[0].Clone());
-                        Parents[1] = (VectorIndividual)(Parents[1].Clone());
-                    }
+                    Sources[0].Produce(2, 2, subpop, Parents, state, thread, misc);
                 }
                 // grab from different Sources
                 else
                 {
-                    Sources[0].Produce(1, 1, 0, subpop, Parents, state, thread);
-                    Sources[1].Produce(1, 1, 1, subpop, Parents, state, thread);
-                    if (!(Sources[0] is BreedingPipeline)) // it's a selection method probably
-                        Parents[0] = (VectorIndividual)(Parents[0].Clone());
-                    if (!(Sources[1] is BreedingPipeline)) // it's a selection method probably
-                        Parents[1] = (VectorIndividual)(Parents[1].Clone());
+                    Sources[0].Produce(1, 1, subpop, Parents, state, thread, misc);
+                    Sources[1].Produce(1, 1, subpop, Parents, state, thread, misc);
                 }
 
                 // at this point, Parents[] contains our two selected individuals,
@@ -153,18 +163,34 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
                 // so we'll cross them over now.  Since this is the default pipeline,
                 // we'll just do it by calling defaultCrossover on the first child
 
-                Parents[0].DefaultCrossover(state, thread, Parents[1]);
+                ((VectorIndividual)Parents[0]).DefaultCrossover(state, thread, (VectorIndividual)Parents[1]);
                 Parents[0].Evaluated = false;
                 Parents[1].Evaluated = false;
 
                 // add 'em to the population
-                inds[q] = Parents[0];
+                // by Ermo. this should use add instead of set, because the inds is empty, so will throw index out of bounds
+                // okay -- Sean
+                inds.Add(Parents[0]);
+                if (preserveParents != null)
+                {
+                    parentparents[0].AddAll(parentparents[1]);
+                    preserveParents[q] = parentparents[0];
+                }
                 q++;
                 if (q < n + start && !TossSecondParent)
                 {
-                    inds[q] = Parents[1];
+                    // by Ermo. as as here, see the comments above
+                    inds.Add(Parents[1]);
+                    if (preserveParents != null)
+                    {
+                        preserveParents[q] = new IntBag(parentparents[0]);
+                    }
                     q++;
                 }
+            }
+            if (preserveParents != null)
+            {
+                misc[KEY_PARENTS] = preserveParents;
             }
             return n;
         }
@@ -177,7 +203,7 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
             var c = (VectorCrossoverPipeline)base.Clone();
 
             // deep-cloned stuff
-            c.Parents = (VectorIndividual[])Parents.Clone();
+            c.Parents = Parents.ToList();
 
             return c;
         }

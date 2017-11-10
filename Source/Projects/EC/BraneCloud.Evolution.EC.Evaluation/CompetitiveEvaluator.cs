@@ -17,11 +17,11 @@
  */
 
 using System;
-using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks.Dataflow;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.Simple;
 
 namespace BraneCloud.Evolution.EC.CoEvolve
 {
@@ -162,13 +162,12 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             return null;
         }
 
-        public virtual void RandomizeOrder(IEvolutionState state, Individual[] individuals)
+        public virtual void RandomizeOrder(IEvolutionState state, IList<Individual> individuals)
         {
             // copy the inds into a new array, then dump them randomly into the
             // subpop again
-            var queue = new Individual[individuals.Length];
+            var queue = individuals.ToArray();
             var len = queue.Length;
-            Array.Copy(individuals, 0, queue, 0, len);
 
             for (var x = len; x > 0; x--)
             {
@@ -189,7 +188,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             var numinds = new int[state.EvalThreads];
             var fromThreads = new int[state.EvalThreads];
 
-            var assessFitness = new bool[state.Population.Subpops.Length];
+            var assessFitness = new bool[state.Population.Subpops.Count];
             for (var i = 0; i < assessFitness.Length; i++)
                 assessFitness[i] = true;					// update everyone's fitness in preprocess and postprocess
 
@@ -198,13 +197,13 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 // figure numinds
                 if (y < state.EvalThreads - 1)
                     // not last one
-                    numinds[y] = state.Population.Subpops[0].Individuals.Length / state.EvalThreads;
+                    numinds[y] = state.Population.Subpops[0].Individuals.Count / state.EvalThreads;
                 else
-                    numinds[y] = state.Population.Subpops[0].Individuals.Length / state.EvalThreads
-                        + (state.Population.Subpops[0].Individuals.Length
-                        - (state.Population.Subpops[0].Individuals.Length / state.EvalThreads) * state.EvalThreads);
+                    numinds[y] = state.Population.Subpops[0].Individuals.Count / state.EvalThreads
+                        + (state.Population.Subpops[0].Individuals.Count
+                        - (state.Population.Subpops[0].Individuals.Count / state.EvalThreads) * state.EvalThreads);
                 // figure from
-                fromThreads[y] = (state.Population.Subpops[0].Individuals.Length / state.EvalThreads) * y;
+                fromThreads[y] = (state.Population.Subpops[0].Individuals.Count / state.EvalThreads) * y;
             }
 
             RandomizeOrder(state, state.Population.Subpops[0].Individuals);
@@ -235,14 +234,14 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             prob.PostprocessPopulation(state, state.Population, assessFitness, Style == STYLE_SINGLE_ELIMINATION);
         }
 
-        public virtual void EvalSingleElimination(IEvolutionState state, Individual[] individuals, int subpop, IGroupedProblem prob)
+        public virtual void EvalSingleElimination(IEvolutionState state, IList<Individual> individuals, int subpop, IGroupedProblem prob)
         {
             // for a single-elimination tournament, the subpop[0] size must be 2^n for
             // some value n.  We don't check that here!  Check it in Setup.
 
             // create the tournament array
-            var tourn = new Individual[individuals.Length];
-            Array.Copy(individuals, 0, tourn, 0, individuals.Length);
+            var tourn = individuals.ToArray();
+
             var len = tourn.Length;
             var competition = new Individual[2];
             var subpops = new[] { subpop, subpop };
@@ -281,7 +280,13 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             }
         }
 
-        public virtual void EvalRoundRobin(IEvolutionState state, int[] origins, int[] numinds, Individual[] individuals, int subpop, IGroupedProblem prob)
+        public virtual void EvalRoundRobin(
+            IEvolutionState state, 
+            int[] origins, 
+            int[] numinds, 
+            IList<Individual> individuals, 
+            int subpop, 
+            IGroupedProblem prob)
         {
             if (state.EvalThreads == 1)
                 EvalRoundRobinPopChunk(state, origins[0], numinds[0], 0, individuals, subpop, prob);
@@ -296,7 +301,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             IEvolutionState state, 
             int[] origins, 
             int[] numinds,
-            Individual[] individuals, 
+            IList<Individual> individuals, 
             int subpop, 
             IGroupedProblem prob)
             where TEvalThread: CompetitiveEvaluatorThread, new()
@@ -336,7 +341,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         /// Although this method is declared public (for the benefit of a private
         /// helper class in this file), you should not call it.
         /// </summary>
-        public virtual void EvalRoundRobinPopChunk(IEvolutionState state, int origin, int numinds, int threadnum, Individual[] individuals, int subpop, IGroupedProblem prob)
+        public virtual void EvalRoundRobinPopChunk(IEvolutionState state, int origin, int numinds, int threadnum, IList<Individual> individuals, int subpop, IGroupedProblem prob)
         {
             var competition = new Individual[2];
             var subpops = new[] { subpop, subpop };
@@ -350,7 +355,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             // individuals >x in this thread.
             for (var x = origin; x < upperBound; x++)
             {
-                for (var y = x + 1; y < individuals.Length; y++)
+                for (var y = x + 1; y < individuals.Count; y++)
                 {
                     competition[0] = individuals[x];
                     competition[1] = individuals[y];
@@ -359,7 +364,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             }
         }
 
-        public virtual void EvalNRandomOneWay(IEvolutionState state, int[] origins, int[] numinds, Individual[] individuals, int subpop, IGroupedProblem prob)
+        public virtual void EvalNRandomOneWay(IEvolutionState state, int[] origins, int[] numinds, IList<Individual> individuals, int subpop, IGroupedProblem prob)
         {
             if (state.EvalThreads == 1)
                 EvalNRandomOneWayPopChunk(state, origins[0], numinds[0], 0, individuals, subpop, prob);
@@ -370,11 +375,10 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             }
         }
 
-        public virtual void EvalNRandomOneWayPopChunk(IEvolutionState state, int origin, int numinds, int threadnum, Individual[] individuals, int subpop, IGroupedProblem prob)
+        public virtual void EvalNRandomOneWayPopChunk(IEvolutionState state, int origin, int numinds, int threadnum, IList<Individual> individuals, int subpop, IGroupedProblem prob)
         {
-            var queue = new Individual[individuals.Length];
-            var len = queue.Length;
-            Array.Copy(individuals, 0, queue, 0, len);
+            var queue = individuals.ToArray();
+            int len = queue.Length;
 
             var competition = new Individual[2];
             var subpops = new[] { subpop, subpop };
@@ -396,7 +400,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                     queue[len - y - 1] = competition[1];
                     // if the opponent is not the actual individual, we can
                     // have a competition
-                    if (competition[1] != individuals[x])
+                    if (!competition[1].Equals(individuals[x]))
                     {
                         prob.Evaluate(state, competition, updates, false, subpops, 0);
                         y++;
@@ -405,7 +409,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             }
         }
 
-        public virtual void EvalNRandomTwoWay(IEvolutionState state, int[] origins, int[] numinds, Individual[] individuals, int subpop, IGroupedProblem prob)
+        public virtual void EvalNRandomTwoWay(IEvolutionState state, int[] origins, int[] numinds, IList<Individual> individuals, int subpop, IGroupedProblem prob)
         {
             if (state.EvalThreads == 1)
                 EvalNRandomTwoWayPopChunk(state, origins[0], numinds[0], 0, individuals, subpop, prob);
@@ -417,13 +421,13 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         }
 
         public virtual void EvalNRandomTwoWayPopChunk(IEvolutionState state, int origin, int numinds, int threadnum,
-                                                        Individual[] individuals, int subpop, IGroupedProblem prob)
+            IList<Individual> individuals, int subpop, IGroupedProblem prob)
         {
 
             // the number of games played for each player
-            var individualsOrdered = new EncapsulatedIndividual[individuals.Length];
-            var queue = new EncapsulatedIndividual[individuals.Length];
-            for (var i = 0; i < individuals.Length; i++)
+            var individualsOrdered = new EncapsulatedIndividual[individuals.Count];
+            var queue = new EncapsulatedIndividual[individuals.Count];
+            for (var i = 0; i < individuals.Count; i++)
                 individualsOrdered[i] = new EncapsulatedIndividual(individuals[i], 0);
 
             var competition = new Individual[2];
@@ -450,7 +454,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 // not for the opponents' (unless allowOverEvaluations is set to true)
 
                 // if true, it means that he has to play against all opponents with greater index
-                if (individuals.Length - x - 1 <= GroupSize - queue[x].NumOpponentsMet)
+                if (individuals.Count - x - 1 <= GroupSize - queue[x].NumOpponentsMet)
                 {
                     for (var y = x + 1; y < queue.Length; y++)
                     {
@@ -593,7 +597,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         public int ThreadNum;
         public IGroupedProblem Problem;
         public int Subpop;
-        public Individual[] Inds;
+        public IList<Individual> Inds;
 
         public abstract void Run();
     }

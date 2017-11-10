@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Simple;
 using BraneCloud.Evolution.EC.Configuration;
 
@@ -68,7 +68,7 @@ namespace BraneCloud.Evolution.EC.SteadyState
         /// If st.firstTimeAround, this acts exactly like SimpleBreeder.
         /// Else, it only breeds one new individual per subpop, to  place in position 0 of the subpop.  
         /// </summary>
-        public BreedingPipeline[] BP { get; set; }
+        public BreedingSource[] BP { get; set; }
 
         /// <summary>
         /// Loaded during the first iteration of breedPopulation 
@@ -131,11 +131,11 @@ namespace BraneCloud.Evolution.EC.SteadyState
         /// Called to check to see if the breeding sources are correct -- if you
         /// use this method, you must call state.Output.ExitIfErrors() immediately  afterwards. 
         /// </summary>
-        public virtual void SourcesAreProperForm(SteadyStateEvolutionState state, BreedingPipeline[] breedingPipelines)
+        public virtual void SourcesAreProperForm(SteadyStateEvolutionState state, BreedingSource[] breedingSources)
         {
-            foreach (BreedingPipeline bp in breedingPipelines)
+            foreach (BreedingSource bp in breedingSources)
             {
-                // all breeding pipelines are ISteadyStateBSource
+                // all breeding sources are ISteadyStateBSource
                 ((ISteadyStateBSource)bp).SourcesAreProperForm(state);
             }
         }
@@ -164,14 +164,15 @@ namespace BraneCloud.Evolution.EC.SteadyState
         {
             var st = (SteadyStateEvolutionState)state;
             // set up the breeding pipelines
-            BP = new BreedingPipeline[st.Population.Subpops.Length];
+            BP = new BreedingSource[st.Population.Subpops.Count];
             for (var pop = 0; pop < BP.Length; pop++)
             {
-                BP[pop] = (BreedingPipeline)st.Population.Subpops[pop].Species.Pipe_Prototype.Clone();
+                BP[pop] = (BreedingSource)st.Population.Subpops[pop].Species.Pipe_Prototype.Clone();
                 if (!BP[pop].Produces(st, st.Population, pop, 0))
-                    st.Output.Error("The Breeding Pipeline of subpop " + pop + " does not produce individuals of the expected species "
+                    st.Output.Error("The Breeding Source of subpop " + pop + " does not produce individuals of the expected species "
                         + st.Population.Subpops[pop].Species.GetType().FullName + " and with the expected Fitness class "
                         + st.Population.Subpops[pop].Species.F_Prototype.GetType().FullName);
+                BP[pop].FillStubs(state, null);
             }
             // are they of the proper form?
             SourcesAreProperForm(st, BP);
@@ -188,11 +189,13 @@ namespace BraneCloud.Evolution.EC.SteadyState
 
         public virtual Individual BreedIndividual(IEvolutionState state, int subpop, int thread)
         {
-            //var st = (SteadyStateEvolutionState)state;
-            var newind = new Individual[1];
+            // this is inefficient but whatever...
+            // BRS: It's not so inefficient if we set the capacity explicitly!
+            var newind = new List<Individual>(1);
 
-            // breed a single individual 
-            BP[subpop].Produce(1, 1, 0, subpop, newind, state, thread);
+            // breed a single individual
+            var newMisc = state.Population.Subpops[subpop].Species.BuildMisc(state, subpop, thread);
+            BP[subpop].Produce(1, 1, subpop, newind, state, thread, newMisc);
             return newind[0];
         }
 

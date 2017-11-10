@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.ES
@@ -92,31 +92,39 @@ namespace BraneCloud.Evolution.EC.ES
             return parent;
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int ProduceWithoutCloning(
+            int min, 
+            int max, 
+            int subpop, IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
             if (min > 1) // uh oh
                 state.Output.Fatal("ESSelection used, but it's being asked to produce more than one individual.");
-            if (!(state.Breeder is MuCommaLambdaBreeder))
-                state.Output.Fatal("ESSelection was handed a Breeder that's not either MuCommaLambdaBreeder or MuCommaPlusLambdaBreeder.");
-            var breeder = (MuCommaLambdaBreeder)(state.Breeder);
+            return base.ProduceWithoutCloning(min, max, subpop, inds, state, thread, misc);
 
-            // determine my position in the array
-            var pos = (breeder.Lambda[subpop] % state.BreedThreads == 0
-                ? breeder.Lambda[subpop] / state.BreedThreads
-                : breeder.Lambda[subpop] / state.BreedThreads + 1)
-                * thread + breeder.Count[thread]; // note integer division
+            //if (!(state.Breeder is MuCommaLambdaBreeder))
+            //    state.Output.Fatal("ESSelection was handed a Breeder that's not either MuCommaLambdaBreeder or MuCommaPlusLambdaBreeder.");
+            //var breeder = (MuCommaLambdaBreeder)(state.Breeder);
 
-            // determine the parent
-            var parent = pos / (breeder.Lambda[subpop] / breeder.Mu[subpop]); // note outer integer division
+            //// determine my position in the array
+            //var pos = (breeder.Lambda[subpop] % state.BreedThreads == 0
+            //    ? breeder.Lambda[subpop] / state.BreedThreads
+            //    : breeder.Lambda[subpop] / state.BreedThreads + 1)
+            //    * thread + breeder.Count[thread]; // note integer division
 
-            // increment our count
-            //breeder.count[thread]++;
+            //// determine the parent
+            //var parent = pos / (breeder.Lambda[subpop] / breeder.Mu[subpop]); // note outer integer division
 
-            // and so we return the parent
-            inds[start] = state.Population.Subpops[subpop].Individuals[parent];
+            //// increment our count
+            ////breeder.count[thread]++;
 
-            // and so we return the parent
-            return 1;
+            //// and so we return the parent
+            //inds[start] = state.Population.Subpops[subpop].Individuals[parent];
+
+            //// and so we return the parent
+            //return 1;
         }
 
         #endregion // Operations

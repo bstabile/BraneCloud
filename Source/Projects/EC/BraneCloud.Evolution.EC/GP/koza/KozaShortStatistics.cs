@@ -17,9 +17,6 @@
  */
 
 using System;
-using System.Diagnostics;
-using System.IO;
-using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Simple;
 
@@ -29,7 +26,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
     /// A Koza-style statistics generator, intended to be easily parseable with awk or other Unix tools.  
     /// Prints fitness information, one generation (or pseudo-generation) per line.
     /// If gather-full is true, then timing information, number of nodes
-    /// and depths of trees, etc. are also given.  No final statistics information is given.
+    /// and depths of trees, etc. are also given.  No statistics information is given.
     /// 
     /// <p/> Each line represents a single generation.  
     /// The first items on a line are always:
@@ -111,10 +108,10 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         {
             base.PostInitializationStatistics(state);
 
-            _totalDepthSoFarTree = new long[state.Population.Subpops.Length][];
-            _totalSizeSoFarTree = new long[state.Population.Subpops.Length][];
+            _totalDepthSoFarTree = new long[state.Population.Subpops.Count][];
+            _totalSizeSoFarTree = new long[state.Population.Subpops.Count][];
 
-            for (var x = 0; x < state.Population.Subpops.Length; x++)
+            for (var x = 0; x < state.Population.Subpops.Count; x++)
             {
                 // check to make sure they're the right class
                 if (!(state.Population.Subpops[x].Species is GPSpecies))
@@ -130,10 +127,10 @@ namespace BraneCloud.Evolution.EC.GP.Koza
 
         protected void PrepareStatistics(EvolutionState state)
         {
-            _totalDepthThisGenTree = new long[state.Population.Subpops.Length][];
-            _totalSizeThisGenTree = new long[state.Population.Subpops.Length][];
+            _totalDepthThisGenTree = new long[state.Population.Subpops.Count][];
+            _totalSizeThisGenTree = new long[state.Population.Subpops.Count][];
 
-            for (var x = 0; x < state.Population.Subpops.Length; x++)
+            for (var x = 0; x < state.Population.Subpops.Count; x++)
             {
                 var i = (GPIndividual)(state.Population.Subpops[x].Individuals[0]);
                 _totalDepthThisGenTree[x] = new long[i.Trees.Length];
@@ -182,7 +179,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
             //long totalDepthThisGenPop = 0;
             //long totalDepthSoFarPop = 0;
 
-            int subpops = state.Population.Subpops.Length;
+            int subpops = state.Population.Subpops.Count;
 
             for (var y = 0; y < subpops; y++)
             {

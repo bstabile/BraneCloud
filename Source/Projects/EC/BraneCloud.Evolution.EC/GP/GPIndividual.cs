@@ -307,7 +307,7 @@ namespace BraneCloud.Evolution.EC.GP
             }
         }
 
-        public override void ParseGenotype(IEvolutionState state, StreamReader reader)
+        protected override void ParseGenotype(IEvolutionState state, StreamReader reader)
         {
             // Read my trees
             foreach (var t in Trees)

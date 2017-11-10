@@ -17,10 +17,8 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
 using BraneCloud.Evolution.EC.Eval;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Simple;
@@ -195,14 +193,14 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
             ((IGroupedProblem)Problem).PreprocessPopulation(state, pop, prepareForFitnessAssessment, countVictoriesOnly);
         }
 
-        public virtual void PostprocessPopulation(IEvolutionState state, Population pop, bool[] assessFitness, bool countVictoriesOnly)
+        public virtual int PostprocessPopulation(IEvolutionState state, Population pop, bool[] assessFitness, bool countVictoriesOnly)
         {
             if (!(Problem is IGroupedProblem))
             {
                 state.Output.Fatal("MasterProblem.PostprocessPopulation(...) invoked, but the underlying Problem is not of IGroupedProblem");
             }
 
-            ((IGroupedProblem)Problem).PostprocessPopulation(state, pop, assessFitness, countVictoriesOnly);
+            return ((IGroupedProblem)Problem).PostprocessPopulation(state, pop, assessFitness, countVictoriesOnly);
         }
 
         #region Evaluation

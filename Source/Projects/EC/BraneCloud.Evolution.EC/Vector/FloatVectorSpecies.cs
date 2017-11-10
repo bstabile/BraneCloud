@@ -401,10 +401,10 @@ namespace BraneCloud.Evolution.EC.Vector
 
             for (int x = 0; x < GenomeSize + 1; x++)
             {
-                if (MaxGenes[x] != MaxGenes[x])  // uh oh, NaN
+                if (double.IsNaN(MaxGenes[x]))  // uh oh, NaN
                     state.Output.Fatal("FloatVectorSpecies found that max-gene[" + x + "] is NaN");
 
-                if (MinGenes[x] != MinGenes[x])  // uh oh, NaN
+                if (double.IsNaN(MinGenes[x]))  // uh oh, NaN
                     state.Output.Fatal("FloatVectorSpecies found that min-gene[" + x + "] is NaN");
 
                 if (MaxGenes[x] < MinGenes[x])
@@ -424,14 +424,14 @@ namespace BraneCloud.Evolution.EC.Vector
                         + x
                         + "] value within the range of this prototype's genome's data types");
 
-                if (((MutationType[x] == FloatVectorSpecies.C_INTEGER_RESET_MUTATION ||
-                            MutationType[x] == FloatVectorSpecies.C_INTEGER_RANDOM_WALK_MUTATION))  // integer type
-                    && (MaxGenes[x] != Math.Floor(MaxGenes[x])))
+                if ((MutationType[x] == FloatVectorSpecies.C_INTEGER_RESET_MUTATION ||
+                     MutationType[x] == FloatVectorSpecies.C_INTEGER_RANDOM_WALK_MUTATION)  // integer type
+                    && !MaxGenes[x].Equals(Math.Floor(MaxGenes[x])))
                     state.Output.Fatal("Gene " + x + " is using an integer mutation method, but the max gene is not an integer (" + MaxGenes[x] + ").");
 
                 if (((MutationType[x] == FloatVectorSpecies.C_INTEGER_RESET_MUTATION ||
                             MutationType[x] == FloatVectorSpecies.C_INTEGER_RANDOM_WALK_MUTATION))  // integer type
-                    && (MinGenes[x] != Math.Floor(MinGenes[x])))
+                    && !MinGenes[x].Equals(Math.Floor(MinGenes[x])))
                     state.Output.Fatal("Gene " + x + " is using an integer mutation method, but the min gene is not an integer (" + MinGenes[x] + ").");
             }
 
@@ -447,7 +447,7 @@ namespace BraneCloud.Evolution.EC.Vector
             base.LoadParametersForGene(state, index, paramBase, def, postfix);
 
             double minVal = state.Parameters.GetDoubleWithDefault(paramBase.Push(P_MINGENE).Push(postfix), def.Push(P_MINGENE).Push(postfix), Double.NaN);
-            if (minVal == minVal)  // it's not NaN
+            if (!double.IsNaN(minVal))  // it's not NaN
             {
                 //check if the value is in range
                 if (!InNumericalTypeRange(minVal))
@@ -463,7 +463,7 @@ namespace BraneCloud.Evolution.EC.Vector
             }
 
             double maxVal = state.Parameters.GetDoubleWithDefault(paramBase.Push(P_MAXGENE).Push(postfix), def.Push(P_MAXGENE).Push(postfix), Double.NaN);
-            if (maxVal == maxVal)  // it's not NaN
+            if (!double.IsNaN(maxVal))  // it's not NaN
             {
                 //check if the value is in range
                 if (!InNumericalTypeRange(maxVal))
@@ -478,10 +478,10 @@ namespace BraneCloud.Evolution.EC.Vector
                         paramBase.Push(P_MAXGENE).Push(postfix));
             }
 
-            if ((maxVal == maxVal && !(minVal == minVal)))
+            if (!double.IsNaN(maxVal) && double.IsNaN(minVal))
                 state.Output.Warning("Max Gene specified but not Min Gene", paramBase.Push(P_MINGENE).Push(postfix), def.Push(P_MINGENE).Push(postfix));
 
-            if ((minVal == minVal && !(maxVal == maxVal)))
+            if (!double.IsNaN(minVal) && double.IsNaN(maxVal))
                 state.Output.Warning("Min Gene specified but not Max Gene", paramBase.Push(P_MAXGENE).Push(postfix), def.Push(P_MINGENE).Push(postfix));
 
 
@@ -520,7 +520,7 @@ namespace BraneCloud.Evolution.EC.Vector
                         state.Output.Fatal("If FloatVectorSpecies is going to use polynomial mutation as a per-gene or per-segment type, the global distribution index must be defined and >= 0.",
                             paramBase.Push(P_MUTATION_DISTRIBUTION_INDEX).Push(postfix), def.Push(P_MUTATION_DISTRIBUTION_INDEX).Push(postfix));
                 }
-                else if (MutationDistributionIndex[index] != MutationDistributionIndex[index])  // it's NaN
+                else if (double.IsNaN(MutationDistributionIndex[index]))  // it's NaN
                     state.Output.Fatal("If FloatVectorSpecies is going to use polynomial mutation as a per-gene or per-segment type, either the global or per-gene/per-segment distribution index must be defined and >= 0.",
                         paramBase.Push(P_MUTATION_DISTRIBUTION_INDEX).Push(postfix), def.Push(P_MUTATION_DISTRIBUTION_INDEX).Push(postfix));
 
@@ -538,7 +538,7 @@ namespace BraneCloud.Evolution.EC.Vector
                         state.Output.Fatal("If it's going to use gaussian mutation as a per-gene or per-segment type, it must have a strictly positive standard deviation",
                             paramBase.Push(P_STDEV).Push(postfix), def.Push(P_STDEV).Push(postfix));
                 }
-                else if (GaussMutationStdev[index] != GaussMutationStdev[index])
+                else if (double.IsNaN(GaussMutationStdev[index]))
                     state.Output.Fatal("If FloatVectorSpecies is going to use polynomial mutation as a per-gene or per-segment type, either the global or per-gene/per-segment standard deviation must be defined.",
                         paramBase.Push(P_STDEV).Push(postfix), def.Push(P_STDEV).Push(postfix));
             }
@@ -735,7 +735,7 @@ namespace BraneCloud.Evolution.EC.Vector
                     state.Output.Fatal("Invalid end index value for segment " + i + ": " + currentSegmentEnd
                         + "\nThe value must be greater than " + previousSegmentEnd + " and smaller than " + GenomeSize);
 
-                //check if the index of the final segment is equal to the GenomeSize
+                //check if the index of the segment is equal to the GenomeSize
                 if (i == numSegments - 1 && currentSegmentEnd != (GenomeSize - 1))
                     state.Output.Fatal("Invalid end index value for the last segment " + i + ": " + currentSegmentEnd
                         + "\nThe value must be equal to the index of the last gene in the genome:  " + (GenomeSize - 1));

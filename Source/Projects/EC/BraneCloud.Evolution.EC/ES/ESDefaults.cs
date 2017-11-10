@@ -28,9 +28,6 @@ namespace BraneCloud.Evolution.EC.ES
         /// <summary>
         /// Returns the default base. 
         /// </summary>
-        public static IParameter ParamBase
-        {
-            get { return new Parameter(P_ES); }
-        }
+        public static IParameter ParamBase => new Parameter(P_ES);
     }
 }

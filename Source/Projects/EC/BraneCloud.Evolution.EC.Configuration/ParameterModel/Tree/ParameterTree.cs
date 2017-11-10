@@ -229,6 +229,37 @@ namespace BraneCloud.Evolution.EC.Configuration
             throw new NotImplementedException();
         }
 
+        public double[] GetDoublesWithMax(IParameter parameter, IParameter defaultParameter, double minValue, double maxValue, int expectedLength)
+        {
+            throw new NotImplementedException();
+        }
+
+        public double[] GetDoublesWithMax(IParameter parameter, IParameter defaultParameter, double minValue, double maxValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public double[] GetDoubles(IParameter parameter, IParameter defaultParameter, double minValue, int expectedLength)
+        {
+            throw new NotImplementedException();
+        }
+
+        public double[] GetDoubles(IParameter parameter, IParameter defaultParameter, double minValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public double[] GetDoublesUnconstrained(IParameter parameter, IParameter defaultParameter, int expectedLength)
+        {
+            throw new NotImplementedException();
+        }
+
+        public double[] GetDoublesUnconstrained(IParameter parameter, IParameter defaultParameter)
+        {
+            throw new NotImplementedException();
+        }
+
+
         public long GetLong(IParameter parameter, IParameter defaultParameter)
         {
             throw new NotImplementedException();

@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using BraneCloud.Evolution.EC.Configuration;
 
@@ -66,10 +67,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPBreedDefaults.ParamBase.Push(P_MUTATEONENODE); }
-        }
+        public override IParameter DefaultBase => GPBreedDefaults.ParamBase.Push(P_MUTATEONENODE);
 
         /// <summary>
         /// How the pipeline chooses a subtree to mutate 
@@ -81,10 +79,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         /// </summary>
         public int Tree { get; set; }
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
         #endregion // Properties
         #region Setup
@@ -170,17 +165,28 @@ namespace BraneCloud.Evolution.EC.GP.Breed
             throw new ApplicationException("Invalid execution path!"); // whoops!
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min,
+            int max,
+            int subpop,
+            IList<Individual> inds,
+            IEvolutionState state,
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab n individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            var n = Sources[0].Produce(min, max, subpop, inds, state, thread, misc);
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
 
-            var initializer = ((GPInitializer)state.Initializer);
+            var initializer = (GPInitializer)state.Initializer;
 
             // now let's mutate 'em
             for (var q = start; q < n + start; q++)
@@ -220,48 +226,11 @@ namespace BraneCloud.Evolution.EC.GP.Breed
 
                 // p2's parent and ArgPosition will be set automatically below
 
-                GPIndividual j;
-
-                if (Sources[0] is BreedingPipeline)
-                // it's already a copy, so just smash the tree in
-                {
-                    j = i;
-                    p1.ReplaceWith(p2);
-                    j.Evaluated = false;
-                }
-                else
-                {
-                    j = i.LightClone();
-
-                    // Fill in various tree information that didn't get filled in there
-                    j.Trees = new GPTree[i.Trees.Length];
-
-                    for (var x = 0; x < j.Trees.Length; x++)
-                    {
-                        if (x == t)
-                        // we've got a tree with a kicking cross position!
-                        {
-                            j.Trees[x] = i.Trees[x].LightClone();
-                            j.Trees[x].Owner = j;
-                            j.Trees[x].Child = i.Trees[x].Child.CloneReplacingAtomic(p2, p1);
-                            j.Trees[x].Child.Parent = j.Trees[x];
-                            j.Trees[x].Child.ArgPosition = 0;
-                            j.Evaluated = false;
-                        }
-                        // it's changed
-                        else
-                        {
-                            j.Trees[x] = i.Trees[x].LightClone();
-                            j.Trees[x].Owner = j;
-                            j.Trees[x].Child = (GPNode)i.Trees[x].Child.Clone();
-                            j.Trees[x].Child.Parent = j.Trees[x];
-                            j.Trees[x].Child.ArgPosition = 0;
-                        }
-                    }
-                }
+                p1.ReplaceWith(p2);
+                i.Evaluated = false;
 
                 // add the new individual, replacing its previous source
-                inds[q] = j;
+                inds[q] = i;
             }
             return n;
         }

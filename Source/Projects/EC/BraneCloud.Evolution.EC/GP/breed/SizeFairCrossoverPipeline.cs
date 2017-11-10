@@ -22,8 +22,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.MultiObjective;
-using BraneCloud.Evolution.EC.Util;
+using BraneCloud.Evolution.EC.Support;
 
 namespace BraneCloud.Evolution.EC.GP.Breed
 {
@@ -105,13 +104,14 @@ namespace BraneCloud.Evolution.EC.GP.Breed
 
         private const long serialVersionUID = 1;
 
-        public const String P_NUM_TRIES = "tries";
-        public const String P_MAXDEPTH = "maxdepth";
-        public const String P_SIZEFAIR = "size-fair";
-        public const String P_TOSS = "toss";
-        public const String P_HOMOLOGOUS = "homologous";
+        public const string P_NUM_TRIES = "tries";
+        public const string P_MAXDEPTH = "maxdepth";
+        public const string P_SIZEFAIR = "size-fair";
+        public const string P_TOSS = "toss";
+        public const string P_HOMOLOGOUS = "homologous";
         public const int INDS_PRODUCED = 2;
         public const int NUM_SOURCES = 2;
+        public const string KEY_PARENTS = "parents";
 
         #endregion // Constants
 
@@ -142,7 +142,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         public bool TossSecondParent { get; set; }
 
         /** Temporary holding place for Parents */
-        public GPIndividual[] Parents { get; set; }
+        public IList<Individual> Parents { get; set; } = new List<Individual>();
 
         public bool Homologous { get; set; }
 
@@ -152,21 +152,15 @@ namespace BraneCloud.Evolution.EC.GP.Breed
 
         #endregion // Properties
 
-        public SizeFairCrossoverPipeline()
-        {
-            Parents = new GPIndividual[2];
-        }
 
-
-
-        public override Object Clone()
+        public override object Clone()
         {
             SizeFairCrossoverPipeline c = (SizeFairCrossoverPipeline) (base.Clone());
 
             // deep-cloned stuff
-            c.NodeSelect1 = (IGPNodeSelector) (NodeSelect1.Clone());
-            c.NodeSelect2 = (IGPNodeSelector) (NodeSelect2.Clone());
-            c.Parents = (GPIndividual[]) Parents.Clone();
+            c.NodeSelect1 = (IGPNodeSelector) NodeSelect1.Clone();
+            c.NodeSelect2 = (IGPNodeSelector) NodeSelect2.Clone();
+            c.Parents = Parents.ToList();
 
             return c;
         }
@@ -255,10 +249,17 @@ namespace BraneCloud.Evolution.EC.GP.Breed
             return true;
         }
 
-        public override int Produce(int min, int max, int start,
-            int subpopulation, Individual[] inds,
-            IEvolutionState state, int thread)
+        public override int Produce(
+            int min,
+            int max,
+            int subpop,
+            IList<Individual> inds,
+            IEvolutionState state,
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // how many individuals should we make?
             int n = TypicalIndsProduced;
             if (n < min)
@@ -268,31 +269,45 @@ namespace BraneCloud.Evolution.EC.GP.Breed
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpopulation, inds, state, thread,
-                    true); // DO produce children from source -- we've not done so already
+            {
+                // just load from source 0 and clone 'em
+                Sources[0].Produce(n, n, subpop, inds, state, thread, misc);
+                return n;
+            }
+
+            IntBag[] parentparents = null;
+            IntBag[] preserveParents = null;
+            if (misc != null && misc[KEY_PARENTS] != null)
+            {
+                preserveParents = (IntBag[])misc[KEY_PARENTS];
+                parentparents = new IntBag[2];
+                misc[KEY_PARENTS] = parentparents;
+            }
 
             GPInitializer initializer = (GPInitializer) state.Initializer;
 
             for (int q = start; q < n + start; /* no increment */) // keep on going until we're filled up
             {
+                Parents.Clear();
+
                 // grab two individuals from our sources
                 if (Sources[0] == Sources[1]) // grab from the same source
-                    Sources[0].Produce(2, 2, 0, subpopulation, Parents, state, thread);
+                    Sources[0].Produce(2, 2, subpop, Parents, state, thread, misc);
                 else // grab from different sources
                 {
-                    Sources[0].Produce(1, 1, 0, subpopulation, Parents, state, thread);
-                    Sources[1].Produce(1, 1, 1, subpopulation, Parents, state, thread);
+                    Sources[0].Produce(1, 1, subpop, Parents, state, thread, misc);
+                    Sources[1].Produce(1, 1, subpop, Parents, state, thread, misc);
                 }
 
 
                 // at this point, Parents[] contains our two selected individuals
 
                 // are our tree values valid?
-                if (Tree1 != TREE_UNFIXED && (Tree1 < 0 || Tree1 >= Parents[0].Trees.Length))
+                if (Tree1 != TREE_UNFIXED && (Tree1 < 0 || Tree1 >= ((GPIndividual)Parents[0]).Trees.Length))
                     // uh oh
                     state.Output.Fatal(
                         "GP Crossover Pipeline attempted to fix tree.0 to a value which was out of bounds of the array of the individual's trees.  Check the pipeline's fixed tree values -- they may be negative or greater than the number of trees in an individual");
-                if (Tree2 != TREE_UNFIXED && (Tree2 < 0 || Tree2 >= Parents[1].Trees.Length))
+                if (Tree2 != TREE_UNFIXED && (Tree2 < 0 || Tree2 >= ((GPIndividual)Parents[1]).Trees.Length))
                     // uh oh
                     state.Output.Fatal(
                         "GP Crossover Pipeline attempted to fix tree.1 to a value which was out of bounds of the array of the individual's trees.  Check the pipeline's fixed tree values -- they may be negative or greater than the number of trees in an individual");
@@ -305,30 +320,30 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                         // pick random trees -- their GPTreeConstraints must be the same
                     {
                         if (Tree1 == TREE_UNFIXED)
-                            if (Parents[0].Trees.Length > 1)
-                                t1 = state.Random[thread].NextInt(Parents[0].Trees.Length);
+                            if (((GPIndividual)Parents[0]).Trees.Length > 1)
+                                t1 = state.Random[thread].NextInt(((GPIndividual)Parents[0]).Trees.Length);
                             else
                                 t1 = 0;
                         else
                             t1 = Tree1;
 
                         if (Tree2 == TREE_UNFIXED)
-                            if (Parents[1].Trees.Length > 1)
-                                t2 = state.Random[thread].NextInt(Parents[1].Trees.Length);
+                            if (((GPIndividual)Parents[1]).Trees.Length > 1)
+                                t2 = state.Random[thread].NextInt(((GPIndividual)Parents[1]).Trees.Length);
                             else
                                 t2 = 0;
                         else
                             t2 = Tree2;
-                    } while (Parents[0].Trees[t1].Constraints(initializer) !=
-                             Parents[1].Trees[t2].Constraints(initializer));
+                    } while (((GPIndividual)Parents[0]).Trees[t1].Constraints(initializer) !=
+                             ((GPIndividual)Parents[1]).Trees[t2].Constraints(initializer));
                 }
                 else
                 {
                     t1 = Tree1;
                     t2 = Tree2;
                     // make sure the constraints are okay
-                    if (Parents[0].Trees[t1].Constraints(initializer) !=
-                        Parents[1].Trees[t2].Constraints(initializer)) // uh oh
+                    if (((GPIndividual)Parents[0]).Trees[t1].Constraints(initializer) !=
+                        ((GPIndividual)Parents[1]).Trees[t2].Constraints(initializer)) // uh oh
                         state.Output.Fatal(
                             "GP Crossover Pipeline's two tree choices are both specified by the user -- but their GPTreeConstraints are not the same");
                 }
@@ -337,7 +352,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                 bool res2 = false;
 
                 // BRS: This is kind of stupid to name it this way!
-                GPTree currTree = Parents[1].Trees[t2];
+                GPTree currTree = ((GPIndividual)Parents[1]).Trees[t2];
 
                 // pick some nodes
                 GPNode p1 = null;
@@ -355,7 +370,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                 for (int x = 0; x < NumTries; x++)
                 {
                     // pick a node in individual 1
-                    p1 = NodeSelect1.PickNode(state, subpopulation, thread, Parents[0], Parents[0].Trees[t1]);
+                    p1 = NodeSelect1.PickNode(state, subpop, thread, (GPIndividual)Parents[0], ((GPIndividual)Parents[0]).Trees[t1]);
                     // now lets find "similar" in parent 2                          
                     p2 = FindFairSizeNode(nodeToSubtrees, sizeToNodes, p1, currTree, state, thread);
 
@@ -395,15 +410,15 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                 // but
                 // we have to then copy so much stuff over; it's not worth it.
 
-                GPIndividual j1 = (GPIndividual) (Parents[0].LightClone());
+                GPIndividual j1 = ((GPIndividual)Parents[0]).LightClone();
                 GPIndividual j2 = null;
                 if (n - (q - start) >= 2 && !TossSecondParent)
-                    j2 = (GPIndividual) (Parents[1].LightClone());
+                    j2 = ((GPIndividual)Parents[1]).LightClone();
 
                 // Fill in various tree information that didn't get filled in there
-                j1.Trees = new GPTree[Parents[0].Trees.Length];
+                j1.Trees = new GPTree[((GPIndividual)Parents[0]).Trees.Length];
                 if (n - (q - start) >= 2 && !TossSecondParent)
-                    j2.Trees = new GPTree[Parents[1].Trees.Length];
+                    j2.Trees = new GPTree[((GPIndividual)Parents[1]).Trees.Length];
 
                 // at this point, p1 or p2, or both, may be null.
                 // If not, swap one in. Else just copy the parent.
@@ -413,18 +428,18 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                     if (x == t1 && res1) // we've got a tree with a kicking cross
                         // position!
                     {
-                        j1.Trees[x] = (GPTree) (Parents[0].Trees[x].LightClone());
+                        j1.Trees[x] = ((GPIndividual)Parents[0]).Trees[x].LightClone();
                         j1.Trees[x].Owner = j1;
-                        j1.Trees[x].Child = Parents[0].Trees[x].Child.CloneReplacing(p2, p1);
+                        j1.Trees[x].Child = ((GPIndividual)Parents[0]).Trees[x].Child.CloneReplacing(p2, p1);
                         j1.Trees[x].Child.Parent = j1.Trees[x];
                         j1.Trees[x].Child.ArgPosition = 0;
                         j1.Evaluated = false;
                     } // it's changed
                     else
                     {
-                        j1.Trees[x] = (GPTree) (Parents[0].Trees[x].LightClone());
+                        j1.Trees[x] = ((GPIndividual)Parents[0]).Trees[x].LightClone();
                         j1.Trees[x].Owner = j1;
-                        j1.Trees[x].Child = (GPNode) (Parents[0].Trees[x].Child.Clone());
+                        j1.Trees[x].Child = (GPNode)((GPIndividual)Parents[0]).Trees[x].Child.Clone();
                         j1.Trees[x].Child.Parent = j1.Trees[x];
                         j1.Trees[x].Child.ArgPosition = 0;
                     }
@@ -436,29 +451,44 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                         if (x == t2 && res2) // we've got a tree with a kicking
                             // cross position!
                         {
-                            j2.Trees[x] = (GPTree) (Parents[1].Trees[x].LightClone());
+                            j2.Trees[x] = ((GPIndividual)Parents[1]).Trees[x].LightClone();
                             j2.Trees[x].Owner = j2;
-                            j2.Trees[x].Child = Parents[1].Trees[x].Child.CloneReplacing(p1, p2);
+                            j2.Trees[x].Child = ((GPIndividual)Parents[1]).Trees[x].Child.CloneReplacing(p1, p2);
                             j2.Trees[x].Child.Parent = j2.Trees[x];
                             j2.Trees[x].Child.ArgPosition = 0;
                             j2.Evaluated = false;
                         } // it's changed
                         else
                         {
-                            j2.Trees[x] = (GPTree) Parents[1].Trees[x].LightClone();
+                            j2.Trees[x] = ((GPIndividual)Parents[1]).Trees[x].LightClone();
                             j2.Trees[x].Owner = j2;
-                            j2.Trees[x].Child = (GPNode) Parents[1].Trees[x].Child.Clone();
+                            j2.Trees[x].Child = (GPNode)((GPIndividual)Parents[1]).Trees[x].Child.Clone();
                             j2.Trees[x].Child.Parent = j2.Trees[x];
                             j2.Trees[x].Child.ArgPosition = 0;
                         }
                     }
 
                 // add the individuals to the population
-                inds[q] = j1;
+                // by Ermo. I think this should be add
+                // inds.set(q,j1);
+                // Yes -- Sean
+                inds.Add(j1);
+                if (preserveParents != null)
+                {
+                    parentparents[0].AddAll(parentparents[1]);
+                    preserveParents[q] = parentparents[0];
+                }
+
                 q++;
                 if (q < n + start && !TossSecondParent)
                 {
-                    inds[q] = j2;
+                    // by Ermo. Same reason, should changed to add
+                    //inds[q] = j2; 
+                    inds.Add(j2);
+                    if (preserveParents != null)
+                    {
+                        preserveParents[q] = parentparents[0];
+                    }
                     q++;
                 }
             }
@@ -583,7 +613,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                 if (listOfNodes.Count > 1)
                 {
                     GPInitializer initializer = ((GPInitializer) state.Initializer);
-                    int currentMinDistance = Int32.MaxValue;
+                    int currentMinDistance = int.MaxValue;
                     for (int i = 0; i < listOfNodes.Count; i++)
                     {
                         // get the GP node
@@ -779,7 +809,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         }
         class NodeComparator : IComparer
         {
-            public int Compare(Object o1, Object o2)
+            public int Compare(object o1, object o2)
             {
                 NodeInfo node1 = o1 as NodeInfo;
                 NodeInfo node2 = o2 as NodeInfo;

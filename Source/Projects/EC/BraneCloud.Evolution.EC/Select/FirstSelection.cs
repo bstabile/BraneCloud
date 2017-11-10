@@ -17,9 +17,11 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.SteadyState;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
+using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.Select
 {
@@ -43,10 +45,7 @@ namespace BraneCloud.Evolution.EC.Select
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_FIRST); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_FIRST); 
 
         #endregion // Properties
         #region Operations
@@ -62,7 +61,15 @@ namespace BraneCloud.Evolution.EC.Select
         /// <summary>
         /// I hard-code both Produce(...) methods for efficiency's sake.
         /// </summary>
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public int Produce(
+            int min, 
+            int max, 
+            int start,
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread, 
+            IDictionary<string, object> misc)
         {
             var n = 1;
             if (n > max) n = max;
@@ -73,6 +80,12 @@ namespace BraneCloud.Evolution.EC.Select
                 // pick size random individuals, then pick the best.
                 var oldinds = state.Population.Subpops[subpop].Individuals;
                 inds[start + q] = oldinds[0]; // note it's a pointer transfer, not a copy!
+                if (misc != null && misc[KEY_PARENTS] != null)
+                {
+                    IntBag parent = new IntBag(1);
+                    parent.Add(0);
+                    ((IntBag[])misc[KEY_PARENTS])[start + q] = parent;
+                }
             }
             return n;
         }

@@ -74,11 +74,14 @@
     <Compile Include="Breed\BreederThread.cs" />
     <Compile Include="Breed\BufferedBreedingPipeline.cs" />
     <Compile Include="Breed\CheckingPipeline.cs" />
+    <Compile Include="Breed\FirstCopyPipeline.cs" />
     <Compile Include="Breed\ForceBreedingPipeline.cs" />
     <Compile Include="Breed\GenerationSwitchPipeline.cs" />
     <Compile Include="Breed\InitializationPipeline.cs" />
     <Compile Include="Breed\MultiBreedingPipeline.cs" />
+    <Compile Include="Breed\RepeatPipeline.cs" />
     <Compile Include="Breed\ReproductionPipeline.cs" />
+    <Compile Include="Breed\StubPipeline.cs" />
     <Compile Include="Breed\UniquePipeline.cs" />
     <Compile Include="CoEvolve\IGroupedProblem.cs" />
     <Compile Include="Core\Breeder.cs" />
@@ -104,6 +107,14 @@
     <Compile Include="Core\Initializer.cs" />
     <Compile Include="Core\Interfaces\IStateManager.cs" />
     <Compile Include="DE\IDEEvaluator.cs" />
+    <None Include="EDA\DOvS\CornerMap.cs" />
+    <None Include="EDA\DOvS\DOVSBreeder.cs" />
+    <None Include="EDA\DOvS\DOVSDefaults.cs" />
+    <None Include="EDA\DOvS\DOVSEvaluator.cs" />
+    <None Include="EDA\DOvS\DOVSFitness.cs" />
+    <None Include="EDA\DOvS\DOVSInitializer.cs" />
+    <None Include="EDA\DOvS\DOVSSpecies.cs" />
+    <None Include="EDA\DOvS\HyperboxSpecies.cs" />
     <Compile Include="Eval\IJob.cs" />
     <Compile Include="Eval\IMasterProblem.cs" />
     <Compile Include="Core\Interfaces\IProblem.cs" />
@@ -144,6 +155,17 @@
     <Compile Include="MultiObjective\Nsga2\NSGA2MultiObjectiveFitness.cs" />
     <Compile Include="MultiObjective\Nsga2\NSGA2MultiObjectiveFitnessComparator.cs" />
     <Compile Include="MultiObjective\Spea2\ISPEA2Evaluator.cs" />
+    <Compile Include="NEAT\NEATBreeder.cs" />
+    <Compile Include="NEAT\NEATDefaults.cs" />
+    <Compile Include="NEAT\NEATExtensions.cs" />
+    <Compile Include="NEAT\NEATGene.cs" />
+    <Compile Include="NEAT\NEATIndividual.cs" />
+    <Compile Include="NEAT\NEATInitializer.cs" />
+    <Compile Include="NEAT\NEATInnovation.cs" />
+    <Compile Include="NEAT\NEATNetwork.cs" />
+    <Compile Include="NEAT\NEATNode.cs" />
+    <Compile Include="NEAT\NEATSpecies.cs" />
+    <Compile Include="NEAT\NEATSubspecies.cs" />
     <Compile Include="PSO\Particle.cs" />
     <Compile Include="Select\BoltzmannSelection.cs" />
     <Compile Include="Select\SigmaScalingSelection.cs" />
@@ -246,8 +268,11 @@
     <Compile Include="Select\RandomSelection.cs" />
     <Compile Include="Select\SelectDefaults.cs" />
     <Compile Include="Select\TournamentSelection.cs" />
+    <Compile Include="Select\AnnealedSelection.cs" />
+    <Compile Include="Core\Evaluator.cs" />
     <Compile Include="Simple\SimpleBreeder.cs" />
     <Compile Include="Simple\SimpleDefaults.cs" />
+    <Compile Include="Simple\SimpleEvaluator.cs" />
     <Compile Include="Simple\SimpleEvolutionState.cs" />
     <Compile Include="Simple\SimpleExchanger.cs" />
     <Compile Include="Simple\SimpleFinisher.cs" />
@@ -256,6 +281,10 @@
     <Compile Include="Simple\ISimpleProblem.cs" />
     <Compile Include="Simple\SimpleShortStatistics.cs" />
     <Compile Include="Simple\SimpleStatistics.cs" />
+    <Compile Include="Select\TopSelection.cs" />
+    <Compile Include="SingleState\SingleStateBreeder.cs" />
+    <Compile Include="SingleState\SingleStateDefaults.cs" />
+    <Compile Include="SingleState\SingleStateEvolutionState.cs" />
     <Compile Include="Spatial\ISpace.cs" />
     <Compile Include="Spatial\Spatial1DSubpopulation.cs" />
     <Compile Include="Spatial\SpatialBreeder.cs" />
@@ -271,11 +300,13 @@
     <Compile Include="SteadyState\ISteadyStateStatistics.cs" />
     <Compile Include="Util\Checkpoint.cs" />
     <Compile Include="Util\Code.cs" />
+    <Compile Include="Util\CollectionExtensions.cs" />
     <Compile Include="Util\DecodeReturn.cs" />
     <Compile Include="Util\ExpressionUtil.cs" />
     <Compile Include="Util\GELexer.cs" />
     <Compile Include="Util\IGELexer.cs" />
     <Compile Include="Util\GELexer_OLD.cs" />
+    <Compile Include="Util\Indexed.cs" />
     <Compile Include="Util\ISortComparatorUL.cs" />
     <Compile Include="Util\LocalHost.cs" />
     <Compile Include="Util\NullOp.cs" />
@@ -306,6 +337,7 @@
     <Compile Include="Vector\VectorDefaults.cs" />
     <Compile Include="Vector\VectorIndividual.cs" />
     <Compile Include="Vector\VectorSpecies.cs" />
+    <None Include="SingleState\README" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BraneCloud.Evolution.EC.Configuration\BraneCloud.Evolution.EC.Configuration.csproj">
@@ -330,13 +362,25 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Breed\README.txt" />
+    <Content Include="CoEvolve\README.txt" />
+    <Content Include="DE\README.txt" />
+    <None Include="EDA\CMAES\CMAESBreeder.cs" />
+    <None Include="EDA\CMAES\CMAESDefaults.cs" />
+    <None Include="EDA\CMAES\CMAESInitializer.cs" />
+    <None Include="EDA\CMAES\CMAESSpecies.cs" />
+    <Content Include="EDA\README.txt" />
     <Content Include="GP\GE\README.txt" />
     <Content Include="MultiObjective\README.txt" />
     <Content Include="Readme.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="EDA\CMAES\README" />
+    <None Include="EDA\DOvS\README" />
+    <None Include="NEAT\README" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

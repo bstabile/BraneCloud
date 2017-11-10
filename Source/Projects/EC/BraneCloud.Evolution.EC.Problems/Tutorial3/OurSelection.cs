@@ -16,6 +16,7 @@
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
 
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Problems.Tutorial3
@@ -57,10 +58,10 @@ namespace BraneCloud.Evolution.EC.Problems.Tutorial3
             if (state.Random[thread].NextBoolean(middleProbability))
             {
                 //pick three individuals, return the middle one
-                Individual[] inds = state.Population.Subpops[subpopulation].Individuals;
-                int one = state.Random[thread].NextInt(inds.Length);
-                int two = state.Random[thread].NextInt(inds.Length);
-                int three = state.Random[thread].NextInt(inds.Length);
+                IList<Individual> inds = state.Population.Subpops[subpopulation].Individuals;
+                int one = state.Random[thread].NextInt(inds.Count);
+                int two = state.Random[thread].NextInt(inds.Count);
+                int three = state.Random[thread].NextInt(inds.Count);
                 // generally the betterThan(...) method imposes an ordering,
                 // so you shouldn't see any cycles here except in very unusual domains...
                 if (inds[two].Fitness.BetterThan(inds[one].Fitness))
@@ -82,7 +83,7 @@ namespace BraneCloud.Evolution.EC.Problems.Tutorial3
             else        //select a random individual's index
             {
                 return state.Random[thread].NextInt(
-                    state.Population.Subpops[subpopulation].Individuals.Length);
+                    state.Population.Subpops[subpopulation].Individuals.Count);
             }
         }
     }  // close the class

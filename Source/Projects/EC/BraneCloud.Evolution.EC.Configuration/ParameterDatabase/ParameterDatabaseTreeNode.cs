@@ -38,7 +38,7 @@ namespace BraneCloud.Evolution.EC.Configuration
 		/// </param>
 		public ParameterDatabaseTreeNode(object userObject) : base(userObject.ToString())
 		{
-		    this.Tag = userObject;
+		    Tag = userObject;
 		}
 		
 		/// <param name="userObject">
@@ -47,16 +47,13 @@ namespace BraneCloud.Evolution.EC.Configuration
 		/// </param>
 		public ParameterDatabaseTreeNode(object userObject, bool allowsChildren) : base(userObject.ToString())
 		{
-            this.Tag = userObject;
+            Tag = userObject;
             // this allowsChildren argument as it is directly linked to the Java Treeview
             // i think we should avoid using it ( to stick to .net ) .
             // but to decide I have to check if this is useful in the code
 		}
 
-        public TreeNodeCollection Children
-        {
-            get { return this.Nodes; }
-        }
+        public TreeNodeCollection Children => Nodes;
 
 		/// <param name="index">
 		/// </param>
@@ -134,22 +131,6 @@ namespace BraneCloud.Evolution.EC.Configuration
                 ParameterDatabaseTreeNode n = (ParameterDatabaseTreeNode) e.Current;
                 n.Sort(comp);
             }
-
-            //throw new NotImplementedException("Requires conversion to WinForms TreeNode logic.");
-            //if (Children == null)
-            //    return ;
-			
-            //object[] childArr = Children.ToArray();
-            //Array.Sort(childArr, comp);
-            
-            //Children = ArrayList.Synchronized(new ArrayList(new ArrayList(childArr)));
-			
-            //IEnumerator e = Children.GetEnumerator();
-            //while (e.MoveNext())
-            //{
-            //    ParameterDatabaseTreeNode n = (ParameterDatabaseTreeNode) e.Current;
-            //    n.Sort(comp);
-            //}
 		}
 	}
 }

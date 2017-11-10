@@ -52,6 +52,7 @@
     <Compile Include="GELexerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuickSortTests.cs" />
+    <Compile Include="ListExtensionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\BraneCloud.Evolution.Util\BraneCloud.Evolution.Util.csproj">

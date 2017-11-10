@@ -189,6 +189,8 @@ namespace BraneCloud.Evolution.EC
         public const string P_CHECKPOINTMODULO = "checkpoint-modulo";
         public const string P_CHECKPOINT = "checkpoint";
 
+        public const string P_INNOVATIONNUMBER = "innovation-number";
+
         #endregion // Constants
         #region Properties
 
@@ -216,6 +218,12 @@ namespace BraneCloud.Evolution.EC
         public Hashtable[] Data { get; set; }
 
         /// <summary>
+        /// The current population.  This is <i>not</i> a singleton object, and may be replaced after every 
+        /// generation in a generational approach. You should only access this in a read-only fashion.  
+        /// </summary>
+        public Population Population { get; set; }
+
+        /// <summary>
         /// Current job iteration variables, set by Evolve.  The default version simply sets this to a single Object[1] containing
         /// the current job iteration number as an Integer (for a single job, it's 0).  You probably should not modify this inside
         /// an evolutionary run.  
@@ -227,6 +235,31 @@ namespace BraneCloud.Evolution.EC
         /// (that is, when the system found an ideal individual. 
         /// </summary>
         public bool QuitOnRunComplete { get; set; }
+
+        /// <summary>
+        /// The number of generations the evolutionary computation system will run until it ends, or UNDEFINED.
+        /// </summary>
+        public int NumGenerations { get; set; } = UNDEFINED;
+
+        /// <summary>
+        /// The current generation of the population in the run.  For non-generational approaches, 
+        /// this probably should represent some kind of incrementing value, perhaps the number of individuals evaluated so far.  
+        /// You probably shouldn't modify this. 
+        /// </summary>
+        public int Generation { get; set; }
+
+        /// How many evaluations should we run for?  If set to UNDEFINED (0), we run for the number of generations instead.
+        public long NumEvaluations { get; set; } = UNDEFINED;
+
+        /// <summary>
+        /// The current number of evaluations which have transpired so far in the run.  This is only updated on a generational boundary.
+        /// </summary>
+        public int Evaluations { get; set; }
+
+        /// <summary>
+        /// Global birthday tracker number for genes in representations such as NEAT. Accessed and modified during run time.
+        /// </summary>
+        public long InnovationNumber { get; set; }
 
         #region Threads
 
@@ -298,37 +331,7 @@ namespace BraneCloud.Evolution.EC
         public Exchanger Exchanger { get; set; }
 
         #endregion // Singletons
-        #region Population
 
-        // set during running
-
-        /// <summary>
-        /// The current generation of the population in the run.  For non-generational approaches, 
-        /// this probably should represent some kind of incrementing value, perhaps the number of individuals evaluated so far.  
-        /// You probably shouldn't modify this. 
-        /// </summary>
-        public int Generation { get; set; }
-
-        /// <summary>
-        /// The number of generations the evolutionary computation system will run until it ends.  
-        /// If the user has specified a desired number of evaluations instead of generations, then
-        /// this value will not be valid until after the first generation has been created(but before
-        /// it has bene evaluated).
-        /// If after the population has been evaluated the Evaluator returns true for RunComplete(...), 
-        /// and quitOnRunComplete is true, then the system will quit.  You probably shouldn't modify this.  
-        /// </summary>
-        public int NumGenerations { get; set; }
-
-        /// How many evaluations should we run for?  If set to UNDEFINED (0), we run for the number of generations instead.
-        public long NumEvaluations { get; set; } = UNDEFINED;
-
-        /// <summary>
-        /// The current population.  This is <i>not</i> a singleton object, and may be replaced after every 
-        /// generation in a generational approach. You should only access this in a read-only fashion.  
-        /// </summary>
-        public Population Population { get; set; }
-
-        #endregion // Population
         #region Checkpoint
 
         /// <summary>
@@ -429,7 +432,6 @@ namespace BraneCloud.Evolution.EC
             }
             else CheckpointDirectory = null;
 
-            // load evaluations, or generations, or both
             p = new Parameter(P_EVALUATIONS);
             if (Parameters.ParameterExists(p, null))
             {
@@ -441,18 +443,18 @@ namespace BraneCloud.Evolution.EC
             p = new Parameter(P_GENERATIONS);
             if (Parameters.ParameterExists(p, null))
             {
-                NumGenerations = Parameters.GetInt(p, null, 1);  // 0 would be UDEFINED                 
+                NumGenerations = Parameters.GetInt(p, null, 1); // 0 would be UDEFINED                 
 
                 if (NumGenerations <= 0)
                     Output.Fatal("If defined, the number of generations must be an integer >= 1.", p, null);
-
-                if (NumEvaluations != UNDEFINED)  // both defined
-                {
-                    state.Output.Warning("Both generations and evaluations defined: generations will be ignored and computed from the evaluations.");
-                    NumGenerations = UNDEFINED;
-                }
             }
-            else if (NumEvaluations == UNDEFINED)  // uh oh, something must be defined
+
+            if (NumEvaluations != UNDEFINED && NumGenerations != UNDEFINED)  // both defined
+            {
+                state.Output.Warning("Both generations and evaluations defined: generations will be ignored and computed from the evaluations.");
+                NumGenerations = UNDEFINED;
+            }
+            else if (NumEvaluations == UNDEFINED && NumGenerations == UNDEFINED)  // uh oh, something must be defined
                 Output.Fatal("Either evaluations or generations must be defined.", new Parameter(P_GENERATIONS), new Parameter(P_EVALUATIONS));
 
             p = new Parameter(P_QUITONRUNCOMPLETE);
@@ -484,6 +486,9 @@ namespace BraneCloud.Evolution.EC
             Exchanger = (Exchanger)(Parameters.GetInstanceForParameter(p, null, typeof(Exchanger)));
             Exchanger.Setup(this, p);
 
+            p = new Parameter(P_INNOVATIONNUMBER);
+            InnovationNumber = Parameters.GetLong(p, null, long.MinValue);
+
             Generation = 0;
         }
 
@@ -497,6 +502,26 @@ namespace BraneCloud.Evolution.EC
         public virtual int Evolve()
         {
             return R_NOTDONE;
+        }
+
+        public void IncrementEvaluations(int val)
+        {
+            if (EvalThreads == 1)
+                Evaluations += val;
+            else
+            {
+                SynchronizedIncrementEvaluations(val);
+            }
+        }
+
+        // This is broken out like this so that incrementEvaluations can get inlined
+        readonly object _syncLock = new object();
+        void SynchronizedIncrementEvaluations(int val)
+        {
+            lock (_syncLock)
+            {
+                Evaluations++;
+            }
         }
 
         /// <summary>

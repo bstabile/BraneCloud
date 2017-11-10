@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Linq;
 using BraneCloud.Evolution.EC.Vector;
 using BraneCloud.Evolution.EC.Configuration;
 
@@ -59,7 +59,7 @@ namespace BraneCloud.Evolution.EC.DE
 
         public override DoubleVectorIndividual CreateIndividual(IEvolutionState state, int subpop, int index, int thread)
         {
-            var inds = state.Population.Subpops[subpop].Individuals;
+            var inds = state.Population.Subpops[subpop].Individuals.ToArray();
 
             var v = (DoubleVectorIndividual)
                 state.Population.Subpops[subpop].Species.NewIndividual(state, thread);

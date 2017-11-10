@@ -61,6 +61,7 @@ namespace BraneCloud.Evolution.EC
         void StartFromCheckpoint();
         void StartFresh();
         int Evolve();
+        void IncrementEvaluations(int val);
         void Run(int condition);
     }
 }

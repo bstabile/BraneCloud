@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Breed
@@ -73,14 +73,14 @@ namespace BraneCloud.Evolution.EC.Breed
                 state.Output.Fatal("CheckingPipeline must have a num-times value >= 1.",
                     paramBase.Push(P_NUMTIMES),
                     def.Push(P_NUMTIMES));
-            if (Likelihood != 1.0)
+            if (!Likelihood.Equals(1.0))
                 state.Output.Warning(
                     "CheckingPipeline given a likelihood other than 1.0.  This is nonsensical and will be ignored.",
                     paramBase.Push(P_LIKELIHOOD),
                     def.Push(P_LIKELIHOOD));
         }
 
-        public bool AllValid(Individual[] inds, int numInds, int subpopulation, IEvolutionState state, int thread)
+        public bool AllValid(IList<Individual> inds, int numInds, int subpop, IEvolutionState state, int thread)
         {
             return true;
         }
@@ -88,36 +88,33 @@ namespace BraneCloud.Evolution.EC.Breed
         public override int Produce(
             int min,
             int max,
-            int start,
-            int subpopulation,
-            Individual[] inds,
+            int subpop,
+            IList<Individual> inds,
             IEvolutionState state,
-            int thread)
+            int thread,
+            IDictionary<string, object> misc)
         {
-            Individual[] inds2 = new Individual[max];
+            IList<Individual> inds2 = new List<Individual>(max);
 
             for (int i = 0; i < _numTimes; i++)
             {
                 // grab individuals from our source and stick 'em into inds2 at position 0
-                int n0 = Sources[0].Produce(min, max, 0, subpopulation, inds2, state, thread);
+                int n0 = Sources[0].Produce(min, max, subpop, inds2, state, thread, misc);
 
                 // check for validity
-                if (!AllValid(inds2, n0, subpopulation, state, thread))
-                    continue; // failure, try again
+                if (!AllValid(inds2, n0, subpop, state, thread))
+                {
+                    inds2.Clear();
+                    continue;  // failure, try again
+                }
 
-                // success!  Copy to inds and possibly clone
-                Array.Copy(inds2, 0, inds, start, n0);
-                if (Sources[0] is SelectionMethod)
-                    for (int q = start; q < n0 + start; q++)
-                        inds[q] = (Individual) inds[q].Clone();
+                ((List<Individual>)inds).AddRange(inds2);
                 return n0;
             }
 
             // big-time failure!  Grab from the other source
-            int n1 = Sources[1].Produce(min, max, start, subpopulation, inds, state, thread);
-            if (Sources[0] is SelectionMethod)
-                for (int q = start; q < n1 + start; q++)
-                    inds[q] = (Individual) inds[q].Clone();
+            int n1 = Sources[1].Produce(min, max, subpop, inds, state, thread, misc);
+
             return n1;
         }
     }

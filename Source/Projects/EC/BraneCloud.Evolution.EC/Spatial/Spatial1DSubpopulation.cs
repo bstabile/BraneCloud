@@ -111,7 +111,7 @@ namespace BraneCloud.Evolution.EC.Spatial
         public virtual int GetIndexRandomNeighbor(IEvolutionState state, int threadnum, int distance)
         {
             var index = Indexes[threadnum];
-            var size = Individuals.Length;
+            var size = Individuals.Count;
             if (size == 0)
                 return index;
             if (Toroidal)

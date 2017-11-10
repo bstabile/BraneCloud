@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Breed
@@ -66,15 +66,9 @@ namespace BraneCloud.Evolution.EC.Breed
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return BreedDefaults.ParamBase.Push(P_MULTIBREED); }
-        }
+        public override IParameter DefaultBase => BreedDefaults.ParamBase.Push(P_MULTIBREED);
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
         public int MaxGeneratable { get; set; }
         public bool GenerateMax { get; set; }
@@ -121,9 +115,19 @@ namespace BraneCloud.Evolution.EC.Breed
         #endregion // Setup
         #region Operations
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
-            var s = (state.Generation < GenerationSwitch ? Sources[0] : Sources[1]);
+            int start = inds.Count;
+
+            IBreedingSource s = state.Generation < GenerationSwitch ? Sources[0] : Sources[1];
+
             int total;
 
             if (GenerateMax)
@@ -136,11 +140,11 @@ namespace BraneCloud.Evolution.EC.Breed
                 if (n > max)
                     n = max;
 
-                total = s.Produce(n, n, start, subpop, inds, state, thread);
+                total = s.Produce(n, n, subpop, inds, state, thread, misc);
             }
             else
             {
-                total = s.Produce(min, max, start, subpop, inds, state, thread);
+                total = s.Produce(min, max, subpop, inds, state, thread, misc);
             }
 
             // clone if necessary

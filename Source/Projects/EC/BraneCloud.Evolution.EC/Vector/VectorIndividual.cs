@@ -116,12 +116,10 @@ namespace BraneCloud.Evolution.EC.Vector
         /// <summary>
         /// Returns the length of the gene array.  By default, this method returns 0. 
         /// </summary>
-        public virtual long Length
-        {
-            get { return 0; }
-        }
+        public virtual long Length => 0;
+        
 
-        public override long Size { get { return Length; } }
+        public override long Size => Length;
 
         #endregion // Properties
         #region Operations

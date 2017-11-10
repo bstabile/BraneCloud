@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Rule.Breed
@@ -69,16 +69,26 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
         #endregion // Properties
         #region Operations
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread, 
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab n individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            var n = Sources[0].Produce(min, max, subpop, inds, state, thread, misc);
 
-            // clone the individuals if necessary
-            if (!(Sources[0] is BreedingPipeline))
-                for (var q = start; q < n + start; q++)
-                    inds[q] = (Individual)inds[q].Clone();
+            // should we bother?
+            if (!state.Random[thread].NextBoolean(Likelihood))
+            {
+                return n;
+            }
 
             // mutate 'em
             for (var q = start; q < n + start; q++)

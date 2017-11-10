@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
@@ -151,7 +151,7 @@ namespace BraneCloud.Evolution.EC.Select
             double val = state.Parameters.GetDouble(paramBase.Push(P_SIZE), def.Push(P_SIZE), 1.0);
             if (val < 1.0)
                 state.Output.Fatal("Tournament size must be >= 1.", paramBase.Push(P_SIZE), def.Push(P_SIZE));
-            else if (val == (int)val)  // easy, it's just an integer
+            else if (val.Equals((int)val))  // easy, it's just an integer
             {
                 Size = (int)val;
                 ProbabilityOfPickingSizePlusOne = 0.0;
@@ -171,12 +171,13 @@ namespace BraneCloud.Evolution.EC.Select
             // load SortedPop integers
             var i = s.Population.Subpops[subpop].Individuals;
 
-            SortedPop = new int[i.Length];
+            SortedPop = new int[i.Count];
             for (var x = 0; x < SortedPop.Length; x++)
                 SortedPop[x] = x;
 
             // sort SortedPop in increasing fitness order
-            QuickSort.QSort(SortedPop, new AnonymousClassSortComparatorL(i));
+            // BRS: Using extension methods in Util.CollectionExtensions
+            i.SortByFitnessAscending();
 
             if (!PickWorst)  // gotta reverse it
                 for (int x = 0; x < SortedPop.Length / 2; x++)
@@ -189,7 +190,7 @@ namespace BraneCloud.Evolution.EC.Select
             // figure out bestn
             if (!BestNFrac.Equals(NOT_SET))
             {
-                BestN = (int)Math.Max(Math.Floor(s.Population.Subpops[subpop].Individuals.Length * BestNFrac), 1);
+                BestN = (int)Math.Max(Math.Floor(s.Population.Subpops[subpop].Individuals.Count * BestNFrac), 1);
             }
         }
 
@@ -197,14 +198,14 @@ namespace BraneCloud.Evolution.EC.Select
         int GetTournamentSizeToUse(IMersenneTwister random)
         {
             double p = ProbabilityOfPickingSizePlusOne;   // pulls us to under 35 bytes
-            if (p == 0.0) return Size;
+            if (p.Equals(0.0)) return Size;
             return Size + (random.NextBoolean(p) ? 1 : 0);
         }
 
         public override int Produce(int subpop, IEvolutionState state, int thread)
         {
             // pick size random individuals, then pick the best.
-            Individual[] oldinds = state.Population.Subpops[subpop].Individuals;
+            IList<Individual> oldinds = state.Population.Subpops[subpop].Individuals;
             int best = state.Random[thread].NextInt(BestN);  // only among the first N
 
             int s = GetTournamentSizeToUse(state.Random[thread]);
@@ -237,28 +238,29 @@ namespace BraneCloud.Evolution.EC.Select
         #endregion // Operations
         #region SortComparator
 
-        private class AnonymousClassSortComparatorL : ISortComparatorL
-        {
-            public AnonymousClassSortComparatorL(Individual[] i)
-            {
-                InitBlock(i);
-            }
-            private void InitBlock(Individual[] i)
-            {
-                _inds = i;
-            }
-            private Individual[] _inds;
+        // BRS: Using extension methods in Util.CollectionExtensions instead
+        //private class AnonymousClassSortComparatorL : ISortComparatorL
+        //{
+        //    public AnonymousClassSortComparatorL(Individual[] i)
+        //    {
+        //        InitBlock(i);
+        //    }
+        //    private void InitBlock(Individual[] i)
+        //    {
+        //        _inds = i;
+        //    }
+        //    private Individual[] _inds;
 
-            public virtual bool lt(long a, long b)
-            {
-                return _inds[(int)b].Fitness.BetterThan(_inds[(int)a].Fitness);
-            }
+        //    public virtual bool lt(long a, long b)
+        //    {
+        //        return _inds[(int)b].Fitness.BetterThan(_inds[(int)a].Fitness);
+        //    }
 
-            public virtual bool gt(long a, long b)
-            {
-                return _inds[(int)a].Fitness.BetterThan(_inds[(int)b].Fitness);
-            }
-        }
+        //    public virtual bool gt(long a, long b)
+        //    {
+        //        return _inds[(int)a].Fitness.BetterThan(_inds[(int)b].Fitness);
+        //    }
+        //}
         
         #endregion // SortComparator
     }

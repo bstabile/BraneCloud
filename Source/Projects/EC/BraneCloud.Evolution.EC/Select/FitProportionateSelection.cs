@@ -69,8 +69,10 @@ namespace BraneCloud.Evolution.EC.Select
 
         public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
         {
+            base.PrepareToProduce(s, subpop, thread);
+
             // load sortedFit
-            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Length];
+            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Count];
             for (var x = 0; x < Fitnesses.Length; x++)
             {
                 Fitnesses[x] = s.Population.Subpops[subpop].Individuals[x].Fitness.Value;
@@ -92,6 +94,8 @@ namespace BraneCloud.Evolution.EC.Select
 
         public override void FinishProducing(IEvolutionState s, int subpop, int thread)
         {
+            base.FinishProducing(s, subpop, thread);
+
             // release the distributions so we can quickly 
             // garbage-collect them if necessary
             Fitnesses = null;

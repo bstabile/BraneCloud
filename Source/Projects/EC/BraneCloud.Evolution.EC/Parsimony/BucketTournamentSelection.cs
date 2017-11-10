@@ -22,6 +22,7 @@ using System.Collections;
 using BraneCloud.Evolution.EC.Select;
 using BraneCloud.Evolution.EC.SteadyState;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.Parsimony
 {
@@ -74,20 +75,6 @@ namespace BraneCloud.Evolution.EC.Parsimony
     [ECConfiguration("ec.parsimony.BucketTournamentSelection")]
     public class BucketTournamentSelection : SelectionMethod, ISteadyStateBSource
     {
-        private class AnonymousClassComparator : IComparer
-        {
-            public virtual int Compare(object o1, object o2)
-            {
-                var a = (Individual) o1;
-                var b = (Individual) o2;
-                if (a.Fitness.BetterThan(b.Fitness))
-                    return 1;
-                if (b.Fitness.BetterThan(a.Fitness))
-                    return - 1;
-                return 0;
-            }
-        }
-
         #region Constants
 
         /// <summary>
@@ -173,19 +160,34 @@ namespace BraneCloud.Evolution.EC.Parsimony
         #endregion // Setup
         #region Operations
 
+        private class AnonymousClassComparator : IComparer
+        {
+            public virtual int Compare(object o1, object o2)
+            {
+                var a = (Individual)o1;
+                var b = (Individual)o2;
+                if (a.Fitness.BetterThan(b.Fitness))
+                    return 1;
+                if (b.Fitness.BetterThan(a.Fitness))
+                    return -1;
+                return 0;
+            }
+        }
+
         /// <summary>
         /// Prepare to produce: create the buckets!!!! 
         /// </summary>
         public override void  PrepareToProduce(IEvolutionState state, int subpop, int thread)
         {
-            BucketValues = new int[state.Population.Subpops[subpop].Individuals.Length];
-            
+            BucketValues = new int[state.Population.Subpops[subpop].Individuals.Count];
+
             // correct?
-            Array.Sort(state.Population.Subpops[subpop].Individuals, new AnonymousClassComparator());
-                        
+            //Array.Sort(state.Population.Subpops[subpop].Individuals, new AnonymousClassComparator());
+            state.Population.Subpops[subpop].Individuals.SortByFitnessAscending();
+
             // how many individuals in current bucket
 
-            var averageBuck = state.Population.Subpops[subpop].Individuals.Length / (double) NumBuckets;
+            var averageBuck = state.Population.Subpops[subpop].Individuals.Count / (double) NumBuckets;
             
             // first individual goes into first bucket
             BucketValues[0] = 0;
@@ -193,7 +195,7 @@ namespace BraneCloud.Evolution.EC.Parsimony
             // now there is one individual in the first bucket
             var nInd = 1;
             
-            for (var i = 1; i < state.Population.Subpops[subpop].Individuals.Length; i++)
+            for (var i = 1; i < state.Population.Subpops[subpop].Individuals.Count; i++)
             {
                 // if there is still some place left in the current bucket, throw the current individual there too
                 if (nInd < averageBuck)
@@ -237,12 +239,12 @@ namespace BraneCloud.Evolution.EC.Parsimony
         {
             // pick size random individuals, then pick the best.
             var oldinds = state.Population.Subpops[subpop].Individuals;
-            var i = state.Random[thread].NextInt(oldinds.Length);
+            var i = state.Random[thread].NextInt(oldinds.Count);
             long si = 0;
             
             for (var x = 1; x < Size; x++)
             {
-                var j = state.Random[thread].NextInt(oldinds.Length);
+                var j = state.Random[thread].NextInt(oldinds.Count);
                 if (PickWorst)
                 {
                     if (BucketValues[j] > BucketValues[i])

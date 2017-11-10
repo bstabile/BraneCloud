@@ -105,11 +105,11 @@ namespace BraneCloud.Evolution.EC.PSO
                 if (psob.Neighborhood == PSOBreeder.C_NEIGHBORHOOD_RANDOM
                 ) // "random" scheme is the only thing that is available for now
                     Neighborhood = CreateRandomPattern(myindex, psob.IncludeSelf,
-                        state.Population.Subpops[subpop].Individuals.Length, psob.NeighborhoodSize, state, thread);
+                        state.Population.Subpops[subpop].Individuals.Count, psob.NeighborhoodSize, state, thread);
                 else if (psob.Neighborhood == PSOBreeder.C_NEIGHBORHOOD_TOROIDAL ||
                          psob.Neighborhood == PSOBreeder.C_NEIGHBORHOOD_RANDOM_EACH_TIME)
                     Neighborhood = CreateToroidalPattern(myindex, psob.IncludeSelf,
-                        state.Population.Subpops[subpop].Individuals.Length, psob.NeighborhoodSize);
+                        state.Population.Subpops[subpop].Individuals.Count, psob.NeighborhoodSize);
                 else // huh?
                     state.Output.Fatal("internal error: invalid PSO Neighborhood style: " + psob.Neighborhood);
             }
@@ -140,7 +140,7 @@ namespace BraneCloud.Evolution.EC.PSO
         // globalCoeff:         cognitive/confidence coefficient for global best, this is not done in the standard PSO
         public void Tweak(
             IEvolutionState state, double[] globalBest,
-            double VelocityCoeff, double personalCoeff,
+            double velocityCoeff, double personalCoeff,
             double informantCoeff, double globalCoeff,
             int thread)
         {
@@ -154,7 +154,7 @@ namespace BraneCloud.Evolution.EC.PSO
                 double gamma = state.Random[thread].NextDouble() * informantCoeff;
                 double delta = state.Random[thread].NextDouble() * globalCoeff;
 
-                double newVelocity = (VelocityCoeff * Velocity[x]) + (beta * (xPersonal - xCurrent)) +
+                double newVelocity = (velocityCoeff * Velocity[x]) + (beta * (xPersonal - xCurrent)) +
                                      (gamma * (xNeighbour - xCurrent)) + (delta * (xGlobal - xCurrent));
                 Velocity[x] = newVelocity;
                 genome[x] += newVelocity;
@@ -164,7 +164,7 @@ namespace BraneCloud.Evolution.EC.PSO
         }
 
         // Creates a toroidal Neighborhood pattern for the individual
-        int[] CreateRandomPattern(int myIndex, bool includeSelf, int popsize, int NeighborhoodSize,
+        int[] CreateRandomPattern(int myIndex, bool includeSelf, int popsize, int neighborhoodSize,
             IEvolutionState state,
             int threadnum)
         {
@@ -175,15 +175,15 @@ namespace BraneCloud.Evolution.EC.PSO
 
             if (includeSelf)
             {
-                neighbors = new int[NeighborhoodSize + 1];
-                neighbors[NeighborhoodSize] = myIndex; // put me at the top
+                neighbors = new int[neighborhoodSize + 1];
+                neighbors[neighborhoodSize] = myIndex; // put me at the top
                 already.Add(myIndex);
             }
             else
-                neighbors = new int[NeighborhoodSize];
+                neighbors = new int[neighborhoodSize];
 
             Int32 n;
-            for (int i = 0; i < NeighborhoodSize; i++)
+            for (int i = 0; i < neighborhoodSize; i++)
             {
                 do
                 {
@@ -197,25 +197,25 @@ namespace BraneCloud.Evolution.EC.PSO
         }
 
         // Creates a toroidal Neighborhood pattern for the individual indexed by 'myindex'
-        int[] CreateToroidalPattern(int myindex, bool includeSelf, int popsize, int NeighborhoodSize)
+        int[] CreateToroidalPattern(int myindex, bool includeSelf, int popsize, int neighborhoodSize)
         {
-            int[] neighbors = null;
+            int[] neighbors;
 
             if (includeSelf)
             {
-                neighbors = new int[NeighborhoodSize + 1];
-                neighbors[NeighborhoodSize] = myindex; // put me at the top
+                neighbors = new int[neighborhoodSize + 1];
+                neighbors[neighborhoodSize] = myindex; // put me at the top
             }
             else
-                neighbors = new int[NeighborhoodSize];
+                neighbors = new int[neighborhoodSize];
 
             int pos = 0;
-            for (int i = myindex - NeighborhoodSize / 2; i < myindex; i++)
+            for (int i = myindex - neighborhoodSize / 2; i < myindex; i++)
             {
                 neighbors[pos++] = ((i % popsize) + popsize) % popsize;
             }
 
-            for (int i = myindex + 1; i < NeighborhoodSize - (NeighborhoodSize / 2) + 1; i++)
+            for (int i = myindex + 1; i < neighborhoodSize - (neighborhoodSize / 2) + 1; i++)
             {
                 neighbors[pos++] = ((i % popsize) + popsize) % popsize;
             }
@@ -352,7 +352,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
         // This would be exceptionally weird to use in a PSO context, but for
         // consistency's sake...
-        public void SetGenome(Object gen)
+        public void SetGenome(object gen)
         {
             Genome = gen;
 
@@ -364,7 +364,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
         // This would be exceptionally weird to use in a PSO context, but for
         // consistency's sake...
-        public override void Join(Object[] pieces)
+        public override void Join(object[] pieces)
         {
             base.Join(pieces);
 
@@ -382,57 +382,57 @@ namespace BraneCloud.Evolution.EC.PSO
 
         StringBuilder EncodeAuxillary()
         {
-            StringBuilder s = new StringBuilder();
-            s.Append(AUXILLARY_PREAMBLE);
-            s.Append(Code.Encode(true));
-            s.Append(Code.Encode(Neighborhood != null));
-            s.Append(Code.Encode(NeighborhoodBestGenome != null));
-            s.Append(Code.Encode(NeighborhoodBestFitness != null));
-            s.Append(Code.Encode(PersonalBestGenome != null));
-            s.Append(Code.Encode(PersonalBestFitness != null));
-            s.Append("\n");
+            StringBuilder sb = new StringBuilder();
+            sb.Append(AUXILLARY_PREAMBLE);
+            sb.Append(Code.Encode(true));
+            sb.Append(Code.Encode(Neighborhood != null));
+            sb.Append(Code.Encode(NeighborhoodBestGenome != null));
+            sb.Append(Code.Encode(NeighborhoodBestFitness != null));
+            sb.Append(Code.Encode(PersonalBestGenome != null));
+            sb.Append(Code.Encode(PersonalBestFitness != null));
+            sb.Append("\n");
 
             // Velocity
-            s.Append(Code.Encode(Velocity.Length));
+            sb.Append(Code.Encode(Velocity.Length));
             for (int i = 0; i < Velocity.Length; i++)
-                s.Append(Code.Encode(Velocity[i]));
-            s.Append("\n");
+                sb.Append(Code.Encode(Velocity[i]));
+            sb.Append("\n");
 
             // Neighborhood 
             if (Neighborhood != null)
             {
-                s.Append(Code.Encode(Neighborhood.Length));
+                sb.Append(Code.Encode(Neighborhood.Length));
                 for (int i = 0; i < Neighborhood.Length; i++)
-                    s.Append(Code.Encode(Neighborhood[i]));
-                s.Append("\n");
+                    sb.Append(Code.Encode(Neighborhood[i]));
+                sb.Append("\n");
             }
 
             // Neighborhood best
             if (NeighborhoodBestGenome != null)
             {
-                s.Append(Code.Encode(NeighborhoodBestGenome.Length));
+                sb.Append(Code.Encode(NeighborhoodBestGenome.Length));
                 for (int i = 0; i < NeighborhoodBestGenome.Length; i++)
-                    s.Append(Code.Encode(NeighborhoodBestGenome[i]));
-                s.Append("\n");
+                    sb.Append(Code.Encode(NeighborhoodBestGenome[i]));
+                sb.Append("\n");
             }
 
             if (NeighborhoodBestFitness != null)
-                s.Append(NeighborhoodBestFitness.FitnessToString());
+                sb.Append(NeighborhoodBestFitness.FitnessToString());
 
             // personal     best
             if (PersonalBestGenome != null)
             {
-                s.Append(Code.Encode(PersonalBestGenome.Length));
+                sb.Append(Code.Encode(PersonalBestGenome.Length));
                 for (int i = 0; i < PersonalBestGenome.Length; i++)
-                    s.Append(Code.Encode(PersonalBestGenome[i]));
-                s.Append("\n");
+                    sb.Append(Code.Encode(PersonalBestGenome[i]));
+                sb.Append("\n");
             }
 
             if (PersonalBestFitness != null)
-                s.Append(PersonalBestFitness.FitnessToString());
-            s.Append("\n");
+                sb.Append(PersonalBestFitness.FitnessToString());
+            sb.Append("\n");
 
-            return s;
+            return sb;
         }
 
         public override void PrintIndividual(IEvolutionState state, int log)
@@ -457,27 +457,27 @@ namespace BraneCloud.Evolution.EC.PSO
             Code.Decode(d);
             if (d.Type != DecodeReturn.T_BOOLEAN)
                 state.Output.Fatal("Line " + d.LineNumber + " should have six boolean values but seems to have fewer.");
-            bool v = (d.L != 0);
+            bool v = d.L != 0;
             Code.Decode(d);
             if (d.Type != DecodeReturn.T_BOOLEAN)
                 state.Output.Fatal("Line " + d.LineNumber + " should have six boolean values but seems to have fewer.");
-            bool n = (d.L != 0);
+            bool n = d.L != 0;
             Code.Decode(d);
             if (d.Type != DecodeReturn.T_BOOLEAN)
                 state.Output.Fatal("Line " + d.LineNumber + " should have six boolean values but seems to have fewer.");
-            bool nb = (d.L != 0);
+            bool nb = d.L != 0;
             Code.Decode(d);
             if (d.Type != DecodeReturn.T_BOOLEAN)
                 state.Output.Fatal("Line " + d.LineNumber + " should have six boolean values but seems to have fewer.");
-            bool nbf = (d.L != 0);
+            bool nbf = d.L != 0;
             Code.Decode(d);
             if (d.Type != DecodeReturn.T_BOOLEAN)
                 state.Output.Fatal("Line " + d.LineNumber + " should have six boolean values but seems to have fewer.");
-            bool pb = (d.L != 0);
+            bool pb = d.L != 0;
             Code.Decode(d);
             if (d.Type != DecodeReturn.T_BOOLEAN)
                 state.Output.Fatal("Line " + d.LineNumber + " should have six boolean values but seems to have fewer.");
-            bool pbf = (d.L != 0);
+            bool pbf = d.L != 0;
 
             // Next, read auxillary arrays.
             if (v)
@@ -487,7 +487,7 @@ namespace BraneCloud.Evolution.EC.PSO
                 Code.Decode(d);
                 if (d.Type != DecodeReturn.T_INT)
                     state.Output.Fatal("Velocity length missing.");
-                Velocity = new double[(int) (d.L)];
+                Velocity = new double[(int) d.L];
                 for (int i = 0; i < Velocity.Length; i++)
                 {
                     Code.Decode(d);
@@ -564,7 +564,7 @@ namespace BraneCloud.Evolution.EC.PSO
             {
                 // here we don't know what kind of fitness it is.  So we'll do our best and guess
                 // that it's the same fitness as our own Particle 
-                PersonalBestFitness = (Fitness) (Fitness.Clone());
+                PersonalBestFitness = (Fitness) Fitness.Clone();
                 PersonalBestFitness.ReadFitness(state, reader);
             }
         }
@@ -660,7 +660,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             if (dataInput.ReadBoolean())
             {
-                NeighborhoodBestFitness = (Fitness) (Fitness.Clone());
+                NeighborhoodBestFitness = (Fitness) Fitness.Clone();
                 NeighborhoodBestFitness.ReadFitness(state, dataInput);
             }
 
@@ -674,7 +674,7 @@ namespace BraneCloud.Evolution.EC.PSO
 
             if (dataInput.ReadBoolean())
             {
-                PersonalBestFitness = (Fitness) (Fitness.Clone());
+                PersonalBestFitness = (Fitness) Fitness.Clone();
                 PersonalBestFitness.ReadFitness(state, dataInput);
             }
         }

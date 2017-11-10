@@ -437,7 +437,7 @@ namespace BraneCloud.Evolution.EC.GP
             if (!NodeEquals(node))
                 return false;
             for (var x = 0; x < Children.Length; x++)
-                if (!(Children[x].RootedTreeEquals(node.Children[x])))
+                if (!Children[x].RootedTreeEquals(node.Children[x]))
                     return false;
             return true;
         }
@@ -623,8 +623,8 @@ namespace BraneCloud.Evolution.EC.GP
         /// </summary>
         public virtual bool NodeEquivalentTo(GPNode node)
         {
-            return (GetType().Equals(node.GetType()) && Children.Length == node.Children.Length &&
-                    ConstraintsIndex == node.ConstraintsIndex);
+            return GetType().Equals(node.GetType()) && Children.Length == node.Children.Length &&
+                   ConstraintsIndex == node.ConstraintsIndex;
         }
 
         /// <summary>
@@ -672,9 +672,9 @@ namespace BraneCloud.Evolution.EC.GP
 
             // replace the Parent pointer
             if (Parent is GPNode)
-                ((GPNode) (Parent)).Children[ArgPosition] = newNode;
+                ((GPNode) Parent).Children[ArgPosition] = newNode;
             else
-                ((GPTree) (Parent)).Child = newNode;
+                ((GPTree) Parent).Child = newNode;
 
             // replace the child pointers
             for (var x = 0; x < Children.Length; x++)
@@ -699,10 +699,10 @@ namespace BraneCloud.Evolution.EC.GP
             GPType type;
             if (node.Parent is GPNode)
                 // it's a GPNode
-                type = ((GPNode) (node.Parent)).Constraints(initializer).ChildTypes[node.ArgPosition];
+                type = ((GPNode) node.Parent).Constraints(initializer).ChildTypes[node.ArgPosition];
             // it's a tree root; I'm set compatible with the GPTree type
             else
-                type = ((GPTree) (node.Parent)).Constraints(initializer).TreeType;
+                type = ((GPTree) node.Parent).Constraints(initializer).TreeType;
 
             return Constraints(initializer).ReturnType.CompatibleWith(initializer, type);
         }

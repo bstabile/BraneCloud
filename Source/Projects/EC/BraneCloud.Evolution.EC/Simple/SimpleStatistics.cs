@@ -145,7 +145,7 @@ namespace BraneCloud.Evolution.EC.Simple
 
             // set up our Best_Of_Run array -- can't do this in Setup, because
             // we don't know if the number of subpops has been determined yet
-            BestOfRun = new Individual[state.Population.Subpops.Length];
+            BestOfRun = new Individual[state.Population.Subpops.Count];
         }
 
         bool warned = false;
@@ -157,11 +157,11 @@ namespace BraneCloud.Evolution.EC.Simple
             base.PostEvaluationStatistics(state);
 
             // for now we just print the best fitness per subpop.
-            var bestI = new Individual[state.Population.Subpops.Length]; // quiets compiler complaints
-            for (var x = 0; x < state.Population.Subpops.Length; x++)
+            var bestI = new Individual[state.Population.Subpops.Count]; // quiets compiler complaints
+            for (var x = 0; x < state.Population.Subpops.Count; x++)
             {
                 bestI[x] = state.Population.Subpops[x].Individuals[0];
-                for (var y = 1; y < state.Population.Subpops[x].Individuals.Length; y++)
+                for (var y = 1; y < state.Population.Subpops[x].Individuals.Count; y++)
                 {
                     if (state.Population.Subpops[x].Individuals[y] == null)
                     {
@@ -191,7 +191,7 @@ namespace BraneCloud.Evolution.EC.Simple
             // print the best-of-generation individual
             if (DoGeneration) state.Output.PrintLn("\nGeneration: " + state.Generation, StatisticsLog);
             if (DoGeneration) state.Output.PrintLn("Best Individual:", StatisticsLog);
-            for (var x = 0; x < state.Population.Subpops.Length; x++)
+            for (var x = 0; x < state.Population.Subpops.Count; x++)
             {
                 if (DoGeneration) state.Output.PrintLn("Subpopulation " + x + ":", StatisticsLog);
                 if (DoGeneration) bestI[x].PrintIndividualForHumans(state, StatisticsLog);
@@ -229,7 +229,7 @@ namespace BraneCloud.Evolution.EC.Simple
 
             if (DoFinal) state.Output.PrintLn("\nBest Individual of Run:", StatisticsLog);
 
-            for (var x = 0; x < state.Population.Subpops.Length; x++)
+            for (var x = 0; x < state.Population.Subpops.Count; x++)
             {
                 if (DoFinal) state.Output.PrintLn("Subpopulation " + x + ":", StatisticsLog);
                 if (DoFinal) BestOfRun[x].PrintIndividualForHumans(state, StatisticsLog);

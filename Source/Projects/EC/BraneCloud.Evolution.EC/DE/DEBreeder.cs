@@ -110,14 +110,14 @@ namespace BraneCloud.Evolution.EC.DE
         public virtual void PrepareDEBreeder(IEvolutionState state)
         {
             // update the bestSoFar for each population
-            if (BestSoFarIndex == null || state.Population.Subpops.Length != BestSoFarIndex.Length)
-                BestSoFarIndex = new int[state.Population.Subpops.Length];
+            if (BestSoFarIndex == null || state.Population.Subpops.Count != BestSoFarIndex.Length)
+                BestSoFarIndex = new int[state.Population.Subpops.Count];
 
-            for (var subpop = 0; subpop < state.Population.Subpops.Length; subpop++)
+            for (var subpop = 0; subpop < state.Population.Subpops.Count; subpop++)
             {
                 var inds = state.Population.Subpops[subpop].Individuals;
                 BestSoFarIndex[subpop] = 0;
-                for (var j = 1; j < inds.Length; j++)
+                for (var j = 1; j < inds.Count; j++)
                     if (inds[j].Fitness.BetterThan(inds[BestSoFarIndex[subpop]].Fitness))
                         BestSoFarIndex[subpop] = j;
             }
@@ -133,18 +133,19 @@ namespace BraneCloud.Evolution.EC.DE
             PrepareDEBreeder(state);
 
             // create the new population
-            var newpop = (Population)state.Population.EmptyClone();
+            Population newpop = state.Population.EmptyClone();
 
             // breed the children
-            for (var subpop = 0; subpop < state.Population.Subpops.Length; subpop++)
+            for (var subpop = 0; subpop < state.Population.Subpops.Count; subpop++)
             {
-                if (state.Population.Subpops[subpop].Individuals.Length < 4)  // Magic number, sorry.  createIndividual() requires at least 4 individuals in the pop
+                if (state.Population.Subpops[subpop].Individuals.Count < 4)  // Magic number, sorry.  createIndividual() requires at least 4 individuals in the pop
                     state.Output.Fatal("Subpopulation " + subpop + " has fewer than four individuals, and so cannot be used with DEBreeder.");
 
                 var inds = newpop.Subpops[subpop].Individuals;
-                for (var i = 0; i < inds.Length; i++)
+                int size = state.Population.Subpops[subpop].Individuals.Count;
+                for (var i = 0; i < size; i++)
                 {
-                    newpop.Subpops[subpop].Individuals[i] = CreateIndividual(state, subpop, i, 0);  // unthreaded for now
+                    newpop.Subpops[subpop].Individuals.Add(CreateIndividual(state, subpop, i, 0));  // unthreaded for now
                 }
             }
 
@@ -178,23 +179,23 @@ namespace BraneCloud.Evolution.EC.DE
                 int r0, r1, r2;
                 do
                 {
-                    r0 = state.Random[thread].NextInt(inds.Length);
+                    r0 = state.Random[thread].NextInt(inds.Count);
                 }
                 while (r0 == index);
                 do
                 {
-                    r1 = state.Random[thread].NextInt(inds.Length);
+                    r1 = state.Random[thread].NextInt(inds.Count);
                 }
                 while (r1 == r0 || r1 == index);
                 do
                 {
-                    r2 = state.Random[thread].NextInt(inds.Length);
+                    r2 = state.Random[thread].NextInt(inds.Count);
                 }
                 while (r2 == r1 || r2 == r0 || r2 == index);
 
-                var g0 = (DoubleVectorIndividual)(inds[r0]);
-                var g1 = (DoubleVectorIndividual)(inds[r1]);
-                var g2 = (DoubleVectorIndividual)(inds[r2]);
+                var g0 = (DoubleVectorIndividual)inds[r0];
+                var g1 = (DoubleVectorIndividual)inds[r1];
+                var g2 = (DoubleVectorIndividual)inds[r2];
 
                 for (var i = 0; i < v.genome.Length; i++)
                     v.genome[i] = g0.genome[i] + F * (g1.genome[i] - g2.genome[i]);

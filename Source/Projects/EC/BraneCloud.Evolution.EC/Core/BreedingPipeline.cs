@@ -76,6 +76,9 @@ namespace BraneCloud.Evolution.EC
         /// </summary>
         public const string V_SAME = "same";
 
+        /** Indicates that the source will be filled later via a call to setStubs(). */
+        public const string V_STUB = "stub";
+
         /// <summary>
         /// Indicates the probability that the Breeding Pipeline will perform 
         /// its mutative action instead of just doing reproduction.
@@ -83,8 +86,7 @@ namespace BraneCloud.Evolution.EC
         public const String P_LIKELIHOOD = "likelihood";
 
         /// <summary>
-        /// Indicates that the number of sources is variable and determined by the
-        /// user in the parameter file. 
+        /// Indicates that the number of sources is not hard coded but is determined by the user in the parameter file.
         /// </summary>       
         public const int DYNAMIC_SOURCES = -1;
 
@@ -174,9 +176,13 @@ namespace BraneCloud.Evolution.EC
                     // else the source is the same source as before
                     Sources[x] = Sources[x - 1];
                 }
+                else if (s != null && s.Equals(V_STUB))
+                {
+                    Sources[x] = null;
+                }
                 else
                 {
-                    Sources[x] = (IBreedingSource)(state.Parameters.GetInstanceForParameter(p, d, typeof(IBreedingSource)));
+                    Sources[x] = (IBreedingSource)state.Parameters.GetInstanceForParameter(p, d, typeof(IBreedingSource));
                     Sources[x].Setup(state, p);
                 }
             }
@@ -195,7 +201,7 @@ namespace BraneCloud.Evolution.EC
                         MyBase.Push(P_SOURCE).Push("" + x), DefaultBase.Push(P_SOURCE).Push("" + x));
                 }
                 else
-                    ((ISteadyStateBSource)(Sources[x])).SourcesAreProperForm(state);
+                    ((ISteadyStateBSource)Sources[x]).SourcesAreProperForm(state);
         }
 
         /// <summary>
@@ -240,6 +246,22 @@ namespace BraneCloud.Evolution.EC
             }
         }
 
+        public override void FillStubs(IEvolutionState state, IBreedingSource source)
+        {
+            for (int x = 0; x < Sources.Length; x++)
+            {
+                if (Sources[x] == null) // fill the stub
+                {
+                    if (source == null)
+                        state.Output.Fatal("BreedingPipeline needed to fill a stub, but no BreedingSource was provided to fill it.\n" +
+                                           "This is probably because no parent pipeline was a StubPipeline.");
+                    Sources[x] = source;
+                }
+                else
+                    Sources[x].FillStubs(state, source);
+            }
+        }
+
         /// <summary>
         /// Returns the "typical" number of individuals produced -- by default
         /// this is the minimum typical number of individuals produced by any
@@ -247,20 +269,6 @@ namespace BraneCloud.Evolution.EC
         /// override this method. 
         /// </summary>
         public override int TypicalIndsProduced => MinChildProduction;
-
-        /// <summary>
-        /// Performs direct cloning of n individuals.  if produceChildrenFromSource is true, then...
-        /// </summary>
-        public int Reproduce(int n, int start, int subpopulation, Individual[] inds, IEvolutionState state,
-                             int thread, bool produceChildrenFromSource)
-        {
-            if (produceChildrenFromSource)
-                Sources[0].Produce(n, n, start, subpopulation, inds, state, thread);
-            if (Sources[0] is SelectionMethod)
-                for (var q = start; q < n + start; q++)
-                    inds[q] = (Individual)(inds[q].Clone());
-            return n;
-        }
 
         public override bool Produces(IEvolutionState state, Population newpop, int subpop, int thread)
         {
@@ -274,8 +282,16 @@ namespace BraneCloud.Evolution.EC
         public override void PrepareToProduce(IEvolutionState state, int subpop, int thread)
         {
             for (var x = 0; x < Sources.Length; x++)
-                if (x == 0 || Sources[x] != Sources[x - 1])
+            {
+                if (Sources[x] == null) // uh oh
+                {
+                    state.Output.Fatal("Stub not filled in Breeding Pipeline.");
+                }
+                else if (x == 0 || Sources[x] != Sources[x - 1])
+                {
                     Sources[x].PrepareToProduce(state, subpop, thread);
+                }
+            }
         }
 
         public override void FinishProducing(IEvolutionState state, int subpop, int thread)
@@ -304,7 +320,7 @@ namespace BraneCloud.Evolution.EC
 
         public override object Clone()
         {
-            var c = (BreedingPipeline)(base.Clone());
+            var c = (BreedingPipeline)base.Clone();
 
             // make a new array
             c.Sources = new IBreedingSource[Sources.Length];
@@ -315,8 +331,12 @@ namespace BraneCloud.Evolution.EC
 
             for (var x = 0; x < Sources.Length; x++)
             {
-                if (x == 0 || Sources[x] != Sources[x - 1])
-                    c.Sources[x] = (IBreedingSource)(Sources[x].Clone());
+                if (Sources[x] == null) // a stub
+                {
+                    // do nothing
+                }
+                else if (x == 0 || Sources[x] != Sources[x - 1])  // not "same"
+                    c.Sources[x] = (IBreedingSource)Sources[x].Clone();
                 else
                     c.Sources[x] = c.Sources[x - 1];
             }

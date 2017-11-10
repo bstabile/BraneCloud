@@ -438,7 +438,7 @@ namespace BraneCloud.Evolution.EC.App.ECSuite
             if (_alreadyChecked || state.Generation > 0) return;
             _alreadyChecked = true;
 
-            for (var i = 0; i < state.Population.Subpops.Length; i++)
+            for (var i = 0; i < state.Population.Subpops.Count; i++)
             {
                 if (!(state.Population.Subpops[i].Species is FloatVectorSpecies))
                 {

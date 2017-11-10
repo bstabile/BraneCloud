@@ -14,7 +14,7 @@ namespace BraneCloud.Evolution.EC.Problems.Mona
             base.PostEvaluationStatistics(state);
 
             bool newBest = false;
-            for (int y = 0; y < state.Population.Subpops[0].Individuals.Length; y++)
+            for (int y = 0; y < state.Population.Subpops[0].Individuals.Count; y++)
                 if (BestOfRun == null ||
                     state.Population.Subpops[0].Individuals[y].Fitness.BetterThan(BestOfRun.Fitness))
                 {

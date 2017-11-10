@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Simple;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
 {
@@ -39,7 +40,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
         {
             base.Setup(state, paramBase);
 
-            for (int i = 0; i < state.Population.Subpops.Length; i++)
+            for (int i = 0; i < state.Population.Subpops.Count; i++)
                 if (ReduceBy[i] != 0)
                     state.Output.Fatal("SPEA2Breeder does not support population reduction.", paramBase.Push(P_REDUCE_BY).Push("" + i), null);
 
@@ -57,14 +58,14 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
         protected override void LoadElites(IEvolutionState state, Population newpop)
         {
             // are our elites small enough?
-            for (var x = 0; x < state.Population.Subpops.Length; x++)
-                if (NumElites(state, x) > state.Population.Subpops[x].Individuals.Length)
+            for (var x = 0; x < state.Population.Subpops.Count; x++)
+                if (NumElites(state, x) > state.Population.Subpops[x].Individuals.Count)
                     state.Output.Error("The number of elites for subpopulation " + x + " exceeds the actual size of the subpopulation",
                         new Parameter(EvolutionState.P_BREEDER).Push(P_ELITE).Push("" + x));
             state.Output.ExitIfErrors();
 
             // do it
-            for (var sub = 0; sub < state.Population.Subpops.Length; sub++)
+            for (var sub = 0; sub < state.Population.Subpops.Count; sub++)
             {
                 var newInds = newpop.Subpops[sub].Individuals;  // The new population after we are done picking the elites                 
                 var oldInds = state.Population.Subpops[sub].Individuals;   // The old population from which to pick elites
@@ -76,17 +77,17 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
             UnmarkElitesEvaluated(state, newpop);
         }
 
-        public double[] CalculateDistancesFromIndividual(Individual ind, Individual[] inds)
+        public double[] CalculateDistancesFromIndividual(Individual ind, IList<Individual> inds)
         {
-            var d = new double[inds.Length];
-            for (var i = 0; i < inds.Length; i++)
+            var d = new double[inds.Count];
+            for (var i = 0; i < inds.Count; i++)
                 d[i] = ((SPEA2MultiObjectiveFitness)ind.Fitness).SumSquaredObjectiveDistance((SPEA2MultiObjectiveFitness)inds[i].Fitness);
             // now sort
             Array.Sort(d);
             return d;
         }
 
-        public void BuildArchive(IEvolutionState state, Individual[] oldInds, Individual[] newInds, int archiveSize)
+        public void BuildArchive(IEvolutionState state, IList<Individual> oldInds, IList<Individual> newInds, int archiveSize)
         {
             // step 1: load the archive with the pareto-nondominated front
             var archive = new List<Individual>();
@@ -99,8 +100,8 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
             {
                 // BRS : The following uses Individual's IComparable implementation based on Fitness.
                 // The fitter individuals will be earlier
-                nonFront.Sort();
-                var len = (archiveSize - currentArchiveSize);
+                nonFront.SortByFitnessDescending();
+                var len = archiveSize - currentArchiveSize;
                 for (var i = 0; i < len; i++)
                 {
                     archive.Add(nonFront[i]);
@@ -124,7 +125,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
                     var competitor = archive[i];
                     var competitorD = CalculateDistancesFromIndividual(competitor, oldInds);
 
-                    for (var k = 0; k < oldInds.Length; k++)
+                    for (var k = 0; k < oldInds.Count; k++)
                     {
                         if (closestD[i] > competitorD[i])
                         {
@@ -148,7 +149,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
             // step 4: put clones of the archive in the new individuals
             var arr = archive.ToArray();
             for (var i = 0; i < archiveSize; i++)
-                newInds[newInds.Length - archiveSize + i] = (Individual)arr[i].Clone();
+                newInds[newInds.Count - archiveSize + i] = (Individual)arr[i].Clone();
         }
 
         #endregion // Operations

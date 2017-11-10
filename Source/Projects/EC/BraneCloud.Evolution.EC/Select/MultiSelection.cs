@@ -145,19 +145,23 @@ namespace BraneCloud.Evolution.EC.Select
 
         public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
         {
+            base.PrepareToProduce(s, subpop, thread);
+
             foreach (SelectionMethod sm in Selects)
                 sm.PrepareToProduce(s, subpop, thread);
         }
 
         public override int Produce(int subpop, IEvolutionState state, int thread)
         {
-            return Selects[PickRandom(Selects, state.Random[thread].NextDouble())].Produce(subpop, state, thread);
+            return Selects[BreedingSource.PickRandom(Selects, state.Random[thread].NextDouble())].Produce(subpop, state, thread);
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
-        {
-            return Selects[PickRandom(Selects, state.Random[thread].NextDouble())].Produce(min, max, start, subpop, inds, state, thread);
-        }
+        // Proposed change in semantics: MultiSelection now picks randomly EVERY time it select an
+        // individual, not just a group of individuals
+        //public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        //{
+        //    return Selects[PickRandom(Selects, state.Random[thread].NextDouble())].Produce(min, max, start, subpop, inds, state, thread);
+        //}
 
         public override void PreparePipeline(object hook)
         {

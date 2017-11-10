@@ -17,7 +17,10 @@
  */
 
 using System;
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
+using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC
 {
@@ -39,16 +42,15 @@ namespace BraneCloud.Evolution.EC
 
         public const int INDS_PRODUCED = 1;
 
-        #endregion // Constants
+        public const string KEY_PARENTS = "parents";
+
+            #endregion // Constants
         #region Properties
 
         /// <summary>
         /// Returns 1 (the typical default value). 
         /// </summary>
-        public override int TypicalIndsProduced
-        {
-            get { return INDS_PRODUCED; }
-        }
+        public override int TypicalIndsProduced => INDS_PRODUCED;
 
         #endregion // Properties
         #region Operations
@@ -75,7 +77,6 @@ namespace BraneCloud.Evolution.EC
         /// </summary>
         public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
         {
-            return;
         }
 
         /// <summary>
@@ -83,19 +84,58 @@ namespace BraneCloud.Evolution.EC
         /// </summary>
         public override void FinishProducing(IEvolutionState s, int subpop, int thread)
         {
-            return;
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread, 
+            IDictionary<string, object> misc)
         {
-            var n = INDS_PRODUCED;
-            if (n < min)
-                n = min;
-            if (n > max)
-                n = max;
+            int start = inds.Count;
+            int n = ProduceWithoutCloning(min, max, subpop, inds, state, thread, misc);
 
-            for (var q = 0; q < n; q++)
-                inds[start + q] = state.Population.Subpops[subpop].Individuals[Produce(subpop, state, thread)];
+            // clone every produced individual
+            for (int q = start; q < n + start; q++)
+            {
+                //System.err.println("" + this + " makes " + inds.get(q));
+                inds[q] = (Individual)inds[q].Clone();
+            }
+
+            return n;
+        }
+
+        public virtual int ProduceWithoutCloning(
+            int min,
+            int max,
+            int subpop,
+            IList<Individual> inds,
+            IEvolutionState state,
+            int thread, 
+            IDictionary<String, Object> misc)
+        {
+            int start = inds.Count;
+
+            int n = INDS_PRODUCED;
+            if (n < min) n = min;
+            if (n > max) n = max;
+
+            for (int q = 0; q < n; q++)
+            {
+                int index = Produce(subpop, state, thread);
+
+                inds.Add(state.Population.Subpops[subpop].Individuals[index]);
+                // by Ermo. seems the misc forget to check if misc is null
+                if (misc?[KEY_PARENTS] != null)
+                {
+                    IntBag bag = new IntBag(1);
+                    bag.Add(index);
+                    ((IntBag[])misc[KEY_PARENTS])[start + q] = bag;
+                }
+            }
             return n;
         }
 

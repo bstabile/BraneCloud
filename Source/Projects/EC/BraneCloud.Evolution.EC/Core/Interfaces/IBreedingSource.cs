@@ -16,6 +16,7 @@
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
 
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
 
@@ -37,7 +38,7 @@ namespace BraneCloud.Evolution.EC
     /// Some BreedingSources, <i>SelectionMethods</i>,
     /// are meant solely to plug into other BreedingSources, <i>BreedingPipelines</i>.
     /// BreedingPipelines can plug into other BreedingPipelines, and can also be
-    /// used to provide the final Individual meant to populate a new generation.
+    /// used to provide the Individual meant to populate a new generation.
     /// 
     /// <p/>Think of BreedingSources as Streams of Individuals; at one end of the
     /// stream is the provider, a SelectionMethod, which picks individuals from
@@ -56,16 +57,22 @@ namespace BraneCloud.Evolution.EC
     public interface IBreedingSource : IPrototype, IRandomChoiceChooserD
     {
         double Probability { get; set; }
-        int PickRandom(IBreedingSource[] sources, double prob);
+
+        // BRS: Gone away in version 25?
+        //int PickRandom(IBreedingSource[] sources, double prob);
+
         void SetupProbabilities(IBreedingSource[] sources);
 
         int TypicalIndsProduced { get; }
 
-        int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread);
+        int Produce(int min, int max, int subpop, IList<Individual> inds, IEvolutionState state, int thread, IDictionary<string, object> misc);
         bool Produces(IEvolutionState state, Population newpop, int subpop, int thread);
         void PrepareToProduce(IEvolutionState state, int subpop, int thread);
         void FinishProducing(IEvolutionState state, int subpop, int thread);
 
         void PreparePipeline(object hook);
+
+        void FillStubs(IEvolutionState state, IBreedingSource source);
+
     }
 }

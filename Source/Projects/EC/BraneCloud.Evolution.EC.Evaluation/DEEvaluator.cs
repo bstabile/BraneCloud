@@ -52,13 +52,13 @@ namespace BraneCloud.Evolution.EC.Evaluation
                 var previousPopulation = ((DEBreeder)(state.Breeder)).PreviousPopulation; // for faster access
                 if (previousPopulation != null)
                 {
-                    if (previousPopulation.Subpops.Length != state.Population.Subpops.Length)
+                    if (previousPopulation.Subpops.Count != state.Population.Subpops.Count)
                         state.Output.Fatal("DEEvaluator requires that the population have the same number of subpopulations every generation.");
-                    for (var i = 0; i < previousPopulation.Subpops.Length; i++)
+                    for (var i = 0; i < previousPopulation.Subpops.Count; i++)
                     {
-                        if (state.Population.Subpops[i].Individuals.Length != previousPopulation.Subpops[i].Individuals.Length)
+                        if (state.Population.Subpops[i].Individuals.Count != previousPopulation.Subpops[i].Individuals.Count)
                             state.Output.Fatal("DEEvaluator requires that subpopulation " + i + " should have the same number of individuals in all generations.");
-                        for (var j = 0; j < state.Population.Subpops[i].Individuals.Length; j++)
+                        for (var j = 0; j < state.Population.Subpops[i].Individuals.Count; j++)
                             if (previousPopulation.Subpops[i].Individuals[j].Fitness.BetterThan(state.Population.Subpops[i].Individuals[j].Fitness))
                                 state.Population.Subpops[i].Individuals[j] = previousPopulation.Subpops[i].Individuals[j];
                     }

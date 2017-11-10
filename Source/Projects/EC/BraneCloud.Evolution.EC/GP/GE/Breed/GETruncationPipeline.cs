@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.GP.GE.Breed
@@ -42,31 +43,32 @@ namespace BraneCloud.Evolution.EC.GP.GE.Breed
         public override int Produce(
             int min,
             int max,
-            int start,
-            int subpopulation,
-            Individual[] inds,
+            int subpop,
+            IList<Individual> inds,
             IEvolutionState state,
-            int thread)
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpopulation, inds, state, thread);
+            var n = Sources[0].Produce(min, max, subpop, inds, state, thread, misc);
 
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpopulation, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
 
 
 
             // now let's mutate 'em
             for (var q = start; q < n + start; q++)
             {
-                if (Sources[0] is SelectionMethod)
-                    inds[q] = (Individual)(inds[q].Clone());
-
-                var ind = (GEIndividual)(inds[q]);
-                var species = (GESpecies)(ind.Species);
+                var ind = (GEIndividual)inds[q];
+                var species = (GESpecies) ind.Species;
 
                 var consumed = species.Consumed(state, ind, thread);
                 if (consumed <= 1) continue;

@@ -166,10 +166,12 @@ namespace BraneCloud.Evolution.EC.Select
 
         public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
         {
+            base.PrepareToProduce(s, subpop, thread);
+
             LastIndex = 0;
             Steps = 0;
 
-            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Length];
+            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Count];
 
             // compute offset
             Offset = (double)(s.Random[thread].NextDouble() / Fitnesses.Length);
@@ -183,7 +185,7 @@ namespace BraneCloud.Evolution.EC.Select
             }
 
             // construct and optionally shuffle fitness distribution and indices
-            Indices = new int[s.Population.Subpops[subpop].Individuals.Length];
+            Indices = new int[s.Population.Subpops[subpop].Individuals.Count];
             for (var i = 0; i < Indices.Length; i++) Indices[i] = i;
             if (Shuffle) ShuffleFitnessesAndIndices(s.Random[thread], Fitnesses, Indices);
 

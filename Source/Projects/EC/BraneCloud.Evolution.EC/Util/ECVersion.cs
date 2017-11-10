@@ -30,8 +30,8 @@ namespace BraneCloud.Evolution.EC.Util
         #region Constants
 
         public const string name = "BrainCloud.Evolution.EC";
-        public const String version = "23";
-        public const String copyright = "2015";
+        public const String version = "25";
+        public const String copyright = "2017";
         public const String authorDotNet = "Bennett R. Stabile";
         public const String authorECJ = "Sean Luke";
         public const String contributors = "L. Panait, G. Balan, S. Paus, Z. Skolicki, R. Kicinger,";

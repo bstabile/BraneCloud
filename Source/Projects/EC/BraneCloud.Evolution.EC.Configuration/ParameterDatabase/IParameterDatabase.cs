@@ -76,6 +76,13 @@ namespace BraneCloud.Evolution.EC.Configuration
         //double GetDoubleWithDefault(IParameter parameter, IParameter defaultParameter, double defaultValue);
         //double GetDoubleWithMax(IParameter parameter, IParameter defaultParameter, double minValue, double maxValue);
 
+        //double[] GetDoublesWithMax(IParameter parameter, IParameter defaultParameter, double minValue, double maxValue, int expectedLength);
+        //double[] GetDoublesWithMax(IParameter parameter, IParameter defaultParameter, double minValue, double maxValue);
+        //double[] GetDoubles(IParameter parameter, IParameter defaultParameter, double minValue, int expectedLength);
+        //double[] GetDoubles(IParameter parameter, IParameter defaultParameter, double minValue);
+        //double[] GetDoublesUnconstrained(IParameter parameter, IParameter defaultParameter, int expectedLength);
+        //double[] GetDoublesUnconstrained(IParameter parameter, IParameter defaultParameter);
+
         //long GetLong(IParameter parameter, IParameter defaultParameter);
         //long GetLong(IParameter parameter, IParameter defaultParameter, long minValue);
         //long GetLong(IParameter parameter, IParameter defaultParameter, long minValue, long maxValue);

@@ -17,13 +17,10 @@
  */
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using BraneCloud.Evolution.EC.Logging;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
-using BraneCloud.Evolution.EC.Util;
-using SharpenMinimal;
 
 namespace BraneCloud.Evolution.EC.Simple
 {
@@ -32,7 +29,7 @@ namespace BraneCloud.Evolution.EC.Simple
     /// awk or other Unix tools.  Prints fitness information,
     /// one generation (or pseudo-generation) per line.
     /// If do-time is true, then timing information is also given.  If do-size is true, then size information is also given.
-    /// No final statistics information is provided.  You can also set SimpleShortStatistics to only output every *modulus* generations
+    /// No statistics information is provided.  You can also set SimpleShortStatistics to only output every *modulus* generations
     /// to keep the tally shorter.  And you can gzip the statistics file.    
     ///  
     /// <p/> Each line represents a single generation.  
@@ -204,7 +201,7 @@ namespace BraneCloud.Evolution.EC.Simple
 
             // set up our BestSoFar array -- can't do this in Setup, because
             // we don't know if the number of subpops has been determined yet
-            BestSoFar = new Individual[state.Population.Subpops.Length];
+            BestSoFar = new Individual[state.Population.Subpops.Count];
 
             // print out our generation number
             if (output)
@@ -213,8 +210,8 @@ namespace BraneCloud.Evolution.EC.Simple
             }
 
             // gather timings       
-            TotalSizeSoFar = new long[state.Population.Subpops.Length];
-            TotalIndsSoFar = new long[state.Population.Subpops.Length];
+            TotalSizeSoFar = new long[state.Population.Subpops.Count];
+            TotalIndsSoFar = new long[state.Population.Subpops.Count];
 
             if (output && DoTime)
             {
@@ -279,7 +276,7 @@ namespace BraneCloud.Evolution.EC.Simple
                 state.Output.Print("" + (DateTimeHelper.CurrentTimeMilliseconds - LastTime) + " ", StatisticsLog);
             }
 
-            int subpops = state.Population.Subpops.Length;				// number of supopulations
+            int subpops = state.Population.Subpops.Count;				// number of supopulations
             TotalIndsThisGen = new long[subpops];						// total assessed individuals
             BestOfGeneration = new Individual[subpops];					// per-subpop best individual this generation
             TotalSizeThisGen = new long[subpops];				// per-subpop total size of individuals this generation
@@ -293,7 +290,7 @@ namespace BraneCloud.Evolution.EC.Simple
 
             for (var x = 0; x < subpops; x++)
             {
-                for (var y = 0; y < state.Population.Subpops[x].Individuals.Length; y++)
+                for (var y = 0; y < state.Population.Subpops[x].Individuals.Count; y++)
                 {
                     if (state.Population.Subpops[x].Individuals[y].Evaluated)		// he's got a valid fitness
                     {

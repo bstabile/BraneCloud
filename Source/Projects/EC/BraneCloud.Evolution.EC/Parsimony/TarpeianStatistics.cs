@@ -93,16 +93,16 @@ namespace BraneCloud.Evolution.EC.Parsimony
         /// </summary>
         public override void  PreEvaluationStatistics(IEvolutionState state)
         {
-            for (var subpop = 0; subpop < state.Population.Subpops.Length; subpop++)
+            for (var subpop = 0; subpop < state.Population.Subpops.Count; subpop++)
             {
                 double averageSize = 0;
                 
-                for (var i = 0; i < state.Population.Subpops[subpop].Individuals.Length; i++)
+                for (var i = 0; i < state.Population.Subpops[subpop].Individuals.Count; i++)
                     averageSize += state.Population.Subpops[subpop].Individuals[i].Size;
                 
-                averageSize /= state.Population.Subpops[subpop].Individuals.Length;
+                averageSize /= state.Population.Subpops[subpop].Individuals.Count;
                 
-                for (var i = 0; i < state.Population.Subpops[subpop].Individuals.Length; i++)
+                for (var i = 0; i < state.Population.Subpops[subpop].Individuals.Count; i++)
                 {
                     if ((state.Population.Subpops[subpop].Individuals[i].Size > averageSize) && (state.Random[0].NextDouble() < KillProportion))
                     {

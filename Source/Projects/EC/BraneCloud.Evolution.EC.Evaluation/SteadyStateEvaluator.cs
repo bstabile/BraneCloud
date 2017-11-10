@@ -121,7 +121,7 @@ namespace BraneCloud.Evolution.EC.SteadyState
         /// be returned until the system is ready to provide us with another one.  NULL will
         /// be returned otherwise.
         /// </summary>
-        public Individual GetNextEvaluatedIndividual()
+        public Individual GetNextEvaluatedIndividual(IEvolutionState state)
         {
             QueueIndividual qind = null;
 
@@ -139,6 +139,7 @@ namespace BraneCloud.Evolution.EC.SteadyState
             if (qind == null) return null;
 
             _subpopulationBeingEvaluated = qind.Subpop;
+            state.IncrementEvaluations(1);
             return qind.Ind;
         }
 

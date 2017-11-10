@@ -22,7 +22,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using BraneCloud.Evolution.EC.Eval;
 using BraneCloud.Evolution.EC.Support;
@@ -189,13 +188,13 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
 
             // load the subpops 
             var subpops = new int[numInds]; // subpops desired by each ind
-            var indsPerSubpop = new int[state.Population.Subpops.Length]; // num inds for each subpop
+            var indsPerSubpop = new int[state.Population.Subpops.Count]; // num inds for each subpop
             for (var i = 0; i < numInds; i++)
             {
                 try
                 {
                     subpops[i] = dataIn.ReadInt32();
-                    if (subpops[i] < 0 || subpops[i] >= state.Population.Subpops.Length)
+                    if (subpops[i] < 0 || subpops[i] >= state.Population.Subpops.Count)
                         state.Output.Fatal("Bad subpop number for individual #" + i + ": " + subpops[i]);
                     indsPerSubpop[subpops[i]]++;
                 }
@@ -337,14 +336,14 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
             // classes, Species, etc. in state.setup(), so all we need to do is modify the number
             // of individuals in each subpopulation.
 
-            for (var subpop = 0; subpop < state.Population.Subpops.Length; subpop++)
+            for (var subpop = 0; subpop < state.Population.Subpops.Count; subpop++)
             {
-                if (state.Population.Subpops[subpop].Individuals.Length != indsPerSubpop[subpop])
+                if (state.Population.Subpops[subpop].Individuals.Count != indsPerSubpop[subpop])
                     state.Population.Subpops[subpop].Individuals = new Individual[indsPerSubpop[subpop]];
             }
 
             // Disperse into the population
-            var counts = new int[state.Population.Subpops.Length];
+            var counts = new int[state.Population.Subpops.Count];
             for (var i = 0; i < numInds; i++)
                 state.Population.Subpops[subpops[i]].Individuals[counts[subpops[i]]++] = inds[i];
 
@@ -358,7 +357,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
             }
 
             // re-gather from population in the same order
-            counts = new int[state.Population.Subpops.Length];
+            counts = new int[state.Population.Subpops.Count];
             for (var i = 0; i < numInds; i++)
                 inds[i] = state.Population.Subpops[subpops[i]].Individuals[counts[subpops[i]]++];
 
@@ -396,13 +395,13 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
 
             // load the subpops 
             var subpops = new int[numInds]; // subpops desired by each ind
-            var indsPerSubpop = new int[state.Population.Subpops.Length]; // num inds for each subpop
+            var indsPerSubpop = new int[state.Population.Subpops.Count]; // num inds for each subpop
             for (var i = 0; i < numInds; i++)
             {
                 try
                 {
                     subpops[i] = dataIn.ReadInt32();
-                    if (subpops[i] < 0 || subpops[i] >= state.Population.Subpops.Length)
+                    if (subpops[i] < 0 || subpops[i] >= state.Population.Subpops.Count)
                         state.Output.Fatal("Bad subpop number for individual #" + i + ": " + subpops[i]);
                     indsPerSubpop[subpops[i]]++;
                 }

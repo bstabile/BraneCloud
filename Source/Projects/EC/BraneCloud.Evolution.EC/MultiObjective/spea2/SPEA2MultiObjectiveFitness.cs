@@ -27,7 +27,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective.SPEA2
     /// Replaces earlier class by: Robert Hubley, with revisions by Gabriel Balan and Keith Sullivan
     /// 
     /// SPEA2MultiObjectiveFitness is a subclass of MultiObjectiveFitness which adds three auxiliary fitness
-    /// measures used in SPEA2: strength S(i), kthNNDistance D(i), and a final fitness value R(i) + D(i). 
+    /// measures used in SPEA2: strength S(i), kthNNDistance D(i), and a fitness value R(i) + D(i). 
     /// Note that so-called "raw fitness" (what Sean calls "Wimpiness" in Essentials of Metaheuristics) is not retained.
     /// <p/>The fitness comparison operators solely use the 'fitness' value R(i) + D(i).
     /// </summary>

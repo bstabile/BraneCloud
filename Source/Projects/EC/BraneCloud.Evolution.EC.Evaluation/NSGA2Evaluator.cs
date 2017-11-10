@@ -84,7 +84,7 @@ namespace BraneCloud.Evolution.EC.Evaluation
         public override void EvaluatePopulation(IEvolutionState state)
         {
             base.EvaluatePopulation(state);
-            for (var x = 0; x < state.Population.Subpops.Length; x++)
+            for (var x = 0; x < state.Population.Subpops.Count; x++)
                 state.Population.Subpops[x].Individuals = BuildArchive(state, x);
         }
 

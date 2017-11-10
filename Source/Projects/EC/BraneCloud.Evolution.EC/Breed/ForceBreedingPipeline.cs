@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Breed
@@ -55,25 +55,16 @@ namespace BraneCloud.Evolution.EC.Breed
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return BreedDefaults.ParamBase.Push(P_FORCE); }
-        }
+        public override IParameter DefaultBase => BreedDefaults.ParamBase.Push(P_FORCE);
 
-        public override int NumSources
-        {
-            get { return 1; }
-        }
+        public override int NumSources => 1; 
 
         public int NumInds { get; set; }
 
         /// <summary>
         /// Returns the max of TypicalIndsProduced of all its children. 
         /// </summary>
-        public override int TypicalIndsProduced
-        {
-            get { return NumInds; }
-        }
+        public override int TypicalIndsProduced => NumInds;
 
         #endregion// Properties
         #region Setup
@@ -96,8 +87,17 @@ namespace BraneCloud.Evolution.EC.Breed
         #endregion // Setup
         #region Operations
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             var n = NumInds;
             if (n < min)
                 n = min;
@@ -105,7 +105,7 @@ namespace BraneCloud.Evolution.EC.Breed
                 n = max;
 
             int total;
-            for (total = 0; total < n; )
+            for (total = 0; total < n; ) // note empty term
             {
                 var numToProduce = n - total;
                 if (numToProduce > NumInds)
@@ -113,7 +113,7 @@ namespace BraneCloud.Evolution.EC.Breed
                 if (numToProduce > NumInds)
                     numToProduce = NumInds;
 
-                total += Sources[0].Produce(numToProduce, numToProduce, start + total, subpop, inds, state, thread);
+                total += Sources[0].Produce(numToProduce, numToProduce, subpop, inds, state, thread, misc);
             }
 
             // clone if necessary

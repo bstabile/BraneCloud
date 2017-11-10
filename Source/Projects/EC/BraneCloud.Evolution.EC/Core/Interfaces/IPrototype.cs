@@ -53,7 +53,7 @@ namespace BraneCloud.Evolution.EC
     /// course, Setup.
     /// </summary>
     [ECConfiguration("ec.IPrototype")]
-    public interface IPrototype : ISetup, ICloneable
+    public interface IPrototype : ICloneable, ISetup
     {
         ///// <summary>
         ///// Creates a new individual cloned from a prototype,
@@ -70,7 +70,7 @@ namespace BraneCloud.Evolution.EC
         ///// <li/>If you hold objects which were given to you as a gesture
         ///// of kindness, and aren't owned by you, you probably shouldn't clone
         ///// them.
-        ///// <li/> DON'T attempt to clone: ISingletons, ICliques, or Groups.
+        ///// <li/> DON'T attempt to clone: ISingletons, ICliques, Population or Subpopulation.
         ///// <li/>Arrays are not cloned automatically; you may need to
         ///// clone an array if you're not sharing it with other instances.
         ///// Arrays have the nice feature of being copyable by calling clone()

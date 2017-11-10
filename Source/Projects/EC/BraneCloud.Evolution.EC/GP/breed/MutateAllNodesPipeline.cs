@@ -17,8 +17,10 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
 
 namespace BraneCloud.Evolution.EC.GP.Breed
 {
@@ -62,24 +64,19 @@ namespace BraneCloud.Evolution.EC.GP.Breed
 
         public const string P_MUTATEALLNODES = "mutate-all-nodes";
         public const int NUM_SOURCES = 1;
+        public const string KEY_PARENTS = "parents";
 
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPBreedDefaults.ParamBase.Push(P_MUTATEALLNODES); }
-        }
+        public override IParameter DefaultBase => GPBreedDefaults.ParamBase.Push(P_MUTATEALLNODES); 
 
         /// <summary>
         /// How the pipeline chooses a subtree to mutate 
         /// </summary>
         public IGPNodeSelector NodeSelect { get; set; }
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES; 
 
         /// <summary>
         /// Is our tree fixed?  If not, this is -1 
@@ -198,15 +195,35 @@ namespace BraneCloud.Evolution.EC.GP.Breed
             return node;
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab n individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            var n = Sources[0].Produce(min, max,subpop, inds, state, thread, misc);
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
+
+            IntBag[] parentparents = null;
+            IntBag[] preserveParents = null;
+            if (misc != null && misc[KEY_PARENTS] != null)
+            {
+                preserveParents = (IntBag[])misc[KEY_PARENTS];
+                parentparents = new IntBag[2];
+                misc[KEY_PARENTS] = parentparents;
+            }
 
             var initializer = ((GPInitializer)state.Initializer);
 
@@ -243,54 +260,21 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                 // we'll need to set p2.ArgPosition and p2.Parent further down
 
 
-                GPIndividual j;
-
-                if (Sources[0] is BreedingPipeline)
-                // it's already a copy, so just smash the tree in
-                {
-                    j = i;
                     p2.Parent = p1.Parent;
                     p2.ArgPosition = p1.ArgPosition;
                     if (p2.Parent is GPNode)
                         ((GPNode)(p2.Parent)).Children[p2.ArgPosition] = p2;
                     else
                         ((GPTree)(p2.Parent)).Child = p2;
-                    j.Evaluated = false; // we've modified it
-                }
-                // need to copy it in
-                else
-                {
-                    j = i.LightClone();
-
-                    // Fill in various tree information that didn't get filled in there
-                    j.Trees = new GPTree[i.Trees.Length];
-
-                    for (var x = 0; x < j.Trees.Length; x++)
-                    {
-                        if (x == t)
-                        // we've got a tree with a kicking cross position!
-                        {
-                            j.Trees[x] = i.Trees[x].LightClone();
-                            j.Trees[x].Owner = j;
-                            j.Trees[x].Child = i.Trees[x].Child.CloneReplacingNoSubclone(p2, p1);
-                            j.Trees[x].Child.Parent = j.Trees[x];
-                            j.Trees[x].Child.ArgPosition = 0;
-                            j.Evaluated = false;
-                        }
-                        // it's changed
-                        else
-                        {
-                            j.Trees[x] = i.Trees[x].LightClone();
-                            j.Trees[x].Owner = j;
-                            j.Trees[x].Child = (GPNode)i.Trees[x].Child.Clone();
-                            j.Trees[x].Child.Parent = j.Trees[x];
-                            j.Trees[x].Child.ArgPosition = 0;
-                        }
-                    }
-                }
+                    i.Evaluated = false; // we've modified it
 
                 // add the new individual, replacing its previous source
-                inds[q] = j;
+                inds[q] = i;
+                if (preserveParents != null)
+                {
+                    parentparents[0].AddAll(parentparents[1]);
+                    preserveParents[q] = new IntBag(parentparents[0]);
+                }
             }
             return n;
         }

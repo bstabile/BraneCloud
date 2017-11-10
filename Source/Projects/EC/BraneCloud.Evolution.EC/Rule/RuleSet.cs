@@ -330,7 +330,7 @@ namespace BraneCloud.Evolution.EC.Rule
                     for (var i = points[p - 1]; i < points[p]; i++)
                         sets[p].AddRule((Rule)_rules[i].Clone());
 
-                // do the final chunk
+                // do the chunk
                 for (var i = points[points.Length - 1]; i < _rules.Length; i++)
                     sets[points.Length].AddRule((Rule)_rules[i].Clone());
             }

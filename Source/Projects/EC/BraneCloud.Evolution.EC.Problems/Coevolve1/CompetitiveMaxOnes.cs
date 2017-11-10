@@ -33,15 +33,16 @@ namespace BraneCloud.Evolution.EC.Problems.Coevolve1
     {
         public void PreprocessPopulation(IEvolutionState state, Population pop, bool[] updateFitness, bool countVictoriesOnly)
         {
-            for (var i = 0; i < pop.Subpops.Length; i++)
+            for (var i = 0; i < pop.Subpops.Count; i++)
                 if (updateFitness[i])
                     foreach (var t in pop.Subpops[i].Individuals)
                         ((SimpleFitness)(t.Fitness)).Trials = new List<double>();
         }
 
-        public void PostprocessPopulation(IEvolutionState state, Population pop, bool[] updateFitness, bool countVictoriesOnly)
+        public int PostprocessPopulation(IEvolutionState state, Population pop, bool[] updateFitness, bool countVictoriesOnly)
         {
-            for (var i = 0; i < pop.Subpops.Length; i++)
+            int total = 0;
+            for (var i = 0; i < pop.Subpops.Count; i++)
                 if (updateFitness[i])
                     foreach (var t in pop.Subpops[i].Individuals)
                     {
@@ -57,7 +58,9 @@ namespace BraneCloud.Evolution.EC.Problems.Coevolve1
                         // we'll not bother declaring the ideal
                         fit.SetFitness(state, (float)(sum), false);
                         t.Evaluated = true;
+                        total++;
                     }
+            return total;
         }
 
         public void Evaluate(IEvolutionState state,

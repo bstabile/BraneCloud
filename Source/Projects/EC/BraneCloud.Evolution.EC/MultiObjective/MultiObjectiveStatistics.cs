@@ -106,7 +106,7 @@ namespace BraneCloud.Evolution.EC.MultiObjective
             BypassFinalStatistics(state, result);  // just call base.base.finalStatistics(...)
 
             if (DoFinal) state.Output.PrintLn("\n\n\n PARETO FRONTS", StatisticsLog);
-            for (var s = 0; s < state.Population.Subpops.Length; s++)
+            for (var s = 0; s < state.Population.Subpops.Count; s++)
             {
                 if (DoFinal)
                     state.Output.PrintLn("\n\nPareto Front of Subpopulation " + s, StatisticsLog);
@@ -121,17 +121,16 @@ namespace BraneCloud.Evolution.EC.MultiObjective
 
                 // print out front to statistics log
                 if (DoFinal)
-                    foreach (var t in sortedFront)
-                        ((Individual)t).PrintIndividualForHumans(state, StatisticsLog);
+                    foreach (var ind in sortedFront)
+                        ind.PrintIndividualForHumans(state, StatisticsLog);
 
                 // write short version of front out to disk
                 if (FrontLog >= 0)
                 {
-                    if (state.Population.Subpops.Length > 1)
+                    if (state.Population.Subpops.Count > 1)
                         state.Output.PrintLn("Subpopulation " + s, FrontLog);
-                    foreach (var t in sortedFront)
+                    foreach (var ind in sortedFront)
                     {
-                        var ind = (Individual)t;
                         var mof = (MultiObjectiveFitness)ind.Fitness;
                         var objectives = mof.GetObjectives();
 

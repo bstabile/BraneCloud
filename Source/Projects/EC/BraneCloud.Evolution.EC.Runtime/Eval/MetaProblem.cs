@@ -478,11 +478,11 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
             else if (d is String[])
             {
                 var dom = (String[]) d;
-                if (min != 0)
+                if (!min.Equals(0))
                     state.Output.Fatal("Invalid min-gene value (" + min +
                                        ") for a string type in MetaProblem.  Gene index was " + index +
                                        ".  Should have been 0.");
-                else if (max != dom.Length - 1)
+                else if (!max.Equals(dom.Length - 1))
                     state.Output.Fatal("Invalid max-gene value (" + max +
                                        ") for a string type in MetaProblem.  Gene index was " + index +
                                        ".  Should have been " + (dom.Length - 1) +
@@ -576,7 +576,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Eval
                     evaluatedState.Run(EvolutionState.C_STARTED_FRESH);
 
                     // Issue a warning if there's more than one subpopulation
-                    if (evaluatedState.Population.Subpops.Length > 1)
+                    if (evaluatedState.Population.Subpops.Count > 1)
                         state.Output.WarnOnce(
                             "MetaProblem used, but underlying evolution state has more than one subpopulation: only the results from subpopulation 0 will be considered.");
 

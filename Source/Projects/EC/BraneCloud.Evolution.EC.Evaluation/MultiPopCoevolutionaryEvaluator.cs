@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Simple;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Configuration;
@@ -253,9 +254,9 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         public override void EvaluatePopulation(IEvolutionState state)
         {
             // determine who needs to be evaluated
-            var preAssessFitness = new bool[state.Population.Subpops.Length];
-            var postAssessFitness = new bool[state.Population.Subpops.Length];
-            for (var i = 0; i < state.Population.Subpops.Length; i++)
+            var preAssessFitness = new bool[state.Population.Subpops.Count];
+            var postAssessFitness = new bool[state.Population.Subpops.Count];
+            for (var i = 0; i < state.Population.Subpops.Count; i++)
             {
                 postAssessFitness[i] = ShouldEvaluateSubpop(state, i, 0);
                 preAssessFitness[i] = postAssessFitness[i] || (state.Generation == 0);  // always prepare (set up trials) on generation 0
@@ -267,8 +268,8 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             
             ((IGroupedProblem) p_problem).PreprocessPopulation(state, state.Population, preAssessFitness, false);
             PerformCoevolutionaryEvaluation(state, state.Population, (IGroupedProblem) p_problem);
-            ((IGroupedProblem) p_problem).PostprocessPopulation(state, state.Population, postAssessFitness, false);
-            
+            state.IncrementEvaluations(((IGroupedProblem)p_problem).PostprocessPopulation(state, state.Population, postAssessFitness, false));
+
             AfterCoevolutionaryEvaluation(state, state.Population, (IGroupedProblem) p_problem);
         }
         
@@ -280,12 +281,12 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 // deep clone the elite individuals as random individuals (in the initial generation, nobody has been evaluated yet).
                 
                 // deal with the elites
-                _eliteIndividuals = TensorFactory.Create<Individual>(state.Population.Subpops.Length, NumElite);
+                _eliteIndividuals = TensorFactory.Create<Individual>(state.Population.Subpops.Count, NumElite);
 
                 // copy the first individuals in each subpop (they are already randomly generated)
                 for (var i = 0; i < _eliteIndividuals.Length; i++)
                 {
-                    if (NumElite > state.Population.Subpops[i].Individuals.Length)
+                    if (NumElite > state.Population.Subpops[i].Individuals.Count)
                         state.Output.Fatal("Number of elite partners is greater than the size of the subpop.");
                     for (var j = 0; j < NumElite; j++)
                         _eliteIndividuals[i][j] = (Individual)(state.Population.Subpops[i].Individuals[j].Clone());  // just take the first N individuals of each subpopulation
@@ -294,12 +295,12 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 // test for shuffled
                 if (NumShuffled > 0)
                 {
-                    var size = state.Population.Subpops[0].Individuals.Length;
-                    for (var i = 0; i < state.Population.Subpops.Length; i++)
+                    var size = state.Population.Subpops[0].Individuals.Count;
+                    for (var i = 0; i < state.Population.Subpops.Count; i++)
                     {
-                        if (state.Population.Subpops[i].Individuals.Length != size)
+                        if (state.Population.Subpops[i].Individuals.Count != size)
                             state.Output.Fatal("Shuffling was requested in MultiPopCoevolutionaryEvaluator, but the subpopulation sizes are not the same.  " +
-                            "Specifically, subpopulation 0 has size " + size + " but subpopulation " + i + " has size " + state.Population.Subpops[i].Individuals.Length);
+                            "Specifically, subpopulation 0 has size " + size + " but subpopulation " + i + " has size " + state.Population.Subpops[i].Individuals.Count);
                     }
                 }
             }
@@ -321,8 +322,8 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         {
             var evaluations = 0;
 
-            _inds = new Individual[pop.Subpops.Length];
-            _updates = new bool[pop.Subpops.Length];
+            _inds = new Individual[pop.Subpops.Count];
+            _updates = new bool[pop.Subpops.Count];
 
             // we start by warming up the selection methods
             if (NumCurrent > 0)
@@ -340,7 +341,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 }
 
             // build subpopulation array to pass in each time
-            var subpops = new int[state.Population.Subpops.Length];
+            var subpops = new int[state.Population.Subpops.Count];
             for (var j = 0; j < subpops.Length; j++)
                 subpops[j] = j;
 
@@ -350,13 +351,13 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             {
                 int[ /*numShuffled*/][ /*subpop*/][ /*shuffledIndividualIndexes*/] ordering = null;
                 // build shuffled orderings
-                ordering = TensorFactory.Create<Int32>(NumShuffled, state.Population.Subpops.Length,
-                                                       state.Population.Subpops[0].Individuals.Length);
+                ordering = TensorFactory.Create<Int32>(NumShuffled, state.Population.Subpops.Count,
+                                                       state.Population.Subpops[0].Individuals.Count);
                 for (var c = 0; c < NumShuffled; c++)
                 {
-                    for (var m = 0; m < state.Population.Subpops.Length; m++)
+                    for (var m = 0; m < state.Population.Subpops.Count; m++)
                     {
-                        for (var i = 0; i < state.Population.Subpops[0].Individuals.Length; i++)
+                        for (var i = 0; i < state.Population.Subpops[0].Individuals.Count; i++)
                             ordering[c][m][i] = i;
                         if (m != 0)
                             Shuffle(state, ordering[c][m]);
@@ -364,7 +365,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
                 }
 
                 // for each individual
-                for (var i = 0; i < state.Population.Subpops[0].Individuals.Length; i++)
+                for (var i = 0; i < state.Population.Subpops[0].Individuals.Count; i++)
                 {
                     for (var k = 0; k < NumShuffled; k++)
                     {
@@ -380,14 +381,14 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             }
 
             // for each subpopulation
-            for (var j = 0; j < state.Population.Subpops.Length; j++)
+            for (var j = 0; j < state.Population.Subpops.Count; j++)
             {
                 // now do elites and randoms
 
                 if (!ShouldEvaluateSubpop(state, j, 0)) continue;  // don't evaluate this subpopulation
 
                 // for each individual
-                for (var i = 0; i < state.Population.Subpops[j].Individuals.Length; i++)
+                for (var i = 0; i < state.Population.Subpops[j].Individuals.Count; i++)
                 {
                     var individual = state.Population.Subpops[j].Individuals[i];
                 
@@ -478,20 +479,18 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         /// population, because we're at generation 0, then an individual from the current
         /// population is selected at random.
         /// </summary>
-        protected Individual ProducePrevious(int subpopulation, IEvolutionState state, int thread)
+        protected Individual ProducePrevious(int subpop, IEvolutionState state, int thread)
         {
             if (state.Generation == 0)
             {
                 // pick current at random.  Can't use a selection method because they may not have fitness assigned
-                return state.Population.Subpops[subpopulation].Individuals[
-                    state.Random[0].NextInt(state.Population.Subpops[subpopulation].Individuals.Length)];
+                return state.Population.Subpops[subpop].Individuals[state.Random[0].NextInt(state.Population.Subpops[subpop].Individuals.Count)];
             }
 
             // do a hack here -- back up population, replace with the previous population, run the selection method, replace again
             var currentPopulation = state.Population;
             state.Population = _previousPopulation;
-            var selected = state.Population.Subpops[subpopulation].Individuals[
-                    _selectionMethodPrev[subpopulation].Produce(subpopulation, state, thread)];
+            Individual selected = state.Population.Subpops[subpop].Individuals[_selectionMethodPrev[subpop].Produce(subpop, state, thread)];
             state.Population = currentPopulation;
             return selected;
         }
@@ -499,17 +498,16 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         /// <summary>
         /// Selects one individual from the given subpopulation.
         /// </summary>
-        protected Individual ProduceCurrent(int subpopulation, IEvolutionState state, int thread)
+        protected Individual ProduceCurrent(int subpop, IEvolutionState state, int thread)
         {
-            return state.Population.Subpops[subpopulation].Individuals[
-                            _selectionMethodCurrent[subpopulation].Produce(subpopulation, state, thread)];
+            return state.Population.Subpops[subpop].Individuals[_selectionMethodCurrent[subpop].Produce(subpop, state, thread)];
         }
 
         public virtual void AfterCoevolutionaryEvaluation(IEvolutionState state, Population pop, IGroupedProblem prob)
         {
             if (NumElite > 0)
             {
-                for (var i = 0; i < state.Population.Subpops.Length; i++)
+                for (var i = 0; i < state.Population.Subpops.Count; i++)
                     if (ShouldEvaluateSubpop(state, i, 0))		// only load elites for subpopulations which are actually changing
                         LoadElites(state, i);
             }
@@ -518,8 +516,8 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             if (NumPrev > 0)
             {
                 _previousPopulation = (Population)(state.Population.EmptyClone());
-                for (var i = 0; i < _previousPopulation.Subpops.Length; i++)
-                    for (var j = 0; j < _previousPopulation.Subpops[i].Individuals.Length; j++)
+                for (var i = 0; i < _previousPopulation.Subpops.Count; i++)
+                    for (var j = 0; j < _previousPopulation.Subpops[i].Individuals.Count; j++)
                         _previousPopulation.Subpops[i].Individuals[j] = (Individual)(state.Population.Subpops[i].Individuals[j].Clone());
             }
         }
@@ -532,15 +530,15 @@ namespace BraneCloud.Evolution.EC.CoEvolve
             {
                 var best = 0;
                 var oldinds = subpop.Individuals;
-                for (var x = 1; x < oldinds.Length; x++)
+                for (var x = 1; x < oldinds.Count; x++)
                     if (oldinds[x].Fitness.BetterThan(oldinds[best].Fitness))
                         best = x;
-                _eliteIndividuals[whichSubpop][0] = (Individual)(state.Population.Subpops[whichSubpop].Individuals[best].Clone());
+                _eliteIndividuals[whichSubpop][0] = (Individual)state.Population.Subpops[whichSubpop].Individuals[best].Clone();
             }
             else if (NumElite > 0)  // we'll need to sort
             {
-                var orderedPop = new int[subpop.Individuals.Length];
-                for (var x = 0; x < subpop.Individuals.Length; x++) orderedPop[x] = x;
+                var orderedPop = new int[subpop.Individuals.Count];
+                for (var x = 0; x < subpop.Individuals.Count; x++) orderedPop[x] = x;
 
                 // sort the best so far where "<" means "more fit than"
                 QuickSort.QSort(orderedPop, new EliteComparator(subpop.Individuals));
@@ -556,18 +554,18 @@ namespace BraneCloud.Evolution.EC.CoEvolve
     
     class EliteComparator : ISortComparatorL
     {
-        internal Individual[] Inds;
-        public EliteComparator(Individual[] inds)
+        readonly IList<Individual> _inds;
+        public EliteComparator(IList<Individual> inds)
         {
-            Inds = inds;
+            _inds = inds;
         }
         public virtual bool lt(long a, long b)
         {
-            return Inds[(int) a].Fitness.BetterThan(Inds[(int) b].Fitness);
+            return _inds[(int) a].Fitness.BetterThan(_inds[(int) b].Fitness);
         }
         public virtual bool gt(long a, long b)
         {
-            return Inds[(int) b].Fitness.BetterThan(Inds[(int) a].Fitness);
+            return _inds[(int) b].Fitness.BetterThan(_inds[(int) a].Fitness);
         }
     }
 }

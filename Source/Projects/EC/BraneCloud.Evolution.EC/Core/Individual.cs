@@ -342,7 +342,7 @@ namespace BraneCloud.Evolution.EC
         /// exits the program with an "unimplemented" error.  You'll want to override this method,
         /// or to override ReadIndividual(...) to not use this method. 
         /// </summary>
-        public virtual void ParseGenotype(IEvolutionState state, StreamReader reader)
+        protected virtual void ParseGenotype(IEvolutionState state, StreamReader reader)
         {
             state.Output.Fatal("ParseGenotype(EvolutionState, LineNumberReader) not implemented in " + this.GetType());
         }

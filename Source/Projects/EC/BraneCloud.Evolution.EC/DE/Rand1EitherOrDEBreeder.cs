@@ -87,7 +87,7 @@ namespace BraneCloud.Evolution.EC.DE
             var inds = state.Population.Subpops[subpop].Individuals;
 
             var v = (DoubleVectorIndividual)
-                (state.Population.Subpops[subpop].Species.NewIndividual(state, thread));
+                state.Population.Subpops[subpop].Species.NewIndividual(state, thread);
 
             var retry = -1;
             do
@@ -98,23 +98,23 @@ namespace BraneCloud.Evolution.EC.DE
                 int r0, r1, r2;
                 do
                 {
-                    r0 = state.Random[thread].NextInt(inds.Length);
+                    r0 = state.Random[thread].NextInt(inds.Count);
                 }
                 while (r0 == index);
                 do
                 {
-                    r1 = state.Random[thread].NextInt(inds.Length);
+                    r1 = state.Random[thread].NextInt(inds.Count);
                 }
                 while (r1 == r0 || r1 == index);
                 do
                 {
-                    r2 = state.Random[thread].NextInt(inds.Length);
+                    r2 = state.Random[thread].NextInt(inds.Count);
                 }
                 while (r2 == r1 || r2 == r0 || r2 == index);
 
-                var g0 = (DoubleVectorIndividual)(inds[r0]);
-                var g1 = (DoubleVectorIndividual)(inds[r1]);
-                var g2 = (DoubleVectorIndividual)(inds[r2]);
+                var g0 = (DoubleVectorIndividual)inds[r0];
+                var g1 = (DoubleVectorIndividual)inds[r1];
+                var g2 = (DoubleVectorIndividual)inds[r2];
 
                 for (int i = 0; i < v.genome.Length; i++)
                     if (state.Random[thread].NextBoolean(PF))

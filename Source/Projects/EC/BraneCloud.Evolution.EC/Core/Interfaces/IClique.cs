@@ -39,7 +39,7 @@ namespace BraneCloud.Evolution.EC
     /// RuleInitializer holds the repository for the RuleConstraints clique.
     /// 
     /// <p/>This change was made to facilitate making ECJ modular; we had to remove
-    /// all non-final static members.  If you make your own IClique, its repository
+    /// all non-static members.  If you make your own IClique, its repository
     /// (if you have one) doesn't have to be in an Initializer, but it's a 
     /// convenient location.
     /// </summary>

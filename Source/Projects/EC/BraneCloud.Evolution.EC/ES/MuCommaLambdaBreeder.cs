@@ -18,12 +18,15 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks.Dataflow;
 using BraneCloud.Evolution.EC.Breed;
 using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Simple;
+using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.ES
 {
@@ -78,38 +81,6 @@ namespace BraneCloud.Evolution.EC.ES
     [ECConfiguration("ec.es.MuCommaLambdaBreeder")]
     public class MuCommaLambdaBreeder : Breeder
     {
-        /// <summary>
-        /// The following private class does NOT have an equivalent in ECJ!
-        /// </summary>
-        private class AnonymousClassComparator : IComparer
-        {
-            public AnonymousClassComparator(MuCommaLambdaBreeder enclosingInstance)
-            {
-                InitBlock(enclosingInstance);
-            }
-            private void  InitBlock(MuCommaLambdaBreeder enclosingInstance)
-            {
-                Enclosing_Instance = enclosingInstance;
-            }
-
-            public MuCommaLambdaBreeder Enclosing_Instance { get; private set; }
-
-            public virtual int Compare(object o1, object o2)
-            {
-                var a = (Individual) o1;
-                var b = (Individual) o2;
-                // return 1 if should appear after object b in the array.
-                // This is the case if a has WORSE fitness.
-                if (b.Fitness.BetterThan(a.Fitness))
-                    return 1;
-                // return -1 if a should appear before object b in the array.
-                // This is the case if b has WORSE fitness.
-                if (a.Fitness.BetterThan(b.Fitness))
-                    return - 1;
-                // else return 0
-                return 0;
-            }
-        }
 
         #region Constants
 
@@ -144,6 +115,12 @@ namespace BraneCloud.Evolution.EC.ES
 
         public int[] Children { get; set; }
         public int[] Parents { get; set; }
+
+        // This is a DOUBLE ARRAY of ARRAYLISTS of <INDIVIDUALS>
+        // Individuals are stored here by the breed pop chunk methods, and afterwards
+        // we coalesce them into the new population. 
+        // public ArrayList newIndividuals[/*subpop*/][/*thread*/];
+        public IList<Individual>[][] NewIndividuals { get; set; }
 
         #endregion // Properties
         #region Setup
@@ -256,28 +233,26 @@ namespace BraneCloud.Evolution.EC.ES
         #endregion // Setup
         #region Operations
 
-        /// <summary>
-        /// Sets all subpops in pop to the expected Lambda size.  Does not fill new slots with individuals. 
-        /// </summary>
-        public virtual Population SetToLambda(Population pop, IEvolutionState state)
-        {
-            for (var x = 0; x < pop.Subpops.Length; x++)
-            {
-                var s = Lambda[x];
-
-                // check to see if the array's not the right size
-                if (pop.Subpops[x].Individuals.Length != s)
-                // need to increase
-                {
-                    var newinds = new Individual[s];
-                    Array.Copy(pop.Subpops[x].Individuals, 0, newinds, 0,
-                        s < pop.Subpops[x].Individuals.Length ? s : pop.Subpops[x].Individuals.Length);
-
-                    pop.Subpops[x].Individuals = newinds;
-                }
-            }
-            return pop;
-        }
+        ///// <summary>
+        ///// Sets all subpops in pop to the expected Lambda size.  Does not fill new slots with individuals. 
+        ///// </summary>
+        //public virtual Population SetToLambda(Population pop, IEvolutionState state)
+        //{
+        //    for (var x = 0; x < pop.Subpops.Length; x++)
+        //    {
+        //        var s = Lambda[x];
+        //        // check to see if the array's not the right size
+        //        if (pop.Subpops[x].Individuals.Length != s)
+        //        // need to increase
+        //        {
+        //            var newinds = new Individual[s];
+        //            Array.Copy(pop.Subpops[x].Individuals, 0, newinds, 0,
+        //                s < pop.Subpops[x].Individuals.Length ? s : pop.Subpops[x].Individuals.Length);
+        //            pop.Subpops[x].Individuals = newinds;
+        //        }
+        //    }
+        //    return pop;
+        //}
 
         public override Population BreedPopulation(IEvolutionState state)
         {
@@ -287,7 +262,7 @@ namespace BraneCloud.Evolution.EC.ES
             {
                 // Only go from 0 to Lambda-1, as the remaining individuals may be parents.
                 // A child C's parent's index I is equal to C / Mu[subpop].
-                for (var x = 0; x < state.Population.Subpops.Length; x++)
+                for (var x = 0; x < state.Population.Subpops.Count; x++)
                 {
                     var numChildrenBetter = 0;
                     for (var i = 0; i < Lambda[x]; i++)
@@ -316,13 +291,13 @@ namespace BraneCloud.Evolution.EC.ES
             // the first issue is: is the number of subpops
             // equal to the number of mu's?
 
-            if (Mu.Length != state.Population.Subpops.Length) // uh oh
+            if (Mu.Length != state.Population.Subpops.Count) // uh oh
                 state.Output.Fatal("For some reason the number of subpops is different than was specified in the file (conflicting with Mu and Lambda storage).", null);
 
             // next, load our population, make sure there are no subpops smaller than the mu's
-            for (var x = 0; x < state.Population.Subpops.Length; x++)
+            for (var x = 0; x < state.Population.Subpops.Count; x++)
             {
-                if (state.Population.Subpops[0].Individuals.Length < Mu[x])
+                if (state.Population.Subpops[0].Individuals.Count < Mu[x])
                     state.Output.Error("Subpopulation " + x + " must be a multiple of the equivalent mu (that is, " + Mu[x] + ").");
             }
             state.Output.ExitIfErrors();
@@ -330,17 +305,15 @@ namespace BraneCloud.Evolution.EC.ES
 
             // sort evaluation to get the Mu best of each subpop
 
-            for (var x = 0; x < state.Population.Subpops.Length; x++)
+            foreach (Subpopulation s in state.Population.Subpops)
             {
-                var i = state.Population.Subpops[x].Individuals;
-
-                Array.Sort(i, new AnonymousClassComparator(this));
+                s.Individuals.SortByFitnessDescending();
             }
 
             // now the subpops are sorted so that the best individuals
             // appear in the lowest indexes.
 
-            var newpop = SetToLambda((Population)state.Population.EmptyClone(), state);
+            Population newpop = state.Population.EmptyClone();
 
             // create the count array
             Count = new int[state.BreedThreads];
@@ -349,26 +322,23 @@ namespace BraneCloud.Evolution.EC.ES
 
             // how many threads do we really need?  No more than the maximum number of individuals in any subpopulation
             int numThreads = 0;
-            for (int x = 0; x < state.Population.Subpops.Length; x++)
+            for (int x = 0; x < state.Population.Subpops.Count; x++)
                 numThreads = Math.Max(numThreads, Lambda[x]);
             numThreads = Math.Min(numThreads, state.BreedThreads);
             if (numThreads < state.BreedThreads)
                 state.Output.WarnOnce("Largest lambda size (" + numThreads + ") is smaller than number of breedthreads (" + state.BreedThreads +
                                       "), so fewer breedthreads will be created.");
 
-            var numinds = new int[state.BreedThreads][];
-            for (var i = 0; i < state.BreedThreads; i++)
-            {
-                numinds[i] = new int[state.Population.Subpops.Length];
-            }
-            var from = new int[state.BreedThreads][];
-            for (var i2 = 0; i2 < state.BreedThreads; i2++)
-            {
-                from[i2] = new int[state.Population.Subpops.Length];
-            }
+            NewIndividuals = TensorFactory.Create<IList<Individual>>(state.Population.Subpops.Count, numThreads);
 
-            for (int x = 0; x < state.Population.Subpops.Length; x++)
+            int[][] numinds = TensorFactory.Create<int>(numThreads, state.Population.Subpops.Count);
+            int[][] from = TensorFactory.Create<int>(numThreads, state.Population.Subpops.Count);
+
+            for (int x = 0; x < state.Population.Subpops.Count; x++)
             {
+                for (int thread = 0; thread < numThreads; thread++)
+                    NewIndividuals[x][thread].Clear();
+
                 int length = Lambda[x];
 
                 // we will have some extra individuals.  We distribute these among the early subpopulations
@@ -420,6 +390,16 @@ namespace BraneCloud.Evolution.EC.ES
                 ParallelBreeding(state, newpop, from, numinds, this);
             }
 
+            // Coalesce
+            for (int subpop = 0; subpop < state.Population.Subpops.Count; subpop++)
+            {
+                IList<Individual> newpopinds = newpop.Subpops[subpop].Individuals;
+                for (int thread = 0; thread < numThreads; thread++)
+                {
+                    ((List<Individual>)newpopinds).AddRange(NewIndividuals[subpop][thread]);
+                }
+            }
+
             return PostProcess(newpop, state.Population, state);
         }
 
@@ -468,13 +448,15 @@ namespace BraneCloud.Evolution.EC.ES
         /// </summary>        
         public override void BreedPopChunk(Population newpop, IEvolutionState state, int[] numinds, int[] from, int threadnum)
         {
-            for (var subpop = 0; subpop < newpop.Subpops.Length; subpop++)
+            for (var subpop = 0; subpop < newpop.Subpops.Count; subpop++)
             {
+                IList<Individual> putHere = NewIndividuals[subpop][threadnum];
+
                 // reset the appropriate count slot  -- this used to be outside the for-loop, a bug
                 // I believe
                 Count[threadnum] = 0;
 
-                var bp = (BreedingPipeline)newpop.Subpops[subpop].Species.Pipe_Prototype.Clone();
+                var bp = (BreedingSource)newpop.Subpops[subpop].Species.Pipe_Prototype.Clone();
 
                 // check to make sure that the breeding pipeline produces
                 // the right kind of individuals.  Don't want a mistake there! :-)
@@ -488,7 +470,7 @@ namespace BraneCloud.Evolution.EC.ES
                 bp.PrepareToProduce(state, subpop, threadnum);
                 if (Count[threadnum] == 0)
                     // the ESSelection didn't set it to nonzero to inform us of his existence
-                    state.Output.WarnOnce("Whoa!  Breeding Pipeline for subpop " + subpop
+                    state.Output.WarnOnce("Whoa!  Breeding Source for subpop " + subpop
                         + " doesn't have an ESSelection, but is being used by MuCommaLambdaBreeder or MuPlusLambdaBreeder."
                         + "  That's probably not right.");
                 // reset again
@@ -499,8 +481,9 @@ namespace BraneCloud.Evolution.EC.ES
                 var upperbound = from[subpop] + numinds[subpop];
                 for (var x = from[subpop]; x < upperbound; x++)
                 {
-                    if (bp.Produce(1, 1, x, subpop, newpop.Subpops[subpop].Individuals, state, threadnum) != 1)
-                        state.Output.Fatal("Whoa! Breeding Pipeline for subpop " + subpop
+                    var newMisc = newpop.Subpops[subpop].Species.BuildMisc(state, subpop, threadnum);
+                    if (bp.Produce(1, 1, subpop, putHere, state, threadnum, newMisc) != 1)
+                        state.Output.Fatal("Whoa! Breeding Source for subpop " + subpop
                             + " is not producing one individual at a time, as is required by the MuLambda strategies.");
 
                     // increment the count

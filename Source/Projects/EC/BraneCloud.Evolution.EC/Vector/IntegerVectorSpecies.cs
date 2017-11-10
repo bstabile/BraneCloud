@@ -523,7 +523,7 @@ namespace BraneCloud.Evolution.EC.Vector
                     state.Output.Fatal("Invalid end index value for segment " + i + ": " + currentSegmentEnd
                             + "\nThe value must be greater than " + previousSegmentEnd + " and smaller than " + GenomeSize);
 
-                //check if the index of the final segment is equal to the GenomeSize
+                //check if the index of the segment is equal to the GenomeSize
                 if (i == numSegments - 1 && currentSegmentEnd != (GenomeSize - 1))
                     state.Output.Fatal("Invalid end index value for the last segment " + i + ": " + currentSegmentEnd
                         + "\nThe value must be equal to the index of the last gene in the genome:  " + (GenomeSize - 1));

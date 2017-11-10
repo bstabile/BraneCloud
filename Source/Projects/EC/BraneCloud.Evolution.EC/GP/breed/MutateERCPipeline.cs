@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.GP.Breed
@@ -68,10 +68,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPBreedDefaults.ParamBase.Push(P_MUTATEERC); }
-        }
+        public override IParameter DefaultBase => GPBreedDefaults.ParamBase.Push(P_MUTATEERC);
 
         /// <summary>
         /// How the pipeline chooses a subtree to mutate 
@@ -83,10 +80,7 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         /// </summary>
         public int Tree { get; set; }
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
         #endregion // Properties
         #region Setup
@@ -126,15 +120,26 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                 MutateERCs(t, state, thread);
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread, 
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab n individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            var n = Sources[0].Produce(min, max, subpop, inds, state, thread, misc);
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
 
             // now let's mutate 'em
             for (var q = start; q < n + start; q++)
@@ -155,44 +160,21 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                 else
                     t = Tree;
 
-                GPIndividual j;
-                if (Sources[0] is BreedingPipeline)
-                // it's already a copy, so just smash the tree in
-                {
-                    j = i;
-                }
-                // need to copy it
-                else
-                {
-                    j = i.LightClone();
-
-                    // Fill in various tree information that didn't get filled in there
-                    j.Trees = new GPTree[i.Trees.Length];
-
-                    for (var x = 0; x < j.Trees.Length; x++)
-                    {
-                        j.Trees[x] = i.Trees[x].LightClone();
-                        j.Trees[x].Owner = j;
-                        j.Trees[x].Child = (GPNode)i.Trees[x].Child.Clone();
-                        j.Trees[x].Child.Parent = j.Trees[x];
-                        j.Trees[x].Child.ArgPosition = 0;
-                    }
-                }
-                j.Evaluated = false;
+                i.Evaluated = false;
 
                 // prepare the NodeSelector
                 NodeSelect.Reset();
 
                 // Now pick a random node
 
-                var p = NodeSelect.PickNode(state, subpop, thread, j, j.Trees[t]);
+                var p = NodeSelect.PickNode(state, subpop, thread, i, i.Trees[t]);
 
                 // mutate all the ERCs in p1's subtree
 
                 MutateERCs(p, state, thread);
 
                 // add the new individual, replacing its previous source
-                inds[q] = j;
+                inds[q] = i;
             }
             return n;
         }

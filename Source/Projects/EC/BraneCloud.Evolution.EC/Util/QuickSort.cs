@@ -113,7 +113,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -193,7 +193,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -273,7 +273,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -354,7 +354,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -435,7 +435,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -515,7 +515,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -592,7 +592,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -672,7 +672,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -749,7 +749,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -829,7 +829,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -906,7 +906,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -986,7 +986,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -1063,7 +1063,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -1145,7 +1145,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -1225,7 +1225,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -1304,7 +1304,7 @@ namespace BraneCloud.Evolution.EC.Util
                     tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 }
                 while (l < r);
-                //DSutil.swap(array, l, r);  // Undo final swap
+                //DSutil.swap(array, l, r);  // Undo swap
                 tmp = array[l]; array[l] = array[r]; array[r] = tmp;
                 //DSutil.swap(array, l, j);  // Put pivot value in place
                 tmp = array[l]; array[l] = array[j]; array[j] = tmp;
@@ -1382,7 +1382,7 @@ namespace BraneCloud.Evolution.EC.Util
     while ((r!=0) && (array[--r].key() > pivot));
     DSutil.swap(array, l, r);
     } while (l < r);
-    DSUtil.swap(array, l, r);  // Undo final swap
+    DSUtil.swap(array, l, r);  // Undo swap
     DSUtil.swap(array, l, j);  // Put pivot value in place
     
     // Put new subarrays onto stack if they are small

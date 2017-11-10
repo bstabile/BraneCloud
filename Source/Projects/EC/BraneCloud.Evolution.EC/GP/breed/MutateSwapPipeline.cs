@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using BraneCloud.Evolution.EC.Configuration;
 
@@ -258,15 +259,26 @@ namespace BraneCloud.Evolution.EC.GP.Breed
             return num;
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min,
+            int max,
+            int subpop,
+            IList<Individual> inds,
+            IEvolutionState state,
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab n individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            var n = Sources[0].Produce(min, max, subpop, inds, state, thread, misc);
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
 
             // now let's mutate 'em
             for (var q = start; q < n + start; q++)
@@ -279,29 +291,6 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                         + " of the array of the individual's trees.  Check the pipeline's fixed tree values"
                         + " -- they may be negative or greater than the number of trees in an individual");
 
-                GPIndividual j;
-                if (Sources[0] is BreedingPipeline)
-                // it's already a copy, so just smash the tree in
-                {
-                    j = i;
-                }
-                // need to copy it
-                else
-                {
-                    j = i.LightClone();
-
-                    // Fill in various tree information that didn't get filled in there
-                    j.Trees = new GPTree[i.Trees.Length];
-
-                    for (var x = 0; x < j.Trees.Length; x++)
-                    {
-                        j.Trees[x] = i.Trees[x].LightClone();
-                        j.Trees[x].Owner = j;
-                        j.Trees[x].Child = (GPNode)i.Trees[x].Child.Clone();
-                        j.Trees[x].Child.Parent = j.Trees[x];
-                        j.Trees[x].Child.ArgPosition = 0;
-                    }
-                }
 
                 for (var x = 0; x < NumTries; x++)
                 {
@@ -314,22 +303,22 @@ namespace BraneCloud.Evolution.EC.GP.Breed
 
                     // is the tree swappable?      
                     var initializer = ((GPInitializer)state.Initializer);
-                    var numswap = NumSwappableNodes(initializer, j.Trees[t].Child, 0);
+                    var numswap = NumSwappableNodes(initializer, i.Trees[t].Child, 0);
                     if (numswap == 0)
                         continue; // uh oh, try again
 
                     // swap the node, or if we're unsuccessful, just leave it alone
-                    PickSwappableNode(initializer, j.Trees[t].Child, state.Random[thread].NextInt(numswap));
+                    PickSwappableNode(initializer, i.Trees[t].Child, state.Random[thread].NextInt(numswap));
 
                     // node is now in swappableNode, swap it
                     SwapSomething(_swappableNode, state, thread);
 
-                    j.Evaluated = false;
+                    i.Evaluated = false;
                     break;
                 }
 
                 // add the new individual, replacing its previous source
-                inds[q] = j;
+                inds[q] = i;
             }
             return n;
         }

@@ -28,7 +28,7 @@ namespace BraneCloud.Evolution.EC.SteadyState
         /// be returned until the system is ready to provide us with another one.  NULL will
         /// be returned otherwise.
         /// </summary>
-        Individual GetNextEvaluatedIndividual();
+        Individual GetNextEvaluatedIndividual(IEvolutionState state);
 
         /// <summary>
         /// Returns the subpopulation of the last evaluated individual returned by getNextEvaluatedIndividual, 

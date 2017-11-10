@@ -75,6 +75,7 @@ namespace BraneCloud.Evolution.EC.Configuration
         #region Constants   **********************************************************************************
 
         public const string C_HERE = "$";
+        public const string C_CLASS = "@";
         public const string UNKNOWN_VALUE = "";
         public const string PRINT_PARAMS = "print-params";
         public const int PS_UNKNOWN = -1;
@@ -525,6 +526,192 @@ namespace BraneCloud.Evolution.EC.Configuration
             return GetDouble(defaultParameter, minValue, maxValue);
         }
 
+        const int ARRAY_NO_EXPECTED_LENGTH = -1;
+
+        double[] GetDoublesWithMax(IParameter parameter, double minValue, double maxValue, int expectedLength)
+        {
+            if (_exists(parameter))
+            {
+                DoubleBag bag = new DoubleBag();
+                // TODO: BRS: This has to be a stream, so find out if the parameter 
+                // is supposed to be a file or just a string that needs to be wrapped in StringStream.
+                // For now, we're going to assume it's a filePath.
+                //Scanner scanner = new Scanner(get(parameter));
+                Scanner scanner = new Scanner(GetResource(parameter));
+                while (scanner.HasNextDouble())
+                {
+                    if (expectedLength != ARRAY_NO_EXPECTED_LENGTH && bag.Size >= expectedLength)
+                        return null;  // too big
+
+                    double val = scanner.NextDouble();
+                    //if (val != val || val > maxValue || val < minValue)
+                    if (double.IsNaN(val) || double.IsPositiveInfinity(val) || double.IsNegativeInfinity(val))
+                        return null;
+                    else
+                    { bag.Add(val); }
+                }
+                if (scanner.HasNext())
+                    return null;  // too long, or garbage afterwards
+                if (expectedLength != ARRAY_NO_EXPECTED_LENGTH && bag.Size != expectedLength)
+                    return null;
+                if (bag.Size == 0)
+                    return null;            // 0 lengths not permitted
+                return bag.ToArray();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
+        double[] GetDoublesWithMax(IParameter parameter, double minValue, double maxValue)
+        {
+            return GetDoublesWithMax(parameter, minValue, maxValue, ARRAY_NO_EXPECTED_LENGTH);
+        }
+
+        double[] GetDoubles(IParameter parameter, double minValue, int expectedLength)
+        {
+            return GetDoublesWithMax(parameter, minValue, double.PositiveInfinity, expectedLength);
+        }
+
+        double[] GetDoubles(IParameter parameter, double minValue)
+        {
+            return GetDoublesWithMax(parameter, minValue, double.PositiveInfinity, ARRAY_NO_EXPECTED_LENGTH);
+        }
+
+        double[] GetDoublesUnconstrained(IParameter parameter, int expectedLength)
+        {
+            return GetDoublesWithMax(parameter, double.NegativeInfinity, double.PositiveInfinity, expectedLength);
+        }
+
+        double[] GetDoublesUnconstrained(IParameter parameter)
+        {
+            return GetDoublesWithMax(parameter, double.NegativeInfinity, double.PositiveInfinity, ARRAY_NO_EXPECTED_LENGTH);
+        }
+
+
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles, each of which is >= minValue and <= maxValue,
+         * and which must be exactly expectedLength (> 0) long.  If the parameter does not exist,
+         * or any of its doubles are out of bounds, or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+
+        public double[] GetDoublesWithMax(IParameter parameter, IParameter defaultParameter, double minValue, double maxValue, int expectedLength)
+        {
+            PrintGotten(parameter, defaultParameter, false);
+            if (_exists(parameter))
+                return GetDoublesWithMax(parameter, minValue, maxValue, expectedLength);
+            else
+                return GetDoublesWithMax(defaultParameter, minValue, maxValue, expectedLength);
+        }
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles, each of which is >= minValue and <= maxValue,
+         * and which must be at least 1 number long.  If the parameter does not exist,
+         * or any of its doubles are out of bounds, or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+
+        public double[] GetDoublesWithMax(IParameter parameter, IParameter defaultParameter, double minValue, double maxValue)
+        {
+            PrintGotten(parameter, defaultParameter, false);
+            if (_exists(parameter))
+                return GetDoublesWithMax(parameter, minValue, maxValue);
+            else
+                return GetDoublesWithMax(defaultParameter, minValue, maxValue);
+        }
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles, each of which is >= minValue,
+         * and which must be exactly expectedLength (> 0) long.  If the parameter does not exist,
+         * or any of its doubles are out of bounds, or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+
+        public double[] GetDoubles(IParameter parameter, IParameter defaultParameter, double minValue, int expectedLength)
+        {
+            PrintGotten(parameter, defaultParameter, false);
+            if (_exists(parameter))
+                return GetDoubles(parameter, minValue, expectedLength);
+            else
+                return GetDoubles(defaultParameter, minValue, expectedLength);
+        }
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles, each of which is >= minValue,
+         * and which must be at least 1 number long.  If the parameter does not exist,
+         * or any of its doubles are out of bounds, or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+
+        public double[] GetDoubles(IParameter parameter, IParameter defaultParameter, double minValue)
+        {
+            PrintGotten(parameter, defaultParameter, false);
+            if (_exists(parameter))
+                return GetDoubles(parameter, minValue);
+            else
+                return GetDoubles(defaultParameter, minValue);
+        }
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles,
+         * and which must be exactly expectedLength (> 0) long.  If the parameter does not exist,
+         * or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+
+        public double[] GetDoublesUnconstrained(IParameter parameter, IParameter defaultParameter, int expectedLength)
+        {
+            PrintGotten(parameter, defaultParameter, false);
+            if (_exists(parameter))
+                return GetDoublesUnconstrained(parameter, expectedLength);
+            else
+                return GetDoublesUnconstrained(defaultParameter, expectedLength);
+        }
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles,
+         * and which must be at least 1 number long.  If the parameter does not exist,
+         * or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+
+        public double[] GetDoublesUnconstrained(IParameter parameter, IParameter defaultParameter)
+        {
+            PrintGotten(parameter, defaultParameter, false);
+            if (_exists(parameter))
+                return GetDoublesUnconstrained(parameter);
+            else
+                return GetDoublesUnconstrained(defaultParameter);
+        }
+
         #endregion // Get Double
 
         #region Get Long   ***********************************************************************************
@@ -823,8 +1010,74 @@ namespace BraneCloud.Evolution.EC.Configuration
             Uncheck();
             return result;
         }
-        
+
         #endregion // File
+
+        #region Resource
+
+        public Stream GetResource(IParameter parameter, IParameter defaultParameter)
+        {
+            PrintGotten(parameter, defaultParameter, false);
+            if (_exists(parameter))
+                return GetResource(parameter);
+            return GetResource(defaultParameter);
+        }
+
+        public Stream GetResource(IParameter parameter)
+        {
+            // TODO : Fix this!
+            //throw new NotImplementedException();
+            try
+            {
+                if (_exists(parameter))
+                {
+                    var p = GetString(parameter);
+                    if (p == null)
+                        return null;
+                    if (p.StartsWith(C_HERE))
+                        return new FileStream(GetFile(parameter).FullName, FileMode.Open);
+
+                    // BRS: I think what below is trying to do is retrieve a resource from
+                    //      an assembly. So we would have to determine which assembly using
+                    //      Assembly.GetAssembly(typeof(T)) and then get the resource stream.
+
+                    if (p.StartsWith(C_CLASS))
+                    {
+                        // TODO: Implement returning an embedded resource as a stream.
+                        throw new NotImplementedException("This may be trying to access an embedded resource (not currently supported).");
+                        //    var i = IndexOfFirstWhitespace(p);
+                        //    if (i == -1)
+                        //        return null;
+                        //    var classname = p.Substring(0, i);
+                        //    var filename = p.Substring(i).Trim();
+                        //    return Type.GetType(classname).getResourceAsStream(filename);
+                    }
+
+                    var f = new FileInfo(p);
+                    if (Path.IsPathRooted(f.FullName))
+                        return new FileStream(f.FullName, FileMode.Open);
+
+                    // BRS: Not sure what this is all about!
+                    //Type c = GetLocation(parameter.Param).relativeClass;
+                    //String rp = GetLocation(parameter.Param).relativePath;
+                    //if (c != null)
+                    //{
+                    //    return c.GetResourceAsStream(new File(new File(rp).GetParent(), p).GetPath());
+                    //}
+
+                    return new FileStream(DirectoryFor(parameter).FullName, FileMode.Open);
+                }
+                return null;
+            }
+            catch (FileNotFoundException ex1) { return null; }
+            catch (TypeLoadException ex2) { return null; }
+            catch (Exception ex3)
+            {
+                return null;
+            }
+        }
+
+        #endregion // Resource
 
         #region Constructors *********************************************************************************
 

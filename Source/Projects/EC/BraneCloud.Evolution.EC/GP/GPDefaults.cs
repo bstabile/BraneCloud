@@ -33,10 +33,7 @@ namespace BraneCloud.Evolution.EC.GP
         /// <summary>
         /// Returns the default base. 
         /// </summary>
-        public static IParameter ParamBase
-        {
-            get { return new Parameter(P_GP); }
-        }
+        public static IParameter ParamBase => new Parameter(P_GP);
 
     }
 }

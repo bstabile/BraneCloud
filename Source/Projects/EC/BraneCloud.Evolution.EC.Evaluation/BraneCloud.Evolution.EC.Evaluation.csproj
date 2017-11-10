@@ -49,11 +49,9 @@
   <ItemGroup>
     <Compile Include="CompetitiveEvaluator.cs" />
     <Compile Include="DEEvaluator.cs" />
-    <Compile Include="Evaluator.cs" />
     <Compile Include="MultiPopCoevolutionaryEvaluator.cs" />
     <Compile Include="NSGA2Evaluator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleEvaluator.cs" />
     <Compile Include="SpatialMultiPopCoevolutionaryEvaluator.cs" />
     <Compile Include="SPEA2Evaluator.cs" />
     <Compile Include="SteadyStateEvaluator.cs" />

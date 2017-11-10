@@ -57,33 +57,6 @@ namespace BraneCloud.Evolution.EC.Simple
             Population = Initializer.InitialPopulation(this, 0); // unthreaded
             Statistics.PostInitializationStatistics(this);
 
-            // Compute generations from evaluations if necessary
-            if (NumEvaluations > UNDEFINED)
-            {
-                // compute a generation's number of individuals
-                int generationSize = 0;
-                for (int sub = 0; sub < Population.Subpops.Length; sub++)
-                {
-                    generationSize += Population.Subpops[sub].Individuals.Length;  // so our sum total 'generationSize' will be the initial total number of individuals
-                }
-
-                if (NumEvaluations < generationSize)
-                {
-                    NumEvaluations = generationSize;
-                    NumGenerations = 1;
-                    Output.Warning("Using evaluations, but evaluations is less than the initial total population size (" + generationSize + ").  Setting to the populatiion size.");
-                }
-                else
-                {
-                    if (NumEvaluations % generationSize != 0)
-                        Output.Warning("Using evaluations, but initial total population size does not divide evenly into it.  Modifying evaluations to a smaller value ("
-                                       + ((NumEvaluations / generationSize) * generationSize) + ") which divides evenly.");  // note integer division
-                    NumGenerations = (int)(NumEvaluations / generationSize);  // note integer division
-                    NumEvaluations = NumGenerations * generationSize;
-                }
-                Output.Message("Generations will be " + NumGenerations);
-            }
-
             // INITIALIZE CONTACTS -- done after initialization to allow
             // a hook for the user to do things in Initializer before
             // an attempt is made to connect to island models etc.
@@ -94,8 +67,8 @@ namespace BraneCloud.Evolution.EC.Simple
         public override int Evolve()
         {
             if (Generation > 0)
-                Output.Message("Generation " + Generation);
-            
+                Output.Message("Generation " + Generation + "\tEvaluations So Far " + Evaluations);
+
             // EVALUATION
             Statistics.PreEvaluationStatistics(this);
             Evaluator.EvaluatePopulation(this);
@@ -108,13 +81,17 @@ namespace BraneCloud.Evolution.EC.Simple
                 Output.Message(runCompleteMessage);
                 return R_SUCCESS;
             }
-            
+
             // SHOULD WE QUIT?
-            if (Generation == NumGenerations - 1)
+            if (NumGenerations != UNDEFINED && Generation >= NumGenerations - 1 ||
+                NumEvaluations != UNDEFINED && Evaluations >= NumEvaluations)
             {
                 return R_FAILURE;
             }
-            
+
+            // INCREMENT GENERATION AND CHECKPOINT
+            Generation++;
+
             // PRE-BREEDING EXCHANGING
             Statistics.PrePreBreedingExchangeStatistics(this);
             Population = Exchanger.PreBreedingExchangePopulation(this);
@@ -140,9 +117,7 @@ namespace BraneCloud.Evolution.EC.Simple
             Population = Exchanger.PostBreedingExchangePopulation(this);
             Statistics.PostPostBreedingExchangeStatistics(this);
             
-            // INCREMENT GENERATION AND CHECKPOINT
-            Generation++;
-            if (Checkpoint && Generation % CheckpointModulo == 0)
+            if (Checkpoint && (Generation - 1) % CheckpointModulo == 0)
             {
                 Output.Message("Checkpointing");
                 Statistics.PreCheckpointStatistics(this);
@@ -155,6 +130,7 @@ namespace BraneCloud.Evolution.EC.Simple
         
         public override void Finish(int result)
         {
+            Output.Message("Total Evaluations " + Evaluations);
             /* finish up -- we completed. */
             Statistics.FinalStatistics(this, result);
             Finisher.FinishPopulation(this, result);

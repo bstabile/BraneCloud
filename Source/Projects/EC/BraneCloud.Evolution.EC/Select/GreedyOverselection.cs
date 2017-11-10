@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
@@ -77,10 +77,7 @@ namespace BraneCloud.Evolution.EC.Select
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return SelectDefaults.ParamBase.Push(P_GREEDY); }
-        }
+        public override IParameter DefaultBase => SelectDefaults.ParamBase.Push(P_GREEDY);
 
         public double[] SortedFitOver { get; set; }
         public double[] SortedFitUnder { get; set; }
@@ -118,12 +115,14 @@ namespace BraneCloud.Evolution.EC.Select
 
         #region Operations
 
-        public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
+        public override void PrepareToProduce(IEvolutionState state, int subpop, int thread)
         {
-            // load SortedPop integers
-            var i = s.Population.Subpops[subpop].Individuals;
+            base.PrepareToProduce(state, subpop, thread);
 
-            SortedPop = new int[i.Length];
+            // load SortedPop integers
+            var i = state.Population.Subpops[subpop].Individuals;
+
+            SortedPop = new int[i.Count];
             for (var x = 0; x < SortedPop.Length; x++)
                 SortedPop[x] = x;
 
@@ -138,7 +137,7 @@ namespace BraneCloud.Evolution.EC.Select
                 boundary = SortedPop.Length - 1;
             if (boundary == 0)
                 // uh oh
-                s.Output.Fatal("Greedy Overselection can only be done with a population of size 2 or more (offending subpop #" + subpop + ")");
+                state.Output.Fatal("Greedy Overselection can only be done with a population of size 2 or more (offending subpop #" + subpop + ")");
 
             // load SortedFitOver
             SortedFitOver = new double[boundary];
@@ -148,7 +147,7 @@ namespace BraneCloud.Evolution.EC.Select
                 SortedFitOver[y] = i[SortedPop[x]].Fitness.Value;
                 if (SortedFitOver[y] < 0)
                     // uh oh
-                    s.Output.Fatal("Discovered a negative fitness value."
+                    state.Output.Fatal("Discovered a negative fitness value."
                         + "  Greedy Overselection requires that all fitness values be non-negative (offending subpop #" + subpop + ")");
                 y++;
             }
@@ -161,7 +160,7 @@ namespace BraneCloud.Evolution.EC.Select
                 SortedFitUnder[y] = i[SortedPop[x]].Fitness.Value;
                 if (SortedFitUnder[y] < 0)
                     // uh oh
-                    s.Output.Fatal("Discovered a negative fitness value."
+                    state.Output.Fatal("Discovered a negative fitness value."
                         + "  Greedy Overselection requires that all fitness values be non-negative (offending subpop #" + subpop + ")");
                 y++;
             }
@@ -185,6 +184,8 @@ namespace BraneCloud.Evolution.EC.Select
 
         public override void FinishProducing(IEvolutionState s, int subpop, int thread)
         {
+            base.FinishProducing(s, subpop, thread);
+
             // release the distributions so we can quickly 
             // garbage-collect them if necessary
             SortedFitUnder = null;
@@ -197,12 +198,12 @@ namespace BraneCloud.Evolution.EC.Select
 
         private class AnonymousClassSortComparatorL : ISortComparatorL
         {
-            public AnonymousClassSortComparatorL(Individual[] i)
+            public AnonymousClassSortComparatorL(IList<Individual> i)
             {
                 _inds = i;
             }
 
-            private readonly Individual[] _inds;
+            private readonly IList<Individual> _inds;
 
             public virtual bool lt(long a, long b)
             {

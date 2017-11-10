@@ -17,8 +17,11 @@
  */
 
 using System;
-
+using System.Collections.Generic;
+using System.Linq;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
+using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.GP.Koza
 {	
@@ -112,6 +115,8 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         public const string P_MAXSIZE = "maxsize";
         public const string P_CROSSOVER = "xover";
         public const string P_TOSS = "toss";
+        public const string KEY_PARENTS = "parents";
+
         public const int INDS_PRODUCED = 2;
         public const int NUM_SOURCES = 2;
         public const int NO_SIZE_LIMIT = -1;
@@ -119,15 +124,9 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPKozaDefaults.ParamBase.Push(P_CROSSOVER); }
-        }
+        public override IParameter DefaultBase => GPKozaDefaults.ParamBase.Push(P_CROSSOVER);
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
         /// <summary>
         /// How the pipeline selects a node from individual 1 
@@ -172,21 +171,13 @@ namespace BraneCloud.Evolution.EC.GP.Koza
         /// <summary>
         /// Temporary holding place for parents 
         /// </summary>
-        public GPIndividual[] Parents
-        {
-            get { return _parents; }
-            set { _parents = value; }
-        }
-        private GPIndividual[] _parents = new GPIndividual[2];
+        public IList<Individual> Parents { get; set; } = new List<Individual>();
 
         /// <summary>
         /// Returns 2 * minimum number of typical individuals produced by any sources, 
         /// else 1 * minimum number if TossSecondParent is true. 
         /// </summary>
-        public override int TypicalIndsProduced
-        {
-            get { return (TossSecondParent ? MinChildProduction : MinChildProduction * 2); }
-        }
+        public override int TypicalIndsProduced => TossSecondParent ? MinChildProduction : MinChildProduction * 2;
 
         #endregion // Properties
         #region Cloning
@@ -196,10 +187,9 @@ namespace BraneCloud.Evolution.EC.GP.Koza
             var c = (CrossoverPipeline) (base.Clone());
             
             // deep-cloned stuff
-            c.NodeSelect1 = (IGPNodeSelector) (NodeSelect1.Clone());
-            c.NodeSelect2 = (IGPNodeSelector) (NodeSelect2.Clone());
-            c._parents = new GPIndividual[_parents.Length];
-            _parents.CopyTo(c._parents, 0);
+            c.NodeSelect1 = (IGPNodeSelector) NodeSelect1.Clone();
+            c.NodeSelect2 = (IGPNodeSelector) NodeSelect2.Clone();
+            c.Parents = Parents.ToList();
             
             return c;
         }
@@ -307,8 +297,17 @@ namespace BraneCloud.Evolution.EC.GP.Koza
             return true;
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // how many individuals should we make?
             var n = TypicalIndsProduced;
             if (n < min)
@@ -318,33 +317,48 @@ namespace BraneCloud.Evolution.EC.GP.Koza
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, true);  // DO produce children from source -- we've not done so already
+            {
+                // just load from source 0 and clone 'em
+                Sources[0].Produce(n, n, subpop, inds, state, thread, misc);
+                return n;
+            }
 
-            var initializer = ((GPInitializer)state.Initializer);
+            IntBag[] parentparents = null;
+            IntBag[] preserveParents = null;
+            if (misc != null && misc[KEY_PARENTS] != null)
+            {
+                preserveParents = (IntBag[])misc[KEY_PARENTS];
+                parentparents = new IntBag[2];
+                misc[KEY_PARENTS] = parentparents;
+            }
+
+            var initializer = (GPInitializer)state.Initializer;
 
             for (var q = start; q < n + start; ) // keep on going until we're filled up
             {
+                Parents.Clear();
+
                 // grab two individuals from our sources
                 if (Sources[0] == Sources[1])
                     // grab from the same source
-                    Sources[0].Produce(2, 2, 0, subpop, _parents, state, thread);
+                    Sources[0].Produce(2, 2, subpop, Parents, state, thread, misc);
                 // grab from different sources
                 else
                 {
-                    Sources[0].Produce(1, 1, 0, subpop, _parents, state, thread);
-                    Sources[1].Produce(1, 1, 1, subpop, _parents, state, thread);
+                    Sources[0].Produce(1, 1, subpop, Parents, state, thread, misc);
+                    Sources[1].Produce(1, 1, subpop, Parents, state, thread, misc);
                 }
 
                 // at this point, Parents[] contains our two selected individuals
 
                 // are our tree values valid?
-                if (Tree1 != TREE_UNFIXED && (Tree1 < 0 || Tree1 >= _parents[0].Trees.Length))
+                if (Tree1 != TREE_UNFIXED && (Tree1 < 0 || Tree1 >= ((GPIndividual)Parents[0]).Trees.Length))
                     // uh oh
                     state.Output.Fatal("GP Crossover Pipeline attempted to fix tree.0 to a value which was out of bounds"
                         + " of the array of the individual's trees.  Check the pipeline's fixed tree values"
                         + " -- they may be negative or greater than the number of trees in an individual");
 
-                if (Tree2 != TREE_UNFIXED && (Tree2 < 0 || Tree2 >= _parents[1].Trees.Length))
+                if (Tree2 != TREE_UNFIXED && (Tree2 < 0 || Tree2 >= ((GPIndividual)Parents[1]).Trees.Length))
                     // uh oh
                     state.Output.Fatal("GP Crossover Pipeline attempted to fix tree.1 to a value which was out of bounds"
                         + " of the array of the individual's trees.  Check the pipeline's fixed tree values"
@@ -358,29 +372,29 @@ namespace BraneCloud.Evolution.EC.GP.Koza
                     // pick random trees  -- their GPTreeConstraints must be the same
                     {
                         if (Tree1 == TREE_UNFIXED)
-                            if (_parents[0].Trees.Length > 1)
-                                t1 = state.Random[thread].NextInt(_parents[0].Trees.Length);
+                            if (((GPIndividual)Parents[0]).Trees.Length > 1)
+                                t1 = state.Random[thread].NextInt(((GPIndividual)Parents[0]).Trees.Length);
                             else
                                 t1 = 0;
                         else
                             t1 = Tree1;
 
                         if (Tree2 == TREE_UNFIXED)
-                            if (_parents[1].Trees.Length > 1)
-                                t2 = state.Random[thread].NextInt(_parents[1].Trees.Length);
+                            if (((GPIndividual)Parents[1]).Trees.Length > 1)
+                                t2 = state.Random[thread].NextInt(((GPIndividual)Parents[1]).Trees.Length);
                             else
                                 t2 = 0;
                         else
                             t2 = Tree2;
                     }
-                    while (_parents[0].Trees[t1].Constraints(initializer) != _parents[1].Trees[t2].Constraints(initializer));
+                    while (((GPIndividual)Parents[0]).Trees[t1].Constraints(initializer) != ((GPIndividual)Parents[1]).Trees[t2].Constraints(initializer));
                 }
                 else
                 {
                     t1 = Tree1;
                     t2 = Tree2;
                     // make sure the constraints are okay
-                    if (_parents[0].Trees[t1].Constraints(initializer) != _parents[1].Trees[t2].Constraints(initializer))
+                    if (((GPIndividual)Parents[0]).Trees[t1].Constraints(initializer) != ((GPIndividual)Parents[1]).Trees[t2].Constraints(initializer))
                         // uh oh
                         state.Output.Fatal("GP Crossover Pipeline's two tree choices are both specified by the user"
                                                                 + " -- but their GPTreeConstraints are not the same");
@@ -402,10 +416,10 @@ namespace BraneCloud.Evolution.EC.GP.Koza
                 for (var x = 0; x < NumTries; x++)
                 {
                     // pick a node in individual 1
-                    p1 = NodeSelect1.PickNode(state, subpop, thread, _parents[0], _parents[0].Trees[t1]);
+                    p1 = NodeSelect1.PickNode(state, subpop, thread, (GPIndividual)Parents[0], ((GPIndividual)Parents[0]).Trees[t1]);
 
                     // pick a node in individual 2
-                    p2 = NodeSelect2.PickNode(state, subpop, thread, _parents[1], _parents[1].Trees[t2]);
+                    p2 = NodeSelect2.PickNode(state, subpop, thread, (GPIndividual)Parents[1], ((GPIndividual)Parents[1]).Trees[t2]);
 
                     // check for depth and swap-compatibility limits
                     res1 = VerifyPoints(initializer, p2, p1); // p2 can fill p1's spot -- order is important!
@@ -440,16 +454,16 @@ namespace BraneCloud.Evolution.EC.GP.Koza
                 // should change this to proto off of the main species prototype, but
                 // we have to then copy so much stuff over; it's not worth it.
 
-                var j1 = _parents[0].LightClone();
+                var j1 = ((GPIndividual)Parents[0]).LightClone();
                 GPIndividual j2 = null;
 
                 if (n - (q - start) >= 2 && !TossSecondParent)
-                    j2 = _parents[1].LightClone();
+                    j2 = ((GPIndividual)Parents[1]).LightClone();
 
                 // Fill in various tree information that didn't get filled in there
-                j1.Trees = new GPTree[_parents[0].Trees.Length];
+                j1.Trees = new GPTree[((GPIndividual)Parents[0]).Trees.Length];
                 if (n - (q - start) >= 2 && !TossSecondParent)
-                    j2.Trees = new GPTree[_parents[1].Trees.Length];
+                    j2.Trees = new GPTree[((GPIndividual)Parents[1]).Trees.Length];
 
                 // at this point, p1 or p2, or both, may be null.
                 // If not, swap one in.  Else just copy the parent.
@@ -459,9 +473,9 @@ namespace BraneCloud.Evolution.EC.GP.Koza
                     if (x == t1 && res1)
                     // we've got a tree with a kicking cross position!
                     {
-                        j1.Trees[x] = _parents[0].Trees[x].LightClone();
+                        j1.Trees[x] = ((GPIndividual)Parents[0]).Trees[x].LightClone();
                         j1.Trees[x].Owner = j1;
-                        j1.Trees[x].Child = _parents[0].Trees[x].Child.CloneReplacing(p2, p1);
+                        j1.Trees[x].Child = ((GPIndividual)Parents[0]).Trees[x].Child.CloneReplacing(p2, p1);
                         j1.Trees[x].Child.Parent = j1.Trees[x];
                         j1.Trees[x].Child.ArgPosition = 0;
                         j1.Evaluated = false;
@@ -469,9 +483,9 @@ namespace BraneCloud.Evolution.EC.GP.Koza
                     // it's changed
                     else
                     {
-                        j1.Trees[x] = _parents[0].Trees[x].LightClone();
+                        j1.Trees[x] = ((GPIndividual)Parents[0]).Trees[x].LightClone();
                         j1.Trees[x].Owner = j1;
-                        j1.Trees[x].Child = (GPNode)_parents[0].Trees[x].Child.Clone();
+                        j1.Trees[x].Child = (GPNode)((GPIndividual)Parents[0]).Trees[x].Child.Clone();
                         j1.Trees[x].Child.Parent = j1.Trees[x];
                         j1.Trees[x].Child.ArgPosition = 0;
                     }
@@ -483,9 +497,9 @@ namespace BraneCloud.Evolution.EC.GP.Koza
                         if (x == t2 && res2)
                         // we've got a tree with a kicking cross position!
                         {
-                            j2.Trees[x] = _parents[1].Trees[x].LightClone();
+                            j2.Trees[x] = ((GPIndividual)Parents[1]).Trees[x].LightClone();
                             j2.Trees[x].Owner = j2;
-                            j2.Trees[x].Child = _parents[1].Trees[x].Child.CloneReplacing(p1, p2);
+                            j2.Trees[x].Child = ((GPIndividual)Parents[1]).Trees[x].Child.CloneReplacing(p1, p2);
                             j2.Trees[x].Child.Parent = j2.Trees[x];
                             j2.Trees[x].Child.ArgPosition = 0;
                             j2.Evaluated = false;
@@ -493,20 +507,25 @@ namespace BraneCloud.Evolution.EC.GP.Koza
                         // it's changed
                         else
                         {
-                            j2.Trees[x] = _parents[1].Trees[x].LightClone();
+                            j2.Trees[x] = ((GPIndividual)Parents[1]).Trees[x].LightClone();
                             j2.Trees[x].Owner = j2;
-                            j2.Trees[x].Child = (GPNode)_parents[1].Trees[x].Child.Clone();
+                            j2.Trees[x].Child = (GPNode)((GPIndividual)Parents[1]).Trees[x].Child.Clone();
                             j2.Trees[x].Child.Parent = j2.Trees[x];
                             j2.Trees[x].Child.ArgPosition = 0;
                         }
                     }
 
                 // add the individuals to the population
-                inds[q] = j1;
+                inds.Add(j1);
                 q++;
                 if (q < n + start && !TossSecondParent)
                 {
-                    inds[q] = j2;
+                    inds.Add(j2);
+                    if (preserveParents != null)
+                    {
+                        parentparents[0].AddAll(parentparents[1]);
+                        preserveParents[q] = parentparents[0];
+                    }
                     q++;
                 }
             }

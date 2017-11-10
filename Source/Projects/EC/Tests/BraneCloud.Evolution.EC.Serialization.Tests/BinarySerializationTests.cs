@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using BraneCloud.Evolution.EC.Evaluation;
@@ -1190,9 +1191,9 @@ namespace BraneCloud.Evolution.EC.Serialization.Tests
         [Serializable]
         private class MyGPBreedingPipeline : GPBreedingPipeline
         {
-            public override int NumSources { get { return 0; } }
-            public override IParameter DefaultBase { get { return null; } }
-            public override int Produce(int i1, int i2, int i3, int i4, Individual[] inds, IEvolutionState state, int i5){return 0;}
+            public override int NumSources => 0;
+            public override IParameter DefaultBase => null;
+            public override int Produce(int i1, int i2, int i3, IList<Individual> inds, IEvolutionState state, int i4, IDictionary<string, object> misc){return 0;}
         }
 
         [TestMethod]

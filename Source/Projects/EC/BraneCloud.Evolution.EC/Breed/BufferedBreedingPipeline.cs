@@ -17,8 +17,10 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
+using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.Breed
 {
@@ -71,23 +73,15 @@ namespace BraneCloud.Evolution.EC.Breed
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return BreedDefaults.ParamBase.Push(P_BUFFERED); }
-        }
+        public IList<Individual> Buffer { get; set; }
+        public int BufSize { get; set; }
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override IParameter DefaultBase => BreedDefaults.ParamBase.Push(P_BUFFERED);
 
-        public override int TypicalIndsProduced
-        {
-            get { return INDS_PRODUCED; }
-        }
+        public override int NumSources => NUM_SOURCES; 
 
-        public Individual[] Buffer { get; set; }
-        public int CurrentSize { get; set; }
+        public override int TypicalIndsProduced => INDS_PRODUCED; 
+
 
         #endregion // Properties
         #region Setup
@@ -97,12 +91,11 @@ namespace BraneCloud.Evolution.EC.Breed
             base.Setup(state, paramBase);
             var def = DefaultBase;
 
-            var bufsize = state.Parameters.GetInt(paramBase.Push(P_BUFSIZE), def.Push(P_BUFSIZE), 1);
-            if (bufsize == 0)
+            BufSize = state.Parameters.GetInt(paramBase.Push(P_BUFSIZE), def.Push(P_BUFSIZE), 1);
+            if (BufSize == 0)
                 state.Output.Fatal("BufferedBreedingPipeline's number of individuals must be >= 1.", paramBase.Push(P_BUFSIZE), def.Push(P_BUFSIZE));
 
-            Buffer = new Individual[bufsize];
-            CurrentSize = 0; // just in case 
+            Buffer = new List<Individual>(BufSize);
 
             // declare that likelihood isn't used
             if (Likelihood < 1.0)
@@ -117,27 +110,26 @@ namespace BraneCloud.Evolution.EC.Breed
         {
             base.PrepareToProduce(state, subpop, thread);
             // reset my number of individuals to 0
-            CurrentSize = 0;
+            Buffer.Clear();
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread, 
+            IDictionary<string, object> misc)
         {
-            for (var q = start; q < min + start; q++)
+            for (int q = 0; q < min; q++)
             {
-                if (CurrentSize == 0)
-                // reload
+                if (Buffer.Count == 0)       // reload
                 {
-                    Sources[0].Produce(Buffer.Length, Buffer.Length, 0, subpop, Buffer, state, thread);
-                    CurrentSize = Buffer.Length;
-
-                    // clone if necessary
-                    if (Sources[0] is SelectionMethod)
-                        for (var z = 0; z < Buffer.Length; z++)
-                            Buffer[z] = (Individual)(Buffer[z].Clone());
+                    Sources[0].Produce(BufSize, BufSize, subpop, Buffer, state, thread, misc);
                 }
-
-                inds[q] = Buffer[CurrentSize - 1];
-                CurrentSize--;
+                var top = Buffer.RemoveFromTopDesctructively();
+                inds.Add(top);
             }
             return min;
         }

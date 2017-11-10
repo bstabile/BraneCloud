@@ -266,7 +266,7 @@ namespace BraneCloud.Evolution.EC.Rule
         /// <summary>
         /// Overridden for the RuleIndividual genotype. 
         /// </summary>
-        public override void ParseGenotype(IEvolutionState state, StreamReader reader)
+        protected override void ParseGenotype(IEvolutionState state, StreamReader reader)
         {
             // read my ruleset
             foreach (var t in Rulesets)

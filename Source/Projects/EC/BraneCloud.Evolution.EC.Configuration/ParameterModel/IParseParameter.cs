@@ -46,6 +46,86 @@ namespace BraneCloud.Evolution.EC.Configuration
         double GetDoubleWithDefault(IParameter parameter, IParameter defaultParameter, double defaultValue);
         double GetDoubleWithMax(IParameter parameter, IParameter defaultParameter, double minValue, double maxValue);
 
+        //double[] GetDoublesWithMax(IParameter parameter, double minValue, double maxValue, int expectedLength);
+        //double[] GetDoublesWithMax(IParameter parameter, double minValue, double maxValue);
+        //double[] GetDoubles(IParameter parameter, double minValue, int expectedLength);
+        //double[] GetDoubles(IParameter parameter, double minValue);
+        //double[] GetDoublesUnconstrained(IParameter parameter, int expectedLength);
+        //double[] GetDoublesUnconstrained(IParameter parameter);
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles, each of which is >= minValue and <= maxValue,
+         * and which must be exactly expectedLength (> 0) long.  If the parameter does not exist,
+         * or any of its doubles are out of bounds, or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+        double[] GetDoublesWithMax(IParameter parameter, IParameter defaultParameter, double minValue, double maxValue,
+            int expectedLength);
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles, each of which is >= minValue and <= maxValue,
+         * and which must be at least 1 number long.  If the parameter does not exist,
+         * or any of its doubles are out of bounds, or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+        double[] GetDoublesWithMax(IParameter parameter, IParameter defaultParameter, double minValue, double maxValue);
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles, each of which is >= minValue,
+         * and which must be exactly expectedLength (> 0) long.  If the parameter does not exist,
+         * or any of its doubles are out of bounds, or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+        double[] GetDoubles(IParameter parameter, IParameter defaultParameter, double minValue, int expectedLength);
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles, each of which is >= minValue,
+         * and which must be at least 1 number long.  If the parameter does not exist,
+         * or any of its doubles are out of bounds, or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+        double[] GetDoubles(IParameter parameter, IParameter defaultParameter, double minValue);
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles,
+         * and which must be exactly expectedLength (> 0) long.  If the parameter does not exist,
+         * or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+        double[] GetDoublesUnconstrained(IParameter parameter, IParameter defaultParameter, int expectedLength);
+
+        /**
+         * Searches down through databases to find a given parameter, whose value
+         * must be a space- or tab-delimited list of doubles,
+         * and which must be at least 1 number long.  If the parameter does not exist,
+         * or the list is not long enough or is  
+         * too long or has garbage at the end of it, then this method returns null.
+         * Otherwise the method returns the doubles in question.  The doubles may not
+         * be NaN, +Infinity, or -Infinity. The parameter chosen is
+         * marked "used" if it exists.
+         */
+        double[] GetDoublesUnconstrained(IParameter parameter, IParameter defaultParameter);
+
         long GetLong(IParameter parameter, IParameter defaultParameter);
         long GetLong(IParameter parameter, IParameter defaultParameter, long minValue);
         long GetLongWithDefault(IParameter parameter, IParameter defaultParameter, long defaultValue);

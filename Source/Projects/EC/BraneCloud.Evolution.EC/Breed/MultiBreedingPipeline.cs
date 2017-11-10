@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Breed
@@ -56,15 +56,9 @@ namespace BraneCloud.Evolution.EC.Breed
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return BreedDefaults.ParamBase.Push(P_MULTIBREED); }
-        }
+        public override IParameter DefaultBase => BreedDefaults.ParamBase.Push(P_MULTIBREED); 
 
-        public override int NumSources
-        {
-            get { return DYNAMIC_SOURCES; }
-        }
+        public override int NumSources => DYNAMIC_SOURCES;
 
         public int MaxGeneratable { get; set; }
         public bool GenerateMax { get; set; }
@@ -100,11 +94,7 @@ namespace BraneCloud.Evolution.EC.Breed
 
             for (var x = 0; x < Sources.Length; x++)
             {
-                // make sure the sources are actually breeding pipelines
-                if (!(Sources[x] is BreedingPipeline))
-                    state.Output.Error("Source #" + x + " is not a BreedingPipeline", paramBase);
-                else if (Sources[x].Probability < 0.0)
-                    // null checked from state.Output.error above
+                if (Sources[x].Probability < 0.0) // null checked from state.Output.error above
                     state.Output.Error("Pipe #" + x + " must have a probability >= 0.0", paramBase); // convenient that NO_PROBABILITY is -1...		
                 else
                     total += Sources[x].Probability;
@@ -131,8 +121,17 @@ namespace BraneCloud.Evolution.EC.Breed
         #endregion // Setup
         #region Operations
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, int 
+            thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             var s = Sources[PickRandom(Sources, state.Random[thread].NextDouble())];
             int total;
 
@@ -146,17 +145,12 @@ namespace BraneCloud.Evolution.EC.Breed
                 if (n > max)
                     n = max;
 
-                total = s.Produce(n, n, start, subpop, inds, state, thread);
+                total = s.Produce(n, n, subpop, inds, state, thread, misc);
             }
             else
             {
-                total = s.Produce(min, max, start, subpop, inds, state, thread);
+                total = s.Produce(min, max, subpop, inds, state, thread, misc);
             }
-
-            // clone if necessary
-            if (s is SelectionMethod)
-                for (var q = start; q < total + start; q++)
-                    inds[q] = (Individual)(inds[q].Clone());
 
             return total;
         }

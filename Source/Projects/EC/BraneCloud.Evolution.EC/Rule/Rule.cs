@@ -224,7 +224,7 @@ namespace BraneCloud.Evolution.EC.Rule
         }
 
         /// <summary>
-        /// Reads a rule from a string, which may contain a final '\n'.
+        /// Reads a rule from a string, which may contain a '\n'.
         /// Override this method.  The default form generates an error. 
         /// </summary>
         public virtual void ReadRuleFromString(string ruleText, IEvolutionState state)

@@ -18,8 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Vector.Breed
@@ -49,41 +47,42 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return VectorDefaults.ParamBase.Push(P_DUPLICATION); }
-        }
+        public override IParameter DefaultBase => VectorDefaults.ParamBase.Push(P_DUPLICATION);
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
         #endregion // Properties
         #region Operations
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
 
             // grab individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            var n = Sources[0].Produce(min, max, subpop, inds, state, thread, misc);
 
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
 
 
             // now let's mutate 'em
             for (var q = start; q < n + start; q++)
             {
-                if (Sources[0] is SelectionMethod)
-                    inds[q] = (Individual)inds[q].Clone();
-
                 //duplicate from the genome between a random begin and end point,
                 //and put that at the end of the new genome.
-                var ind = (VectorIndividual)(inds[q]);
+                var ind = (VectorIndividual)inds[q];
 
                 var len = ind.GenomeLength;
 

@@ -19,8 +19,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
 
 namespace BraneCloud.Evolution.EC.Vector.Breed
 {
@@ -89,29 +89,23 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
         public const string P_MIN_CROSSOVER_PERCENT = "min-crossover-percent";
         public const string P_MAX_CROSSOVER_PERCENT = "max-crossover-percent";
         public const int NUM_SOURCES = 2;
+        public const string KEY_PARENTS = "parents";
 
         #endregion // Constants
+
         #region Fields
 
-        VectorIndividual[] _parents;
+        protected IList<Individual> Parents { get; set; } = new List<Individual>();
 
         #endregion // Fields
+
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return VectorDefaults.ParamBase.Push(P_LIST_CROSSOVER); }
-        }
+        public override IParameter DefaultBase => VectorDefaults.ParamBase.Push(P_LIST_CROSSOVER);
 
-        public override int NumSources
-        {
-            get { return NUM_SOURCES; }
-        }
+        public override int NumSources => NUM_SOURCES;
 
-        public override int TypicalIndsProduced
-        {
-            get { return (TossSecondParent ? MinChildProduction : MinChildProduction * 2); }
-        }
+        public override int TypicalIndsProduced => TossSecondParent ? MinChildProduction : MinChildProduction * 2;
 
         public bool TossSecondParent { get; set; }
         public int CrossoverType { get; set; }
@@ -121,9 +115,8 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
         public float MaxCrossoverPercentage { get; set; }
 
         #endregion // Properties
-        #region Setup
 
-        public ListCrossoverPipeline() { _parents = new VectorIndividual[2]; }
+        #region Setup
 
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
@@ -145,7 +138,8 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
                 def.Push(P_MAX_CROSSOVER_PERCENT), 1.0);
 
 
-            var crossoverTypeString = state.Parameters.GetStringWithDefault(paramBase.Push(VectorSpecies.P_CROSSOVERTYPE),
+            var crossoverTypeString = state.Parameters.GetStringWithDefault(
+                paramBase.Push(VectorSpecies.P_CROSSOVERTYPE),
                 def.Push(VectorSpecies.P_CROSSOVERTYPE),
                 VectorSpecies.V_TWO_POINT);
 
@@ -161,57 +155,69 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
             else
             {
                 state.Output.Error("ListCrossoverPipeline:\n:" +
-                    "   Parameter crossover-type is currently set to: " + crossoverTypeString + "\n" +
-                    "   Currently supported crossover types are \"one\" and \"two\" point.\n");
+                                   "   Parameter crossover-type is currently set to: " + crossoverTypeString + "\n" +
+                                   "   Currently supported crossover types are \"one\" and \"two\" point.\n");
             }
 
             // sanity check for crossover parameters
             if (MinChildSize < 0)
             {
                 state.Output.Error("ListCrossoverPipeline:\n" +
-                    "   Parameter min-child-size is currently equal to: " + MinChildSize + "\n" +
-                    "   min-child-size must be a positive integer\n");
+                                   "   Parameter min-child-size is currently equal to: " + MinChildSize + "\n" +
+                                   "   min-child-size must be a positive integer\n");
             }
 
             if (NumTries < 1)
             {
                 state.Output.Error("ListCrossoverPipeline:\n" +
-                    "   Parameter tries is currently equal to: " + NumTries + "\n" +
-                    "   tries must be greater than or equal to 1\n");
+                                   "   Parameter tries is currently equal to: " + NumTries + "\n" +
+                                   "   tries must be greater than or equal to 1\n");
             }
 
 
             if (MinCrossoverPercentage < 0.0 || MinCrossoverPercentage > 1.0)
             {
                 state.Output.Error("ListCrossoverPipeline:\n" +
-                    "   Parameter min-crossover-percent is currently equal to: " + MinCrossoverPercentage + "\n" +
-                    "   min-crossover-percent must be either a real-value float between [0.0, 1.0] or left unspecified\n");
+                                   "   Parameter min-crossover-percent is currently equal to: " +
+                                   MinCrossoverPercentage + "\n" +
+                                   "   min-crossover-percent must be either a real-value float between [0.0, 1.0] or left unspecified\n");
             }
             if (MaxCrossoverPercentage < 0.0 || MaxCrossoverPercentage > 1.0)
             {
                 state.Output.Error("ListCrossoverPipeline:\n" +
-                    "   Parameter max-crossover-percent is currently equal to: " + MaxCrossoverPercentage + "\n" +
-                    "   max-crossover-percent must be either a real-value float between [0.0, 1.0] or left unspecified\n");
+                                   "   Parameter max-crossover-percent is currently equal to: " +
+                                   MaxCrossoverPercentage + "\n" +
+                                   "   max-crossover-percent must be either a real-value float between [0.0, 1.0] or left unspecified\n");
             }
             if (MinCrossoverPercentage > MaxCrossoverPercentage)
             {
                 state.Output.Error("ListCrossoverPipeline:\n" +
-                    "   Parameter min-crossover-percent must be less than max-crossover-percent\n");
+                                   "   Parameter min-crossover-percent must be less than max-crossover-percent\n");
             }
             if (MinCrossoverPercentage == MaxCrossoverPercentage)
             {
                 state.Output.Warning("ListCrossoverPipeline:\n" +
-                    "   Parameter min-crossover-percent and max-crossover-percent are currently equal to: " +
-                    MinCrossoverPercentage + "\n" +
-                    "   This effectively prevents any crossover from occurring\n");
+                                     "   Parameter min-crossover-percent and max-crossover-percent are currently equal to: " +
+                                     MinCrossoverPercentage + "\n" +
+                                     "   This effectively prevents any crossover from occurring\n");
             }
         }
 
         #endregion // Setup
+
         #region Operations
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min,
+            int max,
+            int subpop,
+            IList<Individual> inds,
+            IEvolutionState state,
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // how many individuals should we make?
             var n = TypicalIndsProduced;
             if (n < min) n = min;
@@ -219,36 +225,42 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, true);  // DO produce children from source -- we've not done so already
-
-            for (var q = start; q < n + start; /* no increment */)  // keep on going until we're filled up
             {
+                // just load from source 0 and clone 'em
+                Sources[0].Produce(n, n, subpop, inds, state, thread, misc);
+                return n;
+            }
+
+            IntBag[] parentparents = null;
+            IntBag[] preserveParents = null;
+            if (misc != null && misc[KEY_PARENTS] != null)
+            {
+                preserveParents = (IntBag[]) misc[KEY_PARENTS];
+                parentparents = new IntBag[2];
+                misc[KEY_PARENTS] = parentparents;
+            }
+
+            for (var q = start; q < n + start; /* no increment */) // keep on going until we're filled up
+            {
+                Parents.Clear();
+
                 // grab two individuals from our sources
-                if (Sources[0] == Sources[1])  // grab from the same source
+                if (Sources[0] == Sources[1]) // grab from the same source
                 {
-                    Sources[0].Produce(2, 2, 0, subpop, _parents, state, thread);
-                    if (!(Sources[0] is BreedingPipeline))  // it's a selection method probably
-                    {
-                        _parents[0] = (VectorIndividual)_parents[0].Clone();
-                        _parents[1] = (VectorIndividual)_parents[1].Clone();
-                    }
+                    Sources[0].Produce(2, 2, subpop, Parents, state, thread, misc);
                 }
                 else // grab from different sources
                 {
-                    Sources[0].Produce(1, 1, 0, subpop, _parents, state, thread);
-                    Sources[1].Produce(1, 1, 1, subpop, _parents, state, thread);
-                    if (!(Sources[0] is BreedingPipeline))  // it's a selection method probably
-                        _parents[0] = (VectorIndividual)_parents[0].Clone();
-                    if (!(Sources[1] is BreedingPipeline)) // it's a selection method probably
-                        _parents[1] = (VectorIndividual)_parents[1].Clone();
+                    Sources[0].Produce(1, 1, subpop, Parents, state, thread, misc);
+                    Sources[1].Produce(1, 1, subpop, Parents, state, thread, misc);
                 }
 
 
                 // determines size of parents, in terms of chunks
-                var chunkSize = ((VectorSpecies)(_parents[0].Species)).ChunkSize;
+                var chunkSize = ((VectorSpecies) Parents[0].Species).ChunkSize;
                 var size = new int[2];
-                size[0] = _parents[0].GenomeLength;
-                size[1] = _parents[1].GenomeLength;
+                size[0] = ((VectorIndividual) Parents[0]).GenomeLength;
+                size[1] = ((VectorIndividual) Parents[1]).GenomeLength;
                 var sizeInChunks = new int[2];
                 sizeInChunks[0] = size[0] / chunkSize;
                 sizeInChunks[1] = size[1] / chunkSize;
@@ -266,13 +278,13 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
                 // determine min and max crossover segment lengths, in terms of chunks
                 for (var i = 0; i < 2; i++)
                 {
-                    minChunks[i] = (int)(sizeInChunks[i] * MinCrossoverPercentage);
+                    minChunks[i] = (int) (sizeInChunks[i] * MinCrossoverPercentage);
                     // round minCrossoverPercentage up to nearest chunk boundary
                     if (size[i] % chunkSize != 0 && minChunks[i] < sizeInChunks[i])
                     {
                         minChunks[i]++;
                     }
-                    maxChunks[i] = (int)(sizeInChunks[i] * MaxCrossoverPercentage);
+                    maxChunks[i] = (int) (sizeInChunks[i] * MaxCrossoverPercentage);
                 }
 
                 // attempt 'num-tries' times to produce valid children (which are bigger than min-child-size)
@@ -306,7 +318,8 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
                             // second index must be at least 'min_chunks' after the first index
                             split[i][1] = split[i][0] + minChunks[i];
                             // add a random value up to max crossover size, without exceeding size of the parent
-                            split[i][1] += state.Random[thread].NextInt(Math.Min(maxChunks[i] - minChunks[i], sizeInChunks[i] - split[i][0]));
+                            split[i][1] += state.Random[thread].NextInt(Math.Min(maxChunks[i] - minChunks[i],
+                                sizeInChunks[i] - split[i][0]));
                             // convert split from chunk numbers to array indices
                             split[i][0] *= chunkSize;
                             split[i][1] *= chunkSize;
@@ -314,8 +327,8 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
                     }
 
                     // use the split indices generated above to split the parents into pieces
-                    _parents[0].Split(split[0], pieces[0]);
-                    _parents[1].Split(split[1], pieces[1]);
+                    ((VectorIndividual) Parents[0]).Split(split[0], pieces[0]);
+                    ((VectorIndividual) Parents[1]).Split(split[1], pieces[1]);
 
                     // create copies of the parents, swap the middle segment, and then rejoin the pieces
                     // - this is done to test whether or not the resulting children are of a valid size,
@@ -325,8 +338,8 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
                     // - instead, we use the join method on copies, and let each vector type figure out its own
                     //   length with the genomeLength() method
                     var children = new VectorIndividual[2];
-                    children[0] = (VectorIndividual)_parents[0].Clone();
-                    children[1] = (VectorIndividual)_parents[1].Clone();
+                    children[0] = (VectorIndividual) Parents[0].Clone();
+                    children[1] = (VectorIndividual) Parents[1].Clone();
 
                     var swap = pieces[0][1];
                     pieces[0][1] = pieces[1][1];
@@ -344,30 +357,52 @@ namespace BraneCloud.Evolution.EC.Vector.Breed
                 // if the children produced were valid, updates the parents
                 if (validChildren)
                 {
-                    _parents[0].Join(pieces[0]);
-                    _parents[1].Join(pieces[1]);
-                    _parents[0].Evaluated = false;
-                    _parents[1].Evaluated = false;
+                    ((VectorIndividual) Parents[0]).Join(pieces[0]);
+                    ((VectorIndividual) Parents[1]).Join(pieces[1]);
+                    Parents[0].Evaluated = false;
+                    Parents[1].Evaluated = false;
                 }
-                // insert parents back into the population
-                inds[q] = _parents[0];
+
+                // add parents to the population
+                // by Ermo. is this wrong?
+                // -- Okay Sean
+                inds.Add(Parents[0]);
+                if (preserveParents != null)
+                {
+                    parentparents[0].AddAll(parentparents[1]);
+                    preserveParents[q] = parentparents[0];
+                }
                 q++;
                 if (q < n + start && TossSecondParent == false)
                 {
-                    inds[q] = _parents[1];
+                    // by Ermo. also this is wrong?
+                    inds.Add(Parents[1]);
+                    if (preserveParents != null)
+                    {
+                        parentparents[0].AddAll(parentparents[1]);
+                        preserveParents[q] = parentparents[0];
+                    }
                     q++;
                 }
             }
             return n;
         }
 
+        /** A hook called by ListCrossoverPipeline to allow subclasses to prepare for additional validation testing. 
+            Primarily used by GECrossoverPipeline.  */
+        public virtual object ComputeValidationData(IEvolutionState state, IList<Individual> parents, int thread)
+        {
+            return null;
+        }
+
         #endregion // Operations
+
         #region Cloning
 
         public override object Clone()
         {
-            var c = (ListCrossoverPipeline)base.Clone();
-            c._parents = (VectorIndividual[])_parents.Clone();
+            var c = (ListCrossoverPipeline) base.Clone();
+            c.Parents = Parents.ToList();
             return c;
         }
 

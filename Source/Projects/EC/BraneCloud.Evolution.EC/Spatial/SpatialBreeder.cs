@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Simple;
 
@@ -64,8 +64,10 @@ namespace BraneCloud.Evolution.EC.Spatial
 
         public override void BreedPopChunk(Population newpop, IEvolutionState state, int[] numinds, int[] from, int threadnum)
         {
-            for (var subpop = 0; subpop < newpop.Subpops.Length; subpop++)
+            for (var subpop = 0; subpop < newpop.Subpops.Count; subpop++)
             {
+                IList<Individual> putHere = NewIndividuals[subpop][threadnum];
+
                 // if it's subpop's turn and we're doing sequential breeding...
                 if (!ShouldBreedSubpop(state, subpop, threadnum))
                 {
@@ -76,16 +78,16 @@ namespace BraneCloud.Evolution.EC.Spatial
                 }
                 else
                 {
-                    var bp = (BreedingPipeline)newpop.Subpops[subpop].Species.Pipe_Prototype.Clone();
+                    var bp = (BreedingSource)newpop.Subpops[subpop].Species.Pipe_Prototype.Clone();
 
                     if (!(state.Population.Subpops[subpop] is ISpace))
                         state.Output.Fatal("Subpopulation " + subpop + " does not implement the Space interface.");
-                    var space = (ISpace)(state.Population.Subpops[subpop]);
+                    var space = (ISpace)state.Population.Subpops[subpop];
 
-                    // check to make sure that the breeding pipeline produces
+                    // check to make sure that the breeding source produces
                     // the right kind of individuals.  Don't want a mistake there! :-)
                     if (!bp.Produces(state, newpop, subpop, threadnum))
-                        state.Output.Fatal("The Breeding Pipeline of subpopulation " + subpop +
+                        state.Output.Fatal("The Breeding Source of subpopulation " + subpop +
                                            " does not produce individuals of the expected species " +
                                            newpop.Subpops[subpop].Species.GetType().Name + " or fitness " +
                                            newpop.Subpops[subpop].Species.F_Prototype);
@@ -95,8 +97,9 @@ namespace BraneCloud.Evolution.EC.Spatial
                     for (var x = from[subpop]; x < from[subpop] + numinds[subpop]; x++)
                     {
                         space.SetIndex(threadnum, x);
-                        if (bp.Produce(1, 1, x, subpop, newpop.Subpops[subpop].Individuals, state, threadnum) != 1)
-                            state.Output.Fatal("The pipelines should produce one individual at a time!");
+                        var newMisc = newpop.Subpops[subpop].Species.BuildMisc(state, subpop, threadnum);
+                        if (bp.Produce(1, 1, subpop, putHere, state, threadnum, newMisc) != 1)
+                            state.Output.Fatal("The sources should produce one individual at a time!");
                     }
 
                     bp.FinishProducing(state, subpop, threadnum);

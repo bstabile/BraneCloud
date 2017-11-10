@@ -17,13 +17,10 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using BraneCloud.Evolution.EC.CoEvolve;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Simple;
-using BraneCloud.Evolution.EC.App.ECSuite;
 using BraneCloud.Evolution.EC.Vector;
 
 namespace BraneCloud.Evolution.EC.App.Coevolve2
@@ -56,7 +53,7 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
 
         public void PreprocessPopulation(IEvolutionState state, Population pop, bool[] prepareForAssessment, bool countVictoriesOnly)
         {
-            for (var i = 0; i < pop.Subpops.Length; i++)
+            for (var i = 0; i < pop.Subpops.Count; i++)
             {
                 if (prepareForAssessment[i])
                 {
@@ -66,9 +63,10 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
             }
         }
 
-        public void PostprocessPopulation(IEvolutionState state, Population pop, bool[] assessFitness, bool countVictoriesOnly)
+        public int PostprocessPopulation(IEvolutionState state, Population pop, bool[] assessFitness, bool countVictoriesOnly)
         {
-            for (var i = 0; i < pop.Subpops.Length; i++)
+            int total = 0;
+            for (var i = 0; i < pop.Subpops.Count; i++)
             {
                 if (!assessFitness[i]) continue;
 
@@ -84,8 +82,10 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
 
                     fit.SetFitness(state, max, IsOptimal(ProblemType, max));
                     ind.Evaluated = true;
+                    total++;
                 }
             }
+            return total;
         }
 
         public void Evaluate(IEvolutionState state,

@@ -111,8 +111,10 @@ namespace BraneCloud.Evolution.EC.Select
         /// </summary>
         public override void PrepareToProduce(IEvolutionState s, int subpop, int thread)
         {
+            base.PrepareToProduce(s, subpop, thread);
+
             // load fitnesses
-            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Length];
+            Fitnesses = new double[s.Population.Subpops[subpop].Individuals.Count];
 
             double meanSum = 0;
             double squaredDeviationsSum = 0;

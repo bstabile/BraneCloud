@@ -17,9 +17,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Util;
 
@@ -31,14 +28,14 @@ namespace BraneCloud.Evolution.EC.MultiObjective
     {
         public bool lt(Object a, Object b)
         {
-            return (((MultiObjectiveFitness)(((Individual)a).Fitness)).GetObjective(0) <
-                    (((MultiObjectiveFitness)((Individual)b).Fitness)).GetObjective(0));
+            return ((MultiObjectiveFitness)((Individual)a).Fitness).GetObjective(0) <
+                   ((MultiObjectiveFitness)((Individual)b).Fitness).GetObjective(0);
         }
 
         public bool gt(Object a, Object b)
         {
-            return (((MultiObjectiveFitness)(((Individual)a).Fitness)).GetObjective(0) >
-                    ((MultiObjectiveFitness)(((Individual)b).Fitness)).GetObjective(0));
+            return ((MultiObjectiveFitness)((Individual)a).Fitness).GetObjective(0) >
+                   ((MultiObjectiveFitness)((Individual)b).Fitness).GetObjective(0);
         }
     }
 }

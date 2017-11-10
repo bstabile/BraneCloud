@@ -26,7 +26,7 @@ namespace BraneCloud.Evolution.EC.SteadyState
     /// with the standard statistics are initialization and final. This is an
     /// optional interface: SteadyStateEvolutionState will complain, but
     /// will permit Statistics objects that don't adhere to it, though they will
-    /// only have their initialization and final statistics methods called!
+    /// only have their initialization and statistics methods called!
     /// 
     /// <p/>See SteadyStateEvolutionState for how regular Statistics objects'
     /// hook methods are called in steady state evolution.

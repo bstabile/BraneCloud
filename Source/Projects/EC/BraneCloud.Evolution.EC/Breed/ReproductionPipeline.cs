@@ -17,30 +17,20 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Breed
 {
     /// <summary> 
     /// ReproductionPipeline is a BreedingPipeline which simply makes a copy
-    /// of the individuals it recieves from its source.  If the source is another
-    /// BreedingPipeline, the individuals have already been cloned, so ReproductionPipeline
-    /// won't clone them again...unless you force it to do so by turning on the <tt>must-clone</tt>
-    /// parameter.
-    /// 
+    /// of the individuals it recieves from its source.  
+    ///  
     /// <p/><b>Typical Number of Individuals Produced Per <tt>produce(...)</tt> call</b><br/>
     /// ...as many as the child produces
     /// <p/><b>Number of Sources</b><br/>
     /// 1
-    /// <p/><b>Parameters</b><br/>
-    /// <table>
-    /// <tr><td valign="top"><i>base.</i><tt>must-clone</tt><br/>
-    /// <font size="-1">bool =  <tt>true</tt> or <tt>false</tt> (default)</font></td>
-    /// <td valign="top">(do we <i>always</i> clone our individuals, 
-    /// or only clone if the individual hasn't already been cloned by our source?  
-    /// Typically you want <tt>false</tt>)</td></tr>
-    /// </table>
+    /// 
     /// <p/><b>Default Base</b><br/>
     /// breed.reproduce
     /// </summary>
@@ -76,9 +66,8 @@ namespace BraneCloud.Evolution.EC.Breed
         {
             base.Setup(state, paramBase);
             IParameter def = DefaultBase;
-            MustClone = state.Parameters.GetBoolean(paramBase.Push(P_MUSTCLONE), def.Push(P_MUSTCLONE), false);
 
-            if (Likelihood != 1.0)
+            if (!Likelihood.Equals(1.0))
                 state.Output.Warning("ReproductionPipeline given a likelihood other than 1.0.  This is nonsensical and will be ignored.",
                     paramBase.Push(P_LIKELIHOOD),
                     def.Push(P_LIKELIHOOD));
@@ -87,15 +76,21 @@ namespace BraneCloud.Evolution.EC.Breed
         #endregion // Setup
         #region Operations
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            int n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            int n = Sources[0].Produce(min, max, subpop, inds, state, thread, misc);
 
-            if (MustClone || (Sources[0] is SelectionMethod))
-                for (var q = start; q < n + start; q++)
-                    inds[q] = (Individual)(inds[q].Clone());
             return n;
         }
 

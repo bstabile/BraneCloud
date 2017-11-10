@@ -354,7 +354,7 @@ namespace BraneCloud.Evolution.EC.Vector
         #endregion // ToString
         #region IO
 
-        public override void ParseGenotype(IEvolutionState state, StreamReader reader)
+        protected override void ParseGenotype(IEvolutionState state, StreamReader reader)
         {
             // read in the next line.  The first item is the number of genes
             var s = reader.ReadLine();

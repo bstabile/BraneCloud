@@ -65,14 +65,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitShifter.cs" />
-    <Compile Include="CollectionExtensions.cs" />
     <Compile Include="CollectionsSupport.cs" />
+    <Compile Include="DoubleBag.cs" />
+    <Compile Include="Indexed.cs" />
+    <Compile Include="IntBag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scanner.cs" />
     <Compile Include="ThreadSupport.cs" />
     <Compile Include="Tokenizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BraneCloud.Evolution.EC.Randomization\BraneCloud.Evolution.EC.Randomization.csproj">
+      <Project>{5993fc6c-820b-482f-ab46-961f89fc8ea1}</Project>
+      <Name>BraneCloud.Evolution.EC.Randomization</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

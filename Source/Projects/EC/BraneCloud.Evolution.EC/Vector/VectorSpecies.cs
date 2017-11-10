@@ -387,7 +387,7 @@ namespace BraneCloud.Evolution.EC.Vector
             // MUTATION
 
             double mutProb = state.Parameters.GetDoubleWithMax(paramBase.Push(P_MUTATIONPROB), def.Push(P_MUTATIONPROB), 0.0, 1.0);
-            if (mutProb == -1.0)
+            if (mutProb.Equals(-1.0))
                 state.Output.Fatal("Global mutation probability must be between 0.0 and 1.0 inclusive",
                     paramBase.Push(P_MUTATIONPROB), def.Push(P_MUTATIONPROB));
             MutationProbability = Fill(new double[GenomeSize + 1], mutProb);
@@ -404,7 +404,7 @@ namespace BraneCloud.Evolution.EC.Vector
             var ctype = state.Parameters.GetStringWithDefault(paramBase.Push(P_CROSSOVERTYPE), def.Push(P_CROSSOVERTYPE), null);
             CrossoverType = C_ONE_POINT;
             if (ctype == null)
-                state.Output.Warning("No crossover type given for VectorSpecies, assuming one-point crossover",
+                state.Output.Warning("No crossover type given for VectorSpecies, assuming one-point crossover (\"one\")",
                                      paramBase.Push(P_CROSSOVERTYPE), def.Push(P_CROSSOVERTYPE));
             else if (ctype.ToUpper().Equals(V_ONE_POINT.ToUpper()))
                 CrossoverType = C_ONE_POINT; // redundant

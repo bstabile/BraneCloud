@@ -67,8 +67,20 @@
     </None>
     <None Include="Params\App\ECSuite\de.params" />
     <None Include="Params\App\ECSuite\es.params" />
+    <None Include="Params\App\ECSuite\hc.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Params\App\ECSuite\hcsteep.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Params\App\ECSuite\hcsteepwr.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Params\App\ECSuite\meta.params" />
     <None Include="Params\App\ECSuite\pso.params" />
+    <None Include="Params\App\ECSuite\sa.params">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Params\App\ECSuite\single.params">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

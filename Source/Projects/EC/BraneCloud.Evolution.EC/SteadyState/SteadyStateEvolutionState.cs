@@ -84,11 +84,6 @@ namespace BraneCloud.Evolution.EC.SteadyState
         /// </summary>
         public double ReplacementProbability { get; set; }
 
-        /// <summary>
-        /// How many Evaluations have we run so far? 
-        /// </summary>
-        public long Evaluations { get; set; }
-
         #endregion // Properties
         #region Fields
 
@@ -97,10 +92,10 @@ namespace BraneCloud.Evolution.EC.SteadyState
         /// </summary>
         protected bool FirstTime;
 
-        /// <summary>
-        /// How many individuals have we added to the initial population? 
-        /// </summary>
-        private int[] _individualCount;
+        ///// <summary>
+        ///// How many individuals have we added to the initial population? 
+        ///// </summary>
+        //private int[] _individualCount;
 
         /// <summary>
         /// Hash table to check for duplicate individuals. 
@@ -111,8 +106,6 @@ namespace BraneCloud.Evolution.EC.SteadyState
         /// Holds which subpop we are currently operating on. 
         /// </summary>
         private int _whichSubpop;
-
-        private bool _justCalledPostEvaluationStatistics;
 
         #endregion
         #region Setup
@@ -176,17 +169,15 @@ namespace BraneCloud.Evolution.EC.SteadyState
             Evaluations = 0;
             _whichSubpop = -1;
 
-            _individualHash = new Hashtable[Population.Subpops.Length];
-            for (var i = 0; i < Population.Subpops.Length; i++)
+            _individualHash = new Hashtable[Population.Subpops.Count];
+            for (var i = 0; i < Population.Subpops.Count; i++)
             {
                 _individualHash[i] = new Hashtable();
             }
 
-            _individualCount = new int[Population.Subpops.Length];
-            for (var sub = 0; sub < Population.Subpops.Length; sub++)
+            for (var sub = 0; sub < Population.Subpops.Count; sub++)
             {
-                _individualCount[sub] = 0;
-                GenerationSize += Population.Subpops[sub].Individuals.Length; // so our sum total 'GenerationSize' will be the initial total number of individuals
+                GenerationSize += Population.Subpops[sub].InitialSize;
             }
 
             if (NumEvaluations > UNDEFINED && NumEvaluations < GenerationSize)
@@ -205,12 +196,6 @@ namespace BraneCloud.Evolution.EC.SteadyState
             {
                 Output.Message("Generation " + Generation + "\tEvaluations " + Evaluations);
                 Statistics.GenerationBoundaryStatistics(this);
-                Statistics.PostEvaluationStatistics(this);
-                _justCalledPostEvaluationStatistics = true;
-            }
-            else
-            {
-                _justCalledPostEvaluationStatistics = false;
             }
 
             if (FirstTime)
@@ -223,10 +208,11 @@ namespace BraneCloud.Evolution.EC.SteadyState
                 FirstTime = false;
             }
 
-            _whichSubpop = (_whichSubpop + 1) % Population.Subpops.Length;  // round robin selection
+            // WARNING: BRS: Two variables _whichSubpop and whichSubpop (instance variable and local method variable)
+            _whichSubpop = (_whichSubpop + 1) % Population.Subpops.Count;  // round robin selection
 
             // is the current subpop full? 
-            var partiallyFullSubpop = _individualCount[_whichSubpop] < Population.Subpops[_whichSubpop].Individuals.Length;
+            bool partiallyFullSubpop = Population.Subpops[_whichSubpop].Individuals.Count < Population.Subpops[_whichSubpop].InitialSize;
 
             // MAIN EVOLVE LOOP 
             Individual ind = null;
@@ -261,20 +247,29 @@ namespace BraneCloud.Evolution.EC.SteadyState
                 ((ISteadyStateEvaluator)Evaluator).EvaluateIndividual(this, ind, _whichSubpop);
             }
 
-            ind = ((ISteadyStateEvaluator)Evaluator).GetNextEvaluatedIndividual();
-            int whichInd = -1;
+            ind = ((ISteadyStateEvaluator)Evaluator).GetNextEvaluatedIndividual(this);
+            int whichIndIndex = -1;
+            // WARNING: BRS: Two variables _whichSubpop and whichSubpop (instance field and local variable)
             int whichSubpop = -1;
             if (ind != null)   // do we have an evaluated individual? 
             {
+                // COMPUTE GENERATION BOUNDARY
+                GenerationBoundary = Evaluations % GenerationSize == 0;
+
+                if (GenerationBoundary)
+                {
+                    Statistics.PreEvaluationStatistics(this);
+                }
+
                 var subpop = ((ISteadyStateEvaluator)Evaluator).GetSubpopulationOfEvaluatedIndividual();
                 whichSubpop = subpop;
 
                 if (partiallyFullSubpop) // is subpopulation full? 
                 {
-                    Population.Subpops[subpop].Individuals[_individualCount[subpop]++] = ind;
+                    Population.Subpops[subpop].Individuals.Add(ind);
 
                     // STATISTICS FOR GENERATION ZERO 
-                    if (_individualCount[subpop] == Population.Subpops[subpop].Individuals.Length)
+                    if (Population.Subpops[subpop].Individuals.Count == Population.Subpops[subpop].InitialSize)
                         if (Statistics is ISteadyStateStatistics)
                             ((ISteadyStateStatistics)Statistics).EnteringSteadyStateStatistics(subpop, this);
                 }
@@ -289,7 +284,7 @@ namespace BraneCloud.Evolution.EC.SteadyState
                         Random[0].NextDouble() < ReplacementProbability) // it's not better but maybe we replace it directly anyway
                     {
                         Population.Subpops[subpop].Individuals[deadIndex] = ind;
-                        whichInd = deadIndex;
+                        whichIndIndex = deadIndex;
                     }
 
                     // update duplicate hash table 
@@ -300,11 +295,10 @@ namespace BraneCloud.Evolution.EC.SteadyState
                             new[] { ind }, new[] { deadInd }, new[] { subpop }, new[] { deadIndex });
                 }
 
-                // INCREMENT NUMBER OF COMPLETED EVALUATIONS
-                Evaluations++;
-
-                // COMPUTE GENERATION BOUNDARY
-                GenerationBoundary = (Evaluations % GenerationSize == 0);
+                if (GenerationBoundary)
+                {
+                    Statistics.PostEvaluationStatistics(this);
+                }
             }
             else
             {
@@ -314,31 +308,31 @@ namespace BraneCloud.Evolution.EC.SteadyState
             // SHOULD WE QUIT?
             if (!partiallyFullSubpop && ((ISteadyStateEvaluator)Evaluator).IsIdeal(this, ind) && QuitOnRunComplete)
             {
-                Output.Message("Individual " + whichInd + " of subpopulation " + _whichSubpop + " has an ideal fitness.");
+                Output.Message("Individual " + whichIndIndex + " of subpopulation " + whichSubpop + " has an ideal fitness.");
+                FinishEvaluationStatistics();
                 return R_SUCCESS;
             }
 
             if (Evaluator.RunCompleted != null)
             {
                 Output.Message(Evaluator.RunCompleted);
+                FinishEvaluationStatistics();
                 return R_SUCCESS;
             }
 
-            if (NumEvaluations > UNDEFINED && Evaluations >= NumEvaluations ||  // using numEvaluations
-                NumEvaluations <= UNDEFINED && GenerationBoundary && Generation == NumGenerations - 1)  // not using numEvaluations
+            if ((GenerationBoundary && NumEvaluations != UNDEFINED && Generation >= NumGenerations - 1) ||
+                (NumEvaluations != UNDEFINED && Evaluations >= NumEvaluations))
             {
-                // we are not exchanging again, but we might wish to increment the generation
-                // one last time if we hit a generation boundary
-                if (GenerationBoundary)
-                    Generation++;
+                FinishEvaluationStatistics();
                 return R_FAILURE;
             }
 
-
-            // EXCHANGING
             if (GenerationBoundary)
             {
-                // PRE-BREED EXCHANGE 
+                // INCREMENT GENERATION AND CHECKPOINT
+                Generation++;
+
+                // PRE-BREEDING EXCHANGING
                 Statistics.PrePreBreedingExchangeStatistics(this);
                 Population = Exchanger.PreBreedingExchangePopulation(this);
                 Statistics.PostPreBreedingExchangeStatistics(this);
@@ -346,36 +340,39 @@ namespace BraneCloud.Evolution.EC.SteadyState
                 if (exchangerWantsToShutdown != null)
                 {
                     Output.Message(exchangerWantsToShutdown);
+                    FinishEvaluationStatistics();
                     return R_SUCCESS;
                 }
 
-                // POST BREED EXCHANGE
+                // POST-BREEDING EXCHANGING
                 Statistics.PrePostBreedingExchangeStatistics(this);
                 Population = Exchanger.PostBreedingExchangePopulation(this);
                 Statistics.PostPostBreedingExchangeStatistics(this);
-
-                // INCREMENT GENERATION AND CHECKPOINT
-                Generation++;
-                if (Checkpoint && Generation % CheckpointModulo == 0)
-                {
-                    Output.Message("Checkpointing");
-                    Statistics.PreCheckpointStatistics(this);
-                    EC.Util.Checkpoint.SetCheckpoint(this);
-                    Statistics.PostCheckpointStatistics(this);
-                }
+            }
+            if (Checkpoint && GenerationBoundary && (Generation - 1) % CheckpointModulo == 0)
+            {
+                Output.Message("Checkpointing");
+                Statistics.PreCheckpointStatistics(this);
+                Util.Checkpoint.SetCheckpoint(this);
+                Statistics.PostCheckpointStatistics(this);
             }
             return R_NOTDONE;
         }
 
+        public void FinishEvaluationStatistics()
+        {
+            bool generationBoundary = Evaluations % GenerationSize == 0;
+            if (!generationBoundary)
+            {
+                Statistics.PostEvaluationStatistics(this);
+                Output.Message("Generation " + Generation + " Was Partial");
+            }
+        }
+
         public override void Finish(int result)
         {
-            /* finish up -- we completed. */
+            Output.Message("Total Evaluations " + Evaluations);
             ((SteadyStateBreeder)Breeder).FinishPipelines(this);
-            if (!_justCalledPostEvaluationStatistics)
-            {
-                Output.Message("Generation " + Generation + "\tEvaluations " + Evaluations);
-                Statistics.PostEvaluationStatistics(this);
-            }
             Statistics.FinalStatistics(this, result);
             Finisher.FinishPopulation(this, result);
             Exchanger.CloseContacts(this, result);

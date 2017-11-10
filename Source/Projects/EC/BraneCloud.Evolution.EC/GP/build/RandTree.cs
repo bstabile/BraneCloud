@@ -17,7 +17,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
@@ -233,7 +232,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
             var noOfArities = 0;
             var current = 0;
             var initArities = new List<ArityObject>();
-            var initializer = ((GPInitializer)state.Initializer);
+            var initializer = (GPInitializer)state.Initializer;
 
             // count available arities and place on linked list
             while (current < funcs.Nodes[0].Length)
@@ -431,7 +430,7 @@ namespace BraneCloud.Evolution.EC.GP.Build
                 // Find another non-0 arity to insert
                 counter = 0;
                 arity = 0;
-                while ((arity == 0) && (counter < scheme.Length))
+                while (arity == 0 && counter < scheme.Length)
                 {
                     if (scheme[counter] > 0)
                     {

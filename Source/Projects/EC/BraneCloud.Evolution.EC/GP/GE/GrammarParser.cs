@@ -155,7 +155,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
          * The predictive parse table to parse the lisp tree, 
          * this is what we are looking for.
          */
-        int[][] predictiveParseTable = null;
+        int[][] predictiveParseTable;
 
         #endregion // Fields
 

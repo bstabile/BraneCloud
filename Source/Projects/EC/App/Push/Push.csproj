@@ -91,6 +91,10 @@
       <Project>{926f38f4-d132-458c-91db-6314ae9f2fad}</Project>
       <Name>BraneCloud.Evolution.EC.Runtime</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Support\BraneCloud.Evolution.EC.Support.csproj">
+      <Project>{1669fd6f-d6a2-4498-a62b-f5a831b56a83}</Project>
+      <Name>BraneCloud.Evolution.EC.Support</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\BraneCloud.Evolution.EC\BraneCloud.Evolution.EC.csproj">
       <Project>{197fc1bd-8578-4de7-9aea-d7098a3505ea}</Project>
       <Name>BraneCloud.Evolution.EC</Name>

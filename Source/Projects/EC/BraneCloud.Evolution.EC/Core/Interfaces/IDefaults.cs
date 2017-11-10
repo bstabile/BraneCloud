@@ -26,9 +26,9 @@ namespace BraneCloud.Evolution.EC
     /// package (there doesn't have to be, but it would be nice).  This
     /// class should be relatively uniquely named (the defaults class in
     /// the GP package is called GPDefaults for example).
-    /// IDefaults objects should implement a single static final method:
+    /// IDefaults objects should implement a single static method:
     /// 
-    /// <p/><tt>public final Parameter base();</tt>
+    /// <p/><tt>public Parameter base();</tt>
     /// 
     /// <p/>...which returns the default parameter base for the package.  This
     /// method cannot be declared in this interface, however, because it is

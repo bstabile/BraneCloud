@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\Projects\EC\App\README.txt = ..\..\Projects\EC\App\README.txt
+		..\..\Projects\EC\App\README = ..\..\Projects\EC\App\README
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBob", "..\..\Projects\EC\App\BBob\BBob.csproj", "{D412EF97-9A4E-4DC7-B75B-5763024A0A28}"
@@ -490,6 +490,23 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoyalTree", "..\..\Projects\EC\App\RoyalTree\RoyalTree.csproj", "{43872910-A4E1-422F-ABDC-9A7A66085DE1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NullProblem", "..\..\Projects\EC\App\NullProblem\NullProblem.csproj", "{69681D42-248A-4B7E-B6B0-39B9B113DA07}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eda", "eda", "{A3578CAD-BA72-4035-B1A5-32E00DFECD83}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cmaes", "cmaes", "{F86FBE92-9042-496B-A082-243995462614}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\eda\cmaes\cmaes.params = ParamFiles\ec\eda\cmaes\cmaes.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dovs", "dovs", "{56226BFF-143E-49A0-B669-0371838F7922}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\eda\dovs\dovs.params = ParamFiles\ec\eda\dovs\dovs.params
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "neat", "neat", "{5699ED33-6FE7-4D20-9AB3-69AA214498AE}"
+	ProjectSection(SolutionItems) = preProject
+		ParamFiles\ec\neat\neat.params = ParamFiles\ec\neat\neat.params
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1401,6 +1418,10 @@ Global
 		{3BD8F0AC-E250-46E1-9319-63A6FBE6316A} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
 		{43872910-A4E1-422F-ABDC-9A7A66085DE1} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
 		{69681D42-248A-4B7E-B6B0-39B9B113DA07} = {4543D14B-433F-4FED-8F0E-6A5EB9CDFC6A}
+		{A3578CAD-BA72-4035-B1A5-32E00DFECD83} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
+		{F86FBE92-9042-496B-A082-243995462614} = {A3578CAD-BA72-4035-B1A5-32E00DFECD83}
+		{56226BFF-143E-49A0-B669-0371838F7922} = {A3578CAD-BA72-4035-B1A5-32E00DFECD83}
+		{5699ED33-6FE7-4D20-9AB3-69AA214498AE} = {FEEBC06D-DDCF-4BFB-B642-F49D595AD10E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F3D450E4-EC34-460F-9537-F527E70EB099}

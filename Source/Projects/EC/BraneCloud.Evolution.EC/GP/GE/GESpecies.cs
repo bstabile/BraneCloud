@@ -280,7 +280,7 @@ namespace BraneCloud.Evolution.EC.GP.GE
          * However, the identicality of the GPTree particulars like grammar, constraints, ADFs,
          * ERC's may not be universally true.
          */
-        public Individual NewIndividual(IEvolutionState state, int thread)
+        public override Individual NewIndividual(IEvolutionState state, int thread)
         {
             GEIndividual gei = null;
             if (InitScheme != null && InitScheme.Equals("sensible"))

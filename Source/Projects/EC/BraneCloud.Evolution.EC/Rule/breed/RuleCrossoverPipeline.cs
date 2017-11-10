@@ -17,8 +17,11 @@
  */
 
 using System;
-
+using System.Collections.Generic;
+using System.Linq;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
+using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.Rule.Breed
 {
@@ -57,14 +60,12 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
         public const string P_CROSSOVERPROB = "crossover-prob";
         public const int INDS_PRODUCED = 2;
         public const int NUM_SOURCES = 2;
+        public const string KEY_PARENTS = "parents";
 
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return RuleDefaults.ParamBase.Push(P_CROSSOVER); }
-        }
+        public override IParameter DefaultBase => RuleDefaults.ParamBase.Push(P_CROSSOVER);
 
         /// <summary>
         /// Returns 2 
@@ -84,7 +85,7 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
         /// <summary>
         /// Temporary holding place for Parents 
         /// </summary>
-        public RuleIndividual[] Parents { get; set; }
+        public IList<Individual> Parents { get; set; } = new List<Individual>();
 
         /// <summary>
         /// Returns 2 (unless tossing the second sibling, in which case it returns 1) 
@@ -94,11 +95,6 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
 
         #endregion // Properties
         #region Setup
-
-        public RuleCrossoverPipeline()
-        {
-            Parents = new RuleIndividual[2];
-        }
 
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
@@ -115,10 +111,19 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
         #endregion // Setup
         #region Operations
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread, 
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // how many individuals should we make?
-            var n = (TossSecondParent ? 1 : INDS_PRODUCED);
+            var n = TossSecondParent ? 1 : INDS_PRODUCED;
             if (n < min)
                 n = min;
             if (n > max)
@@ -126,30 +131,39 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, true);  // DO produce children from source -- we've not done so already
+            {
+                // just load from source 0 and clone 'em
+                Sources[0].Produce(n, n, subpop, inds, state, thread, misc);
+                return n;
+            }
 
-            var initializer = ((RuleInitializer)state.Initializer);
+            IntBag[] parentparents = null;
+            IntBag[] preserveParents = null;
+            if (misc != null && misc[KEY_PARENTS] != null)
+            {
+                preserveParents = (IntBag[])misc[KEY_PARENTS];
+                parentparents = new IntBag[2];
+                misc[KEY_PARENTS] = parentparents;
+            }
+
+            var initializer = (RuleInitializer)state.Initializer;
 
             for (var q = start; q < n + start; )
             // keep on going until we're filled up
             {
+                Parents.Clear();
+
                 // grab two individuals from our Sources
                 if (Sources[0] == Sources[1])
                 // grab from the same source
                 {
-                    Sources[0].Produce(2, 2, 0, subpop, Parents, state, thread);
-                    if (!(Sources[0] is BreedingPipeline))
-                    // it's a selection method probably
-                    {
-                        Parents[0] = (RuleIndividual)Parents[0].Clone();
-                        Parents[1] = (RuleIndividual)Parents[1].Clone();
-                    }
+                    Sources[0].Produce(2, 2, subpop, Parents, state, thread, misc);
                 }
                 // grab from different Sources
                 else
                 {
-                    Sources[0].Produce(1, 1, 0, subpop, Parents, state, thread);
-                    Sources[1].Produce(1, 1, 1, subpop, Parents, state, thread);
+                    Sources[0].Produce(1, 1, subpop, Parents, state, thread, misc);
+                    Sources[1].Produce(1, 1, subpop, Parents, state, thread, misc);
 
                     if (!(Sources[0] is BreedingPipeline)) // it's a selection method probably
                         Parents[0] = (RuleIndividual)Parents[0].Clone();
@@ -164,18 +178,18 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
 
                 // so we'll cross them over now.
 
-                Parents[0].PreprocessIndividual(state, thread);
-                Parents[1].PreprocessIndividual(state, thread);
+                ((RuleIndividual)Parents[0]).PreprocessIndividual(state, thread);
+                ((RuleIndividual)Parents[1]).PreprocessIndividual(state, thread);
 
-                if (Parents[0].Rulesets.Length != Parents[1].Rulesets.Length)
+                if (((RuleIndividual)Parents[0]).Rulesets.Length != ((RuleIndividual)Parents[1]).Rulesets.Length)
                 {
-                    state.Output.Fatal("The number of rule sets should be identical in both Parents ( "
-                        + Parents[0].Rulesets.Length + " : "
-                        + Parents[1].Rulesets.Length + " ).");
+                    state.Output.Fatal("The number of rule sets should be identical in both parents ( " +
+                                       ((RuleIndividual)Parents[0]).Rulesets.Length + " : " +
+                                       ((RuleIndividual)Parents[1]).Rulesets.Length + " ).");
                 }
 
                 // for each set of rules (assume both individuals have the same number of rule sets)
-                for (var x = 0; x < Parents[0].Rulesets.Length; x++)
+                for (var x = 0; x < ((RuleIndividual)Parents[0]).Rulesets.Length; x++)
                 {
                     var temp = new RuleSet[2];
                     while (true)
@@ -185,40 +199,50 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
                             temp[i] = new RuleSet();
 
                         // split the ruleset indexed x in parent 1
-                        temp = Parents[0].Rulesets[x].SplitIntoTwo(state, thread, temp, RuleCrossProbability);
+                        temp = ((RuleIndividual)Parents[0]).Rulesets[x].SplitIntoTwo(state, thread, temp, RuleCrossProbability);
                         // now temp[0] contains rules to that must go to parent[1]
 
                         // split the ruleset indexed x in parent 2 (append after the splitted result from previous operation)
-                        temp = Parents[1].Rulesets[x].SplitIntoTwo(state, thread, temp, RuleCrossProbability);
+                        temp = ((RuleIndividual)Parents[1]).Rulesets[x].SplitIntoTwo(state, thread, temp, RuleCrossProbability);
                         // now temp[1] contains rules that must go to parent[0]
 
                         // ensure that there are enough rules
-                        if (temp[0].RuleCount >= Parents[0].Rulesets[x].Constraints(initializer).MinSize
-                            && temp[0].RuleCount <= Parents[0].Rulesets[x].Constraints(initializer).MaxSize
-                            && temp[1].RuleCount >= Parents[1].Rulesets[x].Constraints(initializer).MinSize
-                            && temp[1].RuleCount <= Parents[1].Rulesets[x].Constraints(initializer).MaxSize)
+                        if (temp[0].RuleCount >= ((RuleIndividual)Parents[0]).Rulesets[x].Constraints(initializer).MinSize
+                            && temp[0].RuleCount <= ((RuleIndividual)Parents[0]).Rulesets[x].Constraints(initializer).MaxSize
+                            && temp[1].RuleCount >= ((RuleIndividual)Parents[1]).Rulesets[x].Constraints(initializer).MinSize
+                            && temp[1].RuleCount <= ((RuleIndividual)Parents[1]).Rulesets[x].Constraints(initializer).MaxSize)
                             break;
 
                         temp = new RuleSet[2];
                     }
 
                     // copy the results in the Rulesets of the Parents
-                    Parents[0].Rulesets[x].CopyNoClone(temp[1]);
-                    Parents[1].Rulesets[x].CopyNoClone(temp[0]);
+                    ((RuleIndividual)Parents[0]).Rulesets[x].CopyNoClone(temp[1]);
+                    ((RuleIndividual)Parents[1]).Rulesets[x].CopyNoClone(temp[0]);
                 }
 
-                Parents[0].PostprocessIndividual(state, thread);
-                Parents[1].PostprocessIndividual(state, thread);
+                ((RuleIndividual)Parents[0]).PostprocessIndividual(state, thread);
+                ((RuleIndividual)Parents[1]).PostprocessIndividual(state, thread);
 
-                Parents[0].Evaluated = false;
-                Parents[1].Evaluated = false;
+                ((RuleIndividual)Parents[0]).Evaluated = false;
+                ((RuleIndividual)Parents[1]).Evaluated = false;
 
                 // add 'em to the population
-                inds[q] = Parents[0];
+                inds.Add(Parents[0]);
+                if (preserveParents != null)
+                {
+                    parentparents[0].AddAll(parentparents[1]);
+                    preserveParents[q] = parentparents[0];
+                }
                 q++;
                 if (q < n + start && !TossSecondParent)
                 {
-                    inds[q] = Parents[1];
+                    inds.Add(Parents[1]);
+                    if (preserveParents != null)
+                    {
+                        parentparents[0].AddAll(parentparents[1]);
+                        preserveParents[q] = parentparents[0];
+                    }
                     q++;
                 }
             }
@@ -233,9 +257,7 @@ namespace BraneCloud.Evolution.EC.Rule.Breed
             var c = (RuleCrossoverPipeline)base.Clone();
 
             // deep-cloned stuff
-            c.Parents = new RuleIndividual[Parents.Length];
-            Parents.CopyTo(c.Parents, 0);
-
+            c.Parents = Parents.ToList();
             return c;
         }
 

@@ -825,7 +825,7 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                                 state.Output.Message("Sending " + Size + " immigrants to island " + OutgoingIds[x]);
 
                             // for each of the subpops
-                            for (var subpop = 0; subpop < state.Population.Subpops.Length; subpop++)
+                            for (var subpop = 0; subpop < state.Population.Subpops.Count; subpop++)
                             {
                                 // send the subpop
                                 OutWriters[x].Write(subpop);
@@ -919,8 +919,8 @@ namespace BraneCloud.Evolution.EC.Runtime.Exchange
                         if (Chatty)
                             state.Output.Message("Immigrating " + Mailbox.NumImmigrants[x] + " individuals from Mailbox for subpop " + x);
 
-                        var selected = new bool[state.Population.Subpops[x].Individuals.Length];
-                        var indices = new int[Mailbox.NumImmigrants[x]];
+                        bool[] selected = new bool[state.Population.Subpops[x].Individuals.Count];
+                        int[] indices = new int[Mailbox.NumImmigrants[x]];
                         for (var i = 0; i < selected.Length; i++)
                             selected[i] = false;
                         IndsToDieSelectionMethod.PrepareToProduce(state, x, 0);

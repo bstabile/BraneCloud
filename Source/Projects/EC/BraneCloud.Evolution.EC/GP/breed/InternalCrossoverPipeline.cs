@@ -17,8 +17,9 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
 
 namespace BraneCloud.Evolution.EC.GP.Breed
 {
@@ -78,14 +79,12 @@ namespace BraneCloud.Evolution.EC.GP.Breed
         public const string P_NUM_TRIES = "tries";
         public const string P_MAXDEPTH = "maxdepth";
         public const int NUM_SOURCES = 1;
+        public const string KEY_PARENTS = "parents";
 
         #endregion // Constants
         #region Properties
 
-        public override IParameter DefaultBase
-        {
-            get { return GPBreedDefaults.ParamBase.Push(P_INTERNALCROSSOVER); }
-        }
+        public override IParameter DefaultBase => GPBreedDefaults.ParamBase.Push(P_INTERNALCROSSOVER); 
 
         /// <summary>
         /// How the pipeline chooses the first subtree 
@@ -219,15 +218,35 @@ namespace BraneCloud.Evolution.EC.GP.Breed
             return true;
         }
 
-        public override int Produce(int min, int max, int start, int subpop, Individual[] inds, IEvolutionState state, int thread)
+        public override int Produce(
+            int min, 
+            int max, 
+            int subpop, 
+            IList<Individual> inds, 
+            IEvolutionState state, 
+            int thread,
+            IDictionary<string, object> misc)
         {
+            int start = inds.Count;
+
             // grab n individuals from our source and stick 'em right into inds.
             // we'll modify them from there
-            var n = Sources[0].Produce(min, max, start, subpop, inds, state, thread);
+            var n = Sources[0].Produce(min, max,subpop, inds, state, thread, misc);
+
+            IntBag[] parentparents = null;
+            IntBag[] preserveParents = null;
+            if (misc != null && misc[KEY_PARENTS] != null)
+            {
+                preserveParents = (IntBag[])misc[KEY_PARENTS];
+                parentparents = new IntBag[2];
+                misc[KEY_PARENTS] = parentparents;
+            }
 
             // should we bother?
             if (!state.Random[thread].NextBoolean(Likelihood))
-                return Reproduce(n, start, subpop, inds, state, thread, false);  // DON'T produce children from source -- we already did
+            {
+                return n;
+            }
 
             var initializer = (GPInitializer)state.Initializer;
 
@@ -248,31 +267,6 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                         + " which was out of bounds of the array of the individual's trees. "
                         + " Check the pipeline's fixed tree values -- they may be negative"
                         + " or greater than the number of trees in an individual");
-
-                GPIndividual j;
-                if (Sources[0] is BreedingPipeline)
-                // it's already a copy, so just smash the tree in
-                {
-                    j = i;
-                }
-                // need to copy it
-                else
-                {
-                    j = i.LightClone();
-
-                    // Fill in various tree information that didn't get filled in there
-                    j.Trees = new GPTree[i.Trees.Length];
-
-                    for (var x = 0; x < j.Trees.Length; x++)
-                    {
-                        j.Trees[x] = i.Trees[x].LightClone(); // light clone
-                        j.Trees[x].Owner = j;
-                        j.Trees[x].Child = (GPNode)i.Trees[x].Child.Clone();
-                        j.Trees[x].Child.Parent = j.Trees[x];
-                        j.Trees[x].Child.ArgPosition = 0;
-                    }
-                }
-
 
                 var t1 = 0;
                 var t2 = 0;
@@ -324,10 +318,10 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                 for (var x = 0; x < NumTries; x++)
                 {
                     // pick a node in individual 1
-                    p1 = NodeSelect0.PickNode(state, subpop, thread, j, j.Trees[t1]);
+                    p1 = NodeSelect0.PickNode(state, subpop, thread, i, i.Trees[t1]);
 
                     // pick a node in individual 2
-                    p2 = NodeSelect1.PickNode(state, subpop, thread, j, j.Trees[t2]);
+                    p2 = NodeSelect1.PickNode(state, subpop, thread, i, i.Trees[t2]);
 
                     // make sure they're not the same node
                     res = (p1 != p2
@@ -359,11 +353,17 @@ namespace BraneCloud.Evolution.EC.GP.Breed
                     else
                         ((GPTree)(p2.Parent)).Child = p2;
 
-                    j.Evaluated = false; // we've modified it
+                    i.Evaluated = false; // we've modified it
                 }
 
                 // add the individuals to the population
-                inds[q] = j;
+                //inds[q] = i;
+                inds.Add(i);
+                if (preserveParents != null)
+                {
+                    parentparents[0].AddAll(parentparents[1]);
+                    preserveParents[q] = new IntBag(parentparents[0]);
+                }
             }
             return n;
         }

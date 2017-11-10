@@ -31,7 +31,7 @@ namespace BraneCloud.Evolution.EC.CoEvolve
     /// fitnesses need to be updated during the evaluation process.
     /// </summary>
     [ECConfiguration("ec.coevolve.IGroupedProblem")]
-    public interface IGroupedProblem : IProblem
+    public interface IGroupedProblem
     {
         /// <summary>
         /// Set up the population <tt>pop</tt> (such as fitness information) prior to evaluation.
@@ -81,9 +81,12 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         /// fitness values assessed.  You should <b>not</b> clear the trials of individuals
         /// for which assessFitness[] is false.  Instead allow trials to accumulate and
         /// ultimately update the fitnesses later when the flag is set.  assessFitness[] may not be
-        /// the same as updateFitness[] in evaluate(...).        
+        /// the same as updateFitness[] in evaluate(...).  
+        ///       
+        /// <p/>Should return the number of individuals evaluated(not tested: but actually had their
+        /// fitnesses modified -- or would have if the evaluated flag wasn't set).
         /// </summary>
-        void PostprocessPopulation(IEvolutionState state, Population pop, bool[] assessFitness, bool countVictoriesOnly);
+        int PostprocessPopulation(IEvolutionState state, Population pop, bool[] assessFitness, bool countVictoriesOnly);
         
         /// <summary>
         /// Evaluates the individuals found in ind together.  If updateFitness[i] is true,
@@ -100,8 +103,8 @@ namespace BraneCloud.Evolution.EC.CoEvolve
         /// in the tests.  This really only happens for Single-Elimination Tournament 
         /// one-population competitive coevolution.  If this is set, you should increment the Fitness of the winner
         /// each time.  If it's not set, you should update Fitness as you see fit, then set
-        /// the final Fitness in preprocessPopulation. 
+        /// the Fitness in preprocessPopulation. 
         /// </summary>
-        void  Evaluate(IEvolutionState state, Individual[] ind, bool[] updateFitness, bool countVictoriesOnly, int[] subpops, int threadnum);
+        void Evaluate(IEvolutionState state, Individual[] ind, bool[] updateFitness, bool countVictoriesOnly, int[] subpops, int threadnum);
     }
 }
