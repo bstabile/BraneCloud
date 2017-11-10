@@ -1,8 +1,0 @@
-W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Tutorial1\Params\App\Tutorial1\tutorial1.params
-W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Tutorial1\BraneCloud.Evolution.EC.App.Tutorial1.exe.config
-W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Tutorial1\BraneCloud.Evolution.EC.App.Tutorial1.exe
-W:\GitHub\BraneCloud\Source\Projects\EC\App\Bin\app\Tutorial1\BraneCloud.Evolution.EC.App.Tutorial1.pdb
-W:\GitHub\BraneCloud\Source\Projects\EC\App\Tutorial1\obj\x86\Debug\Tutorial1.csprojResolveAssemblyReference.cache
-W:\GitHub\BraneCloud\Source\Projects\EC\App\Tutorial1\obj\x86\Debug\Tutorial1.csproj.CoreCompileInputs.cache
-W:\GitHub\BraneCloud\Source\Projects\EC\App\Tutorial1\obj\x86\Debug\BraneCloud.Evolution.EC.App.Tutorial1.exe
-W:\GitHub\BraneCloud\Source\Projects\EC\App\Tutorial1\obj\x86\Debug\BraneCloud.Evolution.EC.App.Tutorial1.pdb
