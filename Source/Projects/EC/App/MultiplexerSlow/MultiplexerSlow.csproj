@@ -15,6 +15,25 @@
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Bin\app\MultiplexerSlow\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Bin\app\MultiplexerSlow\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
@@ -70,10 +89,6 @@
     <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Configuration\BraneCloud.Evolution.EC.Configuration.csproj">
       <Project>{9A7B8EFC-D36E-435D-99E2-10793AA3FFCD}</Project>
       <Name>BraneCloud.Evolution.EC.Configuration</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Evaluation\BraneCloud.Evolution.EC.Evaluation.csproj">
-      <Project>{A8AB0B32-952F-4FBA-8C34-C22CCB897977}</Project>
-      <Name>BraneCloud.Evolution.EC.Evaluation</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Logging\BraneCloud.Evolution.EC.Logging.csproj">
       <Project>{E5ECCEA3-0448-40CD-98B2-BC70578807B1}</Project>

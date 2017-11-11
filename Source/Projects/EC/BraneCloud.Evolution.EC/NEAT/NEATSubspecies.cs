@@ -17,12 +17,9 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.Support;
-using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.NEAT
 {
@@ -35,6 +32,7 @@ namespace BraneCloud.Evolution.EC.NEAT
      * @author Ermo Wei and David Freelan
      *
      */
+    [ECConfiguration("ec.neat.NEATSubspecies")]
     public class NEATSubspecies : IPrototype
     {
         public const string P_SUBSPECIES = "subspecies";
@@ -181,7 +179,9 @@ namespace BraneCloud.Evolution.EC.NEAT
          */
         public void SortIndividuals()
         {
-            ((IList<NEATIndividual>)Individuals).SortByAdjustedFitnessDescending();
+            Individuals = Individuals
+                .OrderByDescending(x => ((NEATIndividual)x).AdjustedFitness)
+                .ToList();
         }
 
         /** Update the maxFitnessEver variable. */
@@ -209,7 +209,7 @@ namespace BraneCloud.Evolution.EC.NEAT
             // is not greater than the argument and is equal to a mathematical
             // integer
 
-            int numParents = (int) Math.Floor(survivalThreshold * ((double) Individuals.Count) + 1.0);
+            int numParents = (int) Math.Floor(survivalThreshold * Individuals.Count + 1.0);
 
             // Mark the champion as such
             ((NEATIndividual) First()).Champion = true;
@@ -302,7 +302,7 @@ namespace BraneCloud.Evolution.EC.NEAT
             for (int i = 0; i < ExpectedOffspring; ++i)
             {
 
-                NEATIndividual newInd = null;
+                NEATIndividual newInd;
 
                 if (bestIndividual.SuperChampionOffspring > 0)
                 {
@@ -341,7 +341,7 @@ namespace BraneCloud.Evolution.EC.NEAT
 
                     bestIndividual.SuperChampionOffspring--;
                 }
-                else if ((!bestIndividualDone) && (ExpectedOffspring > 5))
+                else if (!bestIndividualDone && ExpectedOffspring > 5)
                 {
 
                     newInd = (NEATIndividual) bestIndividual.Clone();
@@ -367,7 +367,7 @@ namespace BraneCloud.Evolution.EC.NEAT
                     // random choose the first parent
                     int parentIndex = state.Random[thread].NextInt(Individuals.Count);
                     NEATIndividual firstParent = (NEATIndividual) Individuals[parentIndex];
-                    NEATIndividual secondParent = null;
+                    NEATIndividual secondParent;
                     // Mate within subspecies, choose random second parent
                     if (state.Random[thread].NextBoolean(1.0 - species.InterspeciesMateRate))
                     {

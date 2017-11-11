@@ -20,6 +20,7 @@ using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.SingleState
 {
+    [ECConfiguration("ec.singlestate.SingleStateEvolutionState")]
     public class SingleStateEvolutionState : EvolutionState
     {
         public const string P_STATISTICS_MODULO = "stats-modulo";

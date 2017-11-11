@@ -36,6 +36,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
      * @author Ermo Wei and David Freelan
      */
 
+    [ECConfiguration("ec.eda.dovs.DOVSFitness")]
     public class DOVSFitness : SimpleFitness
     {
         /** Sum of the all the squared fitness value with all the evaluation. */

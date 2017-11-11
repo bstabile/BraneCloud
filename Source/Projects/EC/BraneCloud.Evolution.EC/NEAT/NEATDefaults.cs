@@ -26,6 +26,7 @@ namespace BraneCloud.Evolution.EC.NEAT
      * @author Ermo Wei and David Freelan
      */
 
+    [ECConfiguration("ec.neat.NEATDefaults")]
     public class NEATDefaults : IDefaults
     {
         public static string P_NEAT = "neat";

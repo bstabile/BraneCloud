@@ -31,7 +31,6 @@ namespace BraneCloud.Evolution.EC.App.Tutorial3
             ECActivator.AddSourceAssemblies(new[]
                                                 {
                                                     Assembly.GetAssembly(typeof(IEvolutionState)),
-                                                    Assembly.GetAssembly(typeof(Evaluator)),
                                                     Assembly.GetAssembly(typeof(OddRosenbrock))
                                                 });
             Evolve.Run(new[] { "-file", @"Params\App\Tutorial3\tutorial3.params" });

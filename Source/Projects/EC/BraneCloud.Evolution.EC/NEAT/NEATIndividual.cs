@@ -61,6 +61,7 @@ namespace BraneCloud.Evolution.EC.NEAT
      * @author Ermo Wei and David Freelan
      * 
      */
+    [ECConfiguration("ec.neat.NEATIndividual")]
     public class NEATIndividual : GeneVectorIndividual
     {
         /**

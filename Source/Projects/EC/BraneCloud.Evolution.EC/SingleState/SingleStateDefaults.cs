@@ -20,6 +20,7 @@ using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.SingleState
 {
+    [ECConfiguration("ec.singlestate.SingleStateDefaults")]
     public class SingleStateDefaults : IDefaults
     {
         public const string P_SINGLE = "single";

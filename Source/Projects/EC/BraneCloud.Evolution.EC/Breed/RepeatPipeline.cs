@@ -39,6 +39,7 @@ namespace BraneCloud.Evolution.EC.Breed
      * @version 1.0 
      */
 
+    [ECConfiguration("ec.breed.RepeatPipeline")]
     public class RepeatPipeline : BreedingPipeline
     {
         public const string P_REPEAT = "repeat";

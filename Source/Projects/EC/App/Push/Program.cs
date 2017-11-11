@@ -13,8 +13,7 @@ namespace BraneCloud.Evolution.EC.App.Push
             ECActivator.AddSourceAssemblies(new[]
             {
                 Assembly.GetAssembly(typeof(IEvolutionState)),
-                Assembly.GetAssembly(typeof(Evaluator)),
-                Assembly.GetAssembly(typeof(App.Push.Regression))
+                Assembly.GetAssembly(typeof(Regression))
             });
 
             Evolve.Run(new[] { "-file", @"Params\App\Push\regression.params" });

@@ -33,6 +33,7 @@ namespace BraneCloud.Evolution.EC.NEAT
      * @author Ermo Wei and David Freelan
      *
      */
+    [ECConfiguration("ec.neat.NEATGene")]
     public class NEATGene : Gene
     {
         // BRS: Defined in Gene

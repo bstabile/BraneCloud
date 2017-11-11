@@ -17,8 +17,7 @@
  */
 
 using System;
-
-using BraneCloud.Evolution.EC;
+using System.Diagnostics;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.Simple
@@ -43,6 +42,12 @@ namespace BraneCloud.Evolution.EC.Simple
     [ECConfiguration("ec.simple.SimpleEvolutionState")]
     public class SimpleEvolutionState : EvolutionState
     {
+        public SimpleEvolutionState()
+            : base()
+        {
+            Trace.WriteLine("Creating SimpleEvolutionState");
+        }
+
         #region Operations
 
         /// <summary> </summary>

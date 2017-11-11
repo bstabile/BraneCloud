@@ -13,7 +13,6 @@ namespace BraneCloud.Evolution.EC.App.OrderTree
             ECActivator.AddSourceAssemblies(new[]
             {
                 Assembly.GetAssembly(typeof(IEvolutionState)),
-                Assembly.GetAssembly(typeof(Evaluator)),
                 Assembly.GetAssembly(typeof(OrderTree))
             });
 

@@ -80,7 +80,7 @@ namespace BraneCloud.Evolution.EC.Select
                 IList<Individual> oldinds = state.Population.Subpops[subpop].Individuals;
                 int index = state.Random[thread].NextInt(state.Population.Subpops[subpop].Individuals.Count);
                 inds[start + q] = oldinds[index];
-                if (misc != null && misc[KEY_PARENTS] != null)
+                if (misc != null && misc.ContainsKey(KEY_PARENTS))
                 {
                     IntBag parent = new IntBag(1);
                     parent.Add(index);

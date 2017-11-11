@@ -36,6 +36,7 @@ namespace BraneCloud.Evolution.EC.NEAT
      * @author Ermo Wei and David Freelan
      */
 
+    [ECConfiguration("ec.neat.NEATNode")]
     public class NEATNode : IPrototype
     {
 

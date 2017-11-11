@@ -37,6 +37,7 @@ namespace BraneCloud.Evolution.EC.Breed
      breed.init
      */
 
+    [ECConfiguration("ec.breed.InitializationPipeline")]
     public class InitializationPipeline : BreedingPipeline
     {
         public const string P_INIT = "init";

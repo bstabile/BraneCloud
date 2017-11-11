@@ -16,6 +16,7 @@
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
 
+using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Simple;
 using BraneCloud.Evolution.EC.Vector;
 
@@ -25,11 +26,12 @@ namespace BraneCloud.Evolution.EC.App.NullProblem
      * @author dfreelan Temporary class intended to be used to measure ECJ overhead
      *         doing non-evaluation tasks (statistics and such)
      */
+    [ECConfiguration("ec.app.nullproblem.NullProblem")]
     public class NullProblem : Problem, ISimpleProblem
     {
         public void Evaluate(IEvolutionState state, Individual ind, int subpopulation, int threadnum)
         {
-            double fit = 10.0 - (((DoubleVectorIndividual) ind).genome[0] * ((DoubleVectorIndividual) ind).genome[0]);
+            double fit = 10.0 - ((DoubleVectorIndividual) ind).genome[0] * ((DoubleVectorIndividual) ind).genome[0];
 
             ((SimpleFitness) ind.Fitness).SetFitness(state, fit, false);
 

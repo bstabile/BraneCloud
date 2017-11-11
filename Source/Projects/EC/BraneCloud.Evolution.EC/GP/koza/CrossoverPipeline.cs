@@ -325,7 +325,7 @@ namespace BraneCloud.Evolution.EC.GP.Koza
 
             IntBag[] parentparents = null;
             IntBag[] preserveParents = null;
-            if (misc != null && misc[KEY_PARENTS] != null)
+            if (misc != null && misc.ContainsKey(KEY_PARENTS))
             {
                 preserveParents = (IntBag[])misc[KEY_PARENTS];
                 parentparents = new IntBag[2];

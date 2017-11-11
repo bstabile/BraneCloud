@@ -27,6 +27,7 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
      * @version 1.0 
      */
 
+    [ECConfiguration("ec.eda.cmaes.CMAESDefaults")]
     public class CMAESDefaults : IDefaults
     {
         public const string P_CMAES = "cmaes";

@@ -58,6 +58,7 @@ namespace BraneCloud.Evolution.EC.SingleState
      * @version 1.0 
      */
 
+    [ECConfiguration("ec.singlestate.SingleStateBreeder")]
     public class SingleStateBreeder : Breeder
     {
         public const string P_ELITE = "elite";

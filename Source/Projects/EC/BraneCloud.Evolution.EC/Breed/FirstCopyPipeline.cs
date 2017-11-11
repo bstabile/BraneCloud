@@ -44,6 +44,7 @@ namespace BraneCloud.Evolution.EC.Breed
      * @version 1.0 
      */
 
+    [ECConfiguration("ec.breed.FirstCopyPipeline")]
     public class FirstCopyPipeline : BreedingPipeline
     {
         public const string P_FIRST_COPY = "first-copy";

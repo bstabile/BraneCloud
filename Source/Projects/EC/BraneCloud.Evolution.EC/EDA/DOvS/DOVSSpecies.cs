@@ -101,6 +101,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
      * 
      */
 
+    [ECConfiguration("ec.eda.dovs.DOVSSpecies")]
     public class DOVSSpecies : IntegerVectorSpecies
     {
 

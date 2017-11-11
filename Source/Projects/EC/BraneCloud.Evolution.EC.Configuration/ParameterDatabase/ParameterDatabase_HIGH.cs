@@ -863,11 +863,12 @@ namespace BraneCloud.Evolution.EC.Configuration
                                                                ? ""
                                                                : "\n     ALSO: " + defaultParameter));
                     }
-                    return Activator.CreateInstance(t, Thread.CurrentContext);
+                    //return Activator.CreateInstance(t, Thread.CurrentContext);
+                    return Activator.CreateInstance(t);
 
                 }
-                    // BRS : 2009-03-15
-                    // Calling Type.GetType(string s) throws TypeLoadException if the typeName (s) is invalid
+                // BRS : 2009-03-15
+                // Calling Type.GetType(string s) throws TypeLoadException if the typeName (s) is invalid
                 catch (TypeLoadException e)
                 {
                     throw new ParamClassLoadException("Type not found: " + Take(p) + "\nPARAMETER: " + parameter
@@ -953,10 +954,11 @@ namespace BraneCloud.Evolution.EC.Configuration
                                                                ? ""
                                                                : "\n     ALSO: " + defaultParameter));
                     }
-                    return Activator.CreateInstance(t, Thread.CurrentContext);
+                    //return Activator.CreateInstance(t, Thread.CurrentContext);
+                    return Activator.CreateInstance(t);
                 }
-                    // BRS : 2009-03-15
-                    // Calling Type.GetType(string s) throws TypeLoadException if the typeName (s) is invalid
+                // BRS : 2009-03-15
+                // Calling Type.GetType(string s) throws TypeLoadException if the typeName (s) is invalid
                 catch (TypeLoadException e)
                 {
                     throw new ParamClassLoadException("Type not found: " + Take(p) + "\nPARAMETER: " + parameter +

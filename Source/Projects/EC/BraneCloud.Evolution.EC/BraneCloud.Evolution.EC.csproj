@@ -83,7 +83,9 @@
     <Compile Include="Breed\ReproductionPipeline.cs" />
     <Compile Include="Breed\StubPipeline.cs" />
     <Compile Include="Breed\UniquePipeline.cs" />
+    <Compile Include="CoEvolve\CompetitiveEvaluator.cs" />
     <Compile Include="CoEvolve\IGroupedProblem.cs" />
+    <Compile Include="CoEvolve\MultiPopCoevolutionaryEvaluator.cs" />
     <Compile Include="Core\Breeder.cs" />
     <Compile Include="Core\BreedingPipeline.cs" />
     <Compile Include="Core\BreedingSource.cs" />
@@ -106,6 +108,7 @@
     <Compile Include="Core\Individual.cs" />
     <Compile Include="Core\Initializer.cs" />
     <Compile Include="Core\Interfaces\IStateManager.cs" />
+    <Compile Include="DE\DEEvaluator.cs" />
     <Compile Include="DE\IDEEvaluator.cs" />
     <None Include="EDA\DOvS\CornerMap.cs" />
     <None Include="EDA\DOvS\DOVSBreeder.cs" />
@@ -152,12 +155,13 @@
     <Compile Include="MultiObjective\MultiObjectiveStatistics.cs" />
     <Compile Include="MultiObjective\Nsga2\INSGA2Evaluator.cs" />
     <Compile Include="MultiObjective\Nsga2\NSGA2Breeder.cs" />
+    <Compile Include="MultiObjective\Nsga2\NSGA2Evaluator.cs" />
     <Compile Include="MultiObjective\Nsga2\NSGA2MultiObjectiveFitness.cs" />
     <Compile Include="MultiObjective\Nsga2\NSGA2MultiObjectiveFitnessComparator.cs" />
     <Compile Include="MultiObjective\Spea2\ISPEA2Evaluator.cs" />
+    <Compile Include="MultiObjective\Spea2\SPEA2Evaluator.cs" />
     <Compile Include="NEAT\NEATBreeder.cs" />
     <Compile Include="NEAT\NEATDefaults.cs" />
-    <Compile Include="NEAT\NEATExtensions.cs" />
     <Compile Include="NEAT\NEATGene.cs" />
     <Compile Include="NEAT\NEATIndividual.cs" />
     <Compile Include="NEAT\NEATInitializer.cs" />
@@ -289,12 +293,14 @@
     <Compile Include="Spatial\Spatial1DSubpopulation.cs" />
     <Compile Include="Spatial\SpatialBreeder.cs" />
     <Compile Include="Spatial\SpatialDefaults.cs" />
+    <Compile Include="Spatial\SpatialMultiPopCoevolutionaryEvaluator.cs" />
     <Compile Include="Spatial\SpatialTournamentSelection.cs" />
     <Compile Include="SteadyState\ISteadyStateEvaluator.cs" />
     <Compile Include="SteadyState\QueueIndividual.cs" />
     <Compile Include="SteadyState\SteadyStateBreeder.cs" />
     <Compile Include="SteadyState\ISteadyStateBSource.cs" />
     <Compile Include="SteadyState\SteadyStateDefaults.cs" />
+    <Compile Include="SteadyState\SteadyStateEvaluator.cs" />
     <Compile Include="SteadyState\SteadyStateEvolutionState.cs" />
     <Compile Include="SteadyState\ISteadyStateExchanger.cs" />
     <Compile Include="SteadyState\ISteadyStateStatistics.cs" />

@@ -251,22 +251,24 @@ namespace BraneCloud.Evolution.EC
             // should we load individuals from a file? -- duplicates are permitted
             if (LoadInds)
             {
-                var stream = state.Parameters.GetResource(FileParam, null);
-                if (stream == null)
+                using (var stream = state.Parameters.GetResource(FileParam, null))
                 {
-                    state.Output.Fatal("Could not load subpopulation from file", FileParam);
-                }
+                    if (stream == null)
+                    {
+                        state.Output.Fatal("Could not load subpopulation from file", FileParam);
+                    }
 
-                try
-                {
-                    ReadSubpopulation(state, new StreamReader(stream, Encoding.Default));
-                }
-                catch (IOException e)
-                {
-                    state.Output.Fatal(
-                        "An IOException occurred when trying to read from the file " +
-                        state.Parameters.GetString(FileParam, null) + ".  The IOException was: \n" + e,
-                        FileParam, null);
+                    try
+                    {
+                        ReadSubpopulation(state, new StreamReader(stream, Encoding.Default));
+                    }
+                    catch (IOException e)
+                    {
+                        state.Output.Fatal(
+                            "An IOException occurred when trying to read from the file " +
+                            state.Parameters.GetString(FileParam, null) + ".  The IOException was: \n" + e,
+                            FileParam, null);
+                    }
                 }
 
                 if (len < Individuals.Count)
@@ -316,7 +318,7 @@ namespace BraneCloud.Evolution.EC
             if (NumDuplicateRetries >= 1)
                 h = new Hashtable((len - start) / 2); // seems reasonable
 
-            for (var x = start; x < Individuals.Count; x++)
+            for (var x = start; x < len; x++)
             {
                 Individual newInd = null;
                 for (var tries = 0; tries <= NumDuplicateRetries; tries++)
@@ -446,7 +448,7 @@ namespace BraneCloud.Evolution.EC
 
                 Individuals = new List<Individual>(numInds);
 
-                for (var i = 0; i < Individuals.Count; i++)
+                for (var i = 0; i < numInds; i++)
                 {
                     var j = Code.ReadIntWithPreamble(INDIVIDUAL_INDEX_PREAMBLE, state, reader);
 

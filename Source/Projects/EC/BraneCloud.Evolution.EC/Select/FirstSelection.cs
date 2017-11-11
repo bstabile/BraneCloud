@@ -80,7 +80,7 @@ namespace BraneCloud.Evolution.EC.Select
                 // pick size random individuals, then pick the best.
                 var oldinds = state.Population.Subpops[subpop].Individuals;
                 inds[start + q] = oldinds[0]; // note it's a pointer transfer, not a copy!
-                if (misc != null && misc[KEY_PARENTS] != null)
+                if (misc != null && misc.ContainsKey(KEY_PARENTS))
                 {
                     IntBag parent = new IntBag(1);
                     parent.Add(0);

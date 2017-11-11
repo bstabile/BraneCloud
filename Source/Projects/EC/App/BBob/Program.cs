@@ -17,10 +17,7 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Runtime;
 
@@ -38,7 +35,6 @@ namespace BraneCloud.Evolution.EC.App.BBob
             ECActivator.AddSourceAssemblies(new[]
                                                 {
                                                     Assembly.GetAssembly(typeof(IEvolutionState)),
-                                                    Assembly.GetAssembly(typeof(Evaluator)),
                                                     Assembly.GetAssembly(typeof(BBOBenchmarks))
                                                 });
 

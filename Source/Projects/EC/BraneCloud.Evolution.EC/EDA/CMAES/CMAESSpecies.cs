@@ -192,6 +192,7 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
      * @version 1.0 
      */
 
+    [ECConfiguration("ec.eda.cmaes.CMAESSpecies")]
     public class CMAESSpecies : FloatVectorSpecies
     {
         public const string P_CMAES_SPECIES = "cma-es.species";

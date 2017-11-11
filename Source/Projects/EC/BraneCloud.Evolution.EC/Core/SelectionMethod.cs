@@ -129,7 +129,7 @@ namespace BraneCloud.Evolution.EC
 
                 inds.Add(state.Population.Subpops[subpop].Individuals[index]);
                 // by Ermo. seems the misc forget to check if misc is null
-                if (misc?[KEY_PARENTS] != null)
+                if (misc != null && misc.ContainsKey(KEY_PARENTS))
                 {
                     IntBag bag = new IntBag(1);
                     bag.Add(index);

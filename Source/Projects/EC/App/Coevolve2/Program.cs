@@ -18,6 +18,7 @@
 
 using System;
 using System.Reflection;
+using BraneCloud.Evolution.EC.CoEvolve;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Runtime;
 
@@ -35,7 +36,6 @@ namespace BraneCloud.Evolution.EC.App.Coevolve2
             ECActivator.AddSourceAssemblies(new[]
              {
                Assembly.GetAssembly(typeof(IEvolutionState)),
-               Assembly.GetAssembly(typeof(Evaluator)),
                Assembly.GetAssembly(typeof(CoevolutionaryECSuite))
              });
 

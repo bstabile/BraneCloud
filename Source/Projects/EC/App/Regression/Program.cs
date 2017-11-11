@@ -31,7 +31,6 @@ namespace BraneCloud.Evolution.EC.App.Regression
             ECActivator.AddSourceAssemblies(new[]
                                                 {
                                                     Assembly.GetAssembly(typeof(IEvolutionState)), 
-                                                    Assembly.GetAssembly(typeof(Evaluator)),
                                                     Assembly.GetAssembly(typeof(Regression))
                                                 });
 

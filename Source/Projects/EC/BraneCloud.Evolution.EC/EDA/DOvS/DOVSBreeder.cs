@@ -31,6 +31,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
      * @author Ermo Wei and David Freelan
      */
 
+    [ECConfiguration("ec.eda.dovs.DOVSBreeder")]
     public class DOVSBreeder : Breeder
     {
         public override void Setup(IEvolutionState state, IParameter paramBase)

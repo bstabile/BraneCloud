@@ -18,9 +18,7 @@
 
 using System;
 using System.Collections.Generic;
-using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.Randomization;
 
 namespace BraneCloud.Evolution.EC.Select
 {
@@ -68,6 +66,7 @@ namespace BraneCloud.Evolution.EC.Select
      * @version 1.0 
      */
 
+    [ECConfiguration("ec.select.AnnealedSelection")]
     public class AnnealedSelection : SelectionMethod
     {
         /** Default base */

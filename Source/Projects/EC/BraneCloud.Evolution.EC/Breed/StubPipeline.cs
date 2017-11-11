@@ -16,10 +16,7 @@
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
 
-using System;
-using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.Breed
 {
@@ -55,6 +52,7 @@ namespace BraneCloud.Evolution.EC.Breed
      * @version 1.0 
      */
 
+    [ECConfiguration("ec.breed.StubPipeline")]
     public class StubPipeline : ReproductionPipeline
     {
         public const string P_STUB = "stub";

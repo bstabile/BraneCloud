@@ -33,6 +33,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
      * @author Ermo Wei and David Freelan
      */
 
+    [ECConfiguration("ec.eda.dovs.DOVSEvaluator")]
     public class DOVSEvaluator : SimpleEvaluator
     {
         /**

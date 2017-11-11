@@ -2,7 +2,7 @@
 # Licensed under the Academic Free License version 3.0
 # See the file "LICENSE" for more information
 
-parent.0 = ../ecsuite/ecsuite.params
+parent.0 = ../../ecsuite/ecsuite.params
 
 eval.problem = ec.app.coevolve2.CoevolutionaryECSuite
 eval.problem.type = rosenbrock

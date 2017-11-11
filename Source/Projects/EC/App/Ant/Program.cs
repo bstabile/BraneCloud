@@ -20,6 +20,7 @@ using System;
 using System.Reflection;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Runtime;
+using BraneCloud.Evolution.EC.Simple;
 
 namespace BraneCloud.Evolution.EC.App.AntApp
 {
@@ -31,7 +32,6 @@ namespace BraneCloud.Evolution.EC.App.AntApp
             ECActivator.AddSourceAssemblies(new[]
                                                 {
                                                     Assembly.GetAssembly(typeof (IEvolutionState)),
-                                                    Assembly.GetAssembly(typeof (Evaluator)),
                                                     Assembly.GetAssembly(typeof (Ant))
                                                 });
 

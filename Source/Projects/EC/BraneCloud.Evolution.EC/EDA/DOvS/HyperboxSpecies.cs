@@ -32,6 +32,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
      *
      * @author Ermo Wei and David Freelan
      */
+    [ECConfiguration("ec.eda.dovs.HyperboxSpecies")]
     public class HyperboxSpecies : DOVSSpecies
     {
         /** boxA and boxB contain the current constraint hyperbox. */

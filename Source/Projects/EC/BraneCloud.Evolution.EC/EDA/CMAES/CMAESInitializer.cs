@@ -30,6 +30,7 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
      * @version 1.0 
      */
 
+    [ECConfiguration("ec.eda.cmaes.CMAESInitializer")]
     public class CMAESInitializer : SimpleInitializer
     {
         private const long SerialVersionUID = 1;

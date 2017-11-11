@@ -79,10 +79,6 @@
       <Project>{9A7B8EFC-D36E-435D-99E2-10793AA3FFCD}</Project>
       <Name>BraneCloud.Evolution.EC.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Evaluation\BraneCloud.Evolution.EC.Evaluation.csproj">
-      <Project>{A8AB0B32-952F-4FBA-8C34-C22CCB897977}</Project>
-      <Name>BraneCloud.Evolution.EC.Evaluation</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Randomization\BraneCloud.Evolution.EC.Randomization.csproj">
       <Project>{5993FC6C-820B-482F-AB46-961F89FC8EA1}</Project>
       <Name>BraneCloud.Evolution.EC.Randomization</Name>

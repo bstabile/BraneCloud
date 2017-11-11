@@ -26,6 +26,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
      * @author Ermo Wei and David Freelan
      */
 
+    [ECConfiguration("ec.eda.dovs.DOVSDefaults")]
     public class DOVSDefaults : IDefaults
     {
     public static string P_DOVS = "dovs";

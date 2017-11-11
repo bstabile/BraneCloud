@@ -31,11 +31,10 @@ namespace BraneCloud.Evolution.EC.App.NullProblem
             ECActivator.AddSourceAssemblies(new[]
             {
                 Assembly.GetAssembly(typeof(IEvolutionState)),
-                Assembly.GetAssembly(typeof(Evaluator)),
                 Assembly.GetAssembly(typeof(NullProblem))
             });
 
-            Evolve.Run(new[] {"-file", @"Params\App\NullProblem\nullproblem2.params"});
+            Evolve.Run(new[] {"-file", @"Params\App\NullProblem\nullproblem.params"});
             Console.WriteLine("\nDone!");
             Console.ReadLine();
         }

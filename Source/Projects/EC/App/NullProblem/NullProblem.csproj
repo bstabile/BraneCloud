@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Params\App\NullProblem\nullproblem2.params">
+    <None Include="Params\App\NullProblem\nullproblem.params">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Params\ec.params">
@@ -65,10 +65,6 @@
     <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Configuration\BraneCloud.Evolution.EC.Configuration.csproj">
       <Project>{9a7b8efc-d36e-435d-99e2-10793aa3ffcd}</Project>
       <Name>BraneCloud.Evolution.EC.Configuration</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Evaluation\BraneCloud.Evolution.EC.Evaluation.csproj">
-      <Project>{a8ab0b32-952f-4fba-8c34-c22ccb897977}</Project>
-      <Name>BraneCloud.Evolution.EC.Evaluation</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\BraneCloud.Evolution.EC.Logging\BraneCloud.Evolution.EC.Logging.csproj">
       <Project>{e5eccea3-0448-40cd-98b2-bc70578807b1}</Project>

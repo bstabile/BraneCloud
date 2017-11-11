@@ -31,6 +31,7 @@ namespace BraneCloud.Evolution.EC.NEAT
      * @author Ermo Wei and David Freelan
      *
      */
+    [ECConfiguration("ec.neat.NEATNetwork")]
     public class NEATNetwork : IPrototype
     {
         public const string P_NETWORK = "network";
@@ -136,7 +137,7 @@ namespace BraneCloud.Evolution.EC.NEAT
         /**
          * Activates the net such that all outputs are active.
          */
-        public void Activate(EvolutionState state)
+        public void Activate(IEvolutionState state)
         {
             // Keep activating until all the outputs have become active
             // (This only happens on the first activation, because after that they
@@ -152,7 +153,7 @@ namespace BraneCloud.Evolution.EC.NEAT
             {
                 abortCounter++;
 
-                if (abortCounter >= ((NEATSpecies) (Individual.Species)).MaxNetworkDepth)
+                if (abortCounter >= ((NEATSpecies) Individual.Species).MaxNetworkDepth)
                 {
                     state.Output.Fatal("Inputs disconnected from output!");
                 }

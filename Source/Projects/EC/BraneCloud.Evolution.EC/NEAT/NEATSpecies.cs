@@ -208,6 +208,7 @@ namespace BraneCloud.Evolution.EC.NEAT
      * @author Ermo Wei and David Freelan
      * 
      */
+    [ECConfiguration("ec.neat.NEATSpecies")]
     public class NEATSpecies : GeneVectorSpecies
     {
 
@@ -624,8 +625,8 @@ namespace BraneCloud.Evolution.EC.NEAT
             // excessCoeff*(numExcess/maxGenomeSize)+
             // mutDiffCoeff*(mutTotalDiff/numMatching));
 
-            double compatibility = DisjointCoeff * (((double) numDisjoint) / 1.0);
-            compatibility += ExcessCoeff * (((double) numExcess) / 1.0);
+            double compatibility = DisjointCoeff * (numDisjoint / 1.0);
+            compatibility += ExcessCoeff * (numExcess / 1.0);
             compatibility += MutDiffCoeff * (mutTotalDiff / ((double) numMatching));
 
 
@@ -687,6 +688,7 @@ namespace BraneCloud.Evolution.EC.NEAT
                 }
 
                 // Give the extra offspring to the best subspecies
+                // TODO: BRS: Handle possible null value!
                 best.ExpectedOffspring++;
                 finalExpected++;
 
@@ -748,9 +750,10 @@ namespace BraneCloud.Evolution.EC.NEAT
             // sort the subspecies use extra list based on the max fitness
             // these need to use original fitness, descending order
 
-            // BRS: Using extension methods.
-            IList<NEATSubspecies> sortedSubspecies = Subspecies.ToList();
-            sortedSubspecies.SortByFitnessDescending();
+            // BRS: Using LINQ instead of IComparer
+            IList<NEATSubspecies> sortedSubspecies = Subspecies
+                .OrderByDescending(s => s.Individuals[0].Fitness)
+                .ToList();
 
 
             // Check for population-level stagnation code

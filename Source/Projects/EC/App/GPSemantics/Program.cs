@@ -31,8 +31,7 @@ namespace BraneCloud.Evolution.EC.App.GPSemantics
             // This primes the activator so it knows where to look for types that will be created from parameters.
             ECActivator.AddSourceAssemblies(new[]
             {
-                Assembly.GetAssembly(typeof(EvolutionState)),
-                Assembly.GetAssembly(typeof(SimpleEvaluator)),
+                Assembly.GetAssembly(typeof(IEvolutionState)),
                 Assembly.GetAssembly(typeof(Semantic))
             });
 

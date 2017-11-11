@@ -30,6 +30,7 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
      * @version 1.0 
      */
 
+    [ECConfiguration("ec.eda.cmaes.CMAESBreeder")]
     public class CMAESBreeder : Breeder
     {
     public override void Setup(IEvolutionState state, IParameter paramBase)

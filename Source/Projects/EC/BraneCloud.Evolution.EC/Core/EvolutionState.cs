@@ -362,16 +362,16 @@ namespace BraneCloud.Evolution.EC
         #endregion // Properties
         #region Setup
 
-        /// <summary>
-        /// This will be called to create your evolution state; immediately
-        /// after the constructor is called,
-        /// the Parameters, random, and output fields will be set
-        /// for you.  The constructor probably won't be called ever if
-        /// restoring (deserializing) from a Checkpoint.
-        /// </summary>
-        public EvolutionState()
-        {
-        }
+        ///// <summary>
+        ///// This will be called to create your evolution state; immediately
+        ///// after the constructor is called,
+        ///// the Parameters, random, and output fields will be set
+        ///// for you.  The constructor probably won't be called ever if
+        ///// restoring (deserializing) from a Checkpoint.
+        ///// </summary>
+        //public EvolutionState()
+        //{
+        //}
 
         /// <summary>
         /// Unlike for other Setup() methods, ignore the base; it will always be null. 

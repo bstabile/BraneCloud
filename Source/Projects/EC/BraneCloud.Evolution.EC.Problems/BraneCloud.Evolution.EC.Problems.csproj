@@ -324,10 +324,6 @@
       <Project>{197FC1BD-8578-4DE7-9AEA-D7098A3505EA}</Project>
       <Name>BraneCloud.Evolution.EC</Name>
     </ProjectReference>
-    <ProjectReference Include="..\BraneCloud.Evolution.EC.Evaluation\BraneCloud.Evolution.EC.Evaluation.csproj">
-      <Project>{A8AB0B32-952F-4FBA-8C34-C22CCB897977}</Project>
-      <Name>BraneCloud.Evolution.EC.Evaluation</Name>
-    </ProjectReference>
     <ProjectReference Include="..\BraneCloud.Evolution.EC.Psh\BraneCloud.Evolution.EC.Psh.csproj">
       <Project>{cfdb1e93-1a72-496d-89ef-ede6695b70af}</Project>
       <Name>BraneCloud.Evolution.EC.Psh</Name>

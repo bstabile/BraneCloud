@@ -17,6 +17,7 @@
  */
 
 using System.Collections.Generic;
+using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Simple;
 
 namespace BraneCloud.Evolution.EC.NEAT
@@ -28,6 +29,7 @@ namespace BraneCloud.Evolution.EC.NEAT
      * @author Ermo Wei and David Freelan
      */
 
+    [ECConfiguration("ec.neat.NEATInitializer")]
     public class NEATInitializer : SimpleInitializer
     {
         private const long SerialVersionUID = 1;
@@ -38,7 +40,7 @@ namespace BraneCloud.Evolution.EC.NEAT
          * mutated version of that template individual. The number of individual we create is
          * determined by the "pop.subpop.X.size" parameter.
          */
-        public Population InitialPopulation(EvolutionState state, int thread)
+        public override Population InitialPopulation(IEvolutionState state, int thread)
         {
             // read in the start genome as the template
             Population p = SetupPopulation(state, thread);
@@ -47,7 +49,7 @@ namespace BraneCloud.Evolution.EC.NEAT
             // go through all the population and populate the NEAT subpop
             foreach (Subpopulation subpop in p.Subpops)
             {
-// NEAT uses a template to populate the population
+                // NEAT uses a template to populate the population
                 // we first read it in to form the population, then mutate the links
                 if (subpop.Species is NEATSpecies)
                 {

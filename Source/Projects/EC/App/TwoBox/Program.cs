@@ -31,7 +31,6 @@ namespace BraneCloud.Evolution.EC.App.TwoBox
             ECActivator.AddSourceAssemblies(new[]
                                                 {
                                                     Assembly.GetAssembly(typeof(IEvolutionState)),
-                                                    Assembly.GetAssembly(typeof(Evaluator)),
                                                     Assembly.GetAssembly(typeof(TwoBox))
                                                 });
 

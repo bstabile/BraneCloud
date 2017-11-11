@@ -46,6 +46,7 @@ namespace BraneCloud.Evolution.EC.Select
      * @version 1.0 
      */
 
+    [ECConfiguration("ec.select.TopSelection")]
     public class TopSelection : SelectionMethod
     {
         /** Default base */

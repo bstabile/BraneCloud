@@ -32,6 +32,7 @@ namespace BraneCloud.Evolution.EC.NEAT
      *
      */
 
+    [ECConfiguration("ec.neat.NEATInnovation")]
     public class NEATInnovation : IPrototype
     {
         public const string P_INNOVATION = "innovation";

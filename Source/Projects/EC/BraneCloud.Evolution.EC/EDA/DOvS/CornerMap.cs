@@ -45,189 +45,191 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
      * @author Ermo Wei and David Freelan
      */
 
+    [ECConfiguration("ec.eda.dovs.CornerMap")]
     public class CornerMap
     {
 
-    /**
-     * Simple structure store the key and value from this CornerMap. This is
-     * userd for retrieving data from CornerMap
-     * 
-     * @author Ermo Wei
-     *
-     */
-    public class Pair
+        /**
+         * Simple structure store the key and value from this CornerMap. This is
+         * userd for retrieving data from CornerMap
+         * 
+         * @author Ermo Wei
+         *
+         */
+        public class Pair
         {
-        public Integer Key;
-        public Individual Value;
+            public Integer Key;
+            public Individual Value;
 
-        public int GetKey()
+            public int GetKey()
             {
-            return (int) Key.Value;
+                return (int) Key.Value;
             }
 
-        public Individual GetValue()
+            public Individual GetValue()
             {
-            return Value;
+                return Value;
             }
         }
 
-    /** major data structure used for this CornerMap, it is order by key */
-    TreeMap<Integer, IList<Individual>> map = new TreeMap<Integer, IList<Individual>>();
+        /** major data structure used for this CornerMap, it is order by key */
+        TreeMap<Integer, IList<Individual>> map = new TreeMap<Integer, IList<Individual>>();
 
-    /** Insert a key and value pair into CornerMap */
-    public void Insert(int coordindate, Individual ind)
+        /** Insert a key and value pair into CornerMap */
+        public void Insert(int coordindate, Individual ind)
         {
-        if (!map.containsKey(coordindate))
-            map.put(coordindate, new List<Individual>());
-        map.get(coordindate).add(ind);
+            if (!map.containsKey(coordindate))
+                map.put(coordindate, new List<Individual>());
+            map.get(coordindate).add(ind);
         }
 
-    /**
-     * This returns the smallest element whose key is equal to or bigger than
-     * the argument "key".
-     */
-    public Pair LowerBound(int key)
+        /**
+         * This returns the smallest element whose key is equal to or bigger than
+         * the argument "key".
+         */
+        public Pair LowerBound(int key)
         {
-        Pair entry = new Pair();
-        if (map.get(key).size() == 0)
-            return null;
-
-        entry.Key = new Integer(key);
-        entry.Value = map.get(key).get(0);
-        return entry;
-        }
-
-    /**
-     * This method returns the smallest element whose key is bigger than
-     * (excluding equal to) "key",
-     */
-    public Pair UpperBound(int key)
-        {
-        Entry<Integer, IList<Individual>> entry = map.higherEntry(key);
-        if (entry != null)
-            {
-            if (entry.getValue().size() == 0)
+            Pair entry = new Pair();
+            if (map.get(key).size() == 0)
                 return null;
-            Pair pair = new Pair();
-            pair.Key = entry.getKey();
-            pair.Value = entry.getValue().get(0);
-            return pair;
-            }
-        else
-            return null;
+
+            entry.Key = new Integer(key);
+            entry.Value = map.get(key).get(0);
+            return entry;
         }
 
-    /** Test if we have another key value pair before parameter pair */
-    public bool HasSmaller(Pair pair)
+        /**
+         * This method returns the smallest element whose key is bigger than
+         * (excluding equal to) "key",
+         */
+        public Pair UpperBound(int key)
         {
-        // First search this individual in the list
-        IList<Individual> currentList = map.get(pair.Key);
-        for (int i = currentList.Count - 1; i >= 0; i--)
+            Entry<Integer, IList<Individual>> entry = map.higherEntry(key);
+            if (entry != null)
             {
-            // We want to compare EXACT SAME OBJECT
-            if (currentList[i] == pair.Value)
+                if (entry.getValue().size() == 0)
+                    return null;
+                Pair pair = new Pair();
+                pair.Key = entry.getKey();
+                pair.Value = entry.getValue().get(0);
+                return pair;
+            }
+            else
+                return null;
+        }
+
+        /** Test if we have another key value pair before parameter pair */
+        public bool HasSmaller(Pair pair)
+        {
+            // First search this individual in the list
+            IList<Individual> currentList = map.get(pair.Key);
+            for (int i = currentList.Count - 1; i >= 0; i--)
+            {
+                // We want to compare EXACT SAME OBJECT
+                if (currentList[i] == pair.Value)
                 {
-                // find, can we just return true?
-                if (i == 0)
+                    // find, can we just return true?
+                    if (i == 0)
                     {
-                    // if this is already the first element in current list,
-                    // find previous list
-                    Entry<Integer, IList<Individual>> entry = map.lowerEntry(pair.Key);
-                    if (entry != null)
+                        // if this is already the first element in current list,
+                        // find previous list
+                        Entry<Integer, IList<Individual>> entry = map.lowerEntry(pair.Key);
+                        if (entry != null)
                         {
-                        if (entry.getValue().size() == 0)
-                            return false;
-                        else
-                            return true;
+                            if (entry.getValue().size() == 0)
+                                return false;
+                            else
+                                return true;
                         }
-                    else
-                        return false;
+                        else
+                            return false;
                     }
-                else
-                    return true;
+                    else
+                        return true;
                 }
             }
-        // we didn't find it in the list, which should not happen
-        return false;
+            // we didn't find it in the list, which should not happen
+            return false;
         }
 
-    /** Test if we have another key value pair after parameter pair */
-    public bool HasLarger(Pair pair)
+        /** Test if we have another key value pair after parameter pair */
+        public bool HasLarger(Pair pair)
         {
-        // First search this individual in the list
-        IList<Individual> currentList = map.get(pair.Key);
-        for (int i = 0; i < currentList.Count; ++i)
+            // First search this individual in the list
+            IList<Individual> currentList = map.get(pair.Key);
+            for (int i = 0; i < currentList.Count; ++i)
             {
-            // We want to compare EXACT SAME OBJECT
-            if (currentList[i] == pair.Value)
+                // We want to compare EXACT SAME OBJECT
+                if (currentList[i] == pair.Value)
                 {
-                // find, can we just return true?
-                if (i == currentList.Count - 1)
+                    // find, can we just return true?
+                    if (i == currentList.Count - 1)
                     {
-                    // if this is already the last element in current list,
-                    // find next list
-                    Entry<Integer, IList<Individual>> entry = map.higherEntry(pair.Key);
-                    if (entry != null)
+                        // if this is already the last element in current list,
+                        // find next list
+                        Entry<Integer, IList<Individual>> entry = map.higherEntry(pair.Key);
+                        if (entry != null)
                         {
-                        if (entry.getValue().size() == 0)
-                            return false;
-                        else
-                            return true;
+                            if (entry.getValue().size() == 0)
+                                return false;
+                            else
+                                return true;
                         }
-                    else
-                        return false;
+                        else
+                            return false;
                     }
-                else
-                    return true;
+                    else
+                        return true;
                 }
             }
-        // we didn't find it in the list, which should not happen
-        return false;
+            // we didn't find it in the list, which should not happen
+            return false;
         }
 
-    /**
-     * Get a greatest key value pair from this CornerMap who is the immediate
-     * previous element of pair
-     */
-    public Pair smaller(Pair pair)
+        /**
+         * Get a greatest key value pair from this CornerMap who is the immediate
+         * previous element of pair
+         */
+        public Pair smaller(Pair pair)
         {
-        Pair newPair = new Pair();
-        // First search this individual in the list
-        IList<Individual> currentList = map.get(pair.Key);
-        for (int i = currentList.Count - 1; i >= 0; i--)
+            Pair newPair = new Pair();
+            // First search this individual in the list
+            IList<Individual> currentList = map.get(pair.Key);
+            for (int i = currentList.Count - 1; i >= 0; i--)
             {
-            // We want to compare EXACT SAME OBJECT
-            if (currentList[i] == pair.Value)
+                // We want to compare EXACT SAME OBJECT
+                if (currentList[i] == pair.Value)
                 {
-                // find, can we just return true?
-                if (i == 0)
+                    // find, can we just return true?
+                    if (i == 0)
                     {
-                    // if this is already the first element in current list,
-                    // find previous list
-                    Entry<Integer, IList<Individual>> entry = map.lowerEntry(pair.Key);
-                    if (entry != null)
+                        // if this is already the first element in current list,
+                        // find previous list
+                        Entry<Integer, IList<Individual>> entry = map.lowerEntry(pair.Key);
+                        if (entry != null)
                         {
-                        if (entry.getValue().size() == 0)
-                            return null;
-                        else
+                            if (entry.getValue().size() == 0)
+                                return null;
+                            else
                             {
-                            newPair.Key = entry.getKey();
-                            newPair.Value = entry.getValue().get(entry.getValue().size() - 1);
-                            return newPair;
+                                newPair.Key = entry.getKey();
+                                newPair.Value = entry.getValue().get(entry.getValue().size() - 1);
+                                return newPair;
                             }
                         }
-                    else
-                        return null;
+                        else
+                            return null;
                     }
-                else
+                    else
                     {
-                    newPair.Key = pair.Key;
-                    newPair.Value = currentList[i - 1];
-                    return newPair;
+                        newPair.Key = pair.Key;
+                        newPair.Value = currentList[i - 1];
+                        return newPair;
                     }
                 }
             }
-        // we didn't find it in the list, which should not happen
-        return null;
+            // we didn't find it in the list, which should not happen
+            return null;
         }
     }
+}

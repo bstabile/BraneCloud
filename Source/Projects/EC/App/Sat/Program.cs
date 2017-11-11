@@ -31,7 +31,6 @@ namespace BraneCloud.Evolution.EC.App.Sat
             ECActivator.AddSourceAssemblies(new[]
                                                 {
                                                     Assembly.GetAssembly(typeof(IEvolutionState)),
-                                                    Assembly.GetAssembly(typeof(Evaluator)),
                                                     Assembly.GetAssembly(typeof(SAT))
                                                 });
 
