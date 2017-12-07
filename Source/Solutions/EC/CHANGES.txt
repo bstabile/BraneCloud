@@ -1523,7 +1523,7 @@ Version		Change Log
 	The default seed.0 is now set to 'time' rather than 4357
 	Bug fix to Parameter.java: popn wasn't popping off more than one
 		element in total. Thanks to Norberto Roth <betoroth@gmail.com>
-	GPProblem now implements SimpleProblemForm.  You'll need your own
+	GPProblem now : SimpleProblemForm.  You'll need your own
 		custom GPProblem to do GroupedProblemForm.
 	KozaStatistics casts individuals to SimpleProblemForm rather than to
 		GPProblem, making it work better with MasterProblem

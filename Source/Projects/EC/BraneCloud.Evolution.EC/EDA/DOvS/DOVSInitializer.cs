@@ -16,8 +16,10 @@
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
 
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Simple;
+using BraneCloud.Evolution.EC.Vector;
 
 namespace BraneCloud.Evolution.EC.EDA.DOvS
 {
@@ -40,50 +42,50 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
          * and sample from this region, the number of sample is equal to parameter
          * "pop.subpop.X.size" in parameter files.
          * 
-         * However, due to redundant samples, we the final individuals size may be
+         * However, due to redundant samples, we the individuals size may be
          * smaller than what have been specified in pop.subpop.X.size.
          */
-        public Population initialPopulation(final EvolutionState state, int thread)
+        public override Population InitialPopulation(IEvolutionState state, int thread)
         {
-            Population p = super.initialPopulation(state, thread);
+            Population p = base.InitialPopulation(state, thread);
             // make sure the each subpop only have one individual
-            for (int i = 0; i < p.subpops.size(); i++)
+            for (int i = 0; i < p.Subpops.Count; i++)
             {
-                if (p.subpops.get(i).species instanceof DOVSSpecies)
+                if (p.Subpops[i].Species is DOVSSpecies)
                 {
-                    DOVSSpecies species = (DOVSSpecies) p.subpops.get(i).species;
+                    DOVSSpecies species = (DOVSSpecies) p.Subpops[i].Species;
 
-                    if (p.subpops.get(i).individuals.size() != 1)
-                        state.output.fatal("contain more than one start point");
+                    if (p.Subpops[i].Individuals.Count != 1)
+                        state.Output.Fatal("contain more than one start point");
 
                     // add the start point to the visited ArrayList
-                    species.visited.clear();
-                    species.visited.add(p.subpops.get(i).individuals.get(0));
-                    species.visitedIndexMap.put(p.subpops.get(i).individuals.get(0), 0);
-                    species.optimalIndex = 0;
+                    species.Visited.Clear();
+                    species.Visited.Add(p.Subpops[i].Individuals[0]);
+                    species.VisitedIndexMap[p.Subpops[i].Individuals[0]] =  0;
+                    species.OptimalIndex = 0;
 
-                    IntegerVectorIndividual ind = (IntegerVectorIndividual) species.visited.get(species.optimalIndex);
+                    IntegerVectorIndividual ind = (IntegerVectorIndividual) species.Visited[species.OptimalIndex];
                     // For the visited solution, record its coordinate
                     // positions in the multimap
-                    for (int j = 0; j < species.genomeSize; ++j)
+                    for (int j = 0; j < species.GenomeSize; ++j)
                     {
                         // The individual is the content. The key is its
                         // coordinate position
-                        species.corners.get(j).insert(ind.genome[j], ind);
+                        species.Corners[j].Insert(ind.genome[j], ind);
                     }
 
                     // update MPA
-                    species.updateMostPromisingArea(state);
+                    species.UpdateMostPromisingArea(state);
 
                     // sample from MPA
-                    int initialSize = p.subpops.get(i).initialSize;
-                    ArrayList<Individual> candidates = species.mostPromisingAreaSamples(state, initialSize);
+                    int initialSize = p.Subpops[i].InitialSize;
+                    IList<Individual> candidates = species.MostPromisingAreaSamples(state, initialSize);
 
                     // get unique candidates for evaluation, this is Sk in paper
-                    ArrayList<Individual> uniqueCandidates = species.uniqueSamples(state, candidates);
+                    IList<Individual> uniqueCandidates = species.UniqueSamples(state, candidates);
 
                     // update the individuals
-                    p.subpops.get(i).individuals = uniqueCandidates;
+                    p.Subpops[i].Individuals = uniqueCandidates;
 
                 }
 

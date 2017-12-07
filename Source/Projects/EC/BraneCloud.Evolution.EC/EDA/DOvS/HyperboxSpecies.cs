@@ -17,11 +17,8 @@
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
-using BraneCloud.Evolution.EC.Simple;
-using BraneCloud.Evolution.EC.Util;
 using BraneCloud.Evolution.EC.Vector;
 
 namespace BraneCloud.Evolution.EC.EDA.DOvS
@@ -53,7 +50,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
         }
 
         /** Constructing a hyperbox, which defines the next search area. */
-        public void UpdateMostPromisingArea(EvolutionState state)
+        public override void UpdateMostPromisingArea(IEvolutionState state)
         {
             int dimension = this.GenomeSize;
             // Each time we construct a hyperbox, the previous one,
@@ -68,7 +65,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
             {
                 boxA.Add(arr);
             }
-            foreach (double arr in b)
+            foreach (double arr in B)
             {
                 boxB.Add(arr);
             }
@@ -100,15 +97,15 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                         // solutions with this key, if there is such a key smaller
                         // than
                         // the key of xstar
-                        pair = Corners[i].smaller(pair);
+                        pair = Corners[i].Smaller(pair);
                         ActiveSolutions.Add(pair.Value);
-                        double[] Atemp = new double[dimension];
-                        Array.Clear(Atemp, 0, Atemp.Length);
-                        Atemp[i] = 1;
+                        double[] atemp = new double[dimension];
+                        Array.Clear(atemp, 0, atemp.Length);
+                        atemp[i] = 1;
                         // The key is the coordinate position.
                         // So it is the rhs of the constraint
-                        double btemp = pair.GetKey();
-                        boxA.Add(Atemp);
+                        double btemp = pair.Key;
+                        boxA.Add(atemp);
                         boxB.Add(btemp);
                     }
                 }
@@ -126,30 +123,30 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                 {
                     ActiveSolutions.Add(pair.Value);
 
-                    double[] Atemp = new double[dimension];
-                    Array.Clear(Atemp, 0, Atemp.Length);
-                    Atemp[i] = -1;
+                    double[] atemp = new double[dimension];
+                    Array.Clear(atemp, 0, atemp.Length);
+                    atemp[i] = -1;
 
                     // The key is the coordinate position.
                     // So it is the rhs of the constraint
-                    double btemp = pair.GetKey();
-                    boxA.Add(Atemp);
+                    double btemp = pair.Key;
+                    boxA.Add(atemp);
                     boxB.Add(btemp);
                 }
             }
         }
 
         /** Sample from the hyperbox to get new samples for evaluation. */
-        public IList<Individual> MostPromisingAreaSamples(IEvolutionState state, int popSize)
+        public override IList<Individual> MostPromisingAreaSamples(IEvolutionState state, int popSize)
         {
-            IntegerVectorIndividual bestIndividual = (IntegerVectorIndividual) Visited[OptimalIndex];
+            var bestIndividual = (IntegerVectorIndividual) Visited[OptimalIndex];
             int dimension = bestIndividual.GenomeLength;
             int numOfConstraints = boxA.Count;
 
             IList<Individual> newSolutions = new List<Individual>();
             IList<Individual> candidates = new List<Individual>();
             // TODO : do we need implement clone function here?
-            IntegerVectorIndividual newInd = (IntegerVectorIndividual) bestIndividual.Clone();
+            var newInd = (IntegerVectorIndividual) bestIndividual.Clone();
             ((DOVSFitness) newInd.Fitness).Reset();
             newSolutions.Add(newInd);
 

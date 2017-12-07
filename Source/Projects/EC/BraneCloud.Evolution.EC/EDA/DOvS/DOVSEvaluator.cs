@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Simple;
 
 namespace BraneCloud.Evolution.EC.EDA.DOvS
@@ -42,7 +43,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
          * activeSolutions. Their number of evaluation is determined by there
          * fitness statistics.
          */
-        protected void EvalPopChunk(IEvolutionState state, int[] numinds, int[] from, int threadnum, ISimpleProblem p)
+        protected override void EvalPopChunk(IEvolutionState state, int[] numinds, int[] from, int threadnum, ISimpleProblem p)
         {
             // so far the evaluator only support when evalthread is 1
             ((Problem) p).PrepareToEvaluate(state, threadnum);
@@ -58,7 +59,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                 IList<Individual> inds = subpops[pop].Individuals;
                 if (subpops[pop].Species is DOVSSpecies)
                 {
-                    DOVSSpecies species = (DOVSSpecies) subpops[pop].Species;
+                    var species = (DOVSSpecies) subpops[pop].Species;
 
                     // Evaluator need to evaluate individual from two set: Sk
                     // (individuals) and activeSolution
@@ -67,13 +68,13 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                     // procedure, require that Sk has at least 2 reps.
                     // Although we do not have stopping test here, we still do 2
                     // reps
-                    for (int i = 0; i < inds.Count; ++i)
+                    foreach (Individual ind in inds)
                     {
-                        DOVSFitness fit = (DOVSFitness) (inds[i].Fitness);
+                        var fit = (DOVSFitness) ind.Fitness;
                         int addrep = 2 - fit.NumOfObservations;
                         for (int rep = 0; rep < addrep; ++rep)
                         {
-                            p.Evaluate(state, inds[i], pop, threadnum);
+                            p.Evaluate(state, ind, pop, threadnum);
                             species.NumOfTotalSamples++;
                         }
                     }
@@ -89,34 +90,33 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                         // if ocba option is turned on.
                         // There are deltan more reps to allocate, where deltan
                         // = sizeof(activesolutions).
-                        int deltan = species.ActiveSolutions.size();
+                        int deltan = species.ActiveSolutions.Count;
+
                         // Always add two more reps to current sample best
                         for (int i = 0; i < 2; i++)
-                            p.Evaluate(state, species.Visited.Get(species.OptimalIndex), pop, threadnum);
+                            p.Evaluate(state, species.Visited[species.OptimalIndex], pop, threadnum);
                         species.NumOfTotalSamples += 2;
+
                         deltan -= 2;
                         if (deltan > 0)
                         {
                             // get R
                             double R = 0;
-                            for (int i = 0; i < species.ActiveSolutions.Size(); ++i)
+                            foreach (Individual ind in species.ActiveSolutions)
                             {
-                                Individual ind = species.activeSolutions.get(i);
-                                DOVSFitness fit = (DOVSFitness) (ind.Fitness);
-                                Individual bestInd = species.Visited.get(species.OptimalIndex);
-                                DOVSFitness bestFit = (DOVSFitness) (bestInd.Fitness);
+                                var fit = (DOVSFitness) ind.Fitness;
+                                Individual bestInd = species.Visited[species.OptimalIndex];
+                                var bestFit = (DOVSFitness) bestInd.Fitness;
                                 R += (fit.Variance
                                       / Math.Max(1e-10, Math.Abs(fit.Mean - bestFit.Mean)));
                             }
-                            for (int i = 0; i < species.ActiveSolutions.size(); ++i)
+                            foreach (Individual ind in species.ActiveSolutions)
                             {
-                                Individual ind = (Individual) species.ActiveSolutions.get(i);
-                                DOVSFitness fit = (DOVSFitness) (ind.Fitness);
-                                Individual bestInd = (Individual) species.Visited.Get(species.OptimalIndex);
-                                DOVSFitness bestFit = (DOVSFitness) (bestInd.Fitness);
+                                var fit = (DOVSFitness) ind.Fitness;
+                                Individual bestInd = species.Visited[species.OptimalIndex];
+                                var bestFit = (DOVSFitness) bestInd.Fitness;
 
-                                double fraction = fit.Variance
-                                                  / Math.Max(1e-10, Math.Abs(fit.Mean - bestFit.Mean)) / R;
+                                double fraction = fit.Variance / Math.Max(1e-10, Math.Abs(fit.Mean - bestFit.Mean)) / R;
                                 double tempDeltan = fraction * deltan;
                                 if (tempDeltan > 1)
                                 {
@@ -144,16 +144,15 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                         species.Repetition = 1;
 
                     // Now do the simulations for activeSolutions
-                    for (int count = 0; count < species.ActiveSolutions.Size(); ++count)
+                    foreach (Individual ind in species.ActiveSolutions)
                     {
-                        Individual individual = (Individual) species.activeSolutions.get(count);
-                        DOVSFitness fit = (DOVSFitness) (individual.Fitness);
+                        var fit = (DOVSFitness) ind.Fitness;
                         if (fit.NumOfObservations < species.Repetition)
                         {
                             int newrep = species.Repetition - fit.NumOfObservations;
                             for (int rep = 0; rep < newrep; ++rep)
                             {
-                                p.Evaluate(state, individual, pop, threadnum);
+                                p.Evaluate(state, ind, pop, threadnum);
                             }
                             species.NumOfTotalSamples += newrep;
                         }
@@ -161,8 +160,8 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
 
                     // Simulate current sample best
                     {
-                        Individual bestIndividual = (Individual) species.Visited.Get(species.OptimalIndex);
-                        DOVSFitness fit = (DOVSFitness) (bestIndividual.Fitness);
+                        Individual bestIndividual = species.Visited[species.OptimalIndex];
+                        var fit = (DOVSFitness) (bestIndividual.Fitness);
                         if (fit.NumOfObservations < species.Repetition)
                         {
                             int newrep = species.Repetition - fit.NumOfObservations;
@@ -176,15 +175,15 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
 
                     // Simulate current individuals
                     // Since backtracking flag is always false, we always do this
-                    for (int i = 0; i < inds.Count; ++i)
+                    foreach (Individual ind in inds)
                     {
-                        DOVSFitness fit = (DOVSFitness) (inds[i].Fitness);
+                        var fit = (DOVSFitness) ind.Fitness;
                         if (fit.NumOfObservations < species.Repetition)
                         {
                             int newRep = species.Repetition - fit.NumOfObservations;
                             for (int rep = 0; rep < newRep; ++rep)
                             {
-                                p.Evaluate(state, inds[i], pop, threadnum);
+                                p.Evaluate(state, ind, pop, threadnum);
                             }
                             species.NumOfTotalSamples += newRep;
                         }

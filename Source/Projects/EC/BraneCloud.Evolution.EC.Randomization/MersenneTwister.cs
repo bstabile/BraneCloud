@@ -535,7 +535,7 @@ namespace BraneCloud.Evolution.EC.Randomization
         /// <summary>
         /// This method is for completness' sake. 
         /// Returns a long drawn uniformly from 0 to n-1.  Suffice it to say,
-        /// n must be > 0, or an IllegalArgumentException is raised. 
+        /// n must be > 0, or an ArgumentException is raised. 
         /// </summary>		
         public virtual long NextLong(long n)
         {

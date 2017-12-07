@@ -529,7 +529,7 @@ namespace BraneCloud.Evolution.EC.Randomization
 
         /// <summary>
         /// Returns an integer drawn uniformly from 0 to n-1.  Suffice it to say,
-        /// n must be > 0, or an IllegalArgumentException is raised. 
+        /// n must be > 0, or an ArgumentException is raised. 
         /// </summary>
         public int NextInt(int n)
         {
@@ -674,7 +674,7 @@ namespace BraneCloud.Evolution.EC.Randomization
 
         /// <summary>
         /// Returns a long drawn uniformly from 0 to n-1.  Suffice it to say,
-        /// n must be > 0, or an IllegalArgumentException is raised. 
+        /// n must be > 0, or an ArgumentException is raised. 
         /// </summary>
         public long NextLong(long n)
         {

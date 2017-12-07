@@ -484,7 +484,7 @@ namespace BraneCloud.Evolution.EC.App.Regression
         }
 
         /* Return the function applied to the given data by benchmark problem.  */
-        public double func(IEvolutionState state, double[] xs, int benchmark) // throws IllegalArgumentException
+        public double func(IEvolutionState state, double[] xs, int benchmark) // throws ArgumentException
         {
             var x = xs[0];
             var y = (xs.Length > 1 ? xs[1] : 0);

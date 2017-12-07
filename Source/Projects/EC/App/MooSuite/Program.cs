@@ -36,7 +36,7 @@ namespace BraneCloud.Evolution.EC.App.MooSuite
 
             // We are defaulting to problem type ZDT1. Change this to another specific type for alternate tests.
             // Choices include: [sphere, zdt1, zdt2, zdt3, zdt4, zdt6, fon, pol, kur-nsga2, kur-spea2, qv, sch, f2, f3(unconstrained-f2.params)]
-            Evolve.Run(new[] { "-file", @"Params\App\MooSuite\zdt1.params" });
+            Evolve.Run(new[] { "-file", @"Params\App\MooSuite\kur-nsga2.params" });
             Console.WriteLine("\nDone!");
             Console.ReadLine();
         }

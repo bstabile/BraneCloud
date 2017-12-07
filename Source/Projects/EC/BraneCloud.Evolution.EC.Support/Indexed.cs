@@ -32,7 +32,7 @@ namespace BraneCloud.Evolution.EC.Support
 
         int Size { get; }
 
-        /** Throws an IndexOutOfBoundsException if index is inappropriate, and IllegalArgumentException
+        /** Throws an IndexOutOfBoundsException if index is inappropriate, and ArgumentException
             if the value is inappropriate.  Not called set() in order to be consistent with getValue(...)*/
         object SetValue(int index, object value);
 

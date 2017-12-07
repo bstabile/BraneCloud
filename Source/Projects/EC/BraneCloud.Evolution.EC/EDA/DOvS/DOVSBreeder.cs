@@ -65,7 +65,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
 
                 // Right now activeSolutions only has A_{k-1}, need to combine S_k
                 for (int j = 0; j < subpop.Individuals.Count; j++)
-                    species.activeSolutions.add(subpop.Individuals[i]);
+                    species.ActiveSolutions.Add(subpop.Individuals[i]);
                 // Ak and bk will have all the constraints, including original
                 // problem formulation and MPR
                 // A b are original problem formulation constraints

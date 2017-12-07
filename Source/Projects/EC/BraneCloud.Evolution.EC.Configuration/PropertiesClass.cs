@@ -427,7 +427,7 @@ namespace BraneCloud.Evolution.EC.Configuration
         /// 
         /// </ul>
         /// 
-        /// An <code>IllegalArgumentException</code> is thrown if a
+        /// An <code>ArgumentException</code> is thrown if a
         /// malformed Unicode escape appears in the input.
         /// 
         /// <p/>
@@ -536,7 +536,7 @@ namespace BraneCloud.Evolution.EC.Configuration
         /// element is the empty string <code>""</code>.
         /// <p/>
         /// Throws IOException if an error occurred when reading from the input stream.
-        /// Throws IllegalArgumentException if the input stream contains a malformed Unicode escape sequence.
+        /// Throws ArgumentException if the input stream contains a malformed Unicode escape sequence.
         /// </summary>
         /// <param name="inStream">the input stream.</param>
         public void Load(Stream inStream) // throws IOException  

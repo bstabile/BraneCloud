@@ -73,6 +73,7 @@
     <Compile Include="Scanner.cs" />
     <Compile Include="ThreadSupport.cs" />
     <Compile Include="Tokenizer.cs" />
+    <Compile Include="TreeMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />

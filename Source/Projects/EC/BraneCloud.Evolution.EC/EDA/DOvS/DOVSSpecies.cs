@@ -124,64 +124,64 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
         public int OptimalIndex = -1;
 
         /** warm up period for RMD sampling. */
-        public int WarmUp;
+        public int WarmUp { get; set; }
 
         /**
          * This list contains all the sample we have visited during current
          * algorithm run.
          */
-        public IList<Individual> Visited;
+        public IList<Individual> Visited { get; set; }
 
         /**
          * Given a individual, return the index of this individual in ArrayList
          * visited
          */
-        public IDictionary<Individual, Integer> VisitedIndexMap;
+        public IDictionary<Individual, int> VisitedIndexMap { get; set; }
 
         /**
          * CornerMaps for the all the visisted individuals. This record the
          * key-value pair for each individuals, where key is the coordinates and
          * value is individual itself.
          */
-        public IList<CornerMap> Corners;
+        public IList<CornerMap> Corners { get; set; }
 
         /**
          * activeSolutions contains all the samples that is on the boundary of the
          * most promising area.
          */
-        public IList<Individual> ActiveSolutions;
+        public IList<Individual> ActiveSolutions { get; set; }
 
         /**
          * This is the Ek in original paper, where is the collection all the
          * individuals evaluated in generation k.
          */
-        public IList<Individual> Ek;
+        public IList<Individual> Ek { get; set; }
 
-        /* Ocba flag. */
+    /* Ocba flag. */
         //public boolean ocba;
 
         /** Is the problem a stochastic problem. */
-        public bool Stochastic;
+        public bool Stochastic { get; set; }
 
         /** Base value of number evaluation for each individual. */
-        public int InitialReps;
+        public int InitialReps { get; set; }
 
         /**
          * This value will be updated at each generation to determine how many
          * evaluation is needed for one individual. It make use of the initialReps.
          */
-        public int Repetition;
+        public int Repetition { get; set; }
 
         /** This is for future using. */
-        public long NumOfTotalSamples = 0;
+        public long NumOfTotalSamples { get; set; } = 0;
 
         /** Constraint coefficients */
-        public IList<double[]> A;
+        public IList<double[]> A { get; set; }
 
-        /** Constratin coefficients */
-        public double[] b;
+        /** Constraint coefficients */
+        public double[] B { get; set; }
 
-        public IParameter DefaultBase => DOVSDefaults.ParamBase.Push(P_DOVS_SPECIES);
+        public override IParameter DefaultBase => DOVSDefaults.ParamBase.Push(P_DOVS_SPECIES);
 
         public override void Setup(IEvolutionState state, IParameter paramBase)
         {
@@ -190,7 +190,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
             ActiveSolutions = new List<Individual>();
             Ek = new List<Individual>();
             Visited = new List<Individual>();
-            VisitedIndexMap = new Dictionary<Individual, Integer>();
+            VisitedIndexMap = new Dictionary<Individual, int>();
             Corners = new List<CornerMap>();
             // initialize corner map
             for (int i = 0; i < GenomeSize; ++i)
@@ -215,7 +215,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
             int size = state.Parameters.GetInt(paramBase.Push(P_CONSTRAINTS_SIZE), def.Push(P_CONSTRAINTS_SIZE), 0);
 
             A = new List<double[]>();
-            b = new double[size];
+            B = new double[size];
 
             if (size > 0)
             {
@@ -239,8 +239,8 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                     IParameter p = paramBase.Push(P_B);
                     IParameter defp = def.Push(P_B);
 
-                    b = state.Parameters.GetDoublesUnconstrained(p, defp, size);
-                    if (b == null)
+                    B = state.Parameters.GetDoublesUnconstrained(p, defp, size);
+                    if (B == null)
                         state.Output.Fatal(
                             "DOVSSpecies constraints vector b must be a space- or tab-delimited list of exactly " +
                             size + " numbers.",
@@ -255,7 +255,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
         /**
          * Define a most promising area for search of next genertion of individuals.
          */
-        public void UpdateMostPromisingArea(EvolutionState state)
+        public virtual void UpdateMostPromisingArea(IEvolutionState state)
         {
             throw new NotImplementedException("updateMostPromisingArea method not implementd!");
         }
@@ -264,7 +264,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
          * Sample from the most promising area to get new generation of individual
          * for evaluation.
          */
-        public IList<Individual> MostPromisingAreaSamples(IEvolutionState state, int size)
+        public virtual IList<Individual> MostPromisingAreaSamples(IEvolutionState state, int size)
         {
             throw new NotImplementedException("mostPromisingAreaSamples method not implementd!");
         }
@@ -281,10 +281,10 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
             Ek.Clear();
 
             IList<Individual> individuals = subpop.Individuals;
-            for (int i = 0; i < individuals.Count; ++i)
-                Ek.Add(individuals[i]);
-            for (int i = 0; i < ActiveSolutions.Count; ++i)
-                Ek.Add(ActiveSolutions[i]);
+            foreach (Individual i in individuals)
+                Ek.Add(i);
+            foreach (Individual i in ActiveSolutions)
+                Ek.Add(i);
             Ek.Add(Visited[OptimalIndex]);
             OptimalIndex = FindOptimalIndividual(Ek);
         }
@@ -321,21 +321,23 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
         {
             // first filter out the redundant sample with in the set of candidates
             HashSet<Individual> set = new HashSet<Individual>();
-            for (int i = 0; i < candidates.Count; ++i)
+            foreach (Individual i in candidates)
             {
-                if (!set.Contains(candidates[i]))
-                    set.Add(candidates[i]);
+                if (!set.Contains(i))
+                    set.Add(i);
             }
             // now all the individual in candidates are unique with in the set
             candidates = new List<Individual>(set);
 
             // Sk will be the new population
-            IList<Individual> Sk = new List<Individual>();
+            IList<Individual> sk = new List<Individual>();
 
             // see if we have these individual in visted array before
             for (int i = 0; i < candidates.Count; ++i)
             {
+
                 IntegerVectorIndividual individual = (IntegerVectorIndividual) candidates[i];
+
                 if (VisitedIndexMap.ContainsKey(individual))
                 {
                     // we have this individual before, retrieve that
@@ -346,7 +348,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                 else
                 {
                     Visited.Add(individual);
-                    VisitedIndexMap[individual] = Visited.Count - 1);
+                    VisitedIndexMap[individual] = Visited.Count - 1;
 
                     // We add the new individual into the CornerMap
                     // NOTE: if the individual already, we still need to do this?
@@ -360,10 +362,10 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                     }
                 }
 
-                Sk.Add(individual);
+                sk.Add(individual);
             }
 
-            return Sk;
+            return sk;
         }
     }
 }

@@ -33,35 +33,37 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
     [ECConfiguration("ec.eda.cmaes.CMAESBreeder")]
     public class CMAESBreeder : Breeder
     {
-    public override void Setup(IEvolutionState state, IParameter paramBase)
+        public override void Setup(IEvolutionState state, IParameter paramBase)
         {
-        // nothing to setup
+            // nothing to setup
         }
 
-    /** Updates the CMA-ES distribution given the current population, then 
-        replaces the population with new samples generated from the distribution.
-        Returns the revised population. */
+        /** Updates the CMA-ES distribution given the current population, then 
+            replaces the population with new samples generated from the distribution.
+            Returns the revised population. */
 
-    public override Population BreedPopulation(IEvolutionState state)
+        public override Population BreedPopulation(IEvolutionState state)
         {
-        Population pop = state.Population;
-        for(int i = 0; i < pop.Subpops.Count; i++)
+            Population pop = state.Population;
+            for (int i = 0; i < pop.Subpops.Count; i++)
             {
-            Subpopulation subpop = pop.Subpops[i];
-            if (!(subpop.Species is CMAESSpecies))  // uh oh
-                state.Output.Fatal("To use CMAESBreeder, subpopulation " + i + " must contain a CMAESSpecies.  But it contains a " + subpop.species);
-                        
-            CMAESSpecies species = (CMAESSpecies)subpop.Species;
-                
-            // update distribution[i] for subpop
-            species.UpdateDistribution(state, subpop);
-                
-            // overwrite individuals
-            ArrayList<Individual> inds = subpop.individuals;
-            for(int j = 0; j < inds.size(); j++)
-                inds.set(j, species.newIndividual(state, 0));
+                Subpopulation subpop = pop.Subpops[i];
+                if (!(subpop.Species is CMAESSpecies)) // uh oh
+                    state.Output.Fatal("To use CMAESBreeder, subpopulation " + i +
+                                       " must contain a CMAESSpecies.  But it contains a " + subpop.species);
+
+                CMAESSpecies species = (CMAESSpecies) subpop.Species;
+
+                // update distribution[i] for subpop
+                species.UpdateDistribution(state, subpop);
+
+                // overwrite individuals
+                ArrayList<Individual> inds = subpop.individuals;
+                for (int j = 0; j < inds.size(); j++)
+                    inds.set(j, species.newIndividual(state, 0));
             }
-                
-        return pop;
+
+            return pop;
         }
     }
+}

@@ -99,7 +99,7 @@ namespace BraneCloud.Evolution.EC
         ///// }
         ///// </pre></tt>
         ///// 
-        ///// <li/>If no ancestor of yours implements clone(), but you
+        ///// <li/>If no ancestor of yours : clone(), but you
         ///// need to deep-clone some things, then you should implement it
         ///// as follows:
         ///// <p/>
@@ -135,7 +135,7 @@ namespace BraneCloud.Evolution.EC
         ///// <summary>
         ///// Sets up the object by reading it from the parameters stored
         ///// in <i>state</i>, built off of the parameter base <i>base</i>.
-        ///// If an ancestor implements this method, be sure to call
+        ///// If an ancestor : this method, be sure to call
         ///// super.Setup(state,base);  before you do anything else. 
         ///// <p/>For prototypes, Setup(...) is typically called once for
         ///// the prototype instance; cloned instances do not receive

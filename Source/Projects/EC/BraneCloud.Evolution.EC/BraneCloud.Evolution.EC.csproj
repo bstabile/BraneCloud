@@ -48,6 +48,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=3.20.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Solutions\EC\packages\MathNet.Numerics.3.20.0\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -110,14 +113,14 @@
     <Compile Include="Core\Interfaces\IStateManager.cs" />
     <Compile Include="DE\DEEvaluator.cs" />
     <Compile Include="DE\IDEEvaluator.cs" />
-    <None Include="EDA\DOvS\CornerMap.cs" />
-    <None Include="EDA\DOvS\DOVSBreeder.cs" />
-    <None Include="EDA\DOvS\DOVSDefaults.cs" />
-    <None Include="EDA\DOvS\DOVSEvaluator.cs" />
-    <None Include="EDA\DOvS\DOVSFitness.cs" />
-    <None Include="EDA\DOvS\DOVSInitializer.cs" />
-    <None Include="EDA\DOvS\DOVSSpecies.cs" />
-    <None Include="EDA\DOvS\HyperboxSpecies.cs" />
+    <Compile Include="EDA\DOvS\CornerMap.cs" />
+    <Compile Include="EDA\DOvS\DOVSBreeder.cs" />
+    <Compile Include="EDA\DOvS\DOVSDefaults.cs" />
+    <Compile Include="EDA\DOvS\DOVSEvaluator.cs" />
+    <Compile Include="EDA\DOvS\DOVSFitness.cs" />
+    <Compile Include="EDA\DOvS\DOVSInitializer.cs" />
+    <Compile Include="EDA\DOvS\DOVSSpecies.cs" />
+    <Compile Include="EDA\DOvS\HyperboxSpecies.cs" />
     <Compile Include="Eval\IJob.cs" />
     <Compile Include="Eval\IMasterProblem.cs" />
     <Compile Include="Core\Interfaces\IProblem.cs" />
@@ -312,7 +315,6 @@
     <Compile Include="Util\GELexer.cs" />
     <Compile Include="Util\IGELexer.cs" />
     <Compile Include="Util\GELexer_OLD.cs" />
-    <Compile Include="Util\Indexed.cs" />
     <Compile Include="Util\ISortComparatorUL.cs" />
     <Compile Include="Util\LocalHost.cs" />
     <Compile Include="Util\NullOp.cs" />

@@ -17,6 +17,9 @@
  */
 
 using System.Collections.Generic;
+using System.Windows.Forms;
+using BraneCloud.Evolution.EC.Configuration;
+using BraneCloud.Evolution.EC.Support;
 using BraneCloud.Evolution.EC.Util;
 
 namespace BraneCloud.Evolution.EC.EDA.DOvS
@@ -58,71 +61,84 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
          */
         public class Pair
         {
-            public Integer Key;
-            public Individual Value;
+            public int Key { get; set; }
+            public Individual Value { get; set; }
 
-            public int GetKey()
-            {
-                return (int) Key.Value;
-            }
+            //public int GetKey()
+            //{
+            //    return (int) Key;
+            //}
 
-            public Individual GetValue()
-            {
-                return Value;
-            }
+            //public Individual GetValue()
+            //{
+            //    return Value;
+            //}
         }
 
         /** major data structure used for this CornerMap, it is order by key */
-        TreeMap<Integer, IList<Individual>> map = new TreeMap<Integer, IList<Individual>>();
+
+        // BRS: Still not clear if the Integer type is used just to force boxing?
+        //      TreeMap is just defined as an alias for OrderedDictionary<TKey, TValue>.
+        //      But since this uses a struct, KeyValuePair<TKey,TValue>, instead of a class
+        //      we have to return a nullable value from the HigherEntry and LowerEntry extension methods
+        //      (in case we are already at the top or bottom of the list of individuals).
+        // NOTE: I'm not sure if there is any reason to use the Integer reference type.
+        //       So I'm just going to cross my fingers and use the int key type to see what happens.
+        //       If nothing blows up then all of this could probably be simplified.
+
+        //TreeMap<Integer, IList<Individual>> map = new TreeMap<Integer, IList<Individual>>();
+        readonly TreeMap<int, IList<Individual>> _map = new TreeMap<int, IList<Individual>>();
 
         /** Insert a key and value pair into CornerMap */
         public void Insert(int coordindate, Individual ind)
         {
-            if (!map.containsKey(coordindate))
-                map.put(coordindate, new List<Individual>());
-            map.get(coordindate).add(ind);
+            if (!_map.ContainsKey(coordindate))
+                _map.Add(coordindate, new List<Individual>());
+            _map[coordindate].Add(ind);
         }
 
-        /**
-         * This returns the smallest element whose key is equal to or bigger than
-         * the argument "key".
-         */
+        /// <summary>
+        /// This returns the smallest element whose key is equal to or bigger than the argument "key".
+        /// </summary>
         public Pair LowerBound(int key)
         {
             Pair entry = new Pair();
-            if (map.get(key).size() == 0)
+            if (_map[key].Count == 0)
                 return null;
 
-            entry.Key = new Integer(key);
-            entry.Value = map.get(key).get(0);
+            entry.Key = key;
+            entry.Value = _map[key][0];
             return entry;
         }
 
-        /**
-         * This method returns the smallest element whose key is bigger than
-         * (excluding equal to) "key",
-         */
+        /// <summary>
+        /// This method returns the smallest element whose key is bigger than (excluding equal to) "key".
+        /// </summary>
         public Pair UpperBound(int key)
         {
-            Entry<Integer, IList<Individual>> entry = map.higherEntry(key);
-            if (entry != null)
+            var entry = _map.HigherEntry(key);
+            if (entry.HasValue)
             {
-                if (entry.getValue().size() == 0)
+                if (entry.Value.Value.Count == 0)
                     return null;
-                Pair pair = new Pair();
-                pair.Key = entry.getKey();
-                pair.Value = entry.getValue().get(0);
+                Pair pair = new Pair
+                {
+                    Key = entry.Value.Key,
+                    Value = entry.Value.Value[0]
+                };
                 return pair;
             }
             else
                 return null;
         }
 
-        /** Test if we have another key value pair before parameter pair */
+        /// <summary>
+        /// Test if we have another key value pair before parameter pair.
+        /// </summary>
         public bool HasSmaller(Pair pair)
         {
             // First search this individual in the list
-            IList<Individual> currentList = map.get(pair.Key);
+            IList<Individual> currentList = _map[pair.Key];
             for (int i = currentList.Count - 1; i >= 0; i--)
             {
                 // We want to compare EXACT SAME OBJECT
@@ -133,19 +149,17 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                     {
                         // if this is already the first element in current list,
                         // find previous list
-                        Entry<Integer, IList<Individual>> entry = map.lowerEntry(pair.Key);
-                        if (entry != null)
+                        var entry = _map.LowerEntry(pair.Key);
+                        if (entry.HasValue)
                         {
-                            if (entry.getValue().size() == 0)
+                            if (entry.Value.Value.Count == 0)
                                 return false;
-                            else
-                                return true;
+
+                            return true;
                         }
-                        else
-                            return false;
+                        return false;
                     }
-                    else
-                        return true;
+                    return true;
                 }
             }
             // we didn't find it in the list, which should not happen
@@ -156,7 +170,7 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
         public bool HasLarger(Pair pair)
         {
             // First search this individual in the list
-            IList<Individual> currentList = map.get(pair.Key);
+            IList<Individual> currentList = _map[pair.Key];
             for (int i = 0; i < currentList.Count; ++i)
             {
                 // We want to compare EXACT SAME OBJECT
@@ -167,34 +181,31 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                     {
                         // if this is already the last element in current list,
                         // find next list
-                        Entry<Integer, IList<Individual>> entry = map.higherEntry(pair.Key);
+                        var entry = _map.HigherEntry(pair.Key);
                         if (entry != null)
                         {
-                            if (entry.getValue().size() == 0)
+                            if (entry.Value.Value.Count == 0)
                                 return false;
-                            else
-                                return true;
+                            return true;
                         }
-                        else
-                            return false;
+                        return false;
                     }
-                    else
-                        return true;
+                    return true;
                 }
             }
             // we didn't find it in the list, which should not happen
             return false;
         }
 
-        /**
-         * Get a greatest key value pair from this CornerMap who is the immediate
-         * previous element of pair
-         */
-        public Pair smaller(Pair pair)
+        /// <summary>
+        /// Get a greatest key value pair from this CornerMap who is the immediate
+        /// previous element of pair
+        /// </summary>
+        public Pair Smaller(Pair pair)
         {
             Pair newPair = new Pair();
             // First search this individual in the list
-            IList<Individual> currentList = map.get(pair.Key);
+            IList<Individual> currentList = _map[pair.Key];
             for (int i = currentList.Count - 1; i >= 0; i--)
             {
                 // We want to compare EXACT SAME OBJECT
@@ -205,27 +216,21 @@ namespace BraneCloud.Evolution.EC.EDA.DOvS
                     {
                         // if this is already the first element in current list,
                         // find previous list
-                        Entry<Integer, IList<Individual>> entry = map.lowerEntry(pair.Key);
+                        var entry = _map.LowerEntry(pair.Key);
                         if (entry != null)
                         {
-                            if (entry.getValue().size() == 0)
+                            if (entry.Value.Value.Count == 0)
                                 return null;
-                            else
-                            {
-                                newPair.Key = entry.getKey();
-                                newPair.Value = entry.getValue().get(entry.getValue().size() - 1);
-                                return newPair;
-                            }
+
+                            newPair.Key = entry.Value.Key;
+                            newPair.Value = entry.Value.Value[entry.Value.Value.Count - 1];
+                            return newPair;
                         }
-                        else
-                            return null;
+                        return null;
                     }
-                    else
-                    {
-                        newPair.Key = pair.Key;
-                        newPair.Value = currentList[i - 1];
-                        return newPair;
-                    }
+                    newPair.Key = pair.Key;
+                    newPair.Value = currentList[i - 1];
+                    return newPair;
                 }
             }
             // we didn't find it in the list, which should not happen
