@@ -1,6 +1,6 @@
 using System;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * High level interface for sparse matrices.

@@ -1,7 +1,7 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Ops;
+using SharpMatrix.Ops;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     //package org.ejml.data;
 

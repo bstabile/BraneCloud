@@ -1,8 +1,8 @@
 using System;
 using System.Drawing;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row
+namespace SharpMatrix.Dense.Row
 {
     //package org.ejml.dense.row;
 

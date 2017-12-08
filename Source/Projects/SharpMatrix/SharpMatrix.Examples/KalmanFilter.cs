@@ -1,6 +1,6 @@
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Examples
+namespace SharpMatrix.Examples
 {
     //package org.ejml.example;
 

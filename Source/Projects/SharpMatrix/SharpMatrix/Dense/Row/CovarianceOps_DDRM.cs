@@ -1,11 +1,11 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Factory;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Misc;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.LinSol;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row.Factory;
+using SharpMatrix.Dense.Row.Misc;
+using SharpMatrix.Interfaces.LinSol;
 using Randomization;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row
+namespace SharpMatrix.Dense.Row
 {
     //package org.ejml.dense.row;
 

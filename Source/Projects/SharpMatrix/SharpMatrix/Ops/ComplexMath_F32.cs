@@ -1,6 +1,6 @@
 using System;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * Basic math operations on complex numbers.

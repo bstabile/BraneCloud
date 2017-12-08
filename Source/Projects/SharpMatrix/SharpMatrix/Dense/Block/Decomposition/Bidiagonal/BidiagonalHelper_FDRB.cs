@@ -1,8 +1,8 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Block.Decomposition.QR;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Block.Decomposition.QR;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Block.Decomposition.Bidiagonal
+namespace SharpMatrix.Dense.Block.Decomposition.Bidiagonal
 {
     //package org.ejml.dense.block.decomposition.bidiagonal;
 

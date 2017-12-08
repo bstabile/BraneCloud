@@ -1,6 +1,6 @@
 using System;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Simple
+namespace SharpMatrix.Simple
 {
     //package org.ejml.simple;
 

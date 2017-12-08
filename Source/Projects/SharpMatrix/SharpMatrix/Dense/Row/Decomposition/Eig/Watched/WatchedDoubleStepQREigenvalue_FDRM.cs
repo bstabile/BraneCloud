@@ -1,7 +1,7 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Eig.Watched
+namespace SharpMatrix.Dense.Row.Decomposition.Eig.Watched
 {
     //package org.ejml.dense.row.decomposition.eig.watched;
 

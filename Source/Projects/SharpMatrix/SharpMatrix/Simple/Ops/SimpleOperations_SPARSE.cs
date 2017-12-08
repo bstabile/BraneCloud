@@ -1,10 +1,10 @@
 using System;
 using System.IO;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Ops;
-using BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc;
+using SharpMatrix.Data;
+using SharpMatrix.Ops;
+using SharpMatrix.Sparse.Csc;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Simple.Ops
+namespace SharpMatrix.Simple.Ops
 {
     //package org.ejml.simple.ops;
 

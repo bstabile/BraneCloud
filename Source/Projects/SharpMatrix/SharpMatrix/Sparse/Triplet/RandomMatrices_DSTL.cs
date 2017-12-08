@@ -1,8 +1,8 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 using Randomization;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Sparse.Triplet
+namespace SharpMatrix.Sparse.Triplet
 {
     //package org.ejml.sparse.triplet;
 

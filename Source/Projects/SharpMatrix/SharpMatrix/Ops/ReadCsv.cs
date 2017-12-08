@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Ops
+namespace SharpMatrix.Ops
 {
     /**
      * <p>

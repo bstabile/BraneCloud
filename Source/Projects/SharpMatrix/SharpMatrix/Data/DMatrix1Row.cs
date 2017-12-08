@@ -1,6 +1,6 @@
 using System;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * Interface for a row-major matrix that uses a single array internally.

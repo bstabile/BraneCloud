@@ -1,9 +1,9 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Block;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Block;
+using SharpMatrix.Interfaces.Decomposition;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition
+namespace SharpMatrix.Dense.Row.Decomposition
 {
     //package org.ejml.dense.row.decomposition;
 

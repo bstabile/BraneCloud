@@ -1,11 +1,11 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Block.Decomposition.Chol;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.LinSol;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Block.Decomposition.Chol;
+using SharpMatrix.Dense.Row;
+using SharpMatrix.Interfaces.Decomposition;
+using SharpMatrix.Interfaces.LinSol;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Block.LinSol.Chol
+namespace SharpMatrix.Dense.Block.LinSol.Chol
 {
     //package org.ejml.dense.block.linsol.chol;
 

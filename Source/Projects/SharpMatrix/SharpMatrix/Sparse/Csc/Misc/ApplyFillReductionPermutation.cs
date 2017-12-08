@@ -1,6 +1,6 @@
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Misc
+namespace SharpMatrix.Sparse.Csc.Misc
 {
     //package org.ejml.sparse.csc.misc;
 

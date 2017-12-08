@@ -1,9 +1,9 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Ops;
+using SharpMatrix.Data;
+using SharpMatrix.Ops;
 using Randomization;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc
+namespace SharpMatrix.Sparse.Csc
 {
     //package org.ejml.sparse.csc;
 

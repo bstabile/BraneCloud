@@ -22,7 +22,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 
-namespace BraneCloud.Evolution.EC.MatrixLib
+namespace SharpMatrix
 {
     /// <summary>
     /// This is to overcome .NET's lack of Java's jagged array initialization.

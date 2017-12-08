@@ -1,10 +1,10 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Factory;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row;
+using SharpMatrix.Dense.Row.Factory;
+using SharpMatrix.Interfaces.Decomposition;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Examples
+namespace SharpMatrix.Examples
 {
     //package org.ejml.example;
 

@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.Serialization;
-using BraneCloud.Evolution.EC.MatrixLib.Ops;
+using SharpMatrix.Ops;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * Fixed sized vector with 2 elements.  Can represent a 2 x 1 or 1 x 2 matrix, context dependent.

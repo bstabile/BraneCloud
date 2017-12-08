@@ -1,8 +1,8 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Block.Decomposition.QR;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row;
+using SharpMatrix.Dense.Block.Decomposition.QR;
+using SharpMatrix.Dense.Row;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Block.Decomposition.Hessenberg
+namespace SharpMatrix.Dense.Block.Decomposition.Hessenberg
 {
 
     //package org.ejml.dense.block.decomposition.hessenberg;

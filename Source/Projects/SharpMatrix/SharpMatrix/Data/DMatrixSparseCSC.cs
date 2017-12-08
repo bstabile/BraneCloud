@@ -1,7 +1,7 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Ops;
+using SharpMatrix.Ops;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * <p>Compressed Column (CC) sparse matrix format.   Only non-zero elements are stored.</p>

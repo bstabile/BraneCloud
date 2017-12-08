@@ -1,8 +1,8 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.LinSol;
+using SharpMatrix.Data;
+using SharpMatrix.Interfaces.LinSol;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Misc
+namespace SharpMatrix.Dense.Row.Misc
 {
     //package org.ejml.dense.row.misc;
 

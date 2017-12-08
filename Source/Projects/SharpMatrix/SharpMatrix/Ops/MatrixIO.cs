@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Ops
+namespace SharpMatrix.Ops
 {
     /**
      * Provides simple to use routines for reading and writing matrices to and from files.

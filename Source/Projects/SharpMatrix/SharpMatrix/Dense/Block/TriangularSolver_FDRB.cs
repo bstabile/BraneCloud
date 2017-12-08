@@ -1,7 +1,7 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Block
+namespace SharpMatrix.Dense.Block
 {
     //package org.ejml.dense.block;
 

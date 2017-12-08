@@ -1,10 +1,10 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Fixed;
-using BraneCloud.Evolution.EC.MatrixLib.Ops;
-using BraneCloud.Evolution.EC.MatrixLib.Simple;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Fixed;
+using SharpMatrix.Ops;
+using SharpMatrix.Simple;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Examples
+namespace SharpMatrix.Examples
 {
     //package org.ejml.example;
 

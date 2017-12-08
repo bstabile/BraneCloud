@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row;
-using BraneCloud.Evolution.EC.MatrixLib.Equation;
-using BraneCloud.Evolution.EC.MatrixLib.Simple;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row;
+using SharpMatrix.Equation;
+using SharpMatrix.Simple;
 using Randomization;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Examples
+namespace SharpMatrix.Examples
 {
     //package org.ejml.example;
 

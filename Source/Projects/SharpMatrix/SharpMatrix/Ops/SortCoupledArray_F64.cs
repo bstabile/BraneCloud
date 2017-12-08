@@ -1,6 +1,6 @@
 using System;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Ops
+namespace SharpMatrix.Ops
 {
     /**
      * @author Peter Abeles

@@ -1,9 +1,9 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.QR;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row.Decomposition;
+using SharpMatrix.Dense.Row.Decomposition.QR;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.LinSol.QR
+namespace SharpMatrix.Dense.Row.LinSol.QR
 {
     //package org.ejml.dense.row.linsol.qr;
 

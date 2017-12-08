@@ -1,8 +1,8 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense
+namespace SharpMatrix.Dense
 {
 /**
  * <p>

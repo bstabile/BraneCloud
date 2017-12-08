@@ -1,7 +1,7 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Fixed
+namespace SharpMatrix.Dense.Fixed
 {
 
     //package org.ejml.dense.fixed;

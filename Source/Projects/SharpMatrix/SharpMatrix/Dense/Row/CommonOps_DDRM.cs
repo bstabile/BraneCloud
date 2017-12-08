@@ -1,12 +1,12 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.LU;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Factory;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.LinSol.LU;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Misc;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.LinSol;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row.Decomposition.LU;
+using SharpMatrix.Dense.Row.Factory;
+using SharpMatrix.Dense.Row.LinSol.LU;
+using SharpMatrix.Dense.Row.Misc;
+using SharpMatrix.Interfaces.LinSol;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row
+namespace SharpMatrix.Dense.Row
 {
 /**
  * <p>

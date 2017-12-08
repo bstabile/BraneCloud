@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using BraneCloud.Evolution.EC.MatrixLib.Ops;
+using SharpMatrix.Ops;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * <p>

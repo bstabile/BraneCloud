@@ -1,5 +1,5 @@
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * Interface which all fixed sized matrices must implement

@@ -1,6 +1,6 @@
 using System;
 
-namespace BraneCloud.Evolution.EC.MatrixLib
+namespace SharpMatrix
 {
     /**
      * If two matrices did not have compatible dimensions for the operation this exception

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Ops
+namespace SharpMatrix.Ops
 {
     /**
      * Reads in a matrix that is in a column-space-value (CSV) format.

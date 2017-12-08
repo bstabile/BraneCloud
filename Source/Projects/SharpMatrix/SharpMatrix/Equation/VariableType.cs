@@ -1,6 +1,6 @@
 using System;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Equation
+namespace SharpMatrix.Equation
 {
     //package org.ejml.equation;
 

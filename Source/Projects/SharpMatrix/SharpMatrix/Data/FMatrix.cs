@@ -1,4 +1,4 @@
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * Interface for all 64F real matrices.

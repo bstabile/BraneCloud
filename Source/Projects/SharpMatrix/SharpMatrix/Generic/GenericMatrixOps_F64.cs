@@ -1,8 +1,8 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 using Randomization;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Generic
+namespace SharpMatrix.Generic
 {
     //package org.ejml.generic;
 

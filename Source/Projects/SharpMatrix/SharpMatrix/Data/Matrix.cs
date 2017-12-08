@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * Base interface for all rectangular matrices

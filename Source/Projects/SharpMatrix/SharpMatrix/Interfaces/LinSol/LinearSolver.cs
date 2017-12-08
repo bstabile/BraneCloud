@@ -1,7 +1,7 @@
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
+using SharpMatrix.Data;
+using SharpMatrix.Interfaces.Decomposition;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Interfaces.LinSol
+namespace SharpMatrix.Interfaces.LinSol
 {
     //package org.ejml.interfaces.linsol;
 

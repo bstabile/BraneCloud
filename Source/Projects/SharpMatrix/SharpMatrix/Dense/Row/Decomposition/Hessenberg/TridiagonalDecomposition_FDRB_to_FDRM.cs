@@ -1,9 +1,9 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Block.Decomposition.Hessenberg;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Block.Decomposition.Hessenberg;
+using SharpMatrix.Interfaces.Decomposition;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Hessenberg
+namespace SharpMatrix.Dense.Row.Decomposition.Hessenberg
 {
     //package org.ejml.dense.row.decomposition.hessenberg;
 

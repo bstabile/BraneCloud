@@ -1,9 +1,9 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Factory;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.LinSol;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row.Factory;
+using SharpMatrix.Interfaces.LinSol;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Eig
+namespace SharpMatrix.Dense.Row.Decomposition.Eig
 {
     //package org.ejml.dense.row.decomposition.eig;
 

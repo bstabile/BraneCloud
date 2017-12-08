@@ -1,4 +1,4 @@
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * Matrix which can be reshaped

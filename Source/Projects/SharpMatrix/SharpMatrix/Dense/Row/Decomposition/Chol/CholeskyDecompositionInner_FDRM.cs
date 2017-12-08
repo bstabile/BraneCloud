@@ -1,6 +1,6 @@
 using System;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Chol
+namespace SharpMatrix.Dense.Row.Decomposition.Chol
 {
     //package org.ejml.dense.row.decomposition.chol;
 

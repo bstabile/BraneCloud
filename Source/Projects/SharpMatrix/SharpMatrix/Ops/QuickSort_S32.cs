@@ -1,6 +1,6 @@
 using System;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Ops
+namespace SharpMatrix.Ops
 {
     /**
      * An implementation of the quick sort algorithm from Numerical Recipes Third Edition

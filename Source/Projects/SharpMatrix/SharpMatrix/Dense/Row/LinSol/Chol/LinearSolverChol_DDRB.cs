@@ -1,8 +1,8 @@
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Block;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Block.LinSol.Chol;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Block;
+using SharpMatrix.Dense.Block.LinSol.Chol;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.LinSol.Chol
+namespace SharpMatrix.Dense.Row.LinSol.Chol
 {
     //package org.ejml.dense.row.linsol.chol;
 

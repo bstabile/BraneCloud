@@ -1,14 +1,14 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Chol;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.LU;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.LinSol.Chol;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.LinSol.LU;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.LinSol.QR;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.LinSol;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row.Decomposition.Chol;
+using SharpMatrix.Dense.Row.Decomposition.LU;
+using SharpMatrix.Dense.Row.LinSol.Chol;
+using SharpMatrix.Dense.Row.LinSol.LU;
+using SharpMatrix.Dense.Row.LinSol.QR;
+using SharpMatrix.Interfaces.Decomposition;
+using SharpMatrix.Interfaces.LinSol;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Factory
+namespace SharpMatrix.Dense.Row.Factory
 {
     //package org.ejml.dense.row.factory;
 

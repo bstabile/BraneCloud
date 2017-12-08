@@ -1,8 +1,8 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
+using SharpMatrix.Data;
+using SharpMatrix.Interfaces.Decomposition;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Chol
+namespace SharpMatrix.Dense.Row.Decomposition.Chol
 {
     //package org.ejml.dense.row.decompose.chol;
 

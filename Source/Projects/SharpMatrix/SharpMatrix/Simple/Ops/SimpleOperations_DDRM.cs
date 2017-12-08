@@ -1,11 +1,11 @@
 using System;
 using System.IO;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row;
-using BraneCloud.Evolution.EC.MatrixLib.Ops;
+using SharpMatrix.Data;
+using SharpMatrix.Dense;
+using SharpMatrix.Dense.Row;
+using SharpMatrix.Ops;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Simple.Ops
+namespace SharpMatrix.Simple.Ops
 {
     /**
      * @author Peter Abeles

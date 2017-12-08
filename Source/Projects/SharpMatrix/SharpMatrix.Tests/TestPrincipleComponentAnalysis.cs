@@ -1,9 +1,9 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row;
+using SharpMatrix.Dense.Row;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Randomization;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Examples
+namespace SharpMatrix.Examples
 {
     //package org.ejml.example;
 

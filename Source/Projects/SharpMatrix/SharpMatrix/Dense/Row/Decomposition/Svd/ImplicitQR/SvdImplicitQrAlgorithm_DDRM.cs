@@ -1,9 +1,9 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Eig;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row.Decomposition.Eig;
 using Randomization;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Svd.ImplicitQR
+namespace SharpMatrix.Dense.Row.Decomposition.Svd.ImplicitQR
 {
     //package org.ejml.dense.row.decomposition.svd.implicitqr;
 

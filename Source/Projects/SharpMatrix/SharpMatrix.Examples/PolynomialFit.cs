@@ -1,9 +1,9 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Factory;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.LinSol;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row.Factory;
+using SharpMatrix.Dense.Row.LinSol;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Examples
+namespace SharpMatrix.Examples
 {
     //package org.ejml.example;
 

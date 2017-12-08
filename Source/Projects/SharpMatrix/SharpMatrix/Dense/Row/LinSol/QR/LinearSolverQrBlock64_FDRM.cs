@@ -1,6 +1,6 @@
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Block.LinSol.QR;
+using SharpMatrix.Dense.Block.LinSol.QR;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.LinSol.QR
+namespace SharpMatrix.Dense.Row.LinSol.QR
 {
     //package org.ejml.dense.row.linsol.qr;
 

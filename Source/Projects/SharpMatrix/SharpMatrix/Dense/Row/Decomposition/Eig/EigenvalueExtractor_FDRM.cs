@@ -1,6 +1,6 @@
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Eig
+namespace SharpMatrix.Dense.Row.Decomposition.Eig
 {
     //package org.ejml.dense.row.decomposition.eig;
 

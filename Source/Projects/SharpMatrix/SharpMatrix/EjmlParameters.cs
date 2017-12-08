@@ -1,4 +1,4 @@
-namespace BraneCloud.Evolution.EC.MatrixLib
+namespace SharpMatrix
 {
     /**
      * This is a list of parameters that are used across the code.  To tune performance

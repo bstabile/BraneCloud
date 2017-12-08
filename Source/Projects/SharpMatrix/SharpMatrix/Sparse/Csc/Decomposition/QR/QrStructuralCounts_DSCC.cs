@@ -1,8 +1,8 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Misc;
+using SharpMatrix.Data;
+using SharpMatrix.Sparse.Csc.Misc;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Decomposition.QR
+namespace SharpMatrix.Sparse.Csc.Decomposition.QR
 {
     //package org.ejml.sparse.csc.decomposition.qr;
 

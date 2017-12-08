@@ -1,7 +1,7 @@
 using System.IO;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Simple
+namespace SharpMatrix.Simple
 {
     /**
      * High level interface for operations inside of SimpleMatrix for one matrix type.

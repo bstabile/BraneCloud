@@ -1,6 +1,6 @@
 using System;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Block.Decomposition.QR
+namespace SharpMatrix.Dense.Block.Decomposition.QR
 {
 
     //package org.ejml.dense.block.decomposition.qr;

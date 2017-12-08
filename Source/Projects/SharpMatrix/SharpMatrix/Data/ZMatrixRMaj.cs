@@ -1,8 +1,8 @@
 
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Ops;
+using SharpMatrix.Ops;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Data
+namespace SharpMatrix.Data
 {
     /**
      * Dense matrix for complex numbers.  Internally it stores its data in a single row-major array with the real

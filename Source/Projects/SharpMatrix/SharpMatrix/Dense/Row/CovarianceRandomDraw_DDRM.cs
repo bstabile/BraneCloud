@@ -1,9 +1,9 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Chol;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row.Decomposition.Chol;
 using Randomization;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row
+namespace SharpMatrix.Dense.Row
 {
     //package org.ejml.dense.row;
 

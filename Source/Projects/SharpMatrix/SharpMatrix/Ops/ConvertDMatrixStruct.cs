@@ -1,8 +1,8 @@
 
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
+using SharpMatrix.Data;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Ops
+namespace SharpMatrix.Ops
 {
     /**
      * Functions for converting between matrix types.  Both matrices must be the same size and their values will

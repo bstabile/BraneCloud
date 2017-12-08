@@ -1,11 +1,11 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
-using BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Decomposition.Chol;
-using BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Decomposition.LU;
-using BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Decomposition.QR;
+using SharpMatrix.Data;
+using SharpMatrix.Interfaces.Decomposition;
+using SharpMatrix.Sparse.Csc.Decomposition.Chol;
+using SharpMatrix.Sparse.Csc.Decomposition.LU;
+using SharpMatrix.Sparse.Csc.Decomposition.QR;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Factory
+namespace SharpMatrix.Sparse.Csc.Factory
 {
     //package org.ejml.sparse.csc.factory;
 

@@ -1,13 +1,13 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
-using BraneCloud.Evolution.EC.MatrixLib.Sparse;
-using BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc;
-using BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Factory;
-using BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Misc;
+using SharpMatrix.Data;
+using SharpMatrix.Interfaces.Decomposition;
+using SharpMatrix.Sparse;
+using SharpMatrix.Sparse.Csc;
+using SharpMatrix.Sparse.Csc.Factory;
+using SharpMatrix.Sparse.Csc.Misc;
 using Randomization;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Examples
+namespace SharpMatrix.Examples
 {
     //package org.ejml.example;
 

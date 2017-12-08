@@ -1,10 +1,10 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Chol;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row.Decomposition;
+using SharpMatrix.Dense.Row.Decomposition.Chol;
+using SharpMatrix.Interfaces.Decomposition;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.LinSol.Chol
+namespace SharpMatrix.Dense.Row.LinSol.Chol
 {
     //package org.ejml.dense.row.linsol.chol;
 

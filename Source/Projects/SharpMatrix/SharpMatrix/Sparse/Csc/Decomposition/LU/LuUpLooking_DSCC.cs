@@ -1,9 +1,9 @@
 using System;
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
-using BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Misc;
+using SharpMatrix.Data;
+using SharpMatrix.Interfaces.Decomposition;
+using SharpMatrix.Sparse.Csc.Misc;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Sparse.Csc.Decomposition.LU
+namespace SharpMatrix.Sparse.Csc.Decomposition.LU
 {
     //package org.ejml.sparse.csc.decomposition.lu;
 

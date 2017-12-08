@@ -1,9 +1,9 @@
-using BraneCloud.Evolution.EC.MatrixLib.Data;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Eig.Watched;
-using BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Hessenberg;
-using BraneCloud.Evolution.EC.MatrixLib.Interfaces.Decomposition;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row.Decomposition.Eig.Watched;
+using SharpMatrix.Dense.Row.Decomposition.Hessenberg;
+using SharpMatrix.Interfaces.Decomposition;
 
-namespace BraneCloud.Evolution.EC.MatrixLib.Dense.Row.Decomposition.Eig
+namespace SharpMatrix.Dense.Row.Decomposition.Eig
 {
     //package org.ejml.dense.row.decomposition.eig;
 
