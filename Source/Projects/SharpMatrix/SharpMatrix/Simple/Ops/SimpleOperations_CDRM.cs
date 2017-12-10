@@ -11,7 +11,7 @@ namespace SharpMatrix.Simple.Ops
 /**
  * @author Peter Abeles
  */
-    public class SimpleOperations_CDRM : SimpleOperations<CMatrixRMaj>
+    public class SimpleOperations_CDRM : SimpleOperations<double, CMatrixRMaj>
     {
         //@Override
         public void transpose(CMatrixRMaj input, CMatrixRMaj output)
@@ -242,5 +242,6 @@ namespace SharpMatrix.Simple.Ops
         {
             MatrixIO.print(output, (CMatrixRMaj) mat);
         }
+
     }
 }

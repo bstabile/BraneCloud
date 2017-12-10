@@ -15,7 +15,7 @@
  * If you wish to create yet another fork, please use a different root namespace.
  * BraneCloud is a registered domain that will be used for name/schema resolution.
  */
-
+using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Configuration;
 
 namespace BraneCloud.Evolution.EC.EDA.CMAES
@@ -50,7 +50,7 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
                 Subpopulation subpop = pop.Subpops[i];
                 if (!(subpop.Species is CMAESSpecies)) // uh oh
                     state.Output.Fatal("To use CMAESBreeder, subpopulation " + i +
-                                       " must contain a CMAESSpecies.  But it contains a " + subpop.species);
+                                       " must contain a CMAESSpecies.  But it contains a " + subpop.Species);
 
                 CMAESSpecies species = (CMAESSpecies) subpop.Species;
 
@@ -58,9 +58,9 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
                 species.UpdateDistribution(state, subpop);
 
                 // overwrite individuals
-                ArrayList<Individual> inds = subpop.individuals;
-                for (int j = 0; j < inds.size(); j++)
-                    inds.set(j, species.newIndividual(state, 0));
+                IList<Individual> inds = subpop.Individuals;
+                for (int j = 0; j < inds.Count; j++)
+                    inds[j] = species.NewIndividual(state, 0);
             }
 
             return pop;

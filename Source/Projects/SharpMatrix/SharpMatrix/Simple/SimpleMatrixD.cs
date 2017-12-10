@@ -422,7 +422,7 @@ namespace SharpMatrix.Simple
         /// Assigns consecutive elements inside a column to the provided array.
         /// A(offset:(offset + values.Length),column) = values
         /// </summary>
-        public void setColumn(int column, int startRow, double[] values)
+        public override void setColumn(int column, int startRow, double[] values)
         {
             ops.setColumn(mat, column, startRow, values);
         }
@@ -430,32 +430,17 @@ namespace SharpMatrix.Simple
         /// <summary>
         /// Copy matrix B into this matrix at location (insertRow, insertCol).
         /// </summary>
-        public void insertIntoThis(int insertRow, int insertCol, SimpleMatrixD B)
+        public override void insertIntoThis(int insertRow, int insertCol, SimpleMatrixD B)
         {
             var bm = B.getMatrix();
             CommonOps_DDRM.insert(bm, mat, insertRow, insertCol);
         }
 
         /// <summary>
-        /// Reshapes the matrix to the specified number of rows and columns.  
-        /// If the total number of elements is &lt; number of elements it had 
-        /// before the data is saved.  Otherwise a new internal array is
-        /// declared and the old data lost.
-        /// </summary>
-        public void reshape(int numRows, int numCols)
-        {
-            if (mat.getType().isFixed())
-                throw new ArgumentException("Can't rename a fixed sized matrix");
-
-            ((ReshapeMatrix)mat).reshape(numRows, numCols);
-        }
-
-
-        /// <summary>
         /// Computes the dot product (a.k.a. inner product) between this vector and vector 'v'.
         /// </summary>
         /// <param name="v">The second vector in the dot product.  Not modified.</param>
-        public double dot(SimpleMatrixD v)
+        public override double dot(SimpleMatrixD v)
         {
             if (!isVector())
                 throw new ArgumentException("'this' matrix is not a vector.");
@@ -468,93 +453,14 @@ namespace SharpMatrix.Simple
         }
 
         /// <summary>
-        /// Computes the Frobenius normal of the matrix:
-        /// <code>normF = Math.Sqrt(A.Sum(v => Math.Abs(v * v))) /* fast version */</code>
-        /// </summary>
-        /// <see cref="NormOps_DDRM.normF(DMatrixD1)"/>
-        public double normF()
-        {
-            return ops.normF(mat);
-        }
-
-        /// <summary>
-        /// The condition p = 2 number of a matrix is used to measure 
-        /// the sensitivity of the linear system <b>Ax=b</b>.  
-        /// A value near one indicates that it is a well conditioned matrix.
-        /// </summary>
-        /// <see cref="NormOps_DDRM.conditionP2(DMatrixRMaj)"/>
-        public double conditionP2()
-        {
-            return ops.conditionP2(mat);
-        }
-
-        /// <summary>
-        /// Computes the determinant of the matrix.
-        /// </summary>
-        public double determinant()
-        {
-            double ret = ops.determinant(mat);
-            if (UtilEjml.isUncountable(ret))
-                return 0;
-            return ret;
-        }
-
-        /// <summary>
-        /// Computes the trace of the matrix.
-        /// </summary>
-        public double trace()
-        {
-            return ops.trace(mat);
-        }
-
-        /// <summary>
-        /// Returns true of the specified matrix element is valid element inside this matrix.
-        /// </summary>
-        public bool isInBounds(int row, int col)
-        {
-            return row >= 0 && col >= 0 && row < mat.getNumRows() && col < mat.getNumCols();
-        }
-
-        /// <summary>
         /// Checks to see if matrix 'a' is the same as this matrix within the specified tolerance.
         /// </summary>
-        public bool isIdentical(SimpleMatrixD a, double tol)
+        public override bool isIdentical(SimpleMatrixD a, double tol)
         {
             var am = a.getMatrix();
             return MatrixFeatures_DDRM.isIdentical(mat, am, tol);
         }
 
-        /// <summary>
-        /// Checks to see if any of the elements in this matrix are either NaN or infinite.
-        /// </summary>
-        /// <returns>True if an element is NaN or infinite.  False otherwise.</returns>
-        public bool hasUncountable()
-        {
-            return ops.hasUncountable(mat);
-        }
-
-
-        /// <summary>
-        /// Extracts the specified rows from the matrix.
-        /// </summary>
-        /// <param name="begin">First row.  Inclusive.</param>
-        /// <param name="end">Last row + 1.</param>
-        /// <returns></returns>
-        public SimpleMatrixD rows(int begin, int end)
-        {
-            return extractMatrix(begin, end, 0, END);
-        }
-
-        /// <summary>
-        /// Extracts the specified rows from the matrix.
-        /// </summary>
-        /// <param name="begin">First row.  Inclusive.</param>
-        /// <param name="end">Last row + 1.</param>
-        /// <returns>Submatrix that contains the specified rows.</returns>
-        public SimpleMatrixD cols(int begin, int end)
-        {
-            return extractMatrix(0, END, begin, end);
-        }
 
         /// <summary>
         /// Concatinates all the matrices together along their columns.  
@@ -563,7 +469,7 @@ namespace SharpMatrix.Simple
         /// </summary>
         /// <param name="A">Set of matrices</param>
         /// <returns>Resulting matrix.</returns>
-        public SimpleMatrixD concatColumns(params SimpleMatrixD[] A)
+        public override SimpleMatrixD concatColumns(params SimpleMatrixD[] A)
         {
             DMatrixRMaj[] m = new DMatrixRMaj[A.Length + 1];
             m[0] = mat;
@@ -582,7 +488,7 @@ namespace SharpMatrix.Simple
         /// </summary>
         /// <param name="A">A Set of matrices.</param>
         /// <returns>Resulting matrix.</returns>
-        public SimpleMatrixD concatRows(params SimpleMatrixD[] A)
+        public override SimpleMatrixD concatRows(params SimpleMatrixD[] A)
         {
             DMatrixRMaj[] m = new DMatrixRMaj[A.Length + 1];
             m[0] = mat;
@@ -595,74 +501,12 @@ namespace SharpMatrix.Simple
         }
 
         /// <summary>
-        /// Returns the transpose of this matrix.
-        /// </summary>
-        public SimpleMatrixD transpose()
-        {
-            SimpleMatrixD ret = createMatrix(mat.getNumCols(), mat.getNumRows());
-            ops.transpose(mat, ret.mat);
-            return ret;
-        }
-
-        /// <summary>
-        /// Returns a matrix which is the result of matrix multiplication.
-        /// <code>c = a * b</code>
-        /// where c is the returned matrix, a is this matrix, and b is the passed in matrix.
-        /// </summary>
-        /// <see cref="CommonOps_DDRM.mult(DMatrix1Row, DMatrix1Row, DMatrix1Row)"/>
-        /// <para name="b">A matrix that is n by bn. Not modified.</para>
-        public SimpleMatrixD mult(SimpleMatrixD b)
-        {
-            SimpleMatrixD ret = createMatrix(mat.getNumRows(), b.getMatrix().getNumCols());
-            ops.mult(mat, b.mat, ret.mat);
-            return ret;
-        }
-
-        /// <summary>
-        /// Computes the Kronecker product between this matrix and the provided B matrix:
-        /// <code>C = kron(A, B)</code>
-        /// </summary>
-        /// <param name="B">The right matrix in the operation. Not modified.</param>
-        /// <returns>Kronecker product between this matrix and B.</returns>
-        /// <see cref="CommonOps_DDRM.kron"/>
-        public SimpleMatrixD kron(SimpleMatrixD B)
-        {
-            SimpleMatrixD ret = createMatrix(mat.getNumRows() * B.numRows(), mat.getNumCols() * B.numCols());
-            ops.kron(mat, B.mat, ret.mat);
-            return ret;
-        }
-
-        /// <summary>
-        /// Returns the result of matrix addition.
-        /// </summary>
-        /// <see cref="SimpleOperations{T}"/>
-        public SimpleMatrixD plus(SimpleMatrixD b)
-        {
-            SimpleMatrixD ret = createMatrix(mat.getNumRows(), mat.getNumCols());
-            ops.plus(mat, b.mat, ret.mat);
-            return ret;
-        }
-
-        /// <summary>
-        /// Returns the result of matrix subtraction.
-        /// <code>c = a - b</code>
-        /// where c is the returned matrix, a is this matrix, and b is the passed in matrix.
-        /// </summary>
-        /// <see cref="SimpleOperations{T}"/>
-        public SimpleMatrixD minus(SimpleMatrixD b)
-        {
-            SimpleMatrixD ret = createMatrix(mat.getNumRows(), mat.getNumCols());
-            ops.minus(mat, b.mat, ret.mat);
-            return ret;
-        }
-
-        /// <summary>
         /// Returns the result of matrix-double subtraction:
         /// <code>c = a - b</code>
         /// where c is the returned matrix, a is this matrix, and b is the passed in double.
         /// </summary>
         /// <see cref="CommonOps_DDRM.subtract(DMatrixD1, double, DMatrixD1)"/>
-        public SimpleMatrixD minus(double b)
+        public override SimpleMatrixD minus(double b)
         {
             SimpleMatrixD ret = copy();
 
@@ -680,7 +524,7 @@ namespace SharpMatrix.Simple
         /// where c is the return matrix, a is this matrix, and b is the passed in double.
         /// </summary>
         /// <see cref="CommonOps_DDRM.add(DMatrixD1, double, DMatrixD1)"/>
-        public SimpleMatrixD plus(double b)
+        public override SimpleMatrixD plus(double b)
         {
             SimpleMatrixD ret = createMatrix(numRows(), numCols());
 
@@ -698,14 +542,14 @@ namespace SharpMatrix.Simple
         /// where c is the returned matrix, a is this matrix, and b is the passed in matrix.
         /// </summary>
         /// <see cref="CommonOps_DDRM.add(DMatrixD1, double, DMatrixD1, DMatrixD1)"/>
-        public SimpleMatrixD plus(double beta, SimpleMatrixD b)
+        public override SimpleMatrixD plus(double beta, SimpleMatrixD b)
         {
             SimpleMatrixD ret = copy();
 
             var rm = ret.getMatrix();
             var bm = b.getMatrix();
 
-            CommonOps_DDRM.addEquals(rm as DMatrixRMaj, beta, bm as DMatrixRMaj);
+            CommonOps_DDRM.addEquals(rm, beta, bm);
 
             return ret;
         }
@@ -716,7 +560,7 @@ namespace SharpMatrix.Simple
         /// </summary>
         /// <param name="val">The multiplication factor.</param>
         /// <see cref="CommonOps_DDRM.scale(double, DMatrixRMaj)"/>
-        public SimpleMatrixD scale(double val)
+        public override SimpleMatrixD scale(double val)
         {
             SimpleMatrixD ret = copy();
 
@@ -734,7 +578,7 @@ namespace SharpMatrix.Simple
         /// <param name="val">Divisor</param>
         /// <returns>Matrix with its elements divided by the specified value.</returns>
         /// <see cref="CommonOps_DDRM.divide(DMatrixD1, double)"/>
-        public SimpleMatrixD divide(double val)
+        public override SimpleMatrixD divide(double val)
         {
             SimpleMatrixD ret = copy();
             var rm = ret.getMatrix();
@@ -743,28 +587,9 @@ namespace SharpMatrix.Simple
         }
 
         /// <summary>
-        /// Returns the inverse of this matrix.
-        /// If the matrix could not be inverted then SingularMatrixException is thrown.  
-        /// Even if no exception is thrown the matrix could still be singular or nearly singular.
-        /// </summary>
-        /// <exception cref="SingularMatrixException"/>
-        /// <see cref="CommonOps_DDRM.invert(DMatrixRMaj, DMatrixRMaj)"/>
-        public SimpleMatrixD invert()
-        {
-            SimpleMatrixD ret = createMatrix(mat.getNumRows(), mat.getNumCols());
-
-            if (!ops.invert(mat, ret.mat))
-                throw new SingularMatrixException();
-            if (ops.hasUncountable(ret.mat))
-                throw new SingularMatrixException("Solution contains uncountable numbers");
-
-            return ret;
-        }
-
-        /// <summary>
         /// Computes the Moore-Penrose pseudo-inverse.
         /// </summary>
-        public SimpleMatrixD pseudoInverse()
+        public override SimpleMatrixD pseudoInverse()
         {
             SimpleMatrixD ret = createMatrix(mat.getNumCols(), mat.getNumRows());
             CommonOps_DDRM.pinv(mat, ret.getMatrix());
@@ -772,80 +597,6 @@ namespace SharpMatrix.Simple
             return ret;
         }
 
-        /*
-         * <p>
-         * <br>
-         * <br>
-         * x = a<sup>-1</sup>b<br>
-         * <br>
-         * where 'a' is this matrix and 'b' is an n by p matrix.
-         * </p>
-         *
-         * <p>
-         * 
-         *
-         * </p>
-         *
-         * @see CommonOps_DDRM#solve(DMatrixRMaj, DMatrixRMaj, DMatrixRMaj)
-         *
-         * @throws SingularMatrixException
-         *
-         * @param b n by p matrix. Not modified.
-         * @return The solution for 'x' that is n by p.
-         */
-        /// <summary>
-        /// Solves for X in the following equation:
-        /// <code>x = pow(a, -1)</code>
-        /// where 'a' is this matrix and 'b' is an n by p matrix.
-        /// If the system could not be solved then SingularMatrixException is thrown.  
-        /// Even if no exception is thrown 'a' could still be singular or nearly singular.
-        /// </summary>
-        /// <see cref="CommonOps_DDRM.solve(DMatrixRMaj, DMatrixRMaj, DMatrixRMaj)"/>
-        public SimpleMatrixD solve(SimpleMatrixD b)
-        {
-            SimpleMatrixD x = createMatrix(mat.getNumCols(), b.getMatrix().getNumCols());
-
-            if (!ops.solve(mat, x.mat, b.mat))
-                throw new SingularMatrixException();
-            if (ops.hasUncountable(x.mat))
-                throw new SingularMatrixException("Solution contains uncountable numbers");
-
-            return x;
-        }
-
-
-        /// <summary>
-        /// Creates and returns a matrix which is idential to this one.
-        /// </summary>
-        public SimpleMatrixD copy()
-        {
-            SimpleMatrixD ret = createMatrix(mat.getNumRows(), mat.getNumCols());
-            ret.getMatrix().set(getMatrix());
-            return ret;
-        }
-
-        /// <summary>
-        /// Creates a new SimpleMatrix which is a submatrix of this matrix.
-        /// <code>s[i-y0, j-x0] = o[ij] // for all y0 &lt;= i &lt; y1 and x0 &lt;= j &lt; x1.</code>
-        /// </summary>
-        /// <param name="y0">Start row.</param>
-        /// <param name="y1">Stop row + 1.</param>
-        /// <param name="x0">Start column.</param>
-        /// <param name="x1">Stop column + 1.</param>
-        /// <returns>The submatrix.</returns>
-        public SimpleMatrixD extractMatrix(int y0, int y1, int x0, int x1)
-        {
-            if (y0 == END) y0 = mat.getNumRows();
-            if (y1 == END) y1 = mat.getNumRows();
-            if (x0 == END) x0 = mat.getNumCols();
-            if (x1 == END) x1 = mat.getNumCols();
-
-            SimpleMatrixD ret = createMatrix(y1 - y0, x1 - x0);
-
-            ops.extract(mat, y0, y1, x0, x1, ret.mat, 0, 0);
-
-            return ret;
-        }
 
         /// <summary>
         /// Extracts a row or column from this matrix. 
@@ -855,7 +606,7 @@ namespace SharpMatrix.Simple
         /// <param name="extractRow">If true a row will be extracted.</param>
         /// <param name="element">The row or column the vector is contained in.</param>
         /// <returns>Extracted vector.</returns>
-        public SimpleMatrixD extractVector(bool extractRow, int element)
+        public override SimpleMatrixD extractVector(bool extractRow, int element)
         {
             int length = extractRow ? mat.getNumCols() : mat.getNumRows();
 
@@ -869,33 +620,6 @@ namespace SharpMatrix.Simple
                 SpecializedOps_DDRM.subvector(mat, 0, element, length, false, 0, rm);
 
             return ret;
-        }
-
-        /// <summary>
-        /// If a vector then a square matrix is returned if a matrix then a vector of diagonal ements is returned.
-        /// </summary>
-        /// <returns>Diagonal elements inside a vector or a square matrix with the same diagonal elements.</returns>
-        /// <see cref="CommonOps_DDRM.extractDiag(DMatrixRMaj, DMatrixRMaj)"/>
-        public SimpleMatrixD diag()
-        {
-            SimpleMatrixD diag;
-
-            if (MatrixFeatures_DDRM.isVector(mat))
-            {
-                int N = Math.Max(mat.getNumCols(), mat.getNumRows());
-                diag = createMatrix(N, N);
-                var dm = diag.getMatrix();
-                CommonOps_DDRM.diag(dm, N, mat.data);
-            }
-            else
-            {
-                int N = Math.Min(mat.getNumCols(), mat.getNumRows());
-                diag = createMatrix(N, 1);
-                var dm = diag.getMatrix();
-                CommonOps_DDRM.extractDiag(mat, dm);
-            }
-
-            return diag;
         }
 
         /// <summary>
@@ -955,6 +679,32 @@ namespace SharpMatrix.Simple
             return A;
         }
 
+        /// <summary>
+        /// If a vector then a square matrix is returned if a matrix then a vector of diagonal ements is returned.
+        /// </summary>
+        /// <returns>Diagonal elements inside a vector or a square matrix with the same diagonal elements.</returns>
+        /// <see cref="CommonOps_DDRM.extractDiag(DMatrixRMaj, DMatrixRMaj)"/>
+        public SimpleMatrixD diag()
+        {
+            SimpleMatrixD diag;
+
+            if (MatrixFeatures_DDRM.isVector(mat))
+            {
+                int N = Math.Max(mat.getNumCols(), mat.getNumRows());
+                diag = createMatrix(N, N);
+                var dm = diag.getMatrix();
+                CommonOps_DDRM.diag(dm, N, mat.data);
+            }
+            else
+            {
+                int N = Math.Min(mat.getNumCols(), mat.getNumRows());
+                diag = createMatrix(N, 1);
+                var dm = diag.getMatrix();
+                CommonOps_DDRM.extractDiag(mat, dm);
+            }
+
+            return diag;
+        }
 
 
         /// <summary>
@@ -962,294 +712,9 @@ namespace SharpMatrix.Simple
         /// This is equivalent the the infinite p-norm of the matrix.
         /// </summary>
         /// <returns>Largest absolute value of any element.</returns>
-        public double elementMaxAbs()
+        public override double elementMaxAbs()
         {
             return ops.elementMaxAbs(mat);
-        }
-
-        /// <summary>
-        /// Computes the sum of all the elements in the matrix.
-        /// </summary>
-        public double elementSum()
-        {
-            return ops.elementSum(mat);
-        }
-
-        /// <summary>
-        /// Returns a matrix which is the result of an element by element multiplication of 'this' and 'b':
-        /// <code>c[i,j] = a[i,j] * b[i,j]</code>
-        /// </summary>
-        /// <param name="b">A simple matrix.</param>
-        /// <returns>The element by element multiplication of 'this' and 'b'.</returns>
-        public SimpleMatrixD elementMult(SimpleMatrixD b)
-        {
-            SimpleMatrixD c = createMatrix(mat.getNumRows(), mat.getNumCols());
-            ops.elementMult(mat, b.mat, c.mat);
-            return c;
-        }
-
-        /// <summary>
-        /// Returns a matrix which is the result of an element by element division of 'this' and 'b':
-        /// <code>c[i,j] = a[i,j] / b[i,j]</code>
-        /// </summary>
-        /// <param name="b">A simple matrix.</param>
-        /// <returns>The element by element division of 'this' and 'b'.</returns>
-        public SimpleMatrixD elementDiv(SimpleMatrixD b)
-        {
-            SimpleMatrixD c = createMatrix(mat.getNumRows(), mat.getNumCols());
-            ops.elementDiv(mat, b.mat, c.mat);
-            return c;
-        }
-
-        /// <summary>
-        /// Returns a matrix which is the result of an element by element power of 'this' and 'b':
-        /// <code>c[i,j] = a[i,j] ^ b[i,j]</code>
-        /// </summary>
-        /// <param name="b">A simple matrix.</param>
-        /// <returns>The element by element power of 'this' and 'b'.</returns>
-        public SimpleMatrixD elementPower(SimpleMatrixD b)
-        {
-            SimpleMatrixD c = createMatrix(mat.getNumRows(), mat.getNumCols());
-            ops.elementPower(mat, b.mat, c.mat);
-            return c;
-        }
-
-        /// <summary>
-        /// Returns a matrix which is the result of an element by element power of 'this' and 'b':
-        /// <code>c[i,j] = a[i,j] ^ b</code>
-        /// </summary>
-        /// <param name="b">Scalar.</param>
-        /// <returns>The element by element power of 'this' and 'b'.</returns>
-        public SimpleMatrixD elementPower(double b)
-        {
-            SimpleMatrixD c = createMatrix(mat.getNumRows(), mat.getNumCols());
-            ops.elementPower(mat, b, c.mat);
-            return c;
-        }
-
-        /// <summary>
-        /// Returns a matrix which is the result of an element by element exp of 'this':
-        /// <code>c[i,j] = Math.Exp(a[i,j])</code>
-        /// </summary>
-        /// <returns>The element by element power of 'this' and 'b'.</returns>
-        public SimpleMatrixD elementExp()
-        {
-            SimpleMatrixD c = createMatrix(mat.getNumRows(), mat.getNumCols());
-            ops.elementExp(mat, c.mat);
-            return c;
-        }
-
-        /// <summary>
-        /// Returns a matrix which is the result of an element by element exp of 'this':
-        /// <code>c[i,j] = Math.Log(a[i,j])</code>
-        /// </summary>
-        public SimpleMatrixD elementLog()
-        {
-            SimpleMatrixD c = createMatrix(mat.getNumRows(), mat.getNumCols());
-            ops.elementLog(mat, c.mat);
-            return c;
-        }
-
-
-        /// <summary>
-        /// Computes a full Singular Value Decomposition (SVD) of this matrix 
-        /// with the eigenvalues ordered from largest to smallest.
-        /// </summary>
-        /// <returns></returns>
-        public SimpleSVD<DMatrixRMaj> svd()
-        {
-            return new SimpleSVD<DMatrixRMaj>(mat, false);
-        }
-
-        /// <summary>
-        /// Computes the SVD in either  compact format or full format.
-        /// </summary>
-        public SimpleSVD<DMatrixRMaj> svd(bool compact)
-        {
-            return new SimpleSVD<DMatrixRMaj>(mat, compact);
-        }
-
-        /// <summary>
-        /// Returns the Eigen Value Decomposition (EVD) of this matrix.
-        /// </summary>
-        public SimpleEVD<DMatrixRMaj> eig()
-        {
-            return new SimpleEVD<DMatrixRMaj>(mat);
-        }
-
-
-        /// <summary>
-        /// Prints the matrix to standard out.
-        /// </summary>
-        public void print()
-        {
-            ops.print(Console.OpenStandardOutput(), mat);
-        }
-
-        /// <summary>
-        /// Prints the matrix to standard out with the specified precision.
-        /// Example resulting string output: {0:F2,5} (numChar = 5, precision = 2).
-        /// </summary>
-        public void print(int numChar, int precision)
-        {
-            MatrixIO.print(Console.OpenStandardOutput(), mat, numChar, precision);
-        }
-
-        /// <summary>
-        /// Prints the matrix to standard out given a floating point format.
-        /// Example format: {0:F2,5} (numChar = 5, precision = 2).
-        /// </summary>
-        public void print(string format)
-        {
-            MatrixIO.print(Console.OpenStandardOutput(), mat, format);
-        }
-
-        /// <summary>
-        /// Converts the array into a string format for display purposes.
-        /// </summary>
-        /// <see cref="MatrixIO.print(Stream, DMatrix)"/>
-        public string toString()
-        {
-            using (var stream = new MemoryStream())
-            {
-                MatrixIO.print(stream, mat);
-                stream.Position = 0;
-                var reader = new StreamReader(stream);
-                return reader.ReadToEnd();
-            }
-        }
-
-
-
-        /// <summary>
-        /// <p>Allows you to perform an equation in-place on this matrix by specifying the right hand side.For information on how to define an equation
-        /// see {@link org.ejml.equation.Equation}.  The variable sequence alternates between variable and it's label String.
-        /// This matrix is by default labeled as 'A', but is a string is the first object in 'variables' then it will take
-        /// on that value.The variable passed in can be any data type supported by Equation can be passed in.
-        /// This includes matrices and scalars.</p>
-        ///
-        /// Examples:<br/>
-        /// <pre>
-        /// perform("A = A + B", matrix,"B");     // Matrix addition
-        /// perform("A + B", matrix,"B");         // Matrix addition with implicit 'A = '
-        /// perform("A(5,:) = B", matrix,"B");    // Insert a row defined by B into A
-        /// perform("[A;A]");                    // stack A twice with implicit 'A = '
-        /// perform("Q = B + 2","Q", matrix,"B"); // Specify the name of 'this' as Q
-        /// </pre>
-        /// </summary>
-        /// <param name="equation">String representing the symbol equation.</param>
-        /// <param name="variables">List of variable names and variables.</param>
-        public void equation(string equation, params object[] variables)
-        {
-            if (variables.Length >= 25)
-                throw new ArgumentException("Too many variables!  At most 25");
-
-            Equation.Equation eq = new Equation.Equation();
-
-            string nameThis = "A";
-            int offset = 0;
-            if (variables.Length > 0 && variables[0] is string)
-            {
-                nameThis = (string)variables[0];
-                offset = 1;
-
-                if (variables.Length % 2 != 1)
-                    throw new ArgumentException("Expected and odd length for variables");
-            }
-            else
-            {
-                if (variables.Length % 2 != 0)
-                    throw new ArgumentException("Expected and even length for variables");
-            }
-
-
-            eq.alias(mat, nameThis);
-
-            for (int i = offset; i < variables.Length; i += 2)
-            {
-                if (!(variables[i + 1] is string))
-                    throw new ArgumentException("String expected at variables index " + i);
-                object o = variables[i];
-                string name = (string)variables[i + 1];
-
-                //if (typeof(SimpleBase).IsAssignableFrom(o.GetType()))
-                if (o is SimpleBase<DMatrixRMaj>)
-                {
-                    // we already know that we've got a matrix type of DMatrixRMaj
-                    // so operations involving the same type of matrix should be okay (right?).
-                    eq.alias(((SimpleMatrixD)o).getMatrix(), name);
-                }
-                else if (o is DMatrixRMaj)
-                {
-                    eq.alias((DMatrixRMaj)o, name);
-                }
-                else if (o is double)
-                {
-                    eq.alias((double)o, name);
-                }
-                else if (o is int)
-                {
-                    eq.alias((int)o, name);
-                }
-                else
-                {
-                    //string type = o == null ? "null" : o.GetType().Name;
-                    string type = o?.GetType().Name ?? "null";
-                    throw new ArgumentException("Variable type not supported by Equation! " + type);
-                }
-            }
-
-            // see if the assignment is implicit
-            if (!equation.Contains("="))
-            {
-                equation = nameThis + " = " + equation;
-            }
-
-            eq.process(equation);
-        }
-
-        /// <summary>
-        /// Saves this matrix to a file as a serialized binary object.
-        /// </summary>
-        /// <exception cref="IOException"/>
-        /// <see cref="MatrixIO.saveBin(DMatrix, string)"/>
-        public void saveToFileBinary(string fileName)
-        {
-            MatrixIO.saveBin(mat, fileName);
-        }
-
-        /// <summary>
-        /// Saves this matrix to a file in a CSV format.  
-        /// For the file format <see cref="MatrixIO"/>.
-        /// </summary>
-        /// <param name="fileName"></param>
-        public void saveToFileCSV(string fileName)
-        {
-            MatrixIO.saveCSV(mat, fileName);
-        }
-
-        /// <summary>
-        /// Loads a new matrix from a CSV file.  
-        /// For the file format <see cref="MatrixIO"/>.
-        /// </summary>
-        /// <exception cref="IOException"/>
-        public SimpleMatrixD loadCSV(string fileName)
-        {
-            DMatrix mat = MatrixIO.loadCSV(fileName);
-
-            SimpleMatrixD ret = createMatrix(1, 1);
-
-            ret.setMatrix(mat as DMatrixRMaj);
-
-            return ret;
-        }
-
-        /// <summary>
-        /// Prints the number of rows and column in this matrix.
-        /// </summary>
-        public void printDimensions()
-        {
-            Console.WriteLine("[rows = " + numRows() + " , cols = " + numCols() + " ]");
         }
 
         #endregion // Public Methods

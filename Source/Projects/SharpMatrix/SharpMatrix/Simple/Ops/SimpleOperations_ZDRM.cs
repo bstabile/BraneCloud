@@ -11,7 +11,7 @@ namespace SharpMatrix.Simple.Ops
 /**
  * @author Peter Abeles
  */
-    public class SimpleOperations_ZDRM : SimpleOperations<ZMatrixRMaj>
+    public class SimpleOperations_ZDRM : SimpleOperations<double, ZMatrixRMaj>
     {
         //@Override
         public void transpose(ZMatrixRMaj input, ZMatrixRMaj output)
@@ -242,5 +242,7 @@ namespace SharpMatrix.Simple.Ops
         {
             MatrixIO.print(output, (ZMatrixRMaj) mat);
         }
+
+
     }
 }

@@ -8,80 +8,82 @@ namespace SharpMatrix.Simple
      *
      * @author Peter Abeles
      */
-    public interface SimpleOperations<T>
-        where T : Matrix
+    public interface SimpleOperations<TData, TMatrix>
+        where TData : struct
+        where TMatrix : Matrix
     {
 
-        void transpose(T input, T output);
+        void transpose(TMatrix input, TMatrix output);
 
-        void mult(T A, T B, T output);
+        void mult(TMatrix A, TMatrix B, TMatrix output);
 
-        void kron(T A, T B, T output);
+        void kron(TMatrix A, TMatrix B, TMatrix output);
 
-        void plus(T A, T B, T output);
+        void plus(TMatrix A, TMatrix B, TMatrix output);
 
-        void minus(T A, T B, T output);
+        void minus(TMatrix A, TMatrix B, TMatrix output);
 
-        void minus(T A, double b, T output);
+        void minus(TMatrix A, TData b, TMatrix output);
 
-        void plus(T A, double b, T output);
+        void plus(TMatrix A, TData b, TMatrix output);
 
-        void plus(T A, double beta, T b, T output);
+        void plus(TMatrix A, TData beta, TMatrix b, TMatrix output);
 
-        double dot(T A, T v);
+        TData dot(TMatrix A, TMatrix v);
 
-        void scale(T A, double val, T output);
+        void scale(TMatrix A, TData val, TMatrix output);
 
-        void divide(T A, double val, T output);
+        void divide(TMatrix A, TData val, TMatrix output);
 
-        bool invert(T A, T output);
+        bool invert(TMatrix A, TMatrix output);
 
-        void pseudoInverse(T A, T output);
+        void pseudoInverse(TMatrix A, TMatrix output);
 
-        bool solve(T A, T X, T B);
+        bool solve(TMatrix A, TMatrix X, TMatrix B);
 
-        void set(T A, double val);
+        void set(TMatrix A, TData val);
 
-        void zero(T A);
+        void zero(TMatrix A);
 
-        double normF(T A);
+        TData normF(TMatrix A);
 
-        double conditionP2(T A);
+        TData conditionP2(TMatrix A);
 
-        double determinant(T A);
+        TData determinant(TMatrix A);
 
-        double trace(T A);
+        TData trace(TMatrix A);
 
-        void setRow(T A, int row, int startColumn, double[] values);
+        void setRow(TMatrix A, int row, int startColumn, TData[] values);
 
-        void setColumn(T A, int column, int startRow, double[] values);
+        void setColumn(TMatrix A, int column, int startRow, TData[] values);
 
-        void extract(T src,
+        void extract(TMatrix src,
             int srcY0, int srcY1,
             int srcX0, int srcX1,
-            T dst,
+            TMatrix dst,
             int dstY0, int dstX0);
 
-        bool hasUncountable(T M);
+        bool hasUncountable(TMatrix M);
 
-        void changeSign(T a);
+        void changeSign(TMatrix a);
 
-        double elementMaxAbs(T A);
+        TData elementMaxAbs(TMatrix A);
 
-        double elementSum(T A);
+        TData elementSum(TMatrix A);
 
-        void elementMult(T A, T B, T output);
+        void elementMult(TMatrix A, TMatrix B, TMatrix output);
 
-        void elementDiv(T A, T B, T output);
+        void elementDiv(TMatrix A, TMatrix B, TMatrix output);
 
-        void elementPower(T A, T B, T output);
+        void elementPower(TMatrix A, TMatrix B, TMatrix output);
 
-        void elementPower(T A, double b, T output);
+        void elementPower(TMatrix A, TData b, TMatrix output);
 
-        void elementExp(T A, T output);
+        void elementExp(TMatrix A, TMatrix output);
 
-        void elementLog(T A, T output);
+        void elementLog(TMatrix A, TMatrix output);
 
         void print(Stream output, Matrix mat);
+
     }
 }

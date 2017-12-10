@@ -348,6 +348,10 @@
     <None Include="SingleState\README" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\SharpMatrix\SharpMatrix\SharpMatrix.csproj">
+      <Project>{3e2557a6-e8a9-4bd6-a5ee-b4b1f78fbb3d}</Project>
+      <Name>SharpMatrix</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BraneCloud.Evolution.EC.Configuration\BraneCloud.Evolution.EC.Configuration.csproj">
       <Project>{9A7B8EFC-D36E-435D-99E2-10793AA3FFCD}</Project>
       <Name>BraneCloud.Evolution.EC.Configuration</Name>

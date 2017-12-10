@@ -16,8 +16,8 @@ namespace SharpMatrix.Simple
         int getNumElements();
 
         TMatrix getMatrix();
-        double get(int row, int col);
-        double get(int index);
+        TData get(int row, int col);
+        TData get(int index);
         int getIndex(int row, int col);
         //DMatrixIterator iterator(bool rowMajor, int minRow, int minCol, int maxRow, int maxCol);
 
@@ -31,11 +31,11 @@ namespace SharpMatrix.Simple
         void insertIntoThis(int insertRow, int insertCol, TSimple B);
         void reshape(int numRows, int numCols);
 
-        double dot(TSimple v);
-        double normF();
-        double conditionP2();
-        double determinant();
-        double trace();
+        TData dot(TSimple v);
+        TData normF();
+        TData conditionP2();
+        TData determinant();
+        TData trace();
 
         bool isInBounds(int row, int col);
         bool isIdentical(TSimple a, TData tol);

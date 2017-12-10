@@ -18,7 +18,8 @@ namespace SharpMatrix.Simple
  */
 //@SuppressWarnings({"unchecked"})
     [Serializable]
-    public abstract class SimpleBase<T> where T : class, Matrix
+    public abstract class SimpleBase<TMatrix>
+        where TMatrix : class, Matrix
     {
 
         const long serialVersionUID = 2342556642L;
@@ -31,24 +32,24 @@ namespace SharpMatrix.Simple
         /**
          * Internal matrix which this is a wrapper around.
          */
-        protected T mat;
+        protected TMatrix mat;
 
-        protected SimpleOperations<T> ops;
+        protected SimpleOperations<double, TMatrix> ops;
 
         public SimpleBase(int numRows, int numCols)
         {
-            if (typeof(T) == typeof(DMatrixRMaj))
-                setMatrix(new DMatrixRMaj(numRows, numCols) as T);
-            else if (typeof(T) == typeof(FMatrixRMaj))
-                setMatrix(new FMatrixRMaj(numRows, numCols) as T);
-            else if (typeof(T) == typeof(ZMatrixRMaj))
-                setMatrix(new ZMatrixRMaj(numRows, numCols) as T);
-            else if (typeof(T) == typeof(CMatrixRMaj))
-                setMatrix(new CMatrixRMaj(numRows, numCols) as T);
-            else if (typeof(T) == typeof(DMatrixSparseCSC))
-                setMatrix(new DMatrixSparseCSC(numRows, numCols) as T);
-            else if (typeof(T) == typeof(FMatrixSparseCSC))
-                setMatrix(new FMatrixSparseCSC(numRows, numCols) as T);
+            if (typeof(TMatrix) == typeof(DMatrixRMaj))
+                setMatrix(new DMatrixRMaj(numRows, numCols) as TMatrix);
+            else if (typeof(TMatrix) == typeof(FMatrixRMaj))
+                setMatrix(new FMatrixRMaj(numRows, numCols) as TMatrix);
+            else if (typeof(TMatrix) == typeof(ZMatrixRMaj))
+                setMatrix(new ZMatrixRMaj(numRows, numCols) as TMatrix);
+            else if (typeof(TMatrix) == typeof(CMatrixRMaj))
+                setMatrix(new CMatrixRMaj(numRows, numCols) as TMatrix);
+            else if (typeof(TMatrix) == typeof(DMatrixSparseCSC))
+                setMatrix(new DMatrixSparseCSC(numRows, numCols) as TMatrix);
+            else if (typeof(TMatrix) == typeof(FMatrixSparseCSC))
+                setMatrix(new FMatrixSparseCSC(numRows, numCols) as TMatrix);
             else
                 throw new InvalidOperationException("Unknown matrix type!");
         }
@@ -67,7 +68,7 @@ namespace SharpMatrix.Simple
          * @param type Type of matrix it should create
          * @return A new matrix.
          */
-        protected abstract SimpleBase<T> createMatrix(int numRows, int numCols, MatrixType type);
+        protected abstract SimpleBase<TMatrix> createMatrix(int numRows, int numCols, MatrixType type);
 
         /// <summary>
         /// We can't return SimpleMatrix here because we're implementing 
@@ -76,12 +77,12 @@ namespace SharpMatrix.Simple
         /// </summary>
         /// <param name="m"></param>
         /// <returns></returns>
-        protected virtual SimpleBase<T> wrapMatrix(T m)
+        protected virtual SimpleBase<TMatrix> wrapMatrix(TMatrix m)
         {
-            return new SimpleMatrix<T>(m);
+            return new SimpleMatrix<TMatrix>(m);
         }
 
-        //protected abstract SimpleBase<T> wrapMatrix(T m);
+        //protected abstract SimpleBase<TMatrix> wrapMatrix(TMatrix m);
 
         /**
          * <p>
@@ -91,7 +92,7 @@ namespace SharpMatrix.Simple
          *
          * @return Reference to the internal DMatrixRMaj.
          */
-        public T getMatrix()
+        public TMatrix getMatrix()
         {
             return mat;
         }
@@ -130,15 +131,15 @@ namespace SharpMatrix.Simple
 
         #endregion // Conversions
 
-        protected SimpleOperations<T> lookupOps(MatrixType type)
+        protected SimpleOperations<double, TMatrix> lookupOps(MatrixType type)
         {
             switch (type.CanonicalCode)
             {
-                case (uint)MatrixType.Code.DDRM: return new SimpleOperations_DDRM() as SimpleOperations<T>;
-                case (uint)MatrixType.Code.FDRM: return new SimpleOperations_FDRM() as SimpleOperations<T>;
-                case (uint)MatrixType.Code.ZDRM: return new SimpleOperations_ZDRM() as SimpleOperations<T>;
-                case (uint)MatrixType.Code.CDRM: return new SimpleOperations_CDRM() as SimpleOperations<T>;
-                case (uint)MatrixType.Code.DSCC: return new SimpleOperations_SPARSE() as SimpleOperations<T>;
+                case (uint)MatrixType.Code.DDRM: return new SimpleOperations_DDRM() as SimpleOperations<double, TMatrix>;
+                case (uint)MatrixType.Code.FDRM: return new SimpleOperations_FDRM() as SimpleOperations<double, TMatrix>;
+                case (uint)MatrixType.Code.ZDRM: return new SimpleOperations_ZDRM() as SimpleOperations<double, TMatrix>;
+                case (uint)MatrixType.Code.CDRM: return new SimpleOperations_CDRM() as SimpleOperations<double, TMatrix>;
+                case (uint)MatrixType.Code.DSCC: return new SimpleOperations_SPARSE() as SimpleOperations<double, TMatrix>;
             }
             throw new InvalidOperationException("Unknown Matrix Type");
         }
@@ -147,18 +148,18 @@ namespace SharpMatrix.Simple
         /**
          * <p>
          * Returns the transpose of this matrix.<br>
-         * a<sup>T</sup>
+         * a<sup>TMatrix</sup>
          * </p>
          *
          * @see CommonOps_DDRM#transpose(DMatrixRMaj, DMatrixRMaj)
          *
          * @return A matrix that is n by m.
          */
-        public SimpleBase<T> transpose()
+        public SimpleBase<TMatrix> transpose()
         {
-            SimpleBase<T> ret = createMatrix(mat.getNumCols(), mat.getNumRows(), mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(mat.getNumCols(), mat.getNumRows(), mat.getType());
 
-            ops.transpose((T) mat, (T) ret.mat);
+            ops.transpose((TMatrix) mat, (TMatrix) ret.mat);
 
             return ret;
         }
@@ -178,11 +179,11 @@ namespace SharpMatrix.Simple
          *
          * @return The results of this operation.
          */
-        public SimpleBase<T> mult(SimpleBase<T> b)
+        public SimpleBase<TMatrix> mult(SimpleBase<TMatrix> b)
         {
-            SimpleBase<T> ret = createMatrix(mat.getNumRows(), b.getMatrix().getNumCols(), mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(mat.getNumRows(), b.getMatrix().getNumCols(), mat.getType());
 
-            ops.mult((T) mat, (T) b.mat, (T) ret.mat);
+            ops.mult((TMatrix) mat, (TMatrix) b.mat, (TMatrix) ret.mat);
 
             return ret;
         }
@@ -199,11 +200,11 @@ namespace SharpMatrix.Simple
          * @param B The right matrix in the operation. Not modified.
          * @return Kronecker product between this matrix and B.
          */
-        public SimpleBase<T> kron(SimpleBase<T> B)
+        public SimpleBase<TMatrix> kron(SimpleBase<TMatrix> B)
         {
-            SimpleBase<T> ret = createMatrix(mat.getNumRows() * B.numRows(), mat.getNumCols() * B.numCols(), mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(mat.getNumRows() * B.numRows(), mat.getNumCols() * B.numCols(), mat.getType());
 
-            ops.kron((T) mat, (T) B.mat, (T) ret.mat);
+            ops.kron((TMatrix) mat, (TMatrix) B.mat, (TMatrix) ret.mat);
 
             return ret;
         }
@@ -223,11 +224,11 @@ namespace SharpMatrix.Simple
          *
          * @return The results of this operation.
          */
-        public SimpleBase<T> plus(SimpleBase<T> b)
+        public SimpleBase<TMatrix> plus(SimpleBase<TMatrix> b)
         {
-            SimpleBase<T> ret = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
 
-            ops.plus((T) mat, (T) b.mat, (T) ret.mat);
+            ops.plus((TMatrix) mat, (TMatrix) b.mat, (TMatrix) ret.mat);
 
             return ret;
         }
@@ -247,11 +248,11 @@ namespace SharpMatrix.Simple
          *
          * @return The results of this operation.
          */
-        public SimpleBase<T> minus(SimpleBase<T> b)
+        public SimpleBase<TMatrix> minus(SimpleBase<TMatrix> b)
         {
-            SimpleBase<T> ret = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
 
-            ops.minus((T) mat, (T) b.mat, (T) ret.mat);
+            ops.minus((TMatrix) mat, (TMatrix) b.mat, (TMatrix) ret.mat);
 
             return ret;
         }
@@ -271,9 +272,9 @@ namespace SharpMatrix.Simple
          *
          * @return The results of this operation.
          */
-        public SimpleBase<T> minus(double b)
+        public SimpleBase<TMatrix> minus(double b)
         {
-            SimpleBase<T> ret = copy();
+            SimpleBase<TMatrix> ret = copy();
 
             var m = getMatrix();
             var rm = ret.getMatrix();
@@ -303,9 +304,9 @@ namespace SharpMatrix.Simple
          *
          * @return A matrix that contains the results.
          */
-        public SimpleBase<T> plus(double b)
+        public SimpleBase<TMatrix> plus(double b)
         {
-            SimpleBase<T> ret = createMatrix(numRows(), numCols(), mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(numRows(), numCols(), mat.getType());
 
             var m = getMatrix();
             var rm = ret.getMatrix();
@@ -335,9 +336,9 @@ namespace SharpMatrix.Simple
          *
          * @return A matrix that contains the results.
          */
-        public SimpleBase<T> plus(double beta, SimpleBase<T> b)
+        public SimpleBase<TMatrix> plus(double beta, SimpleBase<TMatrix> b)
         {
-            SimpleBase<T> ret = copy();
+            SimpleBase<TMatrix> ret = copy();
 
             var rm = ret.getMatrix();
             var bm = b.getMatrix();
@@ -358,7 +359,7 @@ namespace SharpMatrix.Simple
          * @param v The second vector in the dot product.  Not modified.
          * @return dot product
          */
-        public double dot(SimpleBase<T> v)
+        public double dot(SimpleBase<TMatrix> v)
         {
             if (!isVector())
             {
@@ -401,9 +402,9 @@ namespace SharpMatrix.Simple
          * @param val The multiplication factor.
          * @return The scaled matrix.
          */
-        public SimpleBase<T> scale(double val)
+        public SimpleBase<TMatrix> scale(double val)
         {
-            SimpleBase<T> ret = copy();
+            SimpleBase<TMatrix> ret = copy();
 
             var rm = ret.getMatrix();
 
@@ -428,9 +429,9 @@ namespace SharpMatrix.Simple
          * @param val Divisor.
          * @return Matrix with its elements divided by the specified value.
          */
-        public SimpleBase<T> divide(double val)
+        public SimpleBase<TMatrix> divide(double val)
         {
-            SimpleBase<T> ret = copy();
+            SimpleBase<TMatrix> ret = copy();
 
             var rm = ret.getMatrix();
 
@@ -462,13 +463,13 @@ namespace SharpMatrix.Simple
          *
          * @return The inverse of this matrix.
          */
-        public SimpleBase<T> invert()
+        public SimpleBase<TMatrix> invert()
         {
-            SimpleBase<T> ret = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
 
-            if (!ops.invert((T) mat, (T) ret.mat))
+            if (!ops.invert((TMatrix) mat, (TMatrix) ret.mat))
                 throw new SingularMatrixException();
-            if (ops.hasUncountable((T) ret.mat))
+            if (ops.hasUncountable((TMatrix) ret.mat))
                 throw new SingularMatrixException("Solution contains uncountable numbers");
 
             return ret;
@@ -481,9 +482,9 @@ namespace SharpMatrix.Simple
          *
          * @return inverse computed using the pseudo inverse.
          */
-        public SimpleBase<T> pseudoInverse()
+        public SimpleBase<TMatrix> pseudoInverse()
         {
-            SimpleBase<T> ret = createMatrix(mat.getNumCols(), mat.getNumRows(), mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(mat.getNumCols(), mat.getNumRows(), mat.getType());
             if (bits() == 64)
             {
                 CommonOps_DDRM.pinv(mat as DMatrixRMaj, ret.getMatrix() as DMatrixRMaj);
@@ -519,13 +520,13 @@ namespace SharpMatrix.Simple
          * @param b n by p matrix. Not modified.
          * @return The solution for 'x' that is n by p.
          */
-        public SimpleBase<T> solve(SimpleBase<T> b)
+        public SimpleBase<TMatrix> solve(SimpleBase<TMatrix> b)
         {
-            SimpleBase<T> x = createMatrix(mat.getNumCols(), b.getMatrix().getNumCols(), mat.getType());
+            SimpleBase<TMatrix> x = createMatrix(mat.getNumCols(), b.getMatrix().getNumCols(), mat.getType());
 
-            if (!ops.solve((T) mat, (T) x.mat, (T) b.mat))
+            if (!ops.solve((TMatrix) mat, (TMatrix) x.mat, (TMatrix) b.mat))
                 throw new SingularMatrixException();
-            if (ops.hasUncountable((T) x.mat))
+            if (ops.hasUncountable((TMatrix) x.mat))
                 throw new SingularMatrixException("Solution contains uncountable numbers");
 
             return x;
@@ -538,7 +539,7 @@ namespace SharpMatrix.Simple
          *
          * @param a The matrix whose value this matrix is being set to.
          */
-        public void set(SimpleBase<T> a)
+        public void set(SimpleBase<TMatrix> a)
         {
             mat.set(a.getMatrix());
         }
@@ -818,9 +819,9 @@ namespace SharpMatrix.Simple
          *
          * @return A new identical matrix.
          */
-        public SimpleBase<T> copy()
+        public SimpleBase<TMatrix> copy()
         {
-            SimpleBase<T> ret = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
             ret.getMatrix().set(getMatrix());
             return ret;
         }
@@ -949,14 +950,14 @@ namespace SharpMatrix.Simple
          * @param x1 Stop column + 1.
          * @return The submatrix.
          */
-        public SimpleBase<T> extractMatrix(int y0, int y1, int x0, int x1)
+        public SimpleBase<TMatrix> extractMatrix(int y0, int y1, int x0, int x1)
         {
             if (y0 == END) y0 = mat.getNumRows();
             if (y1 == END) y1 = mat.getNumRows();
             if (x0 == END) x0 = mat.getNumCols();
             if (x1 == END) x1 = mat.getNumCols();
 
-            SimpleBase<T> ret = createMatrix(y1 - y0, x1 - x0, mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(y1 - y0, x1 - x0, mat.getType());
 
             ops.extract(mat, y0, y1, x0, x1, ret.mat, 0, 0);
 
@@ -973,11 +974,11 @@ namespace SharpMatrix.Simple
          * @param element The row or column the vector is contained in.
          * @return Extracted vector.
          */
-        public SimpleBase<T> extractVector(bool extractRow, int element)
+        public SimpleBase<TMatrix> extractVector(bool extractRow, int element)
         {
             int length = extractRow ? mat.getNumCols() : mat.getNumRows();
 
-            SimpleBase<T> ret = extractRow ? createMatrix(1, length, mat.getType()) : createMatrix(length, 1, mat.getType());
+            SimpleBase<TMatrix> ret = extractRow ? createMatrix(1, length, mat.getType()) : createMatrix(length, 1, mat.getType());
 
             if (bits() == 64)
             {
@@ -1019,9 +1020,9 @@ namespace SharpMatrix.Simple
          * @see CommonOps_DDRM#extractDiag(DMatrixRMaj, DMatrixRMaj)
          * @return Diagonal elements inside a vector or a square matrix with the same diagonal elements.
          */
-        public SimpleBase<T> diag()
+        public SimpleBase<TMatrix> diag()
         {
-            SimpleBase<T> diag;
+            SimpleBase<TMatrix> diag;
             if (bits() == 64)
             {
                 if (MatrixFeatures_DDRM.isVector(mat))
@@ -1068,7 +1069,7 @@ namespace SharpMatrix.Simple
          * @param tol How similar they must be to be equals.
          * @return If they are equal within tolerance of each other.
          */
-        public bool isIdentical(SimpleBase<T> a, double tol)
+        public bool isIdentical(SimpleBase<TMatrix> a, double tol)
         {
             var am = a.getMatrix();
             if (bits() == 64)
@@ -1097,9 +1098,9 @@ namespace SharpMatrix.Simple
          *
          * @return SVD
          */
-        public SimpleSVD<T> svd()
+        public SimpleSVD<TMatrix> svd()
         {
-            return new SimpleSVD<T>(mat, false);
+            return new SimpleSVD<TMatrix>(mat, false);
         }
 
         /**
@@ -1107,17 +1108,17 @@ namespace SharpMatrix.Simple
          *
          * @return SVD of this matrix.
          */
-        public SimpleSVD<T> svd(bool compact)
+        public SimpleSVD<TMatrix> svd(bool compact)
         {
-            return new SimpleSVD<T>(mat, compact);
+            return new SimpleSVD<TMatrix>(mat, compact);
         }
 
         /**
          * Returns the Eigen Value Decomposition (EVD) of this matrix.
          */
-        public SimpleEVD<T> eig()
+        public SimpleEVD<TMatrix> eig()
         {
-            return new SimpleEVD<T>(mat);
+            return new SimpleEVD<TMatrix>(mat);
         }
 
         /**
@@ -1127,7 +1128,7 @@ namespace SharpMatrix.Simple
          * @param insertCol First column the matrix is to be inserted into.
          * @param B The matrix that is being inserted.
          */
-        public void insertIntoThis(int insertRow, int insertCol, SimpleBase<T> B)
+        public void insertIntoThis(int insertRow, int insertCol, SimpleBase<TMatrix> B)
         {
             var bm = B.getMatrix();
             if (bits() == 64)
@@ -1162,7 +1163,7 @@ namespace SharpMatrix.Simple
          * @param B The matrix that is written into A.
          * @return A new combined matrix.
          */
-        public SimpleBase<T> combine(int insertRow, int insertCol, SimpleBase<T> B)
+        public SimpleBase<TMatrix> combine(int insertRow, int insertCol, SimpleBase<TMatrix> B)
         {
 
             if (insertRow == END)
@@ -1178,7 +1179,7 @@ namespace SharpMatrix.Simple
             int maxRow = insertRow + B.numRows();
             int maxCol = insertCol + B.numCols();
 
-            SimpleBase<T> ret;
+            SimpleBase<TMatrix> ret;
 
             if (maxRow > mat.getNumRows() || maxCol > mat.getNumCols())
             {
@@ -1206,7 +1207,7 @@ namespace SharpMatrix.Simple
          */
         public double elementMaxAbs()
         {
-            return ops.elementMaxAbs((T) mat);
+            return ops.elementMaxAbs((TMatrix) mat);
         }
 
         /**
@@ -1216,7 +1217,7 @@ namespace SharpMatrix.Simple
          */
         public double elementSum()
         {
-            return ops.elementSum((T) mat);
+            return ops.elementSum((TMatrix) mat);
         }
 
         /**
@@ -1228,9 +1229,9 @@ namespace SharpMatrix.Simple
          * @param b A simple matrix.
          * @return The element by element multiplication of 'this' and 'b'.
          */
-        public SimpleBase<T> elementMult(SimpleBase<T> b)
+        public SimpleBase<TMatrix> elementMult(SimpleBase<TMatrix> b)
         {
-            SimpleBase<T> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
+            SimpleBase<TMatrix> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
 
             ops.elementMult(mat, b.mat, c.mat);
 
@@ -1246,9 +1247,9 @@ namespace SharpMatrix.Simple
          * @param b A simple matrix.
          * @return The element by element division of 'this' and 'b'.
          */
-        public SimpleBase<T> elementDiv(SimpleBase<T> b)
+        public SimpleBase<TMatrix> elementDiv(SimpleBase<TMatrix> b)
         {
-            SimpleBase<T> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
+            SimpleBase<TMatrix> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
 
             ops.elementDiv(mat, b.mat, c.mat);
             return c;
@@ -1263,9 +1264,9 @@ namespace SharpMatrix.Simple
          * @param b A simple matrix.
          * @return The element by element power of 'this' and 'b'.
          */
-        public SimpleBase<T> elementPower(SimpleBase<T> b)
+        public SimpleBase<TMatrix> elementPower(SimpleBase<TMatrix> b)
         {
-            SimpleBase<T> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
+            SimpleBase<TMatrix> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
 
             ops.elementPower(mat, b.mat, c.mat);
 
@@ -1281,9 +1282,9 @@ namespace SharpMatrix.Simple
          * @param b Scalar
          * @return The element by element power of 'this' and 'b'.
          */
-        public SimpleBase<T> elementPower(double b)
+        public SimpleBase<TMatrix> elementPower(double b)
         {
-            SimpleBase<T> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
+            SimpleBase<TMatrix> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
 
             ops.elementPower(mat, b, c.mat);
             return c;
@@ -1297,9 +1298,9 @@ namespace SharpMatrix.Simple
          *
          * @return The element by element power of 'this' and 'b'.
          */
-        public SimpleBase<T> elementExp()
+        public SimpleBase<TMatrix> elementExp()
         {
-            SimpleBase<T> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
+            SimpleBase<TMatrix> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
 
             ops.elementExp(mat, c.mat);
 
@@ -1314,9 +1315,9 @@ namespace SharpMatrix.Simple
          *
          * @return The element by element power of 'this' and 'b'.
          */
-        public SimpleBase<T> elementLog()
+        public SimpleBase<TMatrix> elementLog()
         {
-            SimpleBase<T> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
+            SimpleBase<TMatrix> c = createMatrix(mat.getNumRows(), mat.getNumCols(), mat.getType());
 
             ops.elementLog(mat, c.mat);
 
@@ -1332,9 +1333,9 @@ namespace SharpMatrix.Simple
          *
          * @return A matrix that is the negative of the original.
          */
-        public SimpleBase<T> negative()
+        public SimpleBase<TMatrix> negative()
         {
-            SimpleBase<T> A = copy();
+            SimpleBase<TMatrix> A = copy();
             ops.changeSign(A.mat);
             return A;
         }
@@ -1457,19 +1458,19 @@ namespace SharpMatrix.Simple
          * @return The matrix.
          * @throws IOException
          */
-        public static SimpleMatrix<T> loadBinary(string fileName)
+        public static SimpleMatrix<TMatrix> loadBinary(string fileName)
         {
             DMatrix mat = MatrixIO.loadBin<DMatrix>(fileName);
 
             // see if its a DMatrixRMaj
             if (mat is DMatrixRMaj)
             {
-                return SimpleMatrix<T>.wrap(mat as T);
+                return SimpleMatrix<TMatrix>.wrap(mat as TMatrix);
             }
             else
             {
                 // if not convert it into one and wrap it
-                return SimpleMatrix<T>.wrap(new DMatrixRMaj(mat) as T);
+                return SimpleMatrix<TMatrix>.wrap(new DMatrixRMaj(mat) as TMatrix);
             }
         }
 
@@ -1499,13 +1500,13 @@ namespace SharpMatrix.Simple
          * @return The matrix.
          * @throws IOException
          */
-        public SimpleBase<T> loadCSV(string fileName)
+        public SimpleBase<TMatrix> loadCSV(string fileName)
         {
-            DMatrix mat = MatrixIO.loadCSV(fileName);
+            DMatrix mat = MatrixIO.loadCSV(fileName) as DMatrix;
 
-            SimpleBase<T> ret = createMatrix(1, 1, mat.getType());
+            SimpleBase<TMatrix> ret = createMatrix(1, 1, mat.getType());
 
-            ret.setMatrix((T) mat);
+            ret.setMatrix((TMatrix) mat);
 
             return ret;
         }
@@ -1547,9 +1548,9 @@ namespace SharpMatrix.Simple
          * @param A Set of matrices
          * @return Resulting matrix
          */
-        public SimpleBase<T> concatColumns(params SimpleBase<T>[] A)
+        public SimpleBase<TMatrix> concatColumns(params SimpleBase<TMatrix>[] A)
         {
-            T combined;
+            TMatrix combined;
             if (mat.GetType() == typeof(DMatrixRMaj))
             {
                 DMatrixRMaj[] m = new DMatrixRMaj[A.Length + 1];
@@ -1558,7 +1559,7 @@ namespace SharpMatrix.Simple
                 {
                     m[1] = A[i].getDDRM();
                 }
-                combined = CommonOps_DDRM.concatColumns(m) as T;
+                combined = CommonOps_DDRM.concatColumns(m) as TMatrix;
             }
             else if (mat.GetType() == typeof(FMatrixRMaj))
             {
@@ -1568,7 +1569,7 @@ namespace SharpMatrix.Simple
                 {
                     m[1] = A[i].getFDRM();
                 }
-                combined = CommonOps_FDRM.concatColumns(m) as T;
+                combined = CommonOps_FDRM.concatColumns(m) as TMatrix;
             }
             else
             {
@@ -1586,9 +1587,9 @@ namespace SharpMatrix.Simple
          * @param A Set of matrices
          * @return Resulting matrix
          */
-        public SimpleBase<T> concatRows(params SimpleBase<T>[] A)
+        public SimpleBase<TMatrix> concatRows(params SimpleBase<TMatrix>[] A)
         {
-            T combined;
+            TMatrix combined;
             if (mat.GetType() == typeof(DMatrixRMaj))
             {
                 DMatrixRMaj[] m = new DMatrixRMaj[A.Length + 1];
@@ -1597,7 +1598,7 @@ namespace SharpMatrix.Simple
                 {
                     m[1] = A[i].getDDRM();
                 }
-                combined = CommonOps_DDRM.concatRows(m) as T;
+                combined = CommonOps_DDRM.concatRows(m) as TMatrix;
             }
             else if (mat.GetType() == typeof(FMatrixRMaj))
             {
@@ -1607,7 +1608,7 @@ namespace SharpMatrix.Simple
                 {
                     m[1] = A[i].getFDRM();
                 }
-                combined = CommonOps_FDRM.concatRows(m) as T;
+                combined = CommonOps_FDRM.concatRows(m) as TMatrix;
             }
             else
             {
@@ -1622,7 +1623,7 @@ namespace SharpMatrix.Simple
          * @param end Last row + 1.
          * @return Submatrix that contains the specified rows.
          */
-        public SimpleBase<T> rows(int begin, int end)
+        public SimpleBase<TMatrix> rows(int begin, int end)
         {
             return extractMatrix(begin, end, 0, END);
         }
@@ -1633,7 +1634,7 @@ namespace SharpMatrix.Simple
          * @param end Last row + 1.
          * @return Submatrix that contains the specified rows.
          */
-        public SimpleBase<T> cols(int begin, int end)
+        public SimpleBase<TMatrix> cols(int begin, int end)
         {
             return extractMatrix(0, END, begin, end);
         }
@@ -1646,7 +1647,7 @@ namespace SharpMatrix.Simple
             return mat.getType();
         }
 
-        protected void setMatrix(T mat)
+        protected void setMatrix(TMatrix mat)
         {
             this.mat = mat;
             this.ops = lookupOps(mat.getType());

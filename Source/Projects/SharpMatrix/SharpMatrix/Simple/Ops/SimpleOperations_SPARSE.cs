@@ -11,7 +11,7 @@ namespace SharpMatrix.Simple.Ops
 /**
  * @author Peter Abeles
  */
-    public class SimpleOperations_SPARSE : SimpleOperations<DMatrixSparseCSC>
+    public class SimpleOperations_SPARSE : SimpleOperations<double, DMatrixSparseCSC>
     {
 
         //@Override
@@ -237,5 +237,6 @@ namespace SharpMatrix.Simple.Ops
         {
             MatrixIO.print(output, (DMatrixSparseCSC) mat);
         }
+
     }
 }

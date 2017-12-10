@@ -21,6 +21,23 @@ namespace SharpMatrix.Ops
          * @param fileName Name of the file its being saved at.
          * @throws java.io.IOException
          */
+        public static void saveBin(FMatrix A, string fileName)
+        {
+            using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, A);
+                stream.Flush();
+            }
+        }
+
+        /**
+         * Saves a matrix to disk using Java binary serialization.
+         *
+         * @param A The matrix being saved.
+         * @param fileName Name of the file its being saved at.
+         * @throws java.io.IOException
+         */
         public static void saveBin(DMatrix A, string fileName)
         {
             using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
@@ -39,7 +56,7 @@ namespace SharpMatrix.Ops
          * @return  DMatrixRMaj
          * @throws IOException
          */
-        public static T loadBin<T>(string fileName) where T : DMatrix
+        public static T loadBin<T>(string fileName) where T : Matrix
         {
             using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             {
@@ -49,6 +66,33 @@ namespace SharpMatrix.Ops
 
                 stream.Close();
                 return ret;
+            }
+        }
+
+        /**
+         * Saves a matrix to disk using in a Column Space Value (CSV) format. For a 
+         * description of the format see {@link MatrixIO#loadCSV(String)}.
+         *
+         * @param A The matrix being saved.
+         * @param fileName Name of the file its being saved at.
+         * @throws java.io.IOException
+         */
+        public static void saveCSV(FMatrix A, string fileName)
+        {
+            var sb = new StringBuilder();
+            sb = sb.AppendLine(A.getNumRows() + " " + A.getNumCols() + " real");
+            for (int i = 0; i < A.getNumRows(); i++)
+            {
+                for (int j = 0; j < A.getNumCols(); j++)
+                {
+                    sb = sb.Append(A.get(i, j) + " ");
+                }
+                sb = sb.AppendLine();
+            }
+            using (var stream = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write))
+            using (var writer = new StreamWriter(stream))
+            {
+                writer.Write(sb.ToString());
             }
         }
 
@@ -89,16 +133,12 @@ namespace SharpMatrix.Ops
          * @throws IOException
          * @throws InvalidCastException (if type is ZMatrixRMaj instead of DMatrixRMaj)
          */
-        public static DMatrixRMaj loadCSV(string fileName)
+        public static Matrix loadCSV(string fileName)
         {
             using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             {
                 ReadMatrixCsv csv = new ReadMatrixCsv(stream);
-
-                DMatrixRMaj ret = (DMatrixRMaj)csv.read();
-
-                stream.Close();
-
+                Matrix ret = csv.read();
                 return ret;
             }
         }

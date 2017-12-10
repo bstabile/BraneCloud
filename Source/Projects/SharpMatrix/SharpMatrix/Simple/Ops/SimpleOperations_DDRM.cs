@@ -10,7 +10,7 @@ namespace SharpMatrix.Simple.Ops
     /**
      * @author Peter Abeles
      */
-    public class SimpleOperations_DDRM : SimpleOperations<DMatrixRMaj>
+    public class SimpleOperations_DDRM : SimpleOperations<double, DMatrixRMaj>
     {
 
         public virtual void transpose(DMatrixRMaj input, DMatrixRMaj output)
@@ -190,5 +190,6 @@ namespace SharpMatrix.Simple.Ops
         {
             MatrixIO.print(output, (DMatrixRMaj) mat);
         }
+
     }
 }

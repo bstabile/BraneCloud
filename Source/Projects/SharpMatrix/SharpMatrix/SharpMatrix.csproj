@@ -480,6 +480,7 @@
     <Compile Include="Randomization\MersenneTwisterFast.cs" />
     <Compile Include="Randomization\MersenneTwisterPlaire.cs" />
     <Compile Include="Randomization\RandomChoice.cs" />
+    <Compile Include="Simple\CommonOperations.cs" />
     <Compile Include="Simple\ConvertToDenseException.cs" />
     <Compile Include="Simple\ISimpleMatrix.cs" />
     <Compile Include="Simple\Ops\SimpleOperations_CDRM.cs" />
@@ -490,6 +491,7 @@
     <Compile Include="Simple\SimpleBase.cs" />
     <Compile Include="Simple\SimpleEVD.cs" />
     <Compile Include="Simple\SimpleMatrixBase.cs" />
+    <Compile Include="Simple\SimpleMatrixF.cs" />
     <Compile Include="Simple\SimpleMatrixD.cs" />
     <Compile Include="Simple\SimpleMatrix.cs" />
     <Compile Include="Simple\SimpleOperations.cs" />

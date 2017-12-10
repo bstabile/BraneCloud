@@ -21,6 +21,11 @@ using System.Collections.Generic;
 using BraneCloud.Evolution.EC.Vector;
 using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Randomization;
+using SharpMatrix.Data;
+using SharpMatrix.Dense.Row;
+using SharpMatrix.Dense.Row.Factory;
+using SharpMatrix.Interfaces.Decomposition;
+using SharpMatrix.Simple;
 
 namespace BraneCloud.Evolution.EC.EDA.CMAES
 {
@@ -284,31 +289,31 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
         public double sigma;
 
         /** The mean of the distribution. */
-        public SimpleMatrix xmean;
+        public SimpleMatrixD xmean;
 
         /** The "C" covariance matrix of the distribution. */
-        public SimpleMatrix c;
+        public SimpleMatrixD c;
 
         /** The "B" matrix, eigendecomposed from the "C" covariance matrix of the distribution. */
-        public SimpleMatrix b;
+        public SimpleMatrixD b;
 
         /** The "C" matrix, eigendecomposed from the "C" covariance matrix of the distribution. */
-        public SimpleMatrix d;
+        public SimpleMatrixD d;
 
         /** b x d */
-        public DenseMatrix64F bd;
+        public DMatrixRMaj bd;
 
         /** bd x sigma */
-        public DenseMatrix64F sbd;
+        public DMatrixRMaj sbd;
 
         /** C^{-1/2}.  This is equal to B x D^{-1} x B^T */
-        public SimpleMatrix invsqrtC;
+        public SimpleMatrixD invsqrtC;
 
         /** The p_{\sigma} evolution path vector. */
-        public SimpleMatrix ps;
+        public SimpleMatrixD ps;
 
         /** The p_c evolution path vector. */
-        public SimpleMatrix pc;
+        public SimpleMatrixD pc;
 
         /** An estimate of the expected size of the standard multivariate gaussian N(0,I). 
             This is chiN = Math.Sqrt(n)*(1.0-1.0/(4.0*n)+1.0/(21.0*n*n))
@@ -359,9 +364,9 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
             }
 
             double[] cvals = new double[GenomeSize];
-            String covarianceInitialization =
-                state..Parameters.GetStringWithDefault(paramBase.Push(P_COVARIANCE), def.Push(P_COVARIANCE), V_IDENTITY);
-            String covs = "Initial Covariance: <";
+            string covarianceInitialization =
+                state.Parameters.GetStringWithDefault(paramBase.Push(P_COVARIANCE), def.Push(P_COVARIANCE), V_IDENTITY);
+            string covs = "Initial Covariance: <";
             for (int i = 0; i < GenomeSize; i++)
             {
                 if (i > 0) covs += ", ";
@@ -387,13 +392,13 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
 
             // set myself up and define my initial distribution here
             int n = GenomeSize;
-            b = SimpleMatrix.identity(n);
-            c = new SimpleMatrix(CommonOps.diag(cvals));
+            b = SimpleMatrixD.identity(n);
+            c = new SimpleMatrixD(CommonOps_DDRM.diag(cvals));
 
-            d = SimpleMatrix.identity(n);
-            bd = CommonOps.identity(n, n);
-            sbd = CommonOps.identity(n, n);
-            invsqrtC = SimpleMatrix.identity(n);
+            d = SimpleMatrixD.identity(n);
+            bd = CommonOps_DDRM.identity(n, n);
+            sbd = CommonOps_DDRM.identity(n, n);
+            invsqrtC = SimpleMatrixD.identity(n);
 
 
             // Here we do one FIRST round of eigendecomposition, because newIndividual needs
@@ -401,41 +406,41 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
             // then sbd is too, and we're done.  But if c is scaled in any way, we need to compute
             // the proper value of sbd.  Along the way we'll wind up computing b, d, bd, and invsqrtC
 
-            EigenDecomposition<DenseMatrix64F> eig = DecompositionFactory.eig(GenomeSize, true, true);
-            if (eig.decompose(c.copy().GetMatrix()))
+            EigenDecomposition<DMatrixRMaj> eig = DecompositionFactory_DDRM.eig(GenomeSize, true, true);
+            if (eig.decompose(c.copy().getMatrix()))
             {
-                SimpleMatrix dinv = new SimpleMatrix(GenomeSize, GenomeSize);
+                SimpleMatrixD dinv = new SimpleMatrixD(GenomeSize, GenomeSize);
                 for (int i = 0; i < GenomeSize; i++)
                 {
-                    double eigrt = Math.Sqrt(eig.GetEigenvalue(i).real);
+                    double eigrt = Math.Sqrt(eig.getEigenValue(i).real);
                     d.set(i, i, eigrt);
                     dinv.set(i, i, 1 / eigrt);
-                    CommonOps.insert(eig.GetEigenVector(i), b.GetMatrix(), 0, i);
+                    CommonOps_DDRM.insert(eig.getEigenVector(i), b.getMatrix(), 0, i);
                 }
 
                 invsqrtC = b.mult(dinv.mult(b.transpose()));
-                CommonOps.mult(b.GetMatrix(), d.GetMatrix(), bd);
+                CommonOps_DDRM.mult(b.getMatrix(), d.getMatrix(), bd);
             }
             else
             {
                 state.Output.Fatal("CMA-ES eigendecomposition failed. ");
             }
-            CommonOps.scale(sigma, bd, sbd);
+            CommonOps_DDRM.scale(sigma, bd, sbd);
 
             // End FIRST round of eigendecomposition
 
 
 
             // Initialize dynamic (internal) strategy parameters and constants
-            pc = new SimpleMatrix(n, 1);
-            ps = new SimpleMatrix(n, 1); // evolution paths for C and sigma
+            pc = new SimpleMatrixD(n, 1);
+            ps = new SimpleMatrixD(n, 1); // evolution paths for C and sigma
             chiN = Math.Sqrt(n) *
                    (1.0 - 1.0 / (4.0 * n) + 1.0 / (21.0 * n * n)); // expectation of ||N(0,I)|| == norm(randn(N,1))
 
-            xmean = new SimpleMatrix(GenomeSize, 1);
+            xmean = new SimpleMatrixD(GenomeSize, 1);
 
             bool meanSpecified = false;
-            String val = state.Parameters.GetString(paramBase.Push(P_MEAN), def.Push(P_MEAN));
+            string val = state.Parameters.GetString(paramBase.Push(P_MEAN), def.Push(P_MEAN));
             if (val != null)
             {
                 meanSpecified = true;
@@ -498,10 +503,10 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
                 state.Output.Warning("A default mean value was specified, but certain mean values were overridden.");
             }
 
-            String mes = "Initial Mean: <";
+            string mes = "Initial Mean: <";
             for (int i = 0; i < GenomeSize - 1; i++)
-                mes = mes + xmean.Get(i, 0) + ", ";
-            mes = mes + xmean.Get(GenomeSize - 1, 0) + ">";
+                mes = mes + xmean.get(i, 0) + ", ";
+            mes = mes + xmean.get(GenomeSize - 1, 0) + ">";
             state.Output.Message(mes);
 
             if (!state.Parameters.ParameterExists(paramBase.Push(P_LAMBDA), def.Push(P_LAMBDA)))
@@ -681,7 +686,7 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
 
 
 
-        public override Object Clone()
+        public override object Clone()
         {
             CMAESSpecies myobj = (CMAESSpecies) (base.Clone());
 
@@ -689,8 +694,8 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
             myobj.c = c.copy();
             myobj.b = b.copy();
             myobj.d = d.copy();
-            myobj.bd = bd.copy();
-            myobj.sbd = sbd.copy();
+            myobj.bd = (DMatrixRMaj) bd.copy();
+            myobj.sbd = (DMatrixRMaj) sbd.copy();
             myobj.invsqrtC = invsqrtC.copy();
 
             myobj.xmean = xmean.copy();
@@ -715,8 +720,8 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
 
             DoubleVectorIndividual dvind = (DoubleVectorIndividual) (newind);
 
-            DenseMatrix64F genome = DenseMatrix64F.wrap(GenomeSize, 1, dvind.genome);
-            DenseMatrix64F temp = new DenseMatrix64F(GenomeSize, 1);
+            DMatrixRMaj genome = DMatrixRMaj.wrap(GenomeSize, 1, dvind.genome);
+            DMatrixRMaj temp = new DMatrixRMaj(GenomeSize, 1);
 
             // arz(:,k) = randn(N,1); % standard normally distributed vector
             // arx(:,k) = xmean + sigma*(B*D*arz(:,k));
@@ -726,8 +731,8 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
                 for (int i = 0; i < GenomeSize; i++)
                     dvind.genome[i] = random.NextGaussian();
 
-                CommonOps.mult(sbd, genome, temp); // temp = sigma*b*d*genome;
-                CommonOps.add(temp, xmean.GetMatrix(), genome); // genome = temp + xmean;
+                CommonOps_DDRM.mult(sbd, genome, temp); // temp = sigma*b*d*genome;
+                CommonOps_DDRM.add(temp, xmean.getMatrix(), genome); // genome = temp + xmean;
 
                 bool invalid_value = false;
                 for (int i = 0; i < GenomeSize; i++)
@@ -778,43 +783,43 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
             // only need partial sort?
             ((List<Individual>) subpop.Individuals).Sort();
 
-            SimpleMatrix artmp = new SimpleMatrix(GenomeSize, mu);
-            SimpleMatrix xold = xmean;
-            xmean = new SimpleMatrix(GenomeSize, 1);
+            SimpleMatrixD artmp = new SimpleMatrixD(GenomeSize, mu);
+            SimpleMatrixD xold = xmean;
+            xmean = new SimpleMatrixD(GenomeSize, 1);
 
             for (int i = 0; i < mu; i++)
             {
                 DoubleVectorIndividual dvind = (DoubleVectorIndividual) subpop.Individuals[i];
 
                 // won't modify the genome
-                SimpleMatrix arz = new SimpleMatrix(GenomeSize, 1, true, dvind.genome);
+                SimpleMatrixD arz = new SimpleMatrixD(GenomeSize, 1, true, dvind.genome);
                 arz = (arz.minus(xold).divide(sigma));
 
                 for (int j = 0; j < GenomeSize; j++)
                 {
-                    xmean.set(j, 0, xmean.Get(j, 0) + weights[i] * dvind.genome[j]);
-                    artmp.set(j, i, arz.Get(j, 0));
+                    xmean.set(j, 0, xmean.get(j, 0) + weights[i] * dvind.genome[j]);
+                    artmp.set(j, i, arz.get(j, 0));
                 }
             }
 
             // % Cumulation: Update evolution paths
 
-            SimpleMatrix y = xmean.minus(xold).divide(sigma);
-            SimpleMatrix bz = invsqrtC.mult(y);
-            SimpleMatrix bz_scaled = bz.scale(Math.Sqrt(cs * (2.0 - cs) * mueff));
+            SimpleMatrixD y = xmean.minus(xold).divide(sigma);
+            SimpleMatrixD bz = invsqrtC.mult(y);
+            SimpleMatrixD bz_scaled = bz.scale(Math.Sqrt(cs * (2.0 - cs) * mueff));
             ps = ps.scale(1.0 - cs).plus(bz_scaled);
-
+            
             double h_sigma_value =
                 ((ps.dot(ps) / (1.0 - Math.Pow(1.0 - cs, 2.0 * (state.Generation + 1)))) / GenomeSize);
             int hsig = (h_sigma_value < (2.0 + (4.0 / (GenomeSize + 1)))) ? 1 : 0;
-
-            SimpleMatrix y_scaled = y.scale(hsig * Math.Sqrt(cc * (2.0 - cc) * mueff));
+            
+            SimpleMatrixD y_scaled = y.scale(hsig * Math.Sqrt(cc * (2.0 - cc) * mueff));
             pc = pc.scale(1.0 - cc).plus(y_scaled);
 
             // % Adapt covariance matrix C
             c = c.scale(1.0 - c1 - cmu);
             c = c.plus(pc.mult(pc.transpose()).plus(c.scale((1.0 - hsig) * cc * (2.0 - cc))).scale(c1));
-            c = c.plus((artmp.mult(SimpleMatrix.diag(weights).mult(artmp.transpose()))).scale(cmu));
+            c = c.plus((artmp.mult(SimpleMatrixD.diag(weights).mult(artmp.transpose()))).scale(cmu));
 
             // % Adapt step-size sigma
             sigma = sigma * Math.Exp((cs / damps) * (ps.normF() / chiN - 1.0));
@@ -828,24 +833,24 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
                 // not sure if this is necessary           
                 for (int i = 0; i < GenomeSize; i++)
                 for (int j = 0; j < i; j++)
-                    c.set(j, i, c.Get(i, j));
+                    c.set(j, i, c.get(i, j));
 
                 // this copy gets modified by the decomposition
-                DenseMatrix64F copy = c.copy().GetMatrix();
-                EigenDecomposition<DenseMatrix64F> eig = DecompositionFactory.eig(GenomeSize, true, true);
+                DMatrixRMaj copy = c.copy().getMatrix();
+                EigenDecomposition<DMatrixRMaj> eig = DecompositionFactory_DDRM.eig(GenomeSize, true, true);
                 if (eig.decompose(copy))
                 {
-                    SimpleMatrix dinv = new SimpleMatrix(GenomeSize, GenomeSize);
+                    SimpleMatrixD dinv = new SimpleMatrixD(GenomeSize, GenomeSize);
                     for (int i = 0; i < GenomeSize; i++)
                     {
-                        double eigrt = Math.Sqrt(eig.GetEigenvalue(i).real);
+                        double eigrt = Math.Sqrt(eig.getEigenValue(i).real);
                         d.set(i, i, eigrt);
                         dinv.set(i, i, 1 / eigrt);
-                        CommonOps.insert(eig.GetEigenVector(i), b.GetMatrix(), 0, i);
+                        CommonOps_DDRM.insert(eig.getEigenVector(i), b.getMatrix(), 0, i);
                     }
 
                     invsqrtC = b.mult(dinv.mult(b.transpose()));
-                    CommonOps.mult(b.GetMatrix(), d.GetMatrix(), bd);
+                    CommonOps_DDRM.mult(b.getMatrix(), d.getMatrix(), bd);
                 }
                 else
                 {
@@ -853,14 +858,14 @@ namespace BraneCloud.Evolution.EC.EDA.CMAES
                 }
             }
 
-            CommonOps.scale(sigma, bd, sbd);
+            CommonOps_DDRM.scale(sigma, bd, sbd);
 
             // % Break, if fitness is good enough or condition exceeds 1e14, better termination methods are advisable 
             // if arfitness(1) <= stopfitness || max(D) > 1e7 * min(D)
             //   break;
             // end
-            if (useAltTermination && CommonOps.elementMax(d.extractDiag().GetMatrix()) >
-                1e7 * CommonOps.elementMin(d.extractDiag().GetMatrix()))
+            if (useAltTermination && CommonOps_DDRM.elementMax(d.diag().getMatrix()) >
+                1e7 * CommonOps_DDRM.elementMin(d.diag().getMatrix()))
             {
                 state.Evaluator.SetRunCompleted("CMAESSpecies: Stopped because matrix condition exceeded limit.");
             }

@@ -18,6 +18,7 @@
 
 using System;
 using System.Linq;
+using BraneCloud.Evolution.EC.Configuration;
 using BraneCloud.Evolution.EC.Simple;
 
 namespace BraneCloud.Evolution.EC.EDA.CMAES

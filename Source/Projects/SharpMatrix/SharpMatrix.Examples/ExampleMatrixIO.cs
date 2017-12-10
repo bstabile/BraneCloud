@@ -23,7 +23,7 @@ namespace SharpMatrix.Examples
             try
             {
                 MatrixIO.saveCSV(A, "matrix_file.csv");
-                DMatrixRMaj B = MatrixIO.loadCSV("matrix_file.csv");
+                DMatrixRMaj B = (DMatrixRMaj) MatrixIO.loadCSV("matrix_file.csv");
                 B.print();
             }
             catch (IOException e)
